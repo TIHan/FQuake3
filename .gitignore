@@ -1,0 +1,51 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Kate
+*~
+
+# MSVC
+Debug
+Release
+ipch
+x64
+*.sdf
+*.user
+*.suo
+*.opensdf
+
+# Executable
+te-test
+
+# Resharper
+_ReSharper*
+
+# Upgrade Reports
+_UpgradeReport_Files/
+UpgradeLog.XML
+UpgradeLog.htm
+
+# Text Editor
+\#*#
+
+# Exclusions
+!lib/
+
+#Quake Specific
+Debug_TA
+Debug TA
+DebugAxp
+Release_TA
+Release TA
+ReleaseAxp
+q3_ui___Win32_Debug
