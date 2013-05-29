@@ -38,10 +38,13 @@ UpgradeLog.htm
 # Text Editor
 \#*#
 
+# Mono
+lib/Mono
+
 # Exclusions
 !lib/
 
-#Quake Specific
+# Quake Specific
 Debug_TA
 Debug TA
 DebugAxp
