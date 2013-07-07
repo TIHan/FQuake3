@@ -32,9 +32,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
-#include <m.h>
-
-__declspec(dllimport) MInstance *m_instance;
 
 /*
 ================
@@ -57,7 +54,9 @@ int Sys_Milliseconds (void)
 	return sys_curtime;
 }
 #else
-int Sys_Milliseconds (void)
+M_EXPORT
+int
+M_DECL Sys_Milliseconds (void)
 {
 	return *(int *)m_invoke_function_from_module (m_instance, "Engine", "System", "Milliseconds", NULL);
 }

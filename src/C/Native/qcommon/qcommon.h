@@ -23,7 +23,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef _QCOMMON_H_
 #define _QCOMMON_H_
 
+#include <m.h>
 #include "../qcommon/cm_public.h"
+
+M_IMPORT MInstance *m_instance;
 
 //#define	PRE_RELEASE_DEMO
 
@@ -148,7 +151,11 @@ typedef struct {
 	unsigned short	port;
 } netadr_t;
 
-void		NET_Init( void );
+M_EXPORT
+void
+M_DECL
+NET_Init( void );
+
 void		NET_Shutdown( void );
 void		NET_Restart( void );
 void		NET_Config( qboolean enableNetworking );
@@ -800,8 +807,14 @@ void Hunk_Trash( void );
 void Com_TouchMemory( void );
 
 // commandLine should not include the executable name (argv[0])
-void Com_Init( char *commandLine );
-void Com_Frame( void );
+M_EXPORT
+void
+Com_Init (char *commandLine);
+
+M_EXPORT
+void
+Com_Frame (void);
+
 void Com_Shutdown( void );
 
 
@@ -956,7 +969,9 @@ void	Sys_Print( const char *msg );
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-int		Sys_Milliseconds (void);
+M_EXPORT
+int
+Sys_Milliseconds (void);
 
 void	Sys_SnapVector( float *v );
 
@@ -970,7 +985,10 @@ void	Sys_EndStreamedFile( fileHandle_t f );
 int		Sys_StreamedRead( void *buffer, int size, int count, fileHandle_t f );
 void	Sys_StreamSeek( fileHandle_t f, int offset, int origin );
 
-void	Sys_ShowConsole( int level, qboolean quitOnClose );
+M_EXPORT
+void
+Sys_ShowConsole (int level, qboolean quitOnClose);
+
 void	Sys_SetErrorText( const char *text );
 
 void	Sys_SendPacket( int length, const void *data, netadr_t to );
@@ -1058,7 +1076,13 @@ extern huffman_t clientHuffTables;
 #define CL_DECODE_START		4
 
 /* FQuake3 - Wrappers */
-int Com_IsDedicated (void);
-int Com_IsViewLogEnabled (void);
+
+M_EXPORT
+int
+Com_IsDedicated (void);
+
+M_EXPORT
+int
+Com_IsViewLogEnabled (void);
 
 #endif // _QCOMMON_H_

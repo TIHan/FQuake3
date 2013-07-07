@@ -12,34 +12,37 @@ module private Native =
     [<Literal>]
     let libQuake3 = "quake3.dll"
 
-    [<DllImport(libQuake3)>]
+    [<Literal>]
+    let callingConvention = CallingConvention.Cdecl
+
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_CreateConsole ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_Milliseconds ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_InitStreamThread ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Com_Init (string commandLine)
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void NET_Init ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern bool Com_IsDedicated ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern bool Com_IsViewLogEnabled ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void IN_Frame ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Com_Frame ()
 
-    [<DllImport(libQuake3)>]
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
 
@@ -69,6 +72,16 @@ module FileSystem =
 module System =
     let private _stopwatch = new Stopwatch ()
 
+    let private SetupUnhandledExceptions () =
+        let errorFilename = "error.txt"
+        let UnhandledException (sender: obj) (e: UnhandledExceptionEventArgs) =
+            let exceptionObject = (e.ExceptionObject :?> Exception)
+            let msg = sprintf "%s %s" (exceptionObject.ToString ()) (exceptionObject.Message)
+            File.WriteAllText (errorFilename, msg)
+
+        File.Delete (errorFilename)
+        AppDomain.CurrentDomain.UnhandledException.AddHandler (new UnhandledExceptionEventHandler (UnhandledException))
+
     let Sleep (milliseconds: int) =
         Thread.Sleep (milliseconds)
 
@@ -76,6 +89,8 @@ module System =
         _stopwatch.ElapsedMilliseconds
 
     let Init () =
+        SetupUnhandledExceptions ()
+
         // done before Com/Sys_Init since we need this for error output
         Native.Sys_CreateConsole ()
 

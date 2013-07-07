@@ -629,7 +629,11 @@ BACKGROUND FILE STREAMING
 
 #if 1
 
-void Sys_InitStreamThread( void ) {
+M_EXPORT
+void
+M_DECL
+Sys_InitStreamThread (void)
+{
 }
 
 void Sys_ShutdownStreamThread( void ) {
@@ -1177,7 +1181,10 @@ void Sys_Init( void ) {
 Com_IsDedicated
 ==================
 */
-int Com_IsDedicated (void)
+M_EXPORT
+int 
+M_DECL
+Com_IsDedicated (void)
 {
 	return com_dedicated->integer;
 }
@@ -1188,7 +1195,10 @@ int Com_IsDedicated (void)
 Com_IsDedicated
 ==================
 */
-int Com_IsViewLogEnabled (void)
+M_EXPORT
+int
+M_DECL
+Com_IsViewLogEnabled (void)
 {
 	return com_viewlog->integer;
 }

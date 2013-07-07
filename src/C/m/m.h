@@ -3,6 +3,18 @@
 
 #include <glib.h>
 
+#if defined(_WIN32)
+#	define M_IMPORT __declspec(dllimport)
+#	define M_EXPORT	__declspec(dllexport)
+#	define M_DECL __cdecl
+#elif defined(__GNUC__)
+#	define M_EXPORT __attribute__((visibility("default")))
+#	define M_IMPORT
+#	define M_DECL __attribute__((cdecl))
+#else
+#	error Compiler not supported.
+#endif
+
 typedef struct _MInstance MInstance;
 
 typedef enum {

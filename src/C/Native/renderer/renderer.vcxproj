@@ -102,6 +102,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;..\..\..\..\lib\Mono\include\glib-2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Debug_TA\renderer.lib</OutputFile>
@@ -127,6 +128,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;..\..\..\..\lib\Mono\include\glib-2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Release\renderer.lib</OutputFile>
@@ -152,6 +154,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;..\..\..\..\lib\Mono\include\glib-2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Debug\renderer.lib</OutputFile>
@@ -177,6 +180,7 @@
       <ProgramDataBaseFileName>.\Release_TA/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;..\..\..\..\lib\Mono\include\glib-2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Release_TA\renderer.lib</OutputFile>
@@ -203,6 +207,7 @@
       <ProgramDataBaseFileName>.\renderer___Win32_vector0/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;..\..\..\..\lib\Mono\include\glib-2.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\renderer___Win32_vector0\renderer.lib</OutputFile>
@@ -1787,6 +1792,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='vector|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\m\m.vcxproj">
+      <Project>{1d1bb368-ad1d-4500-a62d-3eff121cec23}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\m_instance\m_instance.vcxproj">
+      <Project>{e0e9f4a2-4b85-4e91-8162-b8e1af5122b2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

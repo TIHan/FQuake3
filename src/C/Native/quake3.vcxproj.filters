@@ -256,7 +256,6 @@
     <None Include="unix\ChangeLog" />
     <None Include="unix\Conscript-pk3" />
     <None Include="Construct" />
-    <None Include="Exports.def" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="win32\qe3.ico">

@@ -42,7 +42,10 @@ void	IN_MouseEvent (int mstate);
 
 void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 
-void	Sys_CreateConsole( void );
+M_EXPORT 
+void
+Sys_CreateConsole( void );
+
 void	Sys_DestroyConsole( void );
 
 char	*Sys_ConsoleInput (void);
@@ -61,7 +64,10 @@ void	IN_Move (usercmd_t *cmd);
 void	IN_DeactivateWin32Mouse( void);
 
 void	IN_Activate (qboolean active);
-void	IN_Frame (void);
+
+M_EXPORT
+void
+IN_Frame (void);
 
 // window procedure
 LONG WINAPI MainWndProc (

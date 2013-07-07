@@ -142,7 +142,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -187,7 +186,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -234,7 +232,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -275,7 +272,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -316,7 +312,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -360,7 +355,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -401,7 +395,6 @@
       <SubSystem>Console</SubSystem>
       <StackReserveSize>8388608</StackReserveSize>
       <TargetMachine>MachineX86</TargetMachine>
-      <ModuleDefinitionFile>Exports.def</ModuleDefinitionFile>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <Midl>
@@ -1103,7 +1096,6 @@
     <ClInclude Include="win32\win_local.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Exports.def" />
     <None Include="win32\cursor2.cur" />
     <None Include="win32\cursor3.cur" />
     <None Include="unix\ChangeLog" />

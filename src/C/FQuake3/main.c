@@ -1,6 +1,6 @@
 #include <m.h>
 
-__declspec(dllimport) MInstance *m_instance;
+M_IMPORT MInstance *m_instance;
 
 /*
 ==================

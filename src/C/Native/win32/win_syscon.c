@@ -292,7 +292,10 @@ LONG WINAPI InputLineWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 /*
 ** Sys_CreateConsole
 */
-void Sys_CreateConsole( void )
+M_EXPORT
+void
+M_DECL
+Sys_CreateConsole (void)
 {
 	HDC hDC;
 	WNDCLASS wc;
@@ -442,7 +445,10 @@ void Sys_DestroyConsole( void ) {
 /*
 ** Sys_ShowConsole
 */
-void Sys_ShowConsole( int visLevel, qboolean quitOnClose )
+M_EXPORT
+void
+M_DECL
+Sys_ShowConsole (int visLevel, qboolean quitOnClose)
 {
 	s_wcd.quitOnClose = quitOnClose;
 

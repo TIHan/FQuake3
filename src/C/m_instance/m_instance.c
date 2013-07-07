@@ -1,3 +1,3 @@
 #include <m.h>
 
-__declspec(dllexport) MInstance *m_instance;
+M_EXPORT MInstance *m_instance;
