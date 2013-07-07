@@ -44,7 +44,7 @@ void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptr
 
 M_EXPORT 
 void
-Sys_CreateConsole( void );
+Sys_CreateConsole (void);
 
 void	Sys_DestroyConsole( void );
 

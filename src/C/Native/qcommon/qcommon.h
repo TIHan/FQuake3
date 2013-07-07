@@ -154,7 +154,7 @@ typedef struct {
 M_EXPORT
 void
 M_DECL
-NET_Init( void );
+NET_Init (void);
 
 void		NET_Shutdown( void );
 void		NET_Restart( void );
