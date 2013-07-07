@@ -59,7 +59,7 @@ int Sys_Milliseconds (void)
 #else
 int Sys_Milliseconds (void)
 {
-	return *(int *)m_invoke_function_from_module (m_instance, "idTech3", "idSystem", "Milliseconds", NULL);
+	return *(int *)m_invoke_function_from_module (m_instance, "Engine", "System", "Milliseconds", NULL);
 }
 #endif
 

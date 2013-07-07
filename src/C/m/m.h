@@ -6,7 +6,8 @@
 typedef struct _MInstance MInstance;
 
 typedef enum {
-	M_RUNTIME_4_0
+	M_RUNTIME_4_0,
+	M_RUNTIME_4_5
 } MRuntime;
 
 MInstance

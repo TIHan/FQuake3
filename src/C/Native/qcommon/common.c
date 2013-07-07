@@ -235,6 +235,8 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	static int	errorCount;
 	int			currentTime;
 
+// TIHan: I don't think we need this anymore.
+#if 0
 #if defined(_WIN32) && defined(_DEBUG)
 	if ( code != ERR_DISCONNECT && code != ERR_NEED_CD ) {
 		if (!com_noErrorInterrupt->integer) {
@@ -243,6 +245,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 			}
 		}
 	}
+#endif
 #endif
 
 	// when we are running automated scripts, make sure we

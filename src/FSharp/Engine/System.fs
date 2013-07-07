@@ -1,4 +1,4 @@
-﻿namespace idTech3
+﻿namespace Engine
 
 open System
 open System.IO
@@ -8,43 +8,47 @@ open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 
 module private Native =
-    [<DllImport("quake3.dll")>]
+
+    [<Literal>]
+    let libQuake3 = "quake3.dll"
+
+    [<DllImport(libQuake3)>]
     extern void Sys_CreateConsole ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void Sys_Milliseconds ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void Sys_InitStreamThread ()
 
-    [<DllImport("quake3.dll")>]
-    extern void Com_Init (char *commandLine)
+    [<DllImport(libQuake3)>]
+    extern void Com_Init (string commandLine)
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void NET_Init ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern bool Com_IsDedicated ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern bool Com_IsViewLogEnabled ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void IN_Frame ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void Com_Frame ()
 
-    [<DllImport("quake3.dll")>]
+    [<DllImport(libQuake3)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
 
-module idInput =
+module Input =
     let Frame () =
         Native.IN_Frame ()
 
 
-module idCommon =
+module Common =
     let Frame () =
         Native.Com_Frame ()
 
@@ -52,17 +56,17 @@ module idCommon =
         Native.Com_IsDedicated ()
 
 
-module idNetwork =
+module Network =
     let Init () =
         Native.NET_Init ()
 
 
-module idFileSystem =
+module FileSystem =
     let GetCurrentDirectory () =
         Directory.GetCurrentDirectory ()
 
 
-module idSystem =
+module System =
     let private _stopwatch = new Stopwatch ()
 
     let Sleep (milliseconds: int) =
@@ -80,9 +84,8 @@ module idSystem =
 
         Native.Sys_InitStreamThread ()
 
-        let mutable commandLine = 't'
-        Native.Com_Init (&&commandLine)
-        idNetwork.Init ()
+        Native.Com_Init ("")
+        Network.Init ()
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
@@ -90,18 +93,18 @@ module idSystem =
         | (false, false) -> Native.Sys_ShowConsole (0, false)
         | _ -> ()
 
-        printfn "Working directory: %s\n" (idFileSystem.GetCurrentDirectory ())
+        printfn "Working directory: %s\n" (FileSystem.GetCurrentDirectory ())
 
         // main game loop
         while true do
             // if not running as a game client, sleep a bit
-            match idCommon.IsDedicated () with
+            match Common.IsDedicated () with
             | true -> Sleep (5)
             | _ -> ()
 
             // make sure mouse and joystick are only called once a frame
-            idInput.Frame ()
+            Input.Frame ()
 
             // run the game
-            idCommon.Frame ();
+            Common.Frame ();
         ()

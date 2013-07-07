@@ -13,13 +13,13 @@ main (int argc, char *argv[])
 	m_instance = m_instance_new ();
 
 	// Initialize Mono
-	m_init (m_instance, "Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_0);
+	m_init (m_instance, "Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_5);
 
 	// Load System Assembly
-	m_load_assembly (m_instance, "idTech3.System.dll");
+	m_load_assembly (m_instance, "Engine.dll");
 
 	// Invoke Start
-	m_invoke_function_from_module (m_instance, "idTech3", "idSystem", "Init", NULL);
+	m_invoke_function_from_module (m_instance, "Engine", "System", "Init", NULL);
 
 	// Cleanup
 	m_cleanup (m_instance);

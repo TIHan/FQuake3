@@ -30,8 +30,13 @@ m_init (MInstance *const instance, const gchar *assembly_dir, const gchar *confi
 	switch (runtime)
 	{
 	case M_RUNTIME_4_0:
-	default:
 		version = "v4.0.30319";
+		break;
+	case M_RUNTIME_4_5:
+		version = "v4.0.30319";
+		break;
+	default:
+		g_error ("M: Invalid runtime version.");
 	}
 
 	instance->assemblies_size = 0;
