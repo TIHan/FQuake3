@@ -67,15 +67,10 @@ M_DECL Sys_Milliseconds (void)
 Sys_SnapVector
 ================
 */
-long fastftol( float f ) {
-	static int tmp;
-	__asm fld f
-	__asm fistp tmp
-	__asm mov eax, tmp
-}
-
-void Sys_SnapVector( float *v )
+void
+Sys_SnapVector (float *v)
 {
+#if 0
 	int i;
 	float f;
 
@@ -93,13 +88,9 @@ void Sys_SnapVector( float *v )
 	__asm	fld		f;
 	__asm	fistp	i;
 	*v = i;
-	/*
-	*v = fastftol(*v);
-	v++;
-	*v = fastftol(*v);
-	v++;
-	*v = fastftol(*v);
-	*/
+#else
+	// TODO: F# implementation.
+#endif
 }
 
 

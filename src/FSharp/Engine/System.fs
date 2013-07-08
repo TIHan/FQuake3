@@ -46,6 +46,13 @@ module private Native =
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
 
+type Vector3 =
+    { X: float32; Y: float32; Z: float32 }
+
+    static member Snap (vector: Vector3) =
+        { X = float32 (int vector.X); Y = float32 (int vector.Y); Z = float32 (int vector.Z) }
+
+
 module Input =
     let Frame () =
         Native.IN_Frame ()

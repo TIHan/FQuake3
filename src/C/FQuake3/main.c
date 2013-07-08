@@ -22,7 +22,7 @@ main (int argc, char *argv[])
 	m_invoke_function_from_module (m_instance, "Engine", "System", "Init", NULL);
 
 	// Cleanup
-	m_cleanup (m_instance);
+	m_instance_free (m_instance);
 
 	return 0;
 }
