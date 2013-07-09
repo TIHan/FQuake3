@@ -46,11 +46,17 @@ module private Native =
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
 
+[<Struct>]
 type Vector3 =
-    { X: float32; Y: float32; Z: float32 }
+    val X : float32
+    val Y : float32
+    val Z : float32
+    
+    new (x, y, z) = { X = x; Y = y; Z = z }
+    new (vector: Vector3) = { X = vector.X; Y = vector.Y; Z = vector.Z }
 
-    static member Snap (vector: Vector3) =
-        { X = float32 (int vector.X); Y = float32 (int vector.Y); Z = float32 (int vector.Z) }
+    member this.Snap (vector: Vector3) =
+        new Vector3 (vector)
 
 
 module Input =

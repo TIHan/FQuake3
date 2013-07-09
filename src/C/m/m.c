@@ -19,8 +19,8 @@ struct _MRecord {
 };
 
 
-MInstance
-*m_instance_new (void)
+MInstance*
+m_instance_new (void)
 {
 	return (MInstance *)g_malloc0 (sizeof (MInstance));
 }
@@ -90,36 +90,8 @@ m_load_assembly (MInstance *const instance, const gchar *name)
 }
 
 
-MRecord
-*m_record_new (MInstance *const instance, const gchar *name_space, const gchar *class_name, void **params)
-{
-	gint i;
-
-	for (i = 0; i < instance->assemblies_size; ++i)
-	{
-		MonoAssembly *const assembly = g_array_index (instance->assemblies, MonoAssembly*, i);
-		MonoImage *const image = mono_assembly_get_image (assembly);
-		MonoClass *class_info = mono_class_from_name (image, name_space, class_name);
-		MonoObject *class_instance = mono_object_new (instance->domain, class_info);
-		MonoMethod *ctor = mono_class_get_method_from_name (class_info, ".ctor", 3);
-
-		if (ctor)
-		{
-			MRecord *record = (MRecord *)g_malloc0 (sizeof (MRecord));
-			MonoObject *exception;
-
-			mono_runtime_invoke (ctor, class_instance, params, &exception);
-			record->object = class_instance;
-			return record;
-		}
-	}
-
-	return NULL;
-}
-
-
-void
-*m_invoke_function_from_module (MInstance *const instance, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
+void*
+m_invoke_function_from_module (MInstance *const instance, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
 {
 	gchar name[256];
 	gint i;

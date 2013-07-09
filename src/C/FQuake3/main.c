@@ -10,6 +10,8 @@ main
 int
 main (int argc, char *argv[])
 {
+	MRecord *record;
+
 	m_instance = m_instance_new ();
 
 	// Initialize Mono
