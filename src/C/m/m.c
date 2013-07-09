@@ -5,33 +5,52 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 
-struct _MInstance {
-	gint assemblies_size;
-	GArray *assemblies;
+struct _MDomain {
 	MonoDomain *domain;
-	MonoAssembly *main_assembly;
 };
 
-struct _MRecord {
-	MonoObject *object;
-	gchar *name_space;
-	gchar *class_name;
-};
+typedef struct _MAssemblyQuery {
+	MonoAssembly *assembly;
+	const gchar *name;
+} MAssemblyQuery;
 
 
-MInstance*
-m_instance_new (void)
+static gchar*
+assembly_get_name (MonoAssembly *assembly)
 {
-	return (MInstance *)g_malloc0 (sizeof (MInstance));
+	return (gchar *)mono_image_get_name (mono_assembly_get_image (assembly));
+}
+
+static void
+foreach_assembly (MonoAssembly *assembly, MAssemblyQuery *query)
+{
+	if (g_strcmp0 (assembly_get_name (assembly), query->name) == 0)
+		query->assembly = assembly;
+}
+
+static MonoAssembly*
+find_assembly (const gchar *name)
+{
+	MAssemblyQuery query;
+
+	query.name = name;
+	mono_assembly_foreach ((GFunc)foreach_assembly, &query);
+	return query.assembly;
 }
 
 
-void
-m_init (MInstance *const instance, const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)
+static void
+get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *method_name, gchar *name)
 {
-	gchar *version;
+	g_sprintf (name, "%s.%s:%s", name_space, class_name, method_name);
+}
 
-	g_return_if_fail (instance->domain == NULL);
+
+MDomain*
+m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)
+{
+	MDomain *const domain = (MDomain *)g_malloc0 (sizeof (MDomain));
+	gchar *version;
 
 	switch (runtime)
 	{
@@ -45,73 +64,64 @@ m_init (MInstance *const instance, const gchar *assembly_dir, const gchar *confi
 		g_error ("M: Invalid runtime version.");
 	}
 
-	instance->assemblies_size = 0;
-	instance->assemblies = g_array_new (FALSE, TRUE, 256);
 	mono_set_dirs (assembly_dir, config_dir);
-	instance->domain = mono_jit_init_version (root_domain_name, version);
+	domain->domain = mono_jit_init_version (root_domain_name, version);
+	return domain;
 }
 
 
 void
-m_instance_free (MInstance *const instance)
+m_domain_free (MDomain *const domain)
 {
-	mono_jit_cleanup (instance->domain);
-	g_free (instance);
+	mono_jit_cleanup (domain->domain);
+	g_free (domain);
 }
 
 
 void
-m_record_free (MRecord *const record)
+m_exec (MDomain *const domain, const gchar *name, int argc, char *argv[])
 {
-	g_free (record);
-}
-
-
-void
-m_exec (MInstance *const instance, const gchar *name, int argc, char *argv[])
-{
-	instance->main_assembly = mono_domain_assembly_open (instance->domain, name);
-	if (!instance->main_assembly)
-		g_error ("M: Unable to load %s main assembly.\n", name);
-
-	mono_jit_exec (instance->domain, instance->main_assembly, argc - 1, argv + 1);
-}
-
-
-void
-m_load_assembly (MInstance *const instance, const gchar *name)
-{
-	const MonoAssembly *const assembly = mono_domain_assembly_open (instance->domain, name);
+	MonoAssembly *const assembly = mono_domain_assembly_open (domain->domain, name);
 	if (!assembly)
 		g_error ("M: Unable to load %s assembly.\n", name);
 
-	g_array_append_val (instance->assemblies, assembly);
-	++instance->assemblies_size;
+	mono_jit_exec (domain->domain, assembly, argc - 1, argv + 1);
+}
+
+
+void
+m_load_assembly (const gchar *name)
+{
+	const MonoAssembly *const assembly = mono_domain_assembly_open (mono_domain_get (), name);
+	if (!assembly)
+		g_error ("M: Unable to load %s assembly.\n", name);
 }
 
 
 void*
-m_invoke_function_from_module (MInstance *const instance, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
+m_invoke_function_from_module (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
 {
 	gchar name[256];
-	gint i;
 
-	g_sprintf (name, "%s.%s:%s", name_space, module_name, method_name);
+	MonoAssembly *assembly;
+	MonoImage *image;
+	MonoMethodDesc *method_desc;
+	MonoMethod *method;
 
-	for (i = 0; i < instance->assemblies_size; ++i)
+	get_method_desc (name_space, module_name, method_name, name);
+
+	assembly = find_assembly (assembly_name);
+	image = mono_assembly_get_image (assembly);
+	method_desc = mono_method_desc_new (name, FALSE);
+	method = mono_method_desc_search_in_image (method_desc, image);
+
+	mono_method_desc_free (method_desc);
+
+	if (method)
 	{
-		MonoAssembly *const assembly = g_array_index (instance->assemblies, MonoAssembly*, i);
-		MonoImage *const image = mono_assembly_get_image (assembly);
-		MonoMethodDesc *const method_desc = mono_method_desc_new (name, FALSE);
-		MonoMethod *const method = mono_method_desc_search_in_image (method_desc, image);
-		
-		mono_method_desc_free (method_desc);
-		if (method)
-		{
 			MonoObject *const retval = mono_runtime_invoke (method, NULL, params, NULL);
 			
 			return mono_object_unbox (retval);
-		}
 	}
 
 	g_error ("M: Unable to invoke %s.\n", name);

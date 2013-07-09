@@ -58,7 +58,7 @@ M_EXPORT
 int
 M_DECL Sys_Milliseconds (void)
 {
-	return *(int *)m_invoke_function_from_module (m_instance, "Engine", "System", "Milliseconds", NULL);
+	return *(int *)m_invoke_function_from_module ("Engine", "Engine", "System", "Milliseconds", NULL);
 }
 #endif
 

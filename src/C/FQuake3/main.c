@@ -1,7 +1,5 @@
 #include <m.h>
 
-M_IMPORT MInstance *m_instance;
-
 /*
 ==================
 main
@@ -10,21 +8,17 @@ main
 int
 main (int argc, char *argv[])
 {
-	MRecord *record;
-
-	m_instance = m_instance_new ();
-
-	// Initialize Mono
-	m_init (m_instance, "Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_5);
+	// Initialize Mono Domain
+	MDomain *const domain = m_domain_new ("Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_5);
 
 	// Load System Assembly
-	m_load_assembly (m_instance, "Engine.dll");
+	m_load_assembly ("Engine.dll");
 
 	// Invoke Start
-	m_invoke_function_from_module (m_instance, "Engine", "System", "Init", NULL);
+	m_invoke_function_from_module ("Engine", "Engine", "System", "Init", NULL);
 
 	// Cleanup
-	m_instance_free (m_instance);
+	m_domain_free (domain);
 
 	return 0;
 }

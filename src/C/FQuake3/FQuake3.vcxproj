@@ -22,9 +22,6 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\m_instance\m_instance.vcxproj">
-      <Project>{e0e9f4a2-4b85-4e91-8162-b8e1af5122b2}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E779B4A6-7F0A-4E78-BE2E-45A572D3A837}</ProjectGuid>

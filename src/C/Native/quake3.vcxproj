@@ -1120,9 +1120,6 @@
     <ProjectReference Include="..\m\m.vcxproj">
       <Project>{1d1bb368-ad1d-4500-a62d-3eff121cec23}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\m_instance\m_instance.vcxproj">
-      <Project>{e0e9f4a2-4b85-4e91-8162-b8e1af5122b2}</Project>
-    </ProjectReference>
     <ProjectReference Include="botlib\botlib.vcxproj">
       <Project>{a410161f-ae9f-485d-a01f-5294891430a6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

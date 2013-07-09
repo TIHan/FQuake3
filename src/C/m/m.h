@@ -15,30 +15,29 @@
 #	error Compiler not supported.
 #endif
 
-typedef struct _MInstance MInstance;
-typedef struct _MRecord MRecord;
+typedef struct _MDomain MDomain;
 
 typedef enum {
 	M_RUNTIME_4_0,
 	M_RUNTIME_4_5
 } MRuntime;
 
-MInstance*
-m_instance_new (void);
+MDomain*
+m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime);
 
 void
-m_init (MInstance *const instance, const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime);
+m_init (MDomain *const domain, const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime);
 
 void
-m_instance_free (MInstance *const instance);
+m_domain_free (MDomain *const domain);
 
 void
-m_exec (MInstance *const instance, const gchar *name, int argc, char *argv[]);
+m_domain_exec (MDomain *const domain, const gchar *name, int argc, char *argv[]);
 
 void
-m_load_assembly (MInstance *const instance, const gchar *name);
+m_load_assembly (const gchar *name);
 
 void*
-m_invoke_function_from_module (MInstance *const instance, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params);
+m_invoke_function_from_module (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params);
 
 #endif /* __M_H__ */

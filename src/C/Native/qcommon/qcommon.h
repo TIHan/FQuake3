@@ -26,8 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <m.h>
 #include "../qcommon/cm_public.h"
 
-M_IMPORT MInstance *m_instance;
-
 //#define	PRE_RELEASE_DEMO
 
 //============================================================================
