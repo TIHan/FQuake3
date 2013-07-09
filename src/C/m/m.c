@@ -111,6 +111,10 @@ m_invoke_function_from_module (const gchar *assembly_name, const gchar *name_spa
 	get_method_desc (name_space, module_name, method_name, name);
 
 	assembly = find_assembly (assembly_name);
+
+	if (!assembly)
+		g_error ("M: Unable to find assembly %s.\n", assembly_name);
+
 	image = mono_assembly_get_image (assembly);
 	method_desc = mono_method_desc_new (name, FALSE);
 	method = mono_method_desc_search_in_image (method_desc, image);
