@@ -79,7 +79,7 @@ m_domain_free (MDomain *const domain)
 
 
 void
-m_exec (MDomain *const domain, const gchar *name, int argc, char *argv[])
+m_domain_exec (MDomain *const domain, const gchar *name, int argc, char *argv[])
 {
 	MonoAssembly *const assembly = mono_domain_assembly_open (domain->domain, name);
 	if (!assembly)
