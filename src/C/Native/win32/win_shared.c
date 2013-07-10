@@ -58,7 +58,7 @@ M_EXPORT
 int
 M_DECL Sys_Milliseconds (void)
 {
-	return *(int *)m_invoke_function_from_module ("Engine", "Engine", "System", "Milliseconds", NULL);
+	return *(int *)m_invoke_module_function ("Engine", "Engine", "System", "Milliseconds", NULL);
 }
 #endif
 
@@ -89,6 +89,11 @@ Sys_SnapVector (float *v)
 	__asm	fistp	i;
 	*v = i;
 #else
+	vec3_t *vec3 = (vec3_t *)v;
+	gpointer args[3] = { &(*vec3[0]), &(*vec3[1]), &(*vec3[2]) };
+	MObject object = m_object ("Engine", "Engine", "Vector3", 3, args);
+	//MObject result = m_object_invoke (object, "Snap", 0, NULL);
+
 	// TODO: F# implementation.
 #endif
 }

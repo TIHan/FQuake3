@@ -79,7 +79,7 @@ m_domain_free (MDomain *const domain)
 
 
 void
-m_domain_exec (MDomain *const domain, const gchar *name, int argc, char *argv[])
+m_domain_exec (MDomain *const domain, const gchar *name, gint argc, gchar *argv[])
 {
 	MonoAssembly *const assembly = mono_domain_assembly_open (domain->domain, name);
 	if (!assembly)
@@ -92,14 +92,57 @@ m_domain_exec (MDomain *const domain, const gchar *name, int argc, char *argv[])
 void
 m_load_assembly (const gchar *name)
 {
-	const MonoAssembly *const assembly = mono_domain_assembly_open (mono_domain_get (), name);
+	MonoAssembly *const assembly = mono_domain_assembly_open (mono_domain_get (), name);
 	if (!assembly)
 		g_error ("M: Unable to load %s assembly.\n", name);
 }
 
 
+MObject
+m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name, gint argc, gpointer *args)
+{
+	MonoAssembly *const assembly = find_assembly (assembly_name);
+	MonoImage *image = image = mono_assembly_get_image (assembly);
+	MonoClass *klass = mono_class_from_name (image, name_space, name);
+	MonoObject *object = mono_object_new (mono_domain_get (), klass);
+	MonoMethod *ctor = mono_class_get_method_from_name (klass, ".ctor", argc);
+	MObject result;
+
+	if (!ctor)
+		g_error ("M: Unable to find constructor for type %s.\n", name);
+
+	mono_runtime_invoke (ctor, object, args, NULL);
+	result.priv = object;
+	return result;
+}
+
+// FIXME:
+MObject
+m_object_get_property (MObject object, const gchar *property_name)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.priv);
+	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
+	MObject result;
+	
+	result.priv = mono_property_get_value (prop, object.priv, NULL, NULL);
+	return result;
+}
+
+// FIXME:
+MObject
+m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.priv);
+	MonoMethod *method = mono_class_get_method_from_name (klass, method_name, argc);
+	MObject result;
+
+	result.priv = mono_runtime_invoke (method, object.priv, args, NULL);
+	return result;
+}
+
+
 void*
-m_invoke_function_from_module (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
+m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
 {
 	gchar name[256];
 
@@ -123,9 +166,8 @@ m_invoke_function_from_module (const gchar *assembly_name, const gchar *name_spa
 
 	if (method)
 	{
-			MonoObject *const retval = mono_runtime_invoke (method, NULL, params, NULL);
-			
-			return mono_object_unbox (retval);
+		MonoObject *const retval = mono_runtime_invoke (method, NULL, params, NULL);	
+		return mono_object_unbox (retval);
 	}
 
 	g_error ("M: Unable to invoke %s.\n", name);
