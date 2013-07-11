@@ -16,9 +16,14 @@
 #endif
 
 typedef struct _MDomain MDomain;
-typedef struct _MObject {
-	gpointer priv;
+
+typedef struct {
+	gpointer _priv;
 } MObject;
+
+typedef struct {
+	gpointer _priv;
+} MStruct;
 
 typedef enum {
 	M_RUNTIME_4_0,
@@ -46,7 +51,10 @@ m_object_get_property (MObject object, const gchar *property_name);
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args);
 
-void*
+gpointer
+m_object_unbox (MObject object);
+
+gpointer
 m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params);
 
 #endif /* __M_H__ */

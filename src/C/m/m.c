@@ -9,7 +9,7 @@ struct _MDomain {
 	MonoDomain *domain;
 };
 
-typedef struct _MAssemblyQuery {
+typedef struct {
 	MonoAssembly *assembly;
 	const gchar *name;
 } MAssemblyQuery;
@@ -106,42 +106,80 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name
 	MonoClass *klass = mono_class_from_name (image, name_space, name);
 	MonoObject *object = mono_object_new (mono_domain_get (), klass);
 	MonoMethod *ctor = mono_class_get_method_from_name (klass, ".ctor", argc);
+	MonoType *type = mono_class_get_type (klass);
+	
 	MObject result;
 
 	if (!ctor)
 		g_error ("M: Unable to find constructor for type %s.\n", name);
 
-	mono_runtime_invoke (ctor, object, args, NULL);
-	result.priv = object;
+	if (mono_type_is_struct (type))
+	{
+		mono_runtime_invoke (ctor, mono_object_unbox (object), args, NULL);
+		result._priv = object;
+	}
+	else
+	{
+		mono_runtime_invoke (ctor, object, args, NULL);
+		result._priv = object;
+	}
+
 	return result;
 }
 
-// FIXME:
+
 MObject
 m_object_get_property (MObject object, const gchar *property_name)
 {
-	MonoClass *klass = mono_object_get_class ((MonoObject *)object.priv);
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
+	MonoType *type = mono_class_get_type (klass);
+
 	MObject result;
 	
-	result.priv = mono_property_get_value (prop, object.priv, NULL, NULL);
+	if (mono_type_is_struct (type))
+	{
+		result._priv = mono_property_get_value (prop, mono_object_unbox ((MonoObject *)object._priv), NULL, NULL);
+	}
+	else
+	{
+		result._priv = mono_property_get_value (prop, (MonoObject *)object._priv, NULL, NULL);
+	}
+
 	return result;
 }
 
-// FIXME:
+
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args)
 {
-	MonoClass *klass = mono_object_get_class ((MonoObject *)object.priv);
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
 	MonoMethod *method = mono_class_get_method_from_name (klass, method_name, argc);
+	MonoType *type = mono_class_get_type (klass);
+
 	MObject result;
 
-	result.priv = mono_runtime_invoke (method, object.priv, args, NULL);
+	if (mono_type_is_struct (type))
+	{
+		result._priv = mono_runtime_invoke (method, mono_object_unbox ((MonoObject *)object._priv), args, NULL);
+	}
+	else
+	{
+		result._priv = mono_runtime_invoke (method, (MonoObject *)object._priv, args, NULL);
+	}
+
 	return result;
 }
 
 
-void*
+gpointer
+m_object_unbox (MObject object)
+{
+	return mono_object_unbox ((MonoObject *)object._priv);
+}
+
+
+gpointer
 m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
 {
 	gchar name[256];

@@ -89,12 +89,25 @@ Sys_SnapVector (float *v)
 	__asm	fistp	i;
 	*v = i;
 #else
-	vec3_t *vec3 = (vec3_t *)v;
-	gpointer args[3] = { &(*vec3[0]), &(*vec3[1]), &(*vec3[2]) };
-	MObject object = m_object ("Engine", "Engine", "Vector3", 3, args);
-	//MObject result = m_object_invoke (object, "Snap", 0, NULL);
+	gfloat *px = v++;
+	gfloat *py = v++;
+	gfloat *pz = v;
 
-	// TODO: F# implementation.
+	gfloat vx = *px;
+	gfloat vy = *py;
+	gfloat vz = *pz;
+
+	gpointer args[3] = { &vx, &vy, &vz };
+	MObject object = m_object ("Engine", "Engine", "Vector3", 3, args);
+	MObject result = m_object_invoke (object, "Snap", 0, NULL);
+
+	gfloat x = *(gfloat *)m_object_unbox (m_object_get_property (result, "X"));
+	gfloat y = *(gfloat *)m_object_unbox (m_object_get_property (result, "Y"));
+	gfloat z = *(gfloat *)m_object_unbox (m_object_get_property (result, "Z"));
+
+	*px = x;
+	*py = y;
+	*pz = z;
 #endif
 }
 
