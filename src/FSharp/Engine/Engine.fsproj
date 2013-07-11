@@ -42,6 +42,8 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Renderer.fs" />
     <Compile Include="System.fs" />
   </ItemGroup>
   <PropertyGroup>

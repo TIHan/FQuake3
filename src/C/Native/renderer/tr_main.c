@@ -48,7 +48,19 @@ R_CullLocalBox
 Returns CULL_IN, CULL_CLIP, or CULL_OUT
 =================
 */
-int R_CullLocalBox (vec3_t bounds[2]) {
+
+M_EXPORT
+gint
+M_DECL
+Cvar_GetNoCull (void)
+{
+	return r_nocull->integer;
+}
+
+M_EXPORT
+int
+M_DECL
+R_CullLocalBox (vec3_t bounds[2]) {
 	int		i, j;
 	vec3_t	transformed[8];
 	float	dists[8];
