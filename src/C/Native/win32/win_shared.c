@@ -63,56 +63,6 @@ M_DECL Sys_Milliseconds (void)
 #endif
 
 /*
-================
-Sys_SnapVector
-================
-*/
-void
-Sys_SnapVector (float *v)
-{
-#if 0
-	int i;
-	float f;
-
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-	v++;
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-	v++;
-	f = *v;
-	__asm	fld		f;
-	__asm	fistp	i;
-	*v = i;
-#else
-	gfloat *px = v++;
-	gfloat *py = v++;
-	gfloat *pz = v;
-
-	gfloat vx = *px;
-	gfloat vy = *py;
-	gfloat vz = *pz;
-
-	gpointer args[3] = { &vx, &vy, &vz };
-	MObject object = m_object ("Engine", "Engine", "Vector3", 3, args);
-	MObject result = m_object_invoke (object, "Snap", 0, NULL);
-
-	gfloat x = *(gfloat *)m_object_unbox (m_object_get_property (result, "X"));
-	gfloat y = *(gfloat *)m_object_unbox (m_object_get_property (result, "Y"));
-	gfloat z = *(gfloat *)m_object_unbox (m_object_get_property (result, "Z"));
-
-	*px = x;
-	*py = y;
-	*pz = z;
-#endif
-}
-
-
-/*
 **
 ** Disable all optimizations temporarily so this code works correctly!
 **

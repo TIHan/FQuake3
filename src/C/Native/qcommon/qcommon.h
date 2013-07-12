@@ -971,8 +971,6 @@ M_EXPORT
 int
 Sys_Milliseconds (void);
 
-void	Sys_SnapVector( float *v );
-
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( qboolean show );
 

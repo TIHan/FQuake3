@@ -1831,7 +1831,6 @@ PmoveSingle
 
 ================
 */
-void trap_SnapVector( float *v );
 
 void PmoveSingle (pmove_t *pmove) {
 	pm = pmove;
@@ -2012,7 +2011,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
-	trap_SnapVector( pm->ps->velocity );
+	SnapVector (pm->ps->velocity)
 }
 
 
