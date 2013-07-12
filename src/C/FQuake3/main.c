@@ -15,7 +15,7 @@ main (int argc, char *argv[])
 	m_load_assembly ("Engine.dll");
 
 	// Invoke Engine Init
-	m_invoke_module_function ("Engine", "Engine", "System", "Init", NULL);
+	m_invoke_method ("Engine", "Engine", "System", "Init", NULL);
 
 	// Free Domain
 	m_domain_free (domain);

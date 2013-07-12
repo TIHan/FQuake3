@@ -179,8 +179,8 @@ m_object_unbox (MObject object)
 }
 
 
-gpointer
-m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params)
+MObject
+m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params)
 {
 	gchar name[256];
 
@@ -189,7 +189,9 @@ m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, c
 	MonoMethodDesc *method_desc;
 	MonoMethod *method;
 
-	get_method_desc (name_space, module_name, method_name, name);
+	MObject result;
+
+	get_method_desc (name_space, static_class_name, method_name, name);
 
 	assembly = find_assembly (assembly_name);
 
@@ -204,8 +206,8 @@ m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, c
 
 	if (method)
 	{
-		MonoObject *const retval = mono_runtime_invoke (method, NULL, params, NULL);	
-		return mono_object_unbox (retval);
+		result._priv = mono_runtime_invoke (method, NULL, params, NULL);	
+		return result;
 	}
 
 	g_error ("M: Unable to invoke %s.\n", name);

@@ -54,7 +54,7 @@ m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *
 gpointer
 m_object_unbox (MObject object);
 
-gpointer
-m_invoke_module_function (const gchar *assembly_name, const gchar *name_space, const gchar *module_name, const gchar *method_name, void **params);
+MObject
+m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
 
 #endif /* __M_H__ */

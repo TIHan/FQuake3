@@ -36,7 +36,7 @@ type PlaneType =
 type Orientation =
     val Origin : Vector3        // in world coordinates
 
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 2)>]
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 3)>]
     val Axis : Vector3[]        // orientation in world
 
     val ViewOrigin : Vector3    // viewParams->or.origin in local coordinates
@@ -49,8 +49,13 @@ type Orientation =
 type Plane =
     val Normal : Vector3
     val Distance : float32
-    val Type : PlaneType
+
+    [<MarshalAs (UnmanagedType.I8)>]
+    val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
+
     val SignBits : byte
+
+
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -82,7 +87,30 @@ type ViewParams =
     val ZFar : float32
 
 
-module Cvar =
+module CvarModule =
     
     let GetNoCull () =
         NativeRenderer.Cvar_GetNoCull ()
+(*
+module MainRenderer =
+    
+    let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
+        
+        let rec transformWorldSpace transformed output =
+            match transformed with
+            | [] -> output
+            | head :: tail ->
+                let v =
+                    Vector3 (
+                        bounds.[i &&& 1].X,
+                        bounds.[(i >>> 1) &&& 1].Y,
+                        bounds.[(i >>> 1) &&& 1].Z
+                    )
+
+                transformWorldSpace
+                    tail
+                    orientation.Origin.MA (v.X, orientation.Axis.[0])
+
+        transformWorldSpace [] []
+        *)
+                
