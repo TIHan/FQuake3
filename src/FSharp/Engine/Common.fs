@@ -10,7 +10,7 @@ open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential, CharSet = CharSet.Ansi)>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
     val X : float32
     val Y : float32
@@ -21,4 +21,14 @@ type Vector3 =
 
     member this.Snap () =
         new Vector3 (float32 (int this.X), float32 (int this.Y), float32 (int this.Z))
+
+    member this.MA (s: float32, b: Vector3) =
+        new Vector3 (
+            this.X + (b.X * s),
+            this.Y + (b.Y * s),
+            this.Z + (b.Z * s)
+        )
+
+    member this.DotProduct (v: Vector3) =
+        (this.X * v.X) + (this.Y * v.Y) + (this.Z * v.Z)
 
