@@ -63,6 +63,9 @@ type Vector3 =
             vec.Z + (b.Z * s)
         )
 
+    static member DotProduct (x: Vector3) (y: Vector3) =
+        (x.X * y.X) + (x.Y * y.Y) + (x.Z * y.Z)
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =

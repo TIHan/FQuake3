@@ -1,10 +1,5 @@
 #include "m.h"
 
-#include <glib/gprintf.h>
-#include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
-
 struct _MDomain {
 	MonoDomain *domain;
 };
@@ -45,6 +40,11 @@ get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *
 	g_sprintf (name, "%s.%s:%s", name_space, class_name, method_name);
 }
 
+/*
+#define m_domain_new (assembly_dir, config_dir, root_domain_name, runtime_version, out_domain) \
+	mono_set_dirs (assembly_dir, config_dir); \
+	out_domain = mono_jit_ini_version (root_domain_name, runtime_version); \
+	*/
 
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)

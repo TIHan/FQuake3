@@ -9,6 +9,7 @@ int
 main (int argc, char *argv[])
 {
 	// Initialize Mono Domain
+
 	MDomain *const domain = m_domain_new ("Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_5);
 
 	// Load Engine Assembly

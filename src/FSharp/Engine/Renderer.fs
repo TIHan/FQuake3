@@ -102,7 +102,7 @@ module MainRenderer =
                         bounds.[i &&& 1].X,
                         bounds.[(i >>> 1) &&& 1].Y,
                         bounds.[(i >>> 1) &&& 1].Z  
-            )
+                )
 
             orientation.Origin
             |> Vector3.MA v.X orientation.Axis.X
@@ -110,3 +110,42 @@ module MainRenderer =
             |> Vector3.MA v.Z orientation.Axis.Z
         )
         
+    // TODO: Make this functional.
+    (*
+    let CheckFrustumPlanes (transformed: Vector3[]) (viewParams: ViewParams) =
+        let planes = [| viewParams.Frustum.X; viewParams.Frustum.Y; viewParams.Frustum.Z; viewParams.Frustum.W |]
+        let mutable anyBack = 0
+        let mutable cull = CullType.Clip
+
+        let mutable i = 0
+        while i < 4 do
+            let frust = planes.[i]
+
+            let mutable front = 0
+            let mutable back = 0
+            let mutable j = 0
+            while j < 8 do
+                let distance = Vector3.DotProduct transformed.[j] frust.Normal
+                if distance > frust.Distance then
+                    front <- 1
+                    if back = 1 then
+                        j <- 8
+                    j <- j + 1
+                else
+                    back <- 1
+                    j <- j + 1
+
+            if front = 0 then
+                i <- 4
+                anyBack <- 1
+                cull <- CullType.Out
+
+            anyBack <- anyBack ||| back
+            i <- i + 1
+
+        match anyBack = 0 with
+        | true -> CullType.In
+        | _ -> cull
+        *)
+
+
