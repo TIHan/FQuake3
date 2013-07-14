@@ -108,7 +108,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 			m_array_set (arr, __vector3_t, i, v);
 		}
 
-		args [0] = arr._priv;
+		args [0] = arr.__priv;
 		args [1] = &tr.or;
 		result = m_invoke_method ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", args);
 

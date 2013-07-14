@@ -116,12 +116,12 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name
 	if (mono_type_is_struct (type))
 	{
 		mono_runtime_invoke (ctor, mono_object_unbox (object), args, NULL);
-		result._priv = object;
+		result.__priv = object;
 	}
 	else
 	{
 		mono_runtime_invoke (ctor, object, args, NULL);
-		result._priv = object;
+		result.__priv = object;
 	}
 
 	return result;
@@ -131,7 +131,7 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name
 MObject
 m_object_get_property (MObject object, const gchar *property_name)
 {
-	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
 	MonoType *type = mono_class_get_type (klass);
 
@@ -139,11 +139,11 @@ m_object_get_property (MObject object, const gchar *property_name)
 	
 	if (mono_type_is_struct (type))
 	{
-		result._priv = mono_property_get_value (prop, mono_object_unbox ((MonoObject *)object._priv), NULL, NULL);
+		result.__priv = mono_property_get_value (prop, mono_object_unbox ((MonoObject *)object.__priv), NULL, NULL);
 	}
 	else
 	{
-		result._priv = mono_property_get_value (prop, (MonoObject *)object._priv, NULL, NULL);
+		result.__priv = mono_property_get_value (prop, (MonoObject *)object.__priv, NULL, NULL);
 	}
 
 	return result;
@@ -153,7 +153,7 @@ m_object_get_property (MObject object, const gchar *property_name)
 void
 m_object_set_property (MObject object, const gchar *property_name, gpointer value)
 {
-	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
 	MonoType *type = mono_class_get_type (klass);
 
@@ -162,11 +162,11 @@ m_object_set_property (MObject object, const gchar *property_name, gpointer valu
 	args [0] = value;
 	if (mono_type_is_struct (type))
 	{
-		mono_property_set_value (prop, mono_object_unbox ((MonoObject *)object._priv), args, NULL); 
+		mono_property_set_value (prop, mono_object_unbox ((MonoObject *)object.__priv), args, NULL); 
 	}
 	else
 	{
-		mono_property_set_value (prop, (MonoObject *)object._priv, args, NULL);
+		mono_property_set_value (prop, (MonoObject *)object.__priv, args, NULL);
 	}
 
 }
@@ -175,7 +175,7 @@ m_object_set_property (MObject object, const gchar *property_name, gpointer valu
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args)
 {
-	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoMethod *method = mono_class_get_method_from_name (klass, method_name, argc);
 	MonoType *type = mono_class_get_type (klass);
 
@@ -183,11 +183,11 @@ m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *
 
 	if (mono_type_is_struct (type))
 	{
-		result._priv = mono_runtime_invoke (method, mono_object_unbox ((MonoObject *)object._priv), args, NULL);
+		result.__priv = mono_runtime_invoke (method, mono_object_unbox ((MonoObject *)object.__priv), args, NULL);
 	}
 	else
 	{
-		result._priv = mono_runtime_invoke (method, (MonoObject *)object._priv, args, NULL);
+		result.__priv = mono_runtime_invoke (method, (MonoObject *)object.__priv, args, NULL);
 	}
 
 	return result;
@@ -197,7 +197,7 @@ m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *
 gpointer
 m_object_unbox (MObject object)
 {
-	return mono_object_unbox ((MonoObject *)object._priv);
+	return mono_object_unbox ((MonoObject *)object.__priv);
 }
 
 
@@ -228,7 +228,7 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 
 	if (method)
 	{
-		result._priv = mono_runtime_invoke (method, NULL, params, NULL);	
+		result.__priv = mono_runtime_invoke (method, NULL, params, NULL);	
 		return result;
 	}
 
@@ -244,20 +244,20 @@ m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name,
 
 	MObject result;
 
-	result._priv = mono_array_new (mono_domain_get (), klass, size);
+	result.__priv = mono_array_new (mono_domain_get (), klass, size);
 	return result;
 }
 
 gchar*
 m_array_addr_with_size (const MObject object, const gint size, const gint index)
 {
-	mono_array_addr_with_size ((MonoArray *)object._priv, size, index);
+	mono_array_addr_with_size ((MonoArray *)object.__priv, size, index);
 }
 
 gint
 m_array_length (const MObject object)
 {
-	return mono_array_length ((MonoArray *)object._priv);
+	return mono_array_length ((MonoArray *)object.__priv);
 }
 
 MObject
@@ -269,6 +269,6 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 
 	MObject result;
 
-	result._priv = mono_value_box (mono_domain_get (), klass, value); 
+	result.__priv = mono_value_box (mono_domain_get (), klass, value); 
 	return result;
 }

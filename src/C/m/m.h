@@ -18,7 +18,7 @@
 typedef struct _MDomain MDomain;
 
 typedef struct {
-	gpointer _priv;
+	gpointer __priv;
 } MObject;
 
 typedef enum {
