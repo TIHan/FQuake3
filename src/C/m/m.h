@@ -76,4 +76,25 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 		*__p = (value);	\
 	} while (0)
 
+#define m_object_unwrap(obj) obj.__priv
+
+#define m_array_map(arr,argc,type,native_arr) \
+{ \
+	gint __i; \
+\
+	for (__i = 0; __i < argc; ++__i) \
+	{ \
+		m_array_set (arr, type, __i, native_arr [__i]); \
+	} \
+} \
+
+#define m_invoke_method_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+{ \
+		gpointer __args [argc]; \
+\
+		arg_assignment \
+\
+		o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
+} \
+
 #endif /* __M_H__ */

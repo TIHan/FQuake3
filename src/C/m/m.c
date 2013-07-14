@@ -235,6 +235,7 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 	g_error ("M: Unable to invoke %s.\n", name);
 }
 
+
 MObject
 m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size)
 {

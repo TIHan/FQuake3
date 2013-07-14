@@ -87,30 +87,17 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	}
 #else
 	{
-		typedef struct {
-			gfloat x;
-			gfloat y;
-			gfloat z;
-		} __vector3_t;
-
 		MObject arr = m_array ("Engine", "Engine", "Vector3", 2);
-		gpointer args[2];
+		vector3_t native_bounds[2];
 		MObject result;
 
-		for (i = 0; i < 2; ++i)
-		{
-			__vector3_t v;
+		VEC3_ARRAY_TO_VECTOR3_ARRAY (bounds, 2, native_bounds);
+		m_array_map (arr,2,vector3_t,native_bounds);
 
-			v.x = bounds [i][0];
-			v.y = bounds [i][1];
-			v.z = bounds [i][2];
-
-			m_array_set (arr, __vector3_t, i, v);
-		}
-
-		args [0] = arr.__priv;
-		args [1] = &tr.or;
-		result = m_invoke_method ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", args);
+		m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
+			__args [0] = m_object_unwrap (arr);
+			__args [1] = &tr.or;
+		}, result);
 
 		for (i = 0; i < 8; ++i)
 		{

@@ -487,11 +487,62 @@ typedef float vec_t;
 typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
-typedef vec_t vec5_t[5];
 
 typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
+
+typedef struct {
+	float x;
+} vector_t;
+
+typedef struct {
+	float x;
+	float y;
+} vector2_t;
+
+typedef struct {
+	float x;
+	float y;
+	float z;
+} vector3_t;
+
+typedef struct {
+	float x;
+	float y;
+	float z;
+	float w;
+} vector4_t;
+
+#define VEC_TO_VECTOR(v,o) \
+	o.x = v \
+
+#define VEC2_TO_VECTOR2(v,o) \
+	o.x = v [0]; \
+	o.y = v [1] \
+
+#define VEC3_TO_VECTOR3(v,o) \
+	o.x = v [0]; \
+	o.y = v [1]; \
+	o.z = v [2] \
+
+#define VEC4_TO_VECTOR4(v,o) \
+	o.x = v [0]; \
+	o.y = v [1]; \
+	o.z = v [2]; \
+	o.w = v [3] \
+
+#define VEC3_ARRAY_TO_VECTOR3_ARRAY(v,size,o) \
+{ \
+	int __i; \
+\
+	for (__i = 0; __i < size; ++__i) \
+	{ \
+		vector3_t __v; \
+		VEC3_TO_VECTOR3 (v [__i],__v); \
+		o [__i] = __v; \
+	} \
+} \
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
