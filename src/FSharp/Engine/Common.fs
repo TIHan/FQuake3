@@ -32,6 +32,16 @@ type Cvar =
     val Next : nativeint
     val HashNext : nativeint
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector =
+    val X : float32
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector2 =
+    val X : float32
+    val Y : float32
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -39,7 +49,7 @@ type Vector3 =
     val X : float32
     val Y : float32
     val Z : float32
-    
+
     new (x, y, z) = { X = x; Y = y; Z = z }
     new (vector: Vector3) = { X = vector.X; Y = vector.Y; Z = vector.Z }
 
@@ -53,3 +63,25 @@ type Vector3 =
             vec.Z + (b.Z * s)
         )
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector4 =
+    val X : float32
+    val Y : float32
+    val Z : float32
+    val W : float32
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Axis =
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+    
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Matrix =
+    val X : Vector4
+    val Y : Vector4
+    val Z : Vector4
+    val W : Vector4

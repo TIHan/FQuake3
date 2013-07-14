@@ -33,20 +33,11 @@ type PlaneType =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type Axis =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
     val Origin : Vector3        // in world coordinates
     val Axis : Axis             // orientation in world
     val ViewOrigin : Vector3    // viewParams->or.origin in local coordinates
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
-    val ModelMatrix : float32[]
+    val ModelMatrix : Matrix
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -59,7 +50,19 @@ type Plane =
 
     val SignBits : byte
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Bounds = 
+    val Start : Vector3
+    val End : Vector3
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Frustum =
+    val X : Plane
+    val Y : Plane
+    val Z : Plane
+    val W : Plane
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -78,16 +81,9 @@ type ViewParams =
     val ViewPortHeight : int
     val FovX : float32
     val FovY : float32
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
-    val ProjectionMatrix : float32[]
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 4)>]
-    val Frustum : Plane[]
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 2)>]
-    val VisBounds : Vector3[]
-
+    val ProjectionMatrix : Matrix
+    val Frustum : Frustum
+    val VisibilityBounds : Bounds
     val ZFar : float32
 
 module CvarModule =
@@ -113,3 +109,4 @@ module MainRenderer =
             |> Vector3.MA v.Y orientation.Axis.Y
             |> Vector3.MA v.Z orientation.Axis.Z
         )
+        
