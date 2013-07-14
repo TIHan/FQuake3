@@ -1,5 +1,10 @@
 #include "m.h"
 
+#include <glib/gprintf.h>
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/debug-helpers.h>
+
 struct _MDomain {
 	MonoDomain *domain;
 };

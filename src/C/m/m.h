@@ -2,10 +2,6 @@
 #define __M_H__
 
 #include <glib.h>
-#include <glib/gprintf.h>
-#include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
 
 #if defined(_WIN32)
 #	define M_IMPORT __declspec(dllimport)
