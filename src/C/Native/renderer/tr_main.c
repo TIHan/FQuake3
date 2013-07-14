@@ -74,6 +74,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	}
 
 	// transform into world space
+#if 0
 	for (i = 0 ; i < 8 ; i++) {
 		v[0] = bounds[i&1][0];
 		v[1] = bounds[(i>>1)&1][1];
@@ -84,6 +85,41 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		VectorMA( transformed[i], v[1], tr.or.axis[1], transformed[i] );
 		VectorMA( transformed[i], v[2], tr.or.axis[2], transformed[i] );
 	}
+#else
+	{
+		typedef struct {
+			gfloat x;
+			gfloat y;
+			gfloat z;
+		} __vector3_t;
+
+		MObject arr = m_array ("Engine", "Engine", "Vector3", 2);
+		gpointer args[2];
+		MObject result;
+
+		for (i = 0; i < 2; ++i)
+		{
+			__vector3_t v;
+
+			v.x = bounds [i][0];
+			v.y = bounds [i][1];
+			v.z = bounds [i][2];
+
+			m_array_set (arr, __vector3_t, i, v);
+		}
+
+		args [0] = arr._priv;
+		args [1] = &tr.or;
+		result = m_invoke_method ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", args);
+
+		for (i = 0; i < 8; ++i)
+		{
+			transformed [i][0] = m_array_get (result, vec3_t, i) [0];
+			transformed [i][1] = m_array_get (result, vec3_t, i) [1];
+			transformed [i][2] = m_array_get (result, vec3_t, i) [2];
+		}
+	}
+#endif
 
 	// check against frustum planes
 	anyBack = 0;

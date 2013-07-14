@@ -21,10 +21,6 @@ typedef struct {
 	gpointer _priv;
 } MObject;
 
-typedef struct {
-	gpointer _priv;
-} MStruct;
-
 typedef enum {
 	M_RUNTIME_4_0,
 	M_RUNTIME_4_5
@@ -48,6 +44,9 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *stru
 MObject
 m_object_get_property (MObject object, const gchar *property_name);
 
+void
+m_object_set_property (MObject object, const gchar *property_name, gpointer value);
+
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args);
 
@@ -56,5 +55,25 @@ m_object_unbox (MObject object);
 
 MObject
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
+
+MObject
+m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size);
+
+gchar*
+m_array_addr_with_size (const MObject object, const gint size, const gint index);
+
+gint
+m_array_length (const MObject object);
+
+MObject
+m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value);
+
+#define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
+#define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
+#define m_array_set(array,type,index,value)	\
+	do {	\
+		type *__p = (type *) m_array_addr ((array), type, (index));	\
+		*__p = (value);	\
+	} while (0)
 
 #endif /* __M_H__ */

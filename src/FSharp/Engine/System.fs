@@ -75,8 +75,16 @@ module System =
         let errorFilename = "error.txt"
         let UnhandledException (sender: obj) (e: UnhandledExceptionEventArgs) =
             let exceptionObject = (e.ExceptionObject :?> Exception)
-            let msg = sprintf "%s %s" (exceptionObject.ToString ()) (exceptionObject.Message)
-            File.WriteAllText (errorFilename, msg)
+            let msg = sprintf "%s %s\n" (exceptionObject.ToString ()) (exceptionObject.Message)
+
+            let innerMsg = 
+                match exceptionObject.InnerException = null with
+                | true -> ""
+                | _ -> exceptionObject.InnerException.Message
+            
+            let fullMsg = sprintf "%s %s" msg innerMsg
+
+            File.WriteAllText (errorFilename, fullMsg)
 
         File.Delete (errorFilename)
         AppDomain.CurrentDomain.UnhandledException.AddHandler (new UnhandledExceptionEventHandler (UnhandledException))

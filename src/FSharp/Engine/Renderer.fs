@@ -33,16 +33,20 @@ type PlaneType =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type Axis =
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
     val Origin : Vector3        // in world coordinates
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 3)>]
-    val Axis : Vector3[]        // orientation in world
-
+    val Axis : Axis             // orientation in world
     val ViewOrigin : Vector3    // viewParams->or.origin in local coordinates
 
     [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
-    val ModelMatrix : float[]
+    val ModelMatrix : float32[]
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -86,31 +90,26 @@ type ViewParams =
 
     val ZFar : float32
 
-
 module CvarModule =
     
     let GetNoCull () =
         NativeRenderer.Cvar_GetNoCull ()
-(*
+
 module MainRenderer =
-    
+
     let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
+        let transformed : Vector3[] = Array.zeroCreate 8
         
-        let rec transformWorldSpace transformed output =
-            match transformed with
-            | [] -> output
-            | head :: tail ->
-                let v =
-                    Vector3 (
+        transformed |> Array.mapi (fun i x ->
+            let v =
+                Vector3 (
                         bounds.[i &&& 1].X,
                         bounds.[(i >>> 1) &&& 1].Y,
-                        bounds.[(i >>> 1) &&& 1].Z
-                    )
+                        bounds.[(i >>> 1) &&& 1].Z  
+            )
 
-                transformWorldSpace
-                    tail
-                    orientation.Origin.MA (v.X, orientation.Axis.[0])
-
-        transformWorldSpace [] []
-        *)
-                
+            orientation.Origin
+            |> Vector3.MA v.X orientation.Axis.X
+            |> Vector3.MA v.Y orientation.Axis.Y
+            |> Vector3.MA v.Z orientation.Axis.Z
+        )

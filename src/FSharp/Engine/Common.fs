@@ -12,16 +12,16 @@ open Microsoft.FSharp.NativeInterop
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Cvar =
-    [<MarshalAs(UnmanagedType.LPStr)>]
+    [<MarshalAs (UnmanagedType.LPStr)>]
     val Name : string
 
-    [<MarshalAs(UnmanagedType.LPStr)>]
+    [<MarshalAs (UnmanagedType.LPStr)>]
     val String : string
 
-    [<MarshalAs(UnmanagedType.LPStr)>]
+    [<MarshalAs (UnmanagedType.LPStr)>]
     val ResetString : string
 
-    [<MarshalAs(UnmanagedType.LPStr)>]
+    [<MarshalAs (UnmanagedType.LPStr)>]
     val LatchedString : string
 
     val Flags : int
@@ -46,17 +46,10 @@ type Vector3 =
     static member Snap (vec: Vector3) =
         new Vector3 (float32 (int vec.X), float32 (int vec.Y), float32 (int vec.Z))
 
-        (*
-    member this.Snap () =
-        new Vector3 (float32 (int this.X), float32 (int this.Y), float32 (int this.Z))
-
-    member this.MA (s: float32, b: Vector3) =
+    static member MA (s: float32) (b: Vector3) (vec: Vector3) =
         new Vector3 (
-            this.X + (b.X * s),
-            this.Y + (b.Y * s),
-            this.Z + (b.Z * s)
+            vec.X + (b.X * s),
+            vec.Y + (b.Y * s),
+            vec.Z + (b.Z * s)
         )
-
-    member this.DotProduct (v: Vector3) =
-        (this.X * v.X) + (this.Y * v.Y) + (this.Z * v.Z)*)
 

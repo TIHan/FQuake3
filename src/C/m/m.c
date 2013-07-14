@@ -150,6 +150,28 @@ m_object_get_property (MObject object, const gchar *property_name)
 }
 
 
+void
+m_object_set_property (MObject object, const gchar *property_name, gpointer value)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object._priv);
+	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
+	MonoType *type = mono_class_get_type (klass);
+
+	gpointer args [1];
+
+	args [0] = value;
+	if (mono_type_is_struct (type))
+	{
+		mono_property_set_value (prop, mono_object_unbox ((MonoObject *)object._priv), args, NULL); 
+	}
+	else
+	{
+		mono_property_set_value (prop, (MonoObject *)object._priv, args, NULL);
+	}
+
+}
+
+
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args)
 {
@@ -211,4 +233,42 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 	}
 
 	g_error ("M: Unable to invoke %s.\n", name);
+}
+
+MObject
+m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size)
+{
+	MonoAssembly *const assembly = find_assembly (assembly_name);
+	MonoImage *image = image = mono_assembly_get_image (assembly);
+	MonoClass *klass = mono_class_from_name (image, name_space, name);
+
+	MObject result;
+
+	result._priv = mono_array_new (mono_domain_get (), klass, size);
+	return result;
+}
+
+gchar*
+m_array_addr_with_size (const MObject object, const gint size, const gint index)
+{
+	mono_array_addr_with_size ((MonoArray *)object._priv, size, index);
+}
+
+gint
+m_array_length (const MObject object)
+{
+	return mono_array_length ((MonoArray *)object._priv);
+}
+
+MObject
+m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value)
+{
+	MonoAssembly *const assembly = find_assembly (assembly_name);
+	MonoImage *image = image = mono_assembly_get_image (assembly);
+	MonoClass *klass = mono_class_from_name (image, name_space, name);
+
+	MObject result;
+
+	result._priv = mono_value_box (mono_domain_get (), klass, value); 
+	return result;
 }
