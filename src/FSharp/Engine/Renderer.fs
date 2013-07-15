@@ -35,9 +35,15 @@ type PlaneType =
 [<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
     val Origin : Vector3        // in world coordinates
-    val Axis : Axis             // orientation in world
+
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 3)>]
+    val Axis : Vector3[]        // orientation in world
     val ViewOrigin : Vector3    // viewParams->or.origin in local coordinates
-    val ModelMatrix : Matrix
+
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
+    val ModelMatrix : float32[]
+
+    new (origin, axis, viewOrigin, modelMatrix) = { Origin = origin; Axis = axis; ViewOrigin = viewOrigin; ModelMatrix = modelMatrix }
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -52,21 +58,7 @@ type Plane =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type Bounds = 
-    val Start : Vector3
-    val End : Vector3
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Frustum =
-    val X : Plane
-    val Y : Plane
-    val Z : Plane
-    val W : Plane
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type ViewParams =
+type ViewParms =
     val Orientation : Orientation
     val World : Orientation
     val PvsOrigin : Vector3
@@ -81,10 +73,39 @@ type ViewParams =
     val ViewPortHeight : int
     val FovX : float32
     val FovY : float32
-    val ProjectionMatrix : Matrix
-    val Frustum : Frustum
-    val VisibilityBounds : Bounds
+
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
+    val ProjectionMatrix : float32[]
+
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 4)>]
+    val Frustum : Plane[]
+
+    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 2)>]
+    val VisibilityBounds : Vector3[]
+
     val ZFar : float32
+
+    new (orientation, world, pvsOrigin, isPortal, isMirror, frameSceneId, frameCount, portalPlane, viewPortX, viewPortY, viewPortWidth, viewPortHeight, fovX, fovY, projectionMatrix, frustum, visibilityBounds, zFar) =
+        {
+            Orientation = orientation;
+            World = world;
+            PvsOrigin = pvsOrigin;
+            IsPortal = isPortal;
+            IsMirror = isMirror;
+            FrameSceneId = frameSceneId;
+            FrameCount = frameCount;
+            PortalPlane = portalPlane;
+            ViewPortX = viewPortX;
+            ViewPortY = viewPortY;
+            ViewPortWidth = viewPortWidth;
+            ViewPortHeight = viewPortHeight;
+            FovX = fovX;
+            FovY = fovY;
+            ProjectionMatrix = projectionMatrix;
+            Frustum = frustum;
+            VisibilityBounds = visibilityBounds;
+            ZFar = zFar;
+        }
 
 module CvarModule =
     
@@ -105,47 +126,9 @@ module MainRenderer =
                 )
 
             orientation.Origin
-            |> Vector3.MA v.X orientation.Axis.X
-            |> Vector3.MA v.Y orientation.Axis.Y
-            |> Vector3.MA v.Z orientation.Axis.Z
+            |> Vector3.MA v.X orientation.Axis.[0]
+            |> Vector3.MA v.Y orientation.Axis.[1]
+            |> Vector3.MA v.Z orientation.Axis.[2]
         )
-        
-    // TODO: Make this functional.
-    (*
-    let CheckFrustumPlanes (transformed: Vector3[]) (viewParams: ViewParams) =
-        let planes = [| viewParams.Frustum.X; viewParams.Frustum.Y; viewParams.Frustum.Z; viewParams.Frustum.W |]
-        let mutable anyBack = 0
-        let mutable cull = CullType.Clip
-
-        let mutable i = 0
-        while i < 4 do
-            let frust = planes.[i]
-
-            let mutable front = 0
-            let mutable back = 0
-            let mutable j = 0
-            while j < 8 do
-                let distance = Vector3.DotProduct transformed.[j] frust.Normal
-                if distance > frust.Distance then
-                    front <- 1
-                    if back = 1 then
-                        j <- 8
-                    j <- j + 1
-                else
-                    back <- 1
-                    j <- j + 1
-
-            if front = 0 then
-                i <- 4
-                anyBack <- 1
-                cull <- CullType.Out
-
-            anyBack <- anyBack ||| back
-            i <- i + 1
-
-        match anyBack = 0 with
-        | true -> CullType.In
-        | _ -> cull
-        *)
 
 

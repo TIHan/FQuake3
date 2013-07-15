@@ -57,9 +57,7 @@ Cvar_GetNoCull (void)
 	return r_nocull->integer;
 }
 
-M_EXPORT
-int
-M_DECL
+#if 0
 R_CullLocalBox (vec3_t bounds[2]) {
 	int		i, j;
 	vec3_t	transformed[8];
@@ -74,7 +72,6 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	}
 
 	// transform into world space
-#if 0
 	for (i = 0 ; i < 8 ; i++) {
 		v[0] = bounds[i&1][0];
 		v[1] = bounds[(i>>1)&1][1];
@@ -84,29 +81,124 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		VectorMA( transformed[i], v[0], tr.or.axis[0], transformed[i] );
 		VectorMA( transformed[i], v[1], tr.or.axis[1], transformed[i] );
 		VectorMA( transformed[i], v[2], tr.or.axis[2], transformed[i] );
-	}
-#else
-	{
-		MObject arr = m_array ("Engine", "Engine", "Vector3", 2);
-		vector3_t native_bounds[2];
-		MObject result;
 
-		VEC3_ARRAY_TO_VECTOR3_ARRAY (bounds, 2, native_bounds);
-		m_array_map (arr,2,vector3_t,native_bounds);
+	// check against frustum planes
+	anyBack = 0;
+	for (i = 0 ; i < 4 ; i++) {
+		frust = &tr.viewParms.frustum[i];
 
-		m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
-			__args [0] = m_object_unwrap (arr);
-			__args [1] = &tr.or;
-		}, result);
-
-		for (i = 0; i < 8; ++i)
-		{
-			transformed [i][0] = m_array_get (result, vec3_t, i) [0];
-			transformed [i][1] = m_array_get (result, vec3_t, i) [1];
-			transformed [i][2] = m_array_get (result, vec3_t, i) [2];
+		front = back = 0;
+		for (j = 0 ; j < 8 ; j++) {
+			dists[j] = DotProduct(transformed[j], frust->normal);
+			if ( dists[j] > frust->dist ) {
+				front = 1;
+				if ( back ) {
+					break;		// a point is in front
+				}
+			} else {
+				back = 1;
+			}
 		}
+		if ( !front ) {
+			// all points were behind one of the planes
+			return CULL_OUT;
+		}
+		anyBack |= back;
 	}
+
+	if ( !anyBack ) {
+		return CULL_IN;		// completely inside frustum
+	}
+
+	return CULL_CLIP;		// partially clipped
+}
 #endif
+
+MObject
+common_create_vector3 ()
+{
+	gpointer *args;
+
+	args [0] = 0;
+	args [1] = 0;
+	args [2] = 0;
+
+	return m_object ("Engine", "Engine", "Vector3", 3, args);
+}
+
+MObject
+common_create_vector3_array (const gint size)
+{
+	return m_array ("Engine", "Engine", "Vector3", size);
+}
+
+MObject
+common_create_orientation (orientationr_t *orientation)
+{
+	gpointer args[4];
+
+	vector3_t native_origin;
+	vector3_t native_axis[3];
+	vector3_t native_view_origin;
+
+	MObject axis = common_create_vector3_array (3);
+	MObject model_matrix = m_array_int32 (16);
+
+	VEC3_TO_VECTOR3 (orientation->origin, native_origin);
+	VEC3_ARRAY_TO_VECTOR3_ARRAY (orientation->axis, 3, native_axis);
+	VEC3_TO_VECTOR3 (orientation->viewOrigin, native_view_origin);
+
+	m_array_map (axis, 3, vector3_t, native_axis);
+	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
+
+	args [0] = &native_origin;
+	args [1] = m_object_unwrap (axis);
+	args [2] = &native_view_origin;
+	args [3] = m_object_unwrap (model_matrix);
+
+	return m_object ("Engine", "Engine", "Orientation", 4, args);
+}
+
+MObject
+common_create_view_params (viewParms_t *view_parms)
+{
+
+}
+
+M_EXPORT
+int
+M_DECL
+R_CullLocalBox (vec3_t bounds[2]) {
+	int		i, j;
+	vec3_t	transformed[8];
+	float	dists[8];
+	cplane_t	*frust;
+	int			anyBack;
+	int			front, back;
+
+	MObject arr = common_create_vector3_array (2);
+	vector3_t native_bounds[2];
+	MObject result;
+
+	if ( r_nocull->integer ) {
+		return CULL_CLIP;
+	}
+
+	VEC3_ARRAY_TO_VECTOR3_ARRAY (bounds, 2, native_bounds);
+	m_array_map (arr,2,vector3_t,native_bounds);
+
+	// transform into world space
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
+		__args [0] = m_object_unwrap (arr);
+		__args [1] = m_object_unbox (common_create_orientation (&tr.or));
+	}, result);
+
+	for (i = 0; i < 8; ++i)
+	{
+		transformed [i][0] = m_array_get (result, vec3_t, i) [0];
+		transformed [i][1] = m_array_get (result, vec3_t, i) [1];
+		transformed [i][2] = m_array_get (result, vec3_t, i) [2];
+	}
 
 	// check against frustum planes
 	anyBack = 0;

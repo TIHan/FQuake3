@@ -59,6 +59,9 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 MObject
 m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size);
 
+MObject
+m_array_int32 (const gint size);
+
 gchar*
 m_array_addr_with_size (const MObject object, const gint size, const gint index);
 

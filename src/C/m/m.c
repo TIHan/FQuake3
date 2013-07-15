@@ -45,12 +45,6 @@ get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *
 	g_sprintf (name, "%s.%s:%s", name_space, class_name, method_name);
 }
 
-/*
-#define m_domain_new (assembly_dir, config_dir, root_domain_name, runtime_version, out_domain) \
-	mono_set_dirs (assembly_dir, config_dir); \
-	out_domain = mono_jit_ini_version (root_domain_name, runtime_version); \
-	*/
-
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)
 {
@@ -251,6 +245,15 @@ m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name,
 	MObject result;
 
 	result.__priv = mono_array_new (mono_domain_get (), klass, size);
+	return result;
+}
+
+MObject
+m_array_int32 (const gint size)
+{
+	MObject result;
+
+	result.__priv = mono_array_new (mono_domain_get (), mono_get_int32_class (), size);
 	return result;
 }
 

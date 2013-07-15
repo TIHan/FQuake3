@@ -73,18 +73,3 @@ type Vector4 =
     val Y : float32
     val Z : float32
     val W : float32
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Axis =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
-    
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Matrix =
-    val X : Vector4
-    val Y : Vector4
-    val Z : Vector4
-    val W : Vector4
