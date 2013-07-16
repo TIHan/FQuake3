@@ -162,7 +162,7 @@ common_create_orientation (orientationr_t *orientation)
 MObject
 common_create_view_params (viewParms_t *view_parms)
 {
-
+	gpointer args[18];
 }
 
 M_EXPORT
