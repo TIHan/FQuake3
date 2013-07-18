@@ -115,7 +115,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 #endif
 
 MObject
-common_create_vector3 ()
+managed_common_create_vector3 ()
 {
 	gpointer *args;
 
@@ -127,27 +127,26 @@ common_create_vector3 ()
 }
 
 MObject
-common_create_vector3_array (const gint size)
+managed_common_create_vector3_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "Vector3", size);
 }
 
 MObject
-common_create_orientation (orientationr_t *orientation)
+managed_common_create_orientation (orientationr_t *orientation)
 {
 	gpointer args[4];
 
-	vector3_t native_origin;
+	vector3_t native_origin = *(vector3_t *)orientation->origin;
 	vector3_t native_axis[3];
-	vector3_t native_view_origin;
+	vector3_t native_view_origin = *(vector3_t *)orientation->viewOrigin;
 
-	MObject axis = common_create_vector3_array (3);
+	MObject axis = managed_common_create_vector3_array (3);
 	MObject model_matrix = m_array_int32 (16);
 
-	VEC3_TO_VECTOR3 (orientation->origin, native_origin);
-	VEC3_ARRAY_TO_VECTOR3_ARRAY (orientation->axis, 3, native_axis);
-	VEC3_TO_VECTOR3 (orientation->viewOrigin, native_view_origin);
-
+	native_axis [0] = *(vector3_t *)orientation->axis [0];
+	native_axis [1] = *(vector3_t *)orientation->axis [1];
+	native_axis [2] = *(vector3_t *)orientation->axis [2];
 	m_array_map (axis, 3, vector3_t, native_axis);
 	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
 
@@ -160,7 +159,7 @@ common_create_orientation (orientationr_t *orientation)
 }
 
 MObject
-common_create_view_params (viewParms_t *view_parms)
+managed_common_create_view_params (viewParms_t *view_parms)
 {
 	gpointer args[18];
 }
@@ -176,7 +175,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	int			anyBack;
 	int			front, back;
 
-	MObject arr = common_create_vector3_array (2);
+	MObject arr = managed_common_create_vector3_array (2);
 	vector3_t native_bounds[2];
 	MObject result;
 
@@ -184,13 +183,14 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		return CULL_CLIP;
 	}
 
-	VEC3_ARRAY_TO_VECTOR3_ARRAY (bounds, 2, native_bounds);
+	native_bounds [0] = *(vector3_t *)bounds [0];
+	native_bounds [1] = *(vector3_t *)bounds [1];
 	m_array_map (arr,2,vector3_t,native_bounds);
 
 	// transform into world space
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
 		__args [0] = m_object_unwrap (arr);
-		__args [1] = m_object_unbox (common_create_orientation (&tr.or));
+		__args [1] = m_object_unbox (managed_common_create_orientation (&tr.or));
 	}, result);
 
 	for (i = 0; i < 8; ++i)
