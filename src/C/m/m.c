@@ -269,6 +269,12 @@ m_array_length (const MObject object)
 	return mono_array_length ((MonoArray *)object.__priv);
 }
 
+gpointer
+m_array_unbox (const MObject object)
+{
+	return object.__priv;
+}
+
 MObject
 m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value)
 {

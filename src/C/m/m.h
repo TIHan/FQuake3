@@ -68,6 +68,9 @@ m_array_addr_with_size (const MObject object, const gint size, const gint index)
 gint
 m_array_length (const MObject object);
 
+gpointer
+m_array_unbox (const MObject object);
+
 MObject
 m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value);
 
@@ -78,8 +81,6 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 		type *__p = (type *) m_array_addr ((array), type, (index));	\
 		*__p = (value);	\
 	} while (0)
-
-#define m_object_unwrap(obj) obj.__priv
 
 #define m_array_map(arr,argc,type,native_arr) \
 { \

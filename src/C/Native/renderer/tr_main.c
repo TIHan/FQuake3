@@ -146,9 +146,9 @@ managed_common_create_orientation (orientationr_t *orientation)
 	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
 
 	args [0] = (vector3_t *)orientation->origin;
-	args [1] = m_object_unwrap (axis);
+	args [1] = m_array_unbox (axis);
 	args [2] = (vector3_t *)orientation->viewOrigin;
-	args [3] = m_object_unwrap (model_matrix);
+	args [3] = m_array_unbox (model_matrix);
 
 	return m_object ("Engine", "Engine", "Orientation", 4, args);
 }
@@ -182,7 +182,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 
 	// transform into world space
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
-		__args [0] = m_object_unwrap (arr);
+		__args [0] = m_array_unbox (arr);
 		__args [1] = m_object_unbox (managed_common_create_orientation (&tr.or));
 	}, result);
 
