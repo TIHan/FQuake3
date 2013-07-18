@@ -137,9 +137,7 @@ managed_common_create_orientation (orientationr_t *orientation)
 {
 	gpointer args[4];
 
-	vector3_t native_origin = *(vector3_t *)orientation->origin;
 	vector3_t native_axis[3];
-	vector3_t native_view_origin = *(vector3_t *)orientation->viewOrigin;
 
 	MObject axis = managed_common_create_vector3_array (3);
 	MObject model_matrix = m_array_int32 (16);
@@ -150,9 +148,9 @@ managed_common_create_orientation (orientationr_t *orientation)
 	m_array_map (axis, 3, vector3_t, native_axis);
 	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
 
-	args [0] = &native_origin;
+	args [0] = (vector3_t *)orientation->origin;
 	args [1] = m_object_unwrap (axis);
-	args [2] = &native_view_origin;
+	args [2] = (vector3_t *)orientation->viewOrigin;
 	args [3] = m_object_unwrap (model_matrix);
 
 	return m_object ("Engine", "Engine", "Orientation", 4, args);
