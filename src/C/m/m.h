@@ -96,6 +96,16 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 	} \
 } \
 
+#define m_map_array(native_arr,argc,type,arr) \
+{ \
+	gint __i; \
+\
+	for (__i = 0; __i < argc; ++__i) \
+	{ \
+		native_arr [__i] = m_array_get (arr, type, __i); \
+	} \
+} \
+
 #define m_invoke_method_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
 		gpointer __args [argc]; \

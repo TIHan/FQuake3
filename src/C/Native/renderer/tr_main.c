@@ -58,6 +58,9 @@ Cvar_GetNoCull (void)
 }
 
 #if 0
+M_EXPORT
+int
+M_DECL
 R_CullLocalBox (vec3_t bounds[2]) {
 	int		i, j;
 	vec3_t	transformed[8];
@@ -81,6 +84,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		VectorMA( transformed[i], v[0], tr.or.axis[0], transformed[i] );
 		VectorMA( transformed[i], v[1], tr.or.axis[1], transformed[i] );
 		VectorMA( transformed[i], v[2], tr.or.axis[2], transformed[i] );
+	}
 
 	// check against frustum planes
 	anyBack = 0;
@@ -112,7 +116,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 
 	return CULL_CLIP;		// partially clipped
 }
-#endif
+#else
 
 MObject
 m_common_create_vector3 ()
@@ -183,12 +187,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
 	}, m_transformed);
 
-	for (i = 0; i < 8; ++i)
-	{
-		transformed [i][0] = m_array_get (m_transformed, vec3_t, i) [0];
-		transformed [i][1] = m_array_get (m_transformed, vec3_t, i) [1];
-		transformed [i][2] = m_array_get (m_transformed, vec3_t, i) [2];
-	}
+	m_map_array (((vector3_t *)transformed), 8, vector3_t, m_transformed);
 
 	// check against frustum planes
 	anyBack = 0;
@@ -220,6 +219,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 
 	return CULL_CLIP;		// partially clipped
 }
+#endif
 
 /*
 ** R_CullLocalPointAndRadius
