@@ -115,7 +115,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 #endif
 
 MObject
-managed_common_create_vector3 ()
+m_common_create_vector3 ()
 {
 	gpointer *args;
 
@@ -127,32 +127,32 @@ managed_common_create_vector3 ()
 }
 
 MObject
-managed_common_create_vector3_array (const gint size)
+m_common_create_vector3_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "Vector3", size);
 }
 
 MObject
-managed_common_create_orientation (orientationr_t *orientation)
+m_common_create_orientation (orientationr_t *orientation)
 {
 	gpointer args[4];
 
-	MObject axis = managed_common_create_vector3_array (3);
-	MObject model_matrix = m_array_int32 (16);
+	MObject m_axis = m_common_create_vector3_array (3);
+	MObject m_model_matrix = m_array_int32 (16);
 
-	m_array_map (axis, 3, vector3_t, ((vector3_t *)orientation->axis));
-	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
+	m_array_map (m_axis, 3, vector3_t, ((vector3_t *)orientation->axis));
+	m_array_map (m_model_matrix, 16, gfloat, orientation->modelMatrix);
 
 	args [0] = (vector3_t *)orientation->origin;
-	args [1] = m_array_unbox (axis);
+	args [1] = m_array_unbox (m_axis);
 	args [2] = (vector3_t *)orientation->viewOrigin;
-	args [3] = m_array_unbox (model_matrix);
+	args [3] = m_array_unbox (m_model_matrix);
 
 	return m_object ("Engine", "Engine", "Orientation", 4, args);
 }
 
 MObject
-managed_common_create_view_params (viewParms_t *view_parms)
+m_common_create_view_params (viewParms_t *view_parms)
 {
 	gpointer args[18];
 }
@@ -168,26 +168,26 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	int			anyBack;
 	int			front, back;
 
-	MObject arr = managed_common_create_vector3_array (2);
-	MObject result;
+	MObject m_bounds = m_common_create_vector3_array (2);
+	MObject m_transformed;
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
 	}
 
-	m_array_map (arr, 2, vector3_t, ((vector3_t *)bounds));
+	m_array_map (m_bounds, 2, vector3_t, ((vector3_t *)bounds));
 
 	// transform into world space
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
-		__args [0] = m_array_unbox (arr);
-		__args [1] = m_object_unbox (managed_common_create_orientation (&tr.or));
-	}, result);
+		__args [0] = m_array_unbox (m_bounds);
+		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
+	}, m_transformed);
 
 	for (i = 0; i < 8; ++i)
 	{
-		transformed [i][0] = m_array_get (result, vec3_t, i) [0];
-		transformed [i][1] = m_array_get (result, vec3_t, i) [1];
-		transformed [i][2] = m_array_get (result, vec3_t, i) [2];
+		transformed [i][0] = m_array_get (m_transformed, vec3_t, i) [0];
+		transformed [i][1] = m_array_get (m_transformed, vec3_t, i) [1];
+		transformed [i][2] = m_array_get (m_transformed, vec3_t, i) [2];
 	}
 
 	// check against frustum planes
