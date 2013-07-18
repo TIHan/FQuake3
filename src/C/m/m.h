@@ -21,6 +21,10 @@ typedef struct {
 	gpointer __priv;
 } MObject;
 
+typedef struct {
+	gpointer __priv;
+} MArray;
+
 typedef enum {
 	M_RUNTIME_4_0,
 	M_RUNTIME_4_5
@@ -56,20 +60,20 @@ m_object_unbox (MObject object);
 MObject
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
 
-MObject
+MArray
 m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size);
 
-MObject
+MArray
 m_array_int32 (const gint size);
 
 gchar*
-m_array_addr_with_size (const MObject object, const gint size, const gint index);
+m_array_addr_with_size (const MArray object, const gint size, const gint index);
 
 gint
-m_array_length (const MObject object);
+m_array_length (const MArray object);
 
 gpointer
-m_array_unbox (const MObject object);
+m_array_unbox (const MArray object);
 
 MObject
 m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value);
@@ -98,7 +102,7 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 \
 		arg_assignment \
 \
-		o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
+		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
 #endif /* __M_H__ */

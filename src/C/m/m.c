@@ -235,42 +235,42 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 }
 
 
-MObject
+MArray
 m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size)
 {
 	MonoAssembly *const assembly = find_assembly (assembly_name);
 	MonoImage *image = image = mono_assembly_get_image (assembly);
 	MonoClass *klass = mono_class_from_name (image, name_space, name);
 
-	MObject result;
+	MArray result;
 
 	result.__priv = mono_array_new (mono_domain_get (), klass, size);
 	return result;
 }
 
-MObject
+MArray
 m_array_int32 (const gint size)
 {
-	MObject result;
+	MArray result;
 
 	result.__priv = mono_array_new (mono_domain_get (), mono_get_int32_class (), size);
 	return result;
 }
 
 gchar*
-m_array_addr_with_size (const MObject object, const gint size, const gint index)
+m_array_addr_with_size (const MArray object, const gint size, const gint index)
 {
 	mono_array_addr_with_size ((MonoArray *)object.__priv, size, index);
 }
 
 gint
-m_array_length (const MObject object)
+m_array_length (const MArray object)
 {
 	return mono_array_length ((MonoArray *)object.__priv);
 }
 
 gpointer
-m_array_unbox (const MObject object)
+m_array_unbox (const MArray object)
 {
 	return object.__priv;
 }

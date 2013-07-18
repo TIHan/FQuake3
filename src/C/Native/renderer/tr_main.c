@@ -126,7 +126,7 @@ m_common_create_vector3 ()
 	return m_object ("Engine", "Engine", "Vector3", 3, args);
 }
 
-MObject
+MArray
 m_common_create_vector3_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "Vector3", size);
@@ -137,8 +137,8 @@ m_common_create_orientation (orientationr_t *orientation)
 {
 	gpointer args[4];
 
-	MObject m_axis = m_common_create_vector3_array (3);
-	MObject m_model_matrix = m_array_int32 (16);
+	MArray m_axis = m_common_create_vector3_array (3);
+	MArray m_model_matrix = m_array_int32 (16);
 
 	m_array_map (m_axis, 3, vector3_t, ((vector3_t *)orientation->axis));
 	m_array_map (m_model_matrix, 16, gfloat, orientation->modelMatrix);
@@ -168,8 +168,8 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	int			anyBack;
 	int			front, back;
 
-	MObject m_bounds = m_common_create_vector3_array (2);
-	MObject m_transformed;
+	MArray m_bounds = m_common_create_vector3_array (2);
+	MArray m_transformed;
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
