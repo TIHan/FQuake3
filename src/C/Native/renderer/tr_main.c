@@ -137,14 +137,11 @@ managed_common_create_orientation (orientationr_t *orientation)
 {
 	gpointer args[4];
 
-	vector3_t native_axis[3];
+	vector3_t *native_axis = (vector3_t *)orientation->axis;
 
 	MObject axis = managed_common_create_vector3_array (3);
 	MObject model_matrix = m_array_int32 (16);
 
-	native_axis [0] = *(vector3_t *)orientation->axis [0];
-	native_axis [1] = *(vector3_t *)orientation->axis [1];
-	native_axis [2] = *(vector3_t *)orientation->axis [2];
 	m_array_map (axis, 3, vector3_t, native_axis);
 	m_array_map (model_matrix, 16, gfloat, orientation->modelMatrix);
 
@@ -174,16 +171,14 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	int			front, back;
 
 	MObject arr = managed_common_create_vector3_array (2);
-	vector3_t native_bounds[2];
+	vector3_t *native_bounds = (vector3_t *)bounds;
 	MObject result;
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
 	}
 
-	native_bounds [0] = *(vector3_t *)bounds [0];
-	native_bounds [1] = *(vector3_t *)bounds [1];
-	m_array_map (arr,2,vector3_t,native_bounds);
+	m_array_map (arr, 2, vector3_t, native_bounds);
 
 	// transform into world space
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
