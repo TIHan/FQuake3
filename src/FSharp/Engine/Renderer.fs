@@ -45,6 +45,7 @@ type Orientation =
 
     new (origin, axis, viewOrigin, modelMatrix) = { Origin = origin; Axis = axis; ViewOrigin = viewOrigin; ModelMatrix = modelMatrix }
 
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Plane =

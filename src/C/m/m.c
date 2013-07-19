@@ -167,7 +167,17 @@ m_object_set_property (MObject object, const gchar *property_name, gpointer valu
 	{
 		mono_property_set_value (prop, (MonoObject *)object.__priv, args, NULL);
 	}
+}
 
+
+void
+m_object_set_field (MObject object, const gchar *field_name, gpointer value)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
+	MonoClassField *field = mono_class_get_field_from_name (klass, field_name);
+	MonoType *type = mono_class_get_type (klass);
+
+	mono_field_set_value ((MonoObject *)object.__priv, field, value);
 }
 
 
@@ -276,7 +286,7 @@ m_array_unbox (const MArray object)
 }
 
 MObject
-m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value)
+m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer value)
 {
 	MonoAssembly *const assembly = find_assembly (assembly_name);
 	MonoImage *image = image = mono_assembly_get_image (assembly);

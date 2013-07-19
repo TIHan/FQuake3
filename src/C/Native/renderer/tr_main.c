@@ -119,13 +119,13 @@ R_CullLocalBox (vec3_t bounds[2]) {
 #else
 
 MObject
-m_common_create_vector3 ()
+m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 {
 	gpointer *args;
 
-	args [0] = 0;
-	args [1] = 0;
-	args [2] = 0;
+	args [0] = &x;
+	args [1] = &y;
+	args [2] = &z;
 
 	return m_object ("Engine", "Engine", "Vector3", 3, args);
 }
@@ -139,10 +139,10 @@ m_common_create_vector3_array (const gint size)
 MObject
 m_common_create_orientation (orientationr_t *orientation)
 {
-	gpointer args[4];
-
 	MArray m_axis = m_common_create_vector3_array (3);
 	MArray m_model_matrix = m_array_int32 (16);
+
+	gpointer args[4];
 
 	m_array_map (m_axis, 3, vector3_t, ((vector3_t *)orientation->axis));
 	m_array_map (m_model_matrix, 16, gfloat, orientation->modelMatrix);

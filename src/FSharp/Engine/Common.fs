@@ -50,6 +50,15 @@ type Vector3 =
     val Y : float32
     val Z : float32
 
+    member this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | _ -> 0.f
+        
+
     new (x, y, z) = { X = x; Y = y; Z = z }
     new (vector: Vector3) = { X = vector.X; Y = vector.Y; Z = vector.Z }
 

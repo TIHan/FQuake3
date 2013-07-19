@@ -51,6 +51,9 @@ m_object_get_property (MObject object, const gchar *property_name);
 void
 m_object_set_property (MObject object, const gchar *property_name, gpointer value);
 
+void
+m_object_set_field (MObject object, const gchar *field_name, gpointer value);
+
 MObject
 m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args);
 
@@ -76,7 +79,7 @@ gpointer
 m_array_unbox (const MArray object);
 
 MObject
-m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer *value);
+m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer value);
 
 #define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
 #define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
