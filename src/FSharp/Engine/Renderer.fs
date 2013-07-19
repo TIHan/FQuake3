@@ -57,6 +57,8 @@ type Plane =
 
     val SignBits : byte
 
+    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits }
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type ViewParms =

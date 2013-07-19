@@ -156,9 +156,57 @@ m_common_create_orientation (orientationr_t *orientation)
 }
 
 MObject
-m_common_create_view_params (viewParms_t *view_parms)
+m_common_create_plane (cplane_t *plane)
 {
+	gpointer args[4];
+
+	args [0] = (vector3_t *)plane->normal;
+	args [1] = &plane->dist;
+	args [2] = &plane->type;
+	args [3] = &plane->signbits;
+
+	return m_object ("Engine", "Engine", "Plane", 4, args);
+}
+
+MArray
+m_common_create_plane_array (const gint size)
+{
+	return m_array ("Engine", "Engine", "Plane", size);
+}
+
+MObject
+m_common_create_view_parms (viewParms_t *view_parms)
+{
+	MArray m_projection_matrix = m_array_int32 (16);
+	MArray m_frustum = m_common_create_plane_array (4);
+	MArray m_visibility_bounds = m_common_create_vector3_array (2);
+
 	gpointer args[18];
+
+	m_array_map (m_projection_matrix, 16, gfloat, view_parms->projectionMatrix);
+	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
+	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
+
+	args [0] = &view_parms->or;
+	args [1] = &view_parms->world;
+	args [2] = (vector3_t *)view_parms->pvsOrigin;
+	args [3] = &view_parms->isPortal;
+	args [4] = &view_parms->isMirror;
+	args [5] = &view_parms->frameSceneNum;
+	args [6] = &view_parms->frameCount;
+	args [7] = &view_parms->portalPlane;
+	args [8] = &view_parms->viewportX;
+	args [9] = &view_parms->viewportY;
+	args [10] = &view_parms->viewportWidth;
+	args [11] = &view_parms->viewportHeight;
+	args [12] = &view_parms->fovX;
+	args [13] = &view_parms->fovY;
+	args [14] = m_array_unbox (m_projection_matrix);
+	args [15] = m_array_unbox (m_frustum);
+	args [16] = m_array_unbox (m_visibility_bounds);
+	args [17] = &view_parms->zFar;
+
+	return m_object ("Engine", "Engine", "ViewParms", 18, args);
 }
 
 M_EXPORT
@@ -172,6 +220,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	int			anyBack;
 	int			front, back;
 
+	MObject m_view_parms = m_common_create_view_parms (&tr.viewParms);
 	MArray m_bounds = m_common_create_vector3_array (2);
 	MArray m_transformed;
 
