@@ -149,6 +149,28 @@ m_object_get_property (MObject object, const gchar *property_name)
 }
 
 
+MArray
+m_object_get_property_array (MObject object, const gchar *property_name)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
+	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
+	MonoType *type = mono_class_get_type (klass);
+
+	MArray result;
+	
+	if (mono_type_is_struct (type))
+	{
+		result.__priv = mono_property_get_value (prop, mono_object_unbox ((MonoObject *)object.__priv), NULL, NULL);
+	}
+	else
+	{
+		result.__priv = mono_property_get_value (prop, (MonoObject *)object.__priv, NULL, NULL);
+	}
+
+	return result;
+}
+
+
 void
 m_object_set_property (MObject object, const gchar *property_name, gpointer value)
 {

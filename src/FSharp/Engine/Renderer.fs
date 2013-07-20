@@ -50,7 +50,7 @@ type Orientation =
 [<StructLayout (LayoutKind.Sequential)>]
 type Plane =
     val Normal : Vector3
-    val Distance : float32
+    val Distance : single
 
     [<MarshalAs (UnmanagedType.I8)>]
     val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
@@ -117,21 +117,51 @@ module CvarModule =
 
 module MainRenderer =
 
+    /// <summary>
+    /// Transform into world space.
+    /// </summary>
     let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
         let transformed : Vector3[] = Array.zeroCreate 8
         
         transformed |> Array.mapi (fun i x ->
-            let v =
-                Vector3 (
-                        bounds.[i &&& 1].X,
-                        bounds.[(i >>> 1) &&& 1].Y,
-                        bounds.[(i >>> 1) &&& 1].Z  
-                )
+            let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 1) &&& 1].Z)
 
             orientation.Origin
             |> Vector3.MA v.X orientation.Axis.[0]
             |> Vector3.MA v.Y orientation.Axis.[1]
             |> Vector3.MA v.Z orientation.Axis.[2]
         )
+
+    /// <summary>
+    /// Check against frustum planes.
+    /// </summary>
+    let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
+        let rec checkFrustumPlane (frust: Plane) front back isFront acc =
+            match acc = Array.length transformed || isFront with
+            | true -> (front, back)
+            | _ ->
+                let distance = Vector3.DotProduct transformed.[acc] frust.Normal
+                Console.WriteLine (transformed.[acc].X)
+                match distance > frust.Distance with
+                | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
+                | _ -> checkFrustumPlane frust front 1 false (acc + 1)
+
+
+
+        let rec checkFrustumPlanes anyBack isFront acc =
+            match acc = Array.length frustum || isFront = false with
+            | true ->
+                (anyBack, isFront)
+            | _ ->
+                let frust = frustum.[acc]
+                let frontBack = checkFrustumPlane frust 0 0 false 0
+                match frontBack with
+                | (front, back) ->
+                    checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
+
+        match checkFrustumPlanes 0 true 0 with
+        | (_, false) -> CullType.Out
+        | (0, _) -> CullType.In
+        | _ -> CullType.Clip
 
 

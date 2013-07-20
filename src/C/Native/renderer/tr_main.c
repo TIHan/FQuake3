@@ -214,8 +214,8 @@ int
 M_DECL
 R_CullLocalBox (vec3_t bounds[2]) {
 	int		i, j;
-	vec3_t	transformed[8];
 	float	dists[8];
+	vec3_t	v;
 	cplane_t	*frust;
 	int			anyBack;
 	int			front, back;
@@ -223,6 +223,9 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	MObject m_view_parms = m_common_create_view_parms (&tr.viewParms);
 	MArray m_bounds = m_common_create_vector3_array (2);
 	MArray m_transformed;
+	MObject m_cull_type;
+
+	vec3_t	transformed[8];
 
 	if ( r_nocull->integer ) {
 		return CULL_CLIP;
@@ -239,6 +242,14 @@ R_CullLocalBox (vec3_t bounds[2]) {
 	m_map_array (((vector3_t *)transformed), 8, vector3_t, m_transformed);
 
 	// check against frustum planes
+#if 1
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CheckFrustumPlanes", 2, {
+		__args [0] = m_array_unbox (m_transformed);
+		__args [1] = m_array_unbox (m_object_get_property_array (m_view_parms, "Frustum"));
+	}, m_cull_type);
+
+	return *(gint *)m_object_unbox (m_cull_type);
+#else
 	anyBack = 0;
 	for (i = 0 ; i < 4 ; i++) {
 		frust = &tr.viewParms.frustum[i];
@@ -246,6 +257,7 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		front = back = 0;
 		for (j = 0 ; j < 8 ; j++) {
 			dists[j] = DotProduct(transformed[j], frust->normal);
+
 			if ( dists[j] > frust->dist ) {
 				front = 1;
 				if ( back ) {
@@ -266,7 +278,8 @@ R_CullLocalBox (vec3_t bounds[2]) {
 		return CULL_IN;		// completely inside frustum
 	}
 
-	return CULL_CLIP;		// partially clipped
+	return CULL_CLIP;		// partially clipped*/
+#endif
 }
 #endif
 

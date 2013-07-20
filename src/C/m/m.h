@@ -48,6 +48,9 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *stru
 MObject
 m_object_get_property (MObject object, const gchar *property_name);
 
+MArray
+m_object_get_property_array (MObject object, const gchar *property_name);
+
 void
 m_object_set_property (MObject object, const gchar *property_name, gpointer value);
 
