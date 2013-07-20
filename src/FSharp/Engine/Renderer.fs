@@ -330,3 +330,22 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
             (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z
         )
 
+
+(*
+int R_CullLocalPointAndRadius( vec3_t pt, float radius )
+{
+	vec3_t transformed;
+
+	R_LocalPointToWorld( pt, transformed );
+
+	return R_CullPointAndRadius( transformed, radius );
+}
+*)
+
+    /// <summary>
+    /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
+    /// </summary>
+    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (viewParms: ViewParms) =
+        let transformed = LocalPointToWorld point orientation
+        CullPointAndRadius transformed radius viewParms
+

@@ -167,13 +167,18 @@ gint R_CullLocalBox (vec3_t bounds[2])
 /*
 ** R_CullLocalPointAndRadius
 */
-int R_CullLocalPointAndRadius( vec3_t pt, float radius )
+gint R_CullLocalPointAndRadius( vec3_t pt, float radius )
 {
-	vec3_t transformed;
+	MObject m_cull_type;
 
-	R_LocalPointToWorld( pt, transformed );
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
+		__args [0] = pt;
+		__args [1] = &radius;
+		__args [2] = m_object_unbox (m_common_create_orientation (&tr.or));
+		__args [3] = m_object_unbox (m_common_create_view_parms (&tr.viewParms));
+	}, m_cull_type);
 
-	return R_CullPointAndRadius( transformed, radius );
+	return *(gint *)m_object_unbox (m_cull_type);
 }
 
 /*
@@ -213,12 +218,11 @@ R_LocalPointToWorld
 */
 void R_LocalPointToWorld (vec3_t local, vec3_t world)
 {
-	MObject orientation = m_common_create_orientation (&tr.or);
 	MObject m_world;
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalPointToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_unbox (orientation);
+		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);

@@ -228,6 +228,9 @@ m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *
 gpointer
 m_object_unbox (MObject object)
 {
+	if (!object.__priv)
+		g_error ("M: Cannot unbox null object.");
+
 	return mono_object_unbox ((MonoObject *)object.__priv);
 }
 
