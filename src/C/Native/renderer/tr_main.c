@@ -57,67 +57,6 @@ Cvar_GetNoCull (void)
 	return r_nocull->integer;
 }
 
-#if 0
-M_EXPORT
-int
-M_DECL
-R_CullLocalBox (vec3_t bounds[2]) {
-	int		i, j;
-	vec3_t	transformed[8];
-	float	dists[8];
-	vec3_t	v;
-	cplane_t	*frust;
-	int			anyBack;
-	int			front, back;
-
-	if ( r_nocull->integer ) {
-		return CULL_CLIP;
-	}
-
-	// transform into world space
-	for (i = 0 ; i < 8 ; i++) {
-		v[0] = bounds[i&1][0];
-		v[1] = bounds[(i>>1)&1][1];
-		v[2] = bounds[(i>>2)&1][2];
-
-		VectorCopy( tr.or.origin, transformed[i] );
-		VectorMA( transformed[i], v[0], tr.or.axis[0], transformed[i] );
-		VectorMA( transformed[i], v[1], tr.or.axis[1], transformed[i] );
-		VectorMA( transformed[i], v[2], tr.or.axis[2], transformed[i] );
-	}
-
-	// check against frustum planes
-	anyBack = 0;
-	for (i = 0 ; i < 4 ; i++) {
-		frust = &tr.viewParms.frustum[i];
-
-		front = back = 0;
-		for (j = 0 ; j < 8 ; j++) {
-			dists[j] = DotProduct(transformed[j], frust->normal);
-			if ( dists[j] > frust->dist ) {
-				front = 1;
-				if ( back ) {
-					break;		// a point is in front
-				}
-			} else {
-				back = 1;
-			}
-		}
-		if ( !front ) {
-			// all points were behind one of the planes
-			return CULL_OUT;
-		}
-		anyBack |= back;
-	}
-
-	if ( !anyBack ) {
-		return CULL_IN;		// completely inside frustum
-	}
-
-	return CULL_CLIP;		// partially clipped
-}
-#else
-
 MObject
 m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 {
@@ -212,76 +151,21 @@ m_common_create_view_parms (viewParms_t *view_parms)
 M_EXPORT
 int
 M_DECL
-R_CullLocalBox (vec3_t bounds[2]) {
-	int		i, j;
-	float	dists[8];
-	vec3_t	v;
-	cplane_t	*frust;
-	int			anyBack;
-	int			front, back;
-
-	MObject m_view_parms = m_common_create_view_parms (&tr.viewParms);
-	MArray m_bounds = m_common_create_vector3_array (2);
-	MArray m_transformed;
+R_CullLocalBox (vec3_t bounds[2])
+{
+	MArray m_bounds = m_array ("Engine", "Engine", "Vector3", 2);
 	MObject m_cull_type;
-
-	vec3_t	transformed[8];
-
-	if ( r_nocull->integer ) {
-		return CULL_CLIP;
-	}
 
 	m_array_map (m_bounds, 2, vector3_t, ((vector3_t *)bounds));
 
-	// transform into world space
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformWorldSpace", 2, {
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = m_array_unbox (m_bounds);
 		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
-	}, m_transformed);
-
-	m_map_array (((vector3_t *)transformed), 8, vector3_t, m_transformed);
-
-	// check against frustum planes
-#if 1
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CheckFrustumPlanes", 2, {
-		__args [0] = m_array_unbox (m_transformed);
-		__args [1] = m_array_unbox (m_object_get_property_array (m_view_parms, "Frustum"));
+		__args [2] = m_object_unbox (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
-#else
-	anyBack = 0;
-	for (i = 0 ; i < 4 ; i++) {
-		frust = &tr.viewParms.frustum[i];
-
-		front = back = 0;
-		for (j = 0 ; j < 8 ; j++) {
-			dists[j] = DotProduct(transformed[j], frust->normal);
-
-			if ( dists[j] > frust->dist ) {
-				front = 1;
-				if ( back ) {
-					break;		// a point is in front
-				}
-			} else {
-				back = 1;
-			}
-		}
-		if ( !front ) {
-			// all points were behind one of the planes
-			return CULL_OUT;
-		}
-		anyBack |= back;
-	}
-
-	if ( !anyBack ) {
-		return CULL_IN;		// completely inside frustum
-	}
-
-	return CULL_CLIP;		// partially clipped*/
-#endif
 }
-#endif
 
 /*
 ** R_CullLocalPointAndRadius

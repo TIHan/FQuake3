@@ -47,17 +47,23 @@ type Orientation =
 
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
+[<StructLayout (LayoutKind.Explicit, Size = 20)>]
 type Plane =
+    
+    [<FieldOffset (0)>]
     val Normal : Vector3
+
+    [<FieldOffset (12)>]
     val Distance : single
 
+    [<FieldOffset (16)>]
     [<MarshalAs (UnmanagedType.I8)>]
     val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
 
+    [<FieldOffset (17)>]
     val SignBits : byte
 
-    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits }
+    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -120,7 +126,7 @@ module MainRenderer =
     /// <summary>
     /// Transform into world space.
     /// </summary>
-    let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
+    let private TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
         let transformed : Vector3[] = Array.zeroCreate 8
         
         transformed |> Array.mapi (fun i x ->
@@ -135,13 +141,13 @@ module MainRenderer =
     /// <summary>
     /// Check against frustum planes.
     /// </summary>
-    let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
+    let private CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
         let rec checkFrustumPlane (frust: Plane) front back isFront acc =
             match acc = Array.length transformed || isFront with
             | true -> (front, back)
             | _ ->
                 let distance = Vector3.DotProduct transformed.[acc] frust.Normal
-                Console.WriteLine (transformed.[acc].X)
+
                 match distance > frust.Distance with
                 | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
                 | _ -> checkFrustumPlane frust front 1 false (acc + 1)
@@ -154,8 +160,8 @@ module MainRenderer =
                 (anyBack, isFront)
             | _ ->
                 let frust = frustum.[acc]
-                let frontBack = checkFrustumPlane frust 0 0 false 0
-                match frontBack with
+
+                match checkFrustumPlane frust 0 0 false 0 with
                 | (front, back) ->
                     checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
 
@@ -164,4 +170,74 @@ module MainRenderer =
         | (0, _) -> CullType.In
         | _ -> CullType.Clip
 
+
+(*
+int R_CullLocalBox (vec3_t bounds[2]) {
+	int		i, j;
+	vec3_t	transformed[8];
+	float	dists[8];
+	vec3_t	v;
+	cplane_t	*frust;
+	int			anyBack;
+	int			front, back;
+
+	if ( r_nocull->integer ) {
+		return CULL_CLIP;
+	}
+
+	// transform into world space
+	for (i = 0 ; i < 8 ; i++) {
+		v[0] = bounds[i&1][0];
+		v[1] = bounds[(i>>1)&1][1];
+		v[2] = bounds[(i>>2)&1][2];
+
+		VectorCopy( tr.or.origin, transformed[i] );
+		VectorMA( transformed[i], v[0], tr.or.axis[0], transformed[i] );
+		VectorMA( transformed[i], v[1], tr.or.axis[1], transformed[i] );
+		VectorMA( transformed[i], v[2], tr.or.axis[2], transformed[i] );
+	}
+
+	// check against frustum planes
+	anyBack = 0;
+	for (i = 0 ; i < 4 ; i++) {
+		frust = &tr.viewParms.frustum[i];
+
+		front = back = 0;
+		for (j = 0 ; j < 8 ; j++) {
+			dists[j] = DotProduct(transformed[j], frust->normal);
+			if ( dists[j] > frust->dist ) {
+				front = 1;
+				if ( back ) {
+					break;		// a point is in front
+				}
+			} else {
+				back = 1;
+			}
+		}
+		if ( !front ) {
+			// all points were behind one of the planes
+			return CULL_OUT;
+		}
+		anyBack |= back;
+	}
+
+	if ( !anyBack ) {
+		return CULL_IN;		// completely inside frustum
+	}
+
+	return CULL_CLIP;		// partially clipped
+}
+*)
+
+
+    let CullLocalBox (bounds: Vector3[]) (orientation: Orientation) (viewParms: ViewParms) =
+        match CvarModule.GetNoCull () with
+        | true -> CullType.Clip
+        | _ ->
+
+        // transform into world space
+        let transformed = TransformWorldSpace bounds orientation
+
+        // check against frustum planes
+        CheckFrustumPlanes transformed viewParms.Frustum
 
