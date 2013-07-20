@@ -56,7 +56,7 @@ type Vector3 =
             | 0 -> this.X
             | 1 -> this.Y
             | 2 -> this.Z
-            | _ -> 0.f
+            | _ -> raise <| IndexOutOfRangeException ()
         
 
     new (x, y, z) = { X = x; Y = y; Z = z }

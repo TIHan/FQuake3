@@ -148,10 +148,7 @@ m_common_create_view_parms (viewParms_t *view_parms)
 	return m_object ("Engine", "Engine", "ViewParms", 18, args);
 }
 
-M_EXPORT
-int
-M_DECL
-R_CullLocalBox (vec3_t bounds[2])
+gint R_CullLocalBox (vec3_t bounds[2])
 {
 	MArray m_bounds = m_array ("Engine", "Engine", "Vector3", 2);
 	MObject m_cull_type;
@@ -182,39 +179,17 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 /*
 ** R_CullPointAndRadius
 */
-int R_CullPointAndRadius( vec3_t pt, float radius )
+gint R_CullPointAndRadius( vec3_t pt, float radius )
 {
-	int		i;
-	float	dist;
-	cplane_t	*frust;
-	qboolean mightBeClipped = qfalse;
+	MObject m_cull_type;
 
-	if ( r_nocull->integer ) {
-		return CULL_CLIP;
-	}
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullPointAndRadius", 3, {
+		__args [0] = pt;
+		__args [1] = &radius;
+		__args [2] = m_object_unbox (m_common_create_view_parms (&tr.viewParms));
+	}, m_cull_type);
 
-	// check against frustum planes
-	for (i = 0 ; i < 4 ; i++) 
-	{
-		frust = &tr.viewParms.frustum[i];
-
-		dist = DotProduct( pt, frust->normal) - frust->dist;
-		if ( dist < -radius )
-		{
-			return CULL_OUT;
-		}
-		else if ( dist <= radius ) 
-		{
-			mightBeClipped = qtrue;
-		}
-	}
-
-	if ( mightBeClipped )
-	{
-		return CULL_CLIP;
-	}
-
-	return CULL_IN;		// completely inside frustum
+	return *(gint *)m_object_unbox (m_cull_type);
 }
 
 

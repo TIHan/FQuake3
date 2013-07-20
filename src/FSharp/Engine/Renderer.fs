@@ -115,6 +115,7 @@ type ViewParms =
             VisibilityBounds = visibilityBounds;
             ZFar = zFar;
         }
+        
 
 module CvarModule =
     
@@ -122,53 +123,74 @@ module CvarModule =
         NativeRenderer.Cvar_GetNoCull ()
 
 module MainRenderer =
-
-    /// <summary>
-    /// Transform into world space.
-    /// </summary>
-    let private TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
-        let transformed : Vector3[] = Array.zeroCreate 8
+    module private LocalBox =
+        /// <summary>
+        /// Transform into world space.
+        /// </summary>
+        let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
+            let transformed : Vector3[] = Array.zeroCreate 8
         
-        transformed |> Array.mapi (fun i x ->
-            let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 1) &&& 1].Z)
+            transformed |> Array.mapi (fun i x ->
+                let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 1) &&& 1].Z)
 
-            orientation.Origin
-            |> Vector3.MA v.X orientation.Axis.[0]
-            |> Vector3.MA v.Y orientation.Axis.[1]
-            |> Vector3.MA v.Z orientation.Axis.[2]
-        )
+                orientation.Origin
+                |> Vector3.MA v.X orientation.Axis.[0]
+                |> Vector3.MA v.Y orientation.Axis.[1]
+                |> Vector3.MA v.Z orientation.Axis.[2]
+            )
+
+        /// <summary>
+        /// Check against frustum planes.
+        /// </summary>
+        let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
+            let rec checkFrustumPlane (frust: Plane) front back isFront acc =
+                match acc = Array.length transformed || isFront with
+                | true -> (front, back)
+                | _ ->
+                    let distance = Vector3.DotProduct transformed.[acc] frust.Normal
+
+                    match distance > frust.Distance with
+                    | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
+                    | _ -> checkFrustumPlane frust front 1 false (acc + 1)
+
+
+
+            let rec checkFrustumPlanes anyBack isFront acc =
+                match acc = Array.length frustum || isFront = false with
+                | true -> (anyBack, isFront)
+                | _ ->
+                    let frust = frustum.[acc]
+
+                    match checkFrustumPlane frust 0 0 false 0 with
+                    | (front, back) ->
+                        checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
+
+            match checkFrustumPlanes 0 true 0 with
+            | (_, false) -> CullType.Out
+            | (0, _) -> CullType.In
+            | _ -> CullType.Clip
 
     /// <summary>
-    /// Check against frustum planes.
+    ///
     /// </summary>
-    let private CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
-        let rec checkFrustumPlane (frust: Plane) front back isFront acc =
-            match acc = Array.length transformed || isFront with
-            | true -> (front, back)
-            | _ ->
-                let distance = Vector3.DotProduct transformed.[acc] frust.Normal
+    module private PointAndRadius =
+        let CheckFrustumPlanes (point: Vector3) (radius: single) (frustum: Plane[]) =
+            let rec checkFrustumPlanes mightBeClipped canCullOut acc =
+                match acc = Array.length frustum || canCullOut with
+                | true -> (mightBeClipped, canCullOut)
+                | _ ->
+                    let frust = frustum.[acc]
+                    let distance = (Vector3.DotProduct point frust.Normal) - frust.Distance
 
-                match distance > frust.Distance with
-                | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
-                | _ -> checkFrustumPlane frust front 1 false (acc + 1)
+                    match distance < -radius with
+                    | true -> checkFrustumPlanes mightBeClipped true (acc + 1)
+                    | _ when distance <= radius -> checkFrustumPlanes true false (acc + 1)
+                    | _ -> checkFrustumPlanes mightBeClipped false (acc + 1)
 
-
-
-        let rec checkFrustumPlanes anyBack isFront acc =
-            match acc = Array.length frustum || isFront = false with
-            | true ->
-                (anyBack, isFront)
-            | _ ->
-                let frust = frustum.[acc]
-
-                match checkFrustumPlane frust 0 0 false 0 with
-                | (front, back) ->
-                    checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
-
-        match checkFrustumPlanes 0 true 0 with
-        | (_, false) -> CullType.Out
-        | (0, _) -> CullType.In
-        | _ -> CullType.Clip
+            match checkFrustumPlanes false false 0 with
+            | (_, true) -> CullType.Out
+            | (true, _) -> CullType.Clip
+            | _ -> CullType.In
 
 
 (*
@@ -229,17 +251,66 @@ int R_CullLocalBox (vec3_t bounds[2]) {
 }
 *)
 
-
+    /// <summary>
+    // R_CullLocalBox (vec3_t bounds[2])
+    // </summary>
     let CullLocalBox (bounds: Vector3[]) (orientation: Orientation) (viewParms: ViewParms) =
         match CvarModule.GetNoCull () with
         | true -> CullType.Clip
         | _ ->
 
         // transform into world space
-        let transformed = TransformWorldSpace bounds orientation
+        let transformed = LocalBox.TransformWorldSpace bounds orientation
 
         // check against frustum planes
-        CheckFrustumPlanes transformed viewParms.Frustum
+        LocalBox.CheckFrustumPlanes transformed viewParms.Frustum
+
+(*
+int R_CullPointAndRadius( vec3_t pt, float radius )
+{
+	int		i;
+	float	dist;
+	cplane_t	*frust;
+	qboolean mightBeClipped = qfalse;
+
+	if ( r_nocull->integer ) {
+		return CULL_CLIP;
+	}
+
+	// check against frustum planes
+	for (i = 0 ; i < 4 ; i++) 
+	{
+		frust = &tr.viewParms.frustum[i];
+
+		dist = DotProduct( pt, frust->normal) - frust->dist;
+		if ( dist < -radius )
+		{
+			return CULL_OUT;
+		}
+		else if ( dist <= radius ) 
+		{
+			mightBeClipped = qtrue;
+		}
+	}
+
+	if ( mightBeClipped )
+	{
+		return CULL_CLIP;
+	}
+
+	return CULL_IN;		// completely inside frustum
+}
+*)
+
+    /// <summary>
+    /// R_CullPointAndRadius( vec3_t pt, float radius )
+    /// </summary>
+    let CullPointAndRadius (point: Vector3) (radius: single) (viewParms: ViewParms) =
+        match CvarModule.GetNoCull () with
+        | true -> CullType.Clip
+        | _ ->
+
+        PointAndRadius.CheckFrustumPlanes point radius viewParms.Frustum
 
 (*
 void R_LocalPointToWorld (vec3_t local, vec3_t world) {
@@ -250,7 +321,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
 *)
 
     /// <summary>
-    ///
+    /// R_LocalPointToWorld (vec3_t local, vec3_t world)
     /// </summary>
     let LocalPointToWorld (local: Vector3) (orientation: Orientation) =
         Vector3 (
