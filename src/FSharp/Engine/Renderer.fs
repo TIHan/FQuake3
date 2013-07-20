@@ -241,3 +241,21 @@ int R_CullLocalBox (vec3_t bounds[2]) {
         // check against frustum planes
         CheckFrustumPlanes transformed viewParms.Frustum
 
+(*
+void R_LocalPointToWorld (vec3_t local, vec3_t world) {
+	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
+	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
+	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
+}
+*)
+
+    /// <summary>
+    ///
+    /// </summary>
+    let LocalPointToWorld (local: Vector3) (orientation: Orientation) =
+        Vector3 (
+            (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X,
+            (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y,
+            (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z
+        )
+

@@ -236,10 +236,17 @@ R_LocalPointToWorld
 
 =================
 */
-void R_LocalPointToWorld (vec3_t local, vec3_t world) {
-	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
-	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
-	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
+void R_LocalPointToWorld (vec3_t local, vec3_t world)
+{
+	MObject orientation = m_common_create_orientation (&tr.or);
+	MObject m_world;
+
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalPointToWorld", 2, {
+		__args [0] = local;
+		__args [1] = m_object_unbox (orientation);
+	}, m_world);
+
+	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
 }
 
 /*
