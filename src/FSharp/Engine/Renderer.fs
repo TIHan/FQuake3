@@ -330,6 +330,24 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
             (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z
         )
 
+(*
+void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
+	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
+	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
+	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
+}
+*)
+
+    /// <summary>
+    /// R_LocalNormalToWorld (vec3_t local, vec3_t world)
+    /// </summary>
+    let LocalNormalToWorld (local: Vector3) (orientation: Orientation) =
+        Vector3 (
+            (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X),
+            (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y),
+            (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z)
+        )
+
 
 (*
 int R_CullLocalPointAndRadius( vec3_t pt, float radius )

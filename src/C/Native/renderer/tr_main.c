@@ -41,14 +41,6 @@ refimport_t	ri;
 // point at this for their sorting surface
 surfaceType_t	entitySurface = SF_ENTITY;
 
-/*
-=================
-R_CullLocalBox
-
-Returns CULL_IN, CULL_CLIP, or CULL_OUT
-=================
-*/
-
 M_EXPORT
 gint
 M_DECL
@@ -148,7 +140,15 @@ m_common_create_view_parms (viewParms_t *view_parms)
 	return m_object ("Engine", "Engine", "ViewParms", 18, args);
 }
 
-gint R_CullLocalBox (vec3_t bounds[2])
+/*
+=================
+R_CullLocalBox
+
+Returns CULL_IN, CULL_CLIP, or CULL_OUT
+=================
+*/
+gint
+R_CullLocalBox (vec3_t bounds[2])
 {
 	MArray m_bounds = m_array ("Engine", "Engine", "Vector3", 2);
 	MObject m_cull_type;
@@ -167,7 +167,8 @@ gint R_CullLocalBox (vec3_t bounds[2])
 /*
 ** R_CullLocalPointAndRadius
 */
-gint R_CullLocalPointAndRadius( vec3_t pt, float radius )
+gint
+R_CullLocalPointAndRadius( vec3_t pt, float radius )
 {
 	MObject m_cull_type;
 
@@ -184,7 +185,8 @@ gint R_CullLocalPointAndRadius( vec3_t pt, float radius )
 /*
 ** R_CullPointAndRadius
 */
-gint R_CullPointAndRadius( vec3_t pt, float radius )
+gint
+R_CullPointAndRadius( vec3_t pt, float radius )
 {
 	MObject m_cull_type;
 
@@ -204,10 +206,16 @@ R_LocalNormalToWorld
 
 =================
 */
-void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
-	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
-	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
-	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
+void
+R_LocalNormalToWorld (vec3_t local, vec3_t world) {
+	MObject m_world;
+
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalNormalToWorld", 2, {
+		__args [0] = local;
+		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
+	}, m_world);
+
+	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
 }
 
 /*
@@ -216,7 +224,8 @@ R_LocalPointToWorld
 
 =================
 */
-void R_LocalPointToWorld (vec3_t local, vec3_t world)
+void
+R_LocalPointToWorld (vec3_t local, vec3_t world)
 {
 	MObject m_world;
 
