@@ -63,7 +63,7 @@ type Vector3 =
     new (vector: Vector3) = { X = vector.X; Y = vector.Y; Z = vector.Z }
 
     static member Snap (vec: Vector3) =
-        new Vector3 (float32 (int vec.X), float32 (int vec.Y), float32 (int vec.Z))
+        new Vector3 (truncate vec.X, truncate vec.Y, truncate vec.Z)
 
     static member MA (s: float32) (b: Vector3) (vec: Vector3) =
         new Vector3 (

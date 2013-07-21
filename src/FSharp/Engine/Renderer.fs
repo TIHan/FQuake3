@@ -76,10 +76,10 @@ type ViewParms =
     val FrameSceneId : int
     val FrameCount : int
     val PortalPlane : Plane
-    val ViewPortX : int
-    val ViewPortY : int
-    val ViewPortWidth : int
-    val ViewPortHeight : int
+    val ViewportX : int
+    val ViewportY : int
+    val ViewportWidth : int
+    val ViewportHeight : int
     val FovX : float32
     val FovY : float32
 
@@ -104,10 +104,10 @@ type ViewParms =
             FrameSceneId = frameSceneId;
             FrameCount = frameCount;
             PortalPlane = portalPlane;
-            ViewPortX = viewPortX;
-            ViewPortY = viewPortY;
-            ViewPortWidth = viewPortWidth;
-            ViewPortHeight = viewPortHeight;
+            ViewportX = viewPortX;
+            ViewportY = viewPortY;
+            ViewportWidth = viewPortWidth;
+            ViewportHeight = viewPortHeight;
             FovX = fovX;
             FovY = fovY;
             ProjectionMatrix = projectionMatrix;
@@ -441,3 +441,40 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
             )
 
         (eye, destination)
+
+(*
+void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window ) {
+	normalized[0] = clip[0] / clip[3];
+	normalized[1] = clip[1] / clip[3];
+	normalized[2] = ( clip[2] + clip[3] ) / ( 2 * clip[3] );
+
+	window[0] = 0.5f * ( 1.0f + normalized[0] ) * view->viewportWidth;
+	window[1] = 0.5f * ( 1.0f + normalized[1] ) * view->viewportHeight;
+	window[2] = normalized[2];
+
+	window[0] = (int) ( window[0] + 0.5 );
+	window[1] = (int) ( window[1] + 0.5 );
+}
+*)
+    
+    /// <summary>
+    /// R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window )
+    /// </summary>
+    let TransformClipToWindow (clip: Vector4) (view: ViewParms) =
+        let normalized =
+            Vector4 (
+                clip.X / clip.W,
+                clip.Y / clip.W,
+                (clip.Z + clip.W) / (2.f * clip.W),
+                0.f
+            )
+
+        let window =
+            Vector4 (
+                truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f),
+                truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f),
+                normalized.Z,
+                0.f
+            )
+
+        (normalized, window)

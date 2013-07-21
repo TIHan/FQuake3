@@ -46,22 +46,22 @@ MObject
 m_object (const gchar *assembly_name, const gchar *name_space, const gchar *struct_name, gint argc, gpointer *args);
 
 MObject
-m_object_get_property (MObject object, const gchar *property_name);
+m_object_get_property (const MObject object, const gchar *property_name);
 
 MArray
-m_object_get_property_array (MObject object, const gchar *property_name);
+m_object_get_property_array (const MObject object, const gchar *property_name);
 
 void
-m_object_set_property (MObject object, const gchar *property_name, gpointer value);
+m_object_set_property (const MObject object, const gchar *property_name, gpointer value);
 
 void
-m_object_set_field (MObject object, const gchar *field_name, gpointer value);
+m_object_set_field (const MObject object, const gchar *field_name, gpointer value);
 
 MObject
-m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args);
+m_object_invoke (const MObject object, const gchar *method_name, gint argc, gpointer *args);
 
 gpointer
-m_object_unbox (MObject object);
+m_object_unbox (const MObject object);
 
 MObject
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);

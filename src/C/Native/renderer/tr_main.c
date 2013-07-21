@@ -68,7 +68,7 @@ m_common_create_vector3_array (const gint size)
 }
 
 MObject
-m_common_create_orientation (orientationr_t *orientation)
+m_common_create_orientation (const orientationr_t *const orientation)
 {
 	MArray m_axis = m_common_create_vector3_array (3);
 	MArray m_model_matrix = m_array_int32 (16);
@@ -87,7 +87,7 @@ m_common_create_orientation (orientationr_t *orientation)
 }
 
 MObject
-m_common_create_plane (cplane_t *plane)
+m_common_create_plane (const cplane_t *const plane)
 {
 	gpointer args[4];
 
@@ -106,7 +106,7 @@ m_common_create_plane_array (const gint size)
 }
 
 MObject
-m_common_create_view_parms (viewParms_t *view_parms)
+m_common_create_view_parms (const viewParms_t *const view_parms)
 {
 	MArray m_projection_matrix = m_array_int32 (16);
 	MArray m_frustum = m_common_create_plane_array (4);
@@ -288,17 +288,18 @@ R_TransformClipToWindow
 
 ==========================
 */
-void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window ) {
-	normalized[0] = clip[0] / clip[3];
-	normalized[1] = clip[1] / clip[3];
-	normalized[2] = ( clip[2] + clip[3] ) / ( 2 * clip[3] );
+void
+R_TransformClipToWindow (const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window)
+{
+	MObject m_tuple_normalized_and_window;
 
-	window[0] = 0.5f * ( 1.0f + normalized[0] ) * view->viewportWidth;
-	window[1] = 0.5f * ( 1.0f + normalized[1] ) * view->viewportHeight;
-	window[2] = normalized[2];
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformClipToWindow", 2, {
+		__args [0] = (vector3_t *)clip;
+		__args [1] = m_object_unbox (m_common_create_view_parms (view));
+	}, m_tuple_normalized_and_window);
 
-	window[0] = (int) ( window[0] + 0.5 );
-	window[1] = (int) ( window[1] + 0.5 );
+	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item1"));
+	*(vector4_t *)window = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item2"));
 }
 
 

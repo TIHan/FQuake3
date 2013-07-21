@@ -128,7 +128,7 @@ m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name
 
 
 MObject
-m_object_get_property (MObject object, const gchar *property_name)
+m_object_get_property (const MObject object, const gchar *property_name)
 {
 	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
@@ -150,7 +150,7 @@ m_object_get_property (MObject object, const gchar *property_name)
 
 
 MArray
-m_object_get_property_array (MObject object, const gchar *property_name)
+m_object_get_property_array (const MObject object, const gchar *property_name)
 {
 	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
@@ -172,7 +172,7 @@ m_object_get_property_array (MObject object, const gchar *property_name)
 
 
 void
-m_object_set_property (MObject object, const gchar *property_name, gpointer value)
+m_object_set_property (const MObject object, const gchar *property_name, gpointer value)
 {
 	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
@@ -193,7 +193,7 @@ m_object_set_property (MObject object, const gchar *property_name, gpointer valu
 
 
 void
-m_object_set_field (MObject object, const gchar *field_name, gpointer value)
+m_object_set_field (const MObject object, const gchar *field_name, gpointer value)
 {
 	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoClassField *field = mono_class_get_field_from_name (klass, field_name);
@@ -204,7 +204,7 @@ m_object_set_field (MObject object, const gchar *field_name, gpointer value)
 
 
 MObject
-m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *args)
+m_object_invoke (const MObject object, const gchar *method_name, gint argc, gpointer *args)
 {
 	MonoClass *klass = mono_object_get_class ((MonoObject *)object.__priv);
 	MonoMethod *method = mono_class_get_method_from_name (klass, method_name, argc);
@@ -226,7 +226,7 @@ m_object_invoke (MObject object, const gchar *method_name, gint argc, gpointer *
 
 
 gpointer
-m_object_unbox (MObject object)
+m_object_unbox (const MObject object)
 {
 	if (!object.__priv)
 		g_error ("M: Cannot unbox null object.");
