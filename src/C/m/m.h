@@ -78,12 +78,6 @@ m_array_addr_with_size (const MArray object, const gint size, const gint index);
 gint
 m_array_length (const MArray object);
 
-gpointer
-m_array_unbox (const MArray object);
-
-MObject
-m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer value);
-
 #define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
 #define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
 #define m_array_set(array,type,index,value)	\
@@ -120,5 +114,8 @@ m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *n
 \
 		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
+
+#define m_object_as_arg(obj) m_object_unbox (obj)
+#define m_array_as_arg(obj) obj.__priv
 
 #endif /* __M_H__ */

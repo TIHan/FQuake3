@@ -303,22 +303,3 @@ m_array_length (const MArray object)
 {
 	return mono_array_length ((MonoArray *)object.__priv);
 }
-
-gpointer
-m_array_unbox (const MArray object)
-{
-	return object.__priv;
-}
-
-MObject
-m_value_box (const gchar *assembly_name, const gchar *name_space, const gchar *name, gpointer value)
-{
-	MonoAssembly *const assembly = find_assembly (assembly_name);
-	MonoImage *image = image = mono_assembly_get_image (assembly);
-	MonoClass *klass = mono_class_from_name (image, name_space, name);
-
-	MObject result;
-
-	result.__priv = mono_value_box (mono_domain_get (), klass, value); 
-	return result;
-}
