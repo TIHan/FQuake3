@@ -348,6 +348,24 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
             (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z)
         )
 
+(*
+void R_WorldToLocal (vec3_t world, vec3_t local) {
+	local[0] = DotProduct(world, tr.or.axis[0]);
+	local[1] = DotProduct(world, tr.or.axis[1]);
+	local[2] = DotProduct(world, tr.or.axis[2]);
+}
+*)
+
+    /// <summary>
+    /// R_WorldToLocal (vec3_t world, vec3_t local)
+    /// </summary>
+    let WorldToLocal (world: Vector3) (orientation: Orientation) =
+        Vector3 (
+            Vector3.DotProduct world orientation.Axis.[0],
+            Vector3.DotProduct world orientation.Axis.[1],
+            Vector3.DotProduct world orientation.Axis.[2]
+        )
+
 
 (*
 int R_CullLocalPointAndRadius( vec3_t pt, float radius )

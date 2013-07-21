@@ -243,10 +243,17 @@ R_WorldToLocal
 
 =================
 */
-void R_WorldToLocal (vec3_t world, vec3_t local) {
-	local[0] = DotProduct(world, tr.or.axis[0]);
-	local[1] = DotProduct(world, tr.or.axis[1]);
-	local[2] = DotProduct(world, tr.or.axis[2]);
+void
+R_WorldToLocal (vec3_t world, vec3_t local)
+{
+	MObject m_local;
+
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "WorldToLocal", 2, {
+		__args [0] = local;
+		__args [1] = m_object_unbox (m_common_create_orientation (&tr.or));
+	}, m_local);
+
+	*(vector3_t *)local = *(vector3_t *)m_object_unbox (m_local);
 }
 
 /*
