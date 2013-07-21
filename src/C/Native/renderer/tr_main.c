@@ -175,8 +175,8 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_object_unbox (m_common_create_orientation (&tr.or));
-		__args [3] = m_object_unbox (m_common_create_view_parms (&tr.viewParms));
+		__args [2] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [3] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
