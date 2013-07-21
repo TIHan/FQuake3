@@ -27,7 +27,7 @@ type Cvar =
     val Flags : int
     val IsModified : bool
     val ModificationCount : int
-    val Value : float
+    val Value : single
     val Integer : int
     val Next : nativeint
     val HashNext : nativeint
@@ -35,20 +35,20 @@ type Cvar =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector =
-    val X : float32
+    val X : single
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
-    val X : float32
-    val Y : float32
+    val X : single
+    val Y : single
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
-    val X : float32
-    val Y : float32
-    val Z : float32
+    val X : single
+    val Y : single
+    val Z : single
 
     member this.Item
         with get (i) =
@@ -78,7 +78,18 @@ type Vector3 =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
-    val X : float32
-    val Y : float32
-    val Z : float32
-    val W : float32
+    val X : single
+    val Y : single
+    val Z : single
+    val W : single
+
+    member this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | 3 -> this.W
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }

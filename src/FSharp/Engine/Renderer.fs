@@ -385,3 +385,59 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
         let transformed = LocalPointToWorld point orientation
         CullPointAndRadius transformed radius viewParms
 
+(*
+void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
+							vec4_t eye, vec4_t dst ) {
+	int i;
+
+	for ( i = 0 ; i < 4 ; i++ ) {
+		eye[i] = 
+			src[0] * modelMatrix[ i + 0 * 4 ] +
+			src[1] * modelMatrix[ i + 1 * 4 ] +
+			src[2] * modelMatrix[ i + 2 * 4 ] +
+			1 * modelMatrix[ i + 3 * 4 ];
+	}
+
+	for ( i = 0 ; i < 4 ; i++ ) {
+		dst[i] = 
+			eye[0] * projectionMatrix[ i + 0 * 4 ] +
+			eye[1] * projectionMatrix[ i + 1 * 4 ] +
+			eye[2] * projectionMatrix[ i + 2 * 4 ] +
+			eye[3] * projectionMatrix[ i + 3 * 4 ];
+	}
+}
+*)
+
+    /// <summary>
+    /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
+    /// </summary>
+    let TransformModelToClip (source: Vector3) (modelMatrix: single[]) (projectionMatrix: single[]) =
+        let calculateEye i =
+            (source.X * modelMatrix.[i + 0 * 4]) +
+            (source.Y * modelMatrix.[i + 1 * 4]) +
+            (source.Z * modelMatrix.[i + 2 * 4]) +
+            (1.f * modelMatrix.[i + 3 * 4])
+          
+        let eye =
+            Vector4 (
+                calculateEye 0,
+                calculateEye 1,
+                calculateEye 2,
+                calculateEye 3
+            )
+
+        let calculateDestination i =
+            (eye.X * projectionMatrix.[i + 0 * 4]) +
+            (eye.Y * projectionMatrix.[i + 1 * 4]) +
+            (eye.Z * projectionMatrix.[i + 2 * 4]) +
+            (eye.W * projectionMatrix.[i + 3 * 4])
+
+        let destination =
+            Vector4 (
+                calculateDestination 0,
+                calculateDestination 1,
+                calculateDestination 2,
+                calculateDestination 3
+            )
+
+        (eye, destination)
