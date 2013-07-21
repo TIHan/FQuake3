@@ -131,7 +131,7 @@ module MainRenderer =
             let transformed : Vector3[] = Array.zeroCreate 8
         
             transformed |> Array.mapi (fun i x ->
-                let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 1) &&& 1].Z)
+                let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
                 |> Vector3.MA v.X orientation.Axis.[0]
