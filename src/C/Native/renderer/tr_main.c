@@ -309,18 +309,17 @@ myGlMultMatrix
 
 ==========================
 */
-void myGlMultMatrix( const float *a, const float *b, float *out ) {
-	int		i, j;
+void
+myGlMultMatrix (const gfloat *a, const gfloat *b, gfloat *out)
+{
+	MObject m_out;
 
-	for ( i = 0 ; i < 4 ; i++ ) {
-		for ( j = 0 ; j < 4 ; j++ ) {
-			out[ i * 4 + j ] =
-				a [ i * 4 + 0 ] * b [ 0 * 4 + j ]
-				+ a [ i * 4 + 1 ] * b [ 1 * 4 + j ]
-				+ a [ i * 4 + 2 ] * b [ 2 * 4 + j ]
-				+ a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
-		}
-	}
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MyGLMultMatrix", 2, {
+		__args [0] = (matrix16_t *)a;
+		__args [1] = (matrix16_t *)b;
+	}, m_out);
+
+	*(matrix16_t *)out = *(matrix16_t *)m_object_unbox (m_out);
 }
 
 /*

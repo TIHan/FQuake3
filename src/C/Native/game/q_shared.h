@@ -514,6 +514,13 @@ typedef struct {
 	float w;
 } vector4_t;
 
+typedef struct {
+	vector4_t x;
+	vector4_t y;
+	vector4_t z;
+	vector4_t w;
+} matrix16_t;
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
 #endif
