@@ -5,32 +5,31 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>27c5b1d5-69d0-405d-804f-0656c73f5a90</ProjectGuid>
+    <ProjectGuid>a8fb604b-b5bd-47fa-8f2c-487d8660afd9</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>System</RootNamespace>
-    <AssemblyName>Engine</AssemblyName>
+    <RootNamespace>OpenFK</RootNamespace>
+    <AssemblyName>OpenFK</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <Name>Engine</Name>
-    <TargetFrameworkProfile />
+    <Name>OpenFK</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
-    <OutputPath>..\..\..\Debug</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\System.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\OpenFK.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <Tailcalls>true</Tailcalls>
-    <OutputPath>..\..\..\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\System.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\OpenFK.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -42,16 +41,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common.fs" />
-    <Compile Include="Renderer.fs" />
-    <Compile Include="System.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenFK\OpenFK.fsproj">
-      <Name>OpenFK</Name>
-      <Project>{a8fb604b-b5bd-47fa-8f2c-487d8660afd9}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Compile Include="Math.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
