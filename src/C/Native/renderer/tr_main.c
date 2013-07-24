@@ -110,7 +110,7 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 	gpointer args[18];
 
 	m_array_map (m_projection_matrix, 16, gfloat, view_parms->projectionMatrix);
-	m_array_map_objects (m_frustum, 4, gpointer, view_parms->frustum, m_common_create_plane);
+	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
 	args [0] = &view_parms->or;
@@ -120,7 +120,7 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 	args [4] = &view_parms->isMirror;
 	args [5] = &view_parms->frameSceneNum;
 	args [6] = &view_parms->frameCount;
-	args [7] = m_object_as_arg (m_common_create_plane (&view_parms->portalPlane));
+	args [7] = m_struct_as_arg (m_common_create_plane (&view_parms->portalPlane));
 	args [8] = &view_parms->viewportX;
 	args [9] = &view_parms->viewportY;
 	args [10] = &view_parms->viewportWidth;

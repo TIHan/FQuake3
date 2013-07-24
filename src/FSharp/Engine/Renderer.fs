@@ -19,6 +19,11 @@ Derivative of Quake III Arena source:
 Copyright © 1999-2005 Id Software, Inc.
 *)
 
+(*
+    Rules of Thumb:
+    1. Types that are 64 bytes or less can be structs.
+*)
+
 namespace Engine
 
 #nowarn "9"
@@ -99,12 +104,24 @@ type Orientation = {
     ModelMatrix: Matrix16;
 }
 
-type Plane = {
-    Normal: Vector3;
-    Distance: single;
-    Type: PlaneType;
-    SignBits: byte;
-}
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 20)>]
+type Plane =
+    
+    [<FieldOffset (0)>]
+    val Normal : Vector3
+
+    [<FieldOffset (12)>]
+    val Distance : single
+
+    [<FieldOffset (16)>]
+    [<MarshalAs (UnmanagedType.I8)>]
+    val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
+
+    [<FieldOffset (17)>]
+    val SignBits : byte
+
+    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
