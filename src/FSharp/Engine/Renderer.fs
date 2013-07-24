@@ -74,22 +74,6 @@ type Axis =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-// Why do we need this type?
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Origin =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X
-            | 1 -> this.Y
-            | 2 -> this.Z
-            | _ -> raise <| IndexOutOfRangeException ()
-
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
@@ -173,9 +157,9 @@ type RefEntity = {
     LightningOrigin: Vector3;
     Axis: Axis;
     HasNonNormalizedAxes: bool;
-    Origin: Origin; // Origin type? Why is this?
+    Origin: Vector3;
     Frame: int;
-    OldOrigin: Origin;
+    OldOrigin: Vector3;
     OldFrame: int;
     BackLerp: single;
     SkinId: int;
@@ -647,7 +631,48 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Generates an orientation for an entity and viewParms
     /// Does NOT produce any GL calls
     /// Called by both the front end and the back end
+    /// TODO: Not finished.
     /// </summary>
     let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
-        ()
+        match entity.Entity.Type <> RefEntityType.Model with
+        | true -> viewParms.Orientation
+        | _ ->
+
+        let newOrientation =
+            Orientation (
+                entity.Entity.Origin,
+                entity.Entity.Axis,
+                orientation.ViewOrigin,
+                orientation.ModelMatrix
+            )
+
+        let glMatrix =
+            Matrix16 (
+                newOrientation.Axis.[0].[0],
+                newOrientation.Axis.[0].[1],
+                newOrientation.Axis.[0].[2],
+                0.f,
+                newOrientation.Axis.[1].[0],
+                newOrientation.Axis.[1].[1],
+                newOrientation.Axis.[1].[2],
+                0.f,
+                newOrientation.Axis.[2].[0],
+                newOrientation.Axis.[2].[1],
+                newOrientation.Axis.[2].[2],
+                0.f,
+                newOrientation.Origin.X,
+                newOrientation.Origin.Y,
+                newOrientation.Origin.Z,
+                0.f
+            )
+
+        let newNewOrientation =
+            Orientation (
+                newOrientation.Origin,
+                newOrientation.Axis,
+                newOrientation.ViewOrigin,
+                glMatrix * viewParms.World.ModelMatrix
+            )
+
+        newNewOrientation
         
