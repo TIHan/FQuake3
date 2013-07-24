@@ -213,8 +213,7 @@ type Matrix16 =
             M10 = m10; M11 = m11; M12 = m12; M13 = m13;
             M20 = m20; M21 = m21; M22 = m22; M23 = m23;
             M30 = m30; M31 = m31; M32 = m32; M33 = m33;
-        }
-    
+        }    
     
     static member inline Init (f: int -> int -> single) =
         Matrix16 (
@@ -239,8 +238,16 @@ type Matrix16 =
             f 2 0 m1.[2, 0], f 2 1 m1.[2, 1], f 2 2 m1.[2, 2], f 2 3 m1.[2, 3],
             f 3 0 m1.[3, 0], f 3 1 m1.[3, 1], f 3 2 m1.[3, 2], f 3 3 m1.[3, 3]
         )
-        
+
+
+module NativeMatrix16 =
+    [<DllImport ("OpenFK.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
+    extern Matrix16 matrix16_multiply (Matrix16 m1, Matrix16 m2)
+
+
+type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
+#if NOT_NATIVE
         let dotProduct row column =
             (m1.[row, 0] * m2.[0, column]) +
             (m1.[row, 1] * m2.[1, column]) +
@@ -248,4 +255,6 @@ type Matrix16 =
             (m1.[row, 3] * m2.[3, column])
         
         Matrix16.Init dotProduct
-    
+#else
+        NativeMatrix16.matrix16_multiply (m1, m2)
+#endif
