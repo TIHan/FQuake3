@@ -74,7 +74,7 @@ type Axis =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-
+// Why do we need this type?
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Origin =
@@ -98,6 +98,7 @@ type Rgba =
     val B : byte
     val A : byte 
 
+// Should this be a record type? It is over 64 bytes, don't know for sure.
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
@@ -172,7 +173,7 @@ type RefEntity = {
     LightningOrigin: Vector3;
     Axis: Axis;
     HasNonNormalizedAxes: bool;
-    Origin: Origin;
+    Origin: Origin; // Origin type? Why is this?
     Frame: int;
     OldOrigin: Origin;
     OldFrame: int;
@@ -647,6 +648,6 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Does NOT produce any GL calls
     /// Called by both the front end and the back end
     /// </summary>
-    let RotateForEntity () =
+    let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
         ()
         
