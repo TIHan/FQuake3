@@ -113,7 +113,7 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
-	args [0] = &view_parms->or;
+	args [0] = m_struct_as_arg (m_common_create_orientation (&view_parms->or));
 	args [1] = &view_parms->world;
 	args [2] = (vector3_t *)view_parms->pvsOrigin;
 	args [3] = &view_parms->isPortal;
