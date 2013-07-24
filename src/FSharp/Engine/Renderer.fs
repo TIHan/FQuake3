@@ -131,56 +131,27 @@ type Plane =
 
     new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
 
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type ViewParms =
-    val Orientation : Orientation
-    val World : Orientation
-    val PvsOrigin : Vector3
-    val IsPortal : bool
-    val IsMirror : bool
-    val FrameSceneId : int
-    val FrameCount : int
-    val PortalPlane : Plane
-    val ViewportX : int
-    val ViewportY : int
-    val ViewportWidth : int
-    val ViewportHeight : int
-    val FovX : float32
-    val FovY : float32
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
-    val ProjectionMatrix : float32[]
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 4)>]
-    val Frustum : Plane[]
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 2)>]
-    val VisibilityBounds : Vector3[]
-
-    val ZFar : float32
-
-    new (orientation, world, pvsOrigin, isPortal, isMirror, frameSceneId, frameCount, portalPlane, viewPortX, viewPortY, viewPortWidth, viewPortHeight, fovX, fovY, projectionMatrix, frustum, visibilityBounds, zFar) =
-        {
-            Orientation = orientation;
-            World = world;
-            PvsOrigin = pvsOrigin;
-            IsPortal = isPortal;
-            IsMirror = isMirror;
-            FrameSceneId = frameSceneId;
-            FrameCount = frameCount;
-            PortalPlane = portalPlane;
-            ViewportX = viewPortX;
-            ViewportY = viewPortY;
-            ViewportWidth = viewPortWidth;
-            ViewportHeight = viewPortHeight;
-            FovX = fovX;
-            FovY = fovY;
-            ProjectionMatrix = projectionMatrix;
-            Frustum = frustum;
-            VisibilityBounds = visibilityBounds;
-            ZFar = zFar;
-        }
+// This is way too big to be a struct, makes sense for it to be a record.
+type ViewParms = {
+    Orientation: Orientation;
+    World: Orientation;
+    PvsOrigin: Vector3;
+    IsPortal: bool;
+    IsMirror: bool;
+    FrameSceneId: int;
+    FrameCount: int;
+    PortalPlane: Plane;
+    ViewportX: int;
+    ViewportY: int;
+    ViewportWidth: int;
+    ViewportHeight: int;
+    FovX: single;
+    FovY: single;
+    ProjectionMatrix: Matrix16;
+    Frustum: Plane[];
+    VisibilityBounds: Vector3[];
+    ZFar: single;
+}
 
 type RefEntityType =
     | Model
