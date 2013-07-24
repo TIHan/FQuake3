@@ -152,7 +152,7 @@ R_CullLocalBox (vec3_t bounds[2])
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = m_array_as_arg (m_bounds);
-		__args [1] = m_array_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
 		__args [2] = m_struct_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
@@ -170,7 +170,7 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [2] = m_struct_as_arg (m_common_create_orientation (&tr.or));
 		__args [3] = m_struct_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
@@ -207,7 +207,7 @@ R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalNormalToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
@@ -226,7 +226,7 @@ R_LocalPointToWorld (vec3_t local, vec3_t world)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalPointToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
@@ -245,7 +245,7 @@ R_WorldToLocal (vec3_t world, vec3_t local)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "WorldToLocal", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
 	}, m_local);
 
 	*(vector3_t *)local = *(vector3_t *)m_object_unbox (m_local);

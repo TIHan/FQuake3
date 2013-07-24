@@ -97,17 +97,25 @@ type Rgba =
     val B : byte
     val A : byte 
 
-type Orientation = {
-    Origin: Vector3;
-    Axis: Axis;
-    ViewOrigin: Vector3;
-    ModelMatrix: Matrix16;
-}
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Orientation =
+    val Origin : Vector3
+    val Axis : Axis
+    val ViewOrigin : Vector3
+    val ModelMatrix : Matrix16
+
+    new (origin, axis, viewOrigin, modelMatrix) = {
+        Origin = origin;
+        Axis = axis;
+        ViewOrigin = viewOrigin;
+        ModelMatrix = modelMatrix;
+    }
+
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 20)>]
 type Plane =
-    
     [<FieldOffset (0)>]
     val Normal : Vector3
 
