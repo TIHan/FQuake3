@@ -70,18 +70,12 @@ m_common_create_vector3_array (const gint size)
 MObject
 m_common_create_orientation (const orientationr_t *const orientation)
 {
-	MArray m_axis = m_common_create_vector3_array (3);
-	MArray m_model_matrix = m_array_int32 (16);
-
 	gpointer args[4];
 
-	m_array_map (m_axis, 3, vector3_t, ((vector3_t *)orientation->axis));
-	m_array_map (m_model_matrix, 16, gfloat, orientation->modelMatrix);
-
 	args [0] = (vector3_t *)orientation->origin;
-	args [1] = m_array_as_arg (m_axis);
+	args [1] = (vector3_t *)orientation->axis;
 	args [2] = (vector3_t *)orientation->viewOrigin;
-	args [3] = m_array_as_arg (m_model_matrix);
+	args [3] = (matrix16_t *)orientation->modelMatrix;
 
 	return m_object ("Engine", "Engine", "Orientation", 4, args);
 }
@@ -157,8 +151,8 @@ R_CullLocalBox (vec3_t bounds[2])
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = m_array_as_arg (m_bounds);
-		__args [1] = m_object_as_arg (m_common_create_orientation (&tr.or));
-		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [1] = m_array_as_arg (m_common_create_orientation (&tr.or));
+		__args [2] = m_struct_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
@@ -176,7 +170,7 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_object_as_arg (m_common_create_orientation (&tr.or));
-		__args [3] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [3] = m_struct_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
@@ -193,7 +187,7 @@ R_CullPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullPointAndRadius", 3, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [2] = m_struct_as_arg (m_common_create_view_parms (&tr.viewParms));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
@@ -295,7 +289,7 @@ R_TransformClipToWindow (const vec4_t clip, const viewParms_t *view, vec4_t norm
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformClipToWindow", 2, {
 		__args [0] = (vector3_t *)clip;
-		__args [1] = m_object_as_arg (m_common_create_view_parms (view));
+		__args [1] = m_struct_as_arg (m_common_create_view_parms (view));
 	}, m_tuple_normalized_and_window);
 
 	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item1"));

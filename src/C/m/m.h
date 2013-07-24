@@ -115,7 +115,8 @@ m_array_length (const MArray object);
 		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
-#define m_object_as_arg(obj) m_object_unbox (obj)
+#define m_struct_as_arg(obj) m_object_unbox (obj)
+#define m_object_as_arg(obj) obj.__priv
 #define m_array_as_arg(obj) obj.__priv
 
 #endif /* __M_H__ */

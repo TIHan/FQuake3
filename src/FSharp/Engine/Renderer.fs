@@ -55,6 +55,46 @@ type PlaneType =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type Axis =
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Origin =
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Rgba =
+    val R : byte
+    val G : byte
+    val B : byte
+    val A : byte 
+
+(*
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
     val Origin : Vector3        // in world coordinates
 
@@ -66,7 +106,14 @@ type Orientation =
     val ModelMatrix : float32[]
 
     new (origin, axis, viewOrigin, modelMatrix) = { Origin = origin; Axis = axis; ViewOrigin = viewOrigin; ModelMatrix = modelMatrix }
+    *)
 
+type Orientation = {
+    Origin: Vector3;
+    Axis: Axis;
+    ViewOrigin: Vector3;
+    ModelMatrix: Matrix16;
+}
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 20)>]
@@ -137,6 +184,78 @@ type ViewParms =
             VisibilityBounds = visibilityBounds;
             ZFar = zFar;
         }
+
+type RefEntityType =
+    | Model
+    | Poly
+    | Sprite
+    | Beam
+    | RailCore
+    | RailRings
+    | Lightning
+    | PortalSurface // doesn't draw anything, just info for portals
+    | MaxRefEntityType
+
+type RecordRefEntity = {
+    Type: RefEntityType;
+    RenderFx: int;
+    ModelHandle: int;
+    LightningOrigin: Vector3;
+    Axis: Axis;
+    HasNonNormalizedAxes: bool;
+    Origin: Origin;
+    Frame: int;
+    OldOrigin: Origin;
+    OldFrame: int;
+    BackLerp: single;
+    SkinId: int;
+    CustomSkinHandle: int;
+    ShaderRgba: Rgba;
+    ShaderTextureCoordinate: Vector2;
+    ShaderTime: single;
+    Radius: single;
+    Rotation: single;
+}
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type RefEntity =
+    val Type : RefEntityType
+    val RenderFx : int
+    val ModelHandle : int
+    val LightningOrigin : Vector3
+    //val Axis : Vector3[] // 3
+    val Axis : Axis
+    val HasNonNormalizedAxes : bool
+    //val Origin : single[] // 3
+    val Origin : Origin
+    val Frame : int
+   // val OldOrigin : Vector3[] // 3
+    val OldOrigin : Origin
+    val OldFrame : int
+    val BackLerp : single
+    val SkinId : int
+    val CustomSkinHandle : int
+    val CustomShaderHandle : int
+    //val ShaderRgba : byte[] // 4
+    //val ShaderTextureCoordinate : single[] // 2
+    val ShaderRgba : Rgba
+    val ShaderTextureCooridnate : Vector2
+    val ShaderTime : single
+    val Radius : single
+    val Rotation : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type TrRefEntity =
+    val Entity : RefEntity
+    val AxisLength : single
+    val NeedDlights : bool
+    val IsLightingCalculated : bool
+    val LightDirection : Vector3
+    val AmbientLight : Vector3
+    val AmbientLightInt : int
+    val DirectedLight : Vector3
         
 
 module CvarModule =
@@ -519,3 +638,76 @@ void myGlMultMatrix( const float *a, const float *b, float *out ) {
 
     let MyGLMultMatrix (a: Matrix16) (b: Matrix16) =
         a * b
+
+(*
+void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
+					   orientationr_t *or ) {
+	float	glMatrix[16];
+	vec3_t	delta;
+	float	axisLength;
+
+	if ( ent->e.reType != RT_MODEL ) {
+		*or = viewParms->world;
+		return;
+	}
+
+	VectorCopy( ent->e.origin, or->origin );
+
+	VectorCopy( ent->e.axis[0], or->axis[0] );
+	VectorCopy( ent->e.axis[1], or->axis[1] );
+	VectorCopy( ent->e.axis[2], or->axis[2] );
+
+	glMatrix[0] = or->axis[0][0];
+	glMatrix[4] = or->axis[1][0];
+	glMatrix[8] = or->axis[2][0];
+	glMatrix[12] = or->origin[0];
+
+	glMatrix[1] = or->axis[0][1];
+	glMatrix[5] = or->axis[1][1];
+	glMatrix[9] = or->axis[2][1];
+	glMatrix[13] = or->origin[1];
+
+	glMatrix[2] = or->axis[0][2];
+	glMatrix[6] = or->axis[1][2];
+	glMatrix[10] = or->axis[2][2];
+	glMatrix[14] = or->origin[2];
+
+	glMatrix[3] = 0;
+	glMatrix[7] = 0;
+	glMatrix[11] = 0;
+	glMatrix[15] = 1;
+
+	myGlMultMatrix( glMatrix, viewParms->world.modelMatrix, or->modelMatrix );
+
+	// calculate the viewer origin in the model's space
+	// needed for fog, specular, and environment mapping
+	VectorSubtract( viewParms->or.origin, or->origin, delta );
+
+	// compensate for scale in the axes if necessary
+	if ( ent->e.nonNormalizedAxes ) {
+		axisLength = VectorLength( ent->e.axis[0] );
+		if ( !axisLength ) {
+			axisLength = 0;
+		} else {
+			axisLength = 1.0f / axisLength;
+		}
+	} else {
+		axisLength = 1.0f;
+	}
+
+	or->viewOrigin[0] = DotProduct( delta, or->axis[0] ) * axisLength;
+	or->viewOrigin[1] = DotProduct( delta, or->axis[1] ) * axisLength;
+	or->viewOrigin[2] = DotProduct( delta, or->axis[2] ) * axisLength;
+}
+*)
+
+    /// <summary>
+    /// R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, orientationr_t *or )
+    ///
+    /// Generates an orientation for an entity and viewParms
+    /// Does NOT produce any GL calls
+    /// Called by both the front end and the back end
+    /// </summary>
+    let RotateForEntity () =
+        ()
+        
