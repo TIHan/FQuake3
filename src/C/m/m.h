@@ -78,6 +78,10 @@ m_array_addr_with_size (const MArray object, const gint size, const gint index);
 gint
 m_array_length (const MArray object);
 
+#define m_struct_as_arg(obj) m_object_unbox (obj)
+#define m_object_as_arg(obj) obj.__priv
+#define m_array_as_arg(obj) obj.__priv
+
 #define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
 #define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
 #define m_array_set(array,type,index,value)	\
@@ -93,6 +97,16 @@ m_array_length (const MArray object);
 	for (__i = 0; __i < argc; ++__i) \
 	{ \
 		m_array_set (arr, type, __i, native_arr [__i]); \
+	} \
+} \
+
+#define m_array_map_objects(arr,argc,type,native_arr,obj_func) \
+{ \
+	gint __i; \
+\
+	for (__i = 0; __i < argc; ++__i) \
+	{ \
+		m_array_set (arr, type, __i, m_object_as_arg (obj_func (&native_arr [__i]))); \
 	} \
 } \
 
@@ -114,9 +128,5 @@ m_array_length (const MArray object);
 \
 		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
-
-#define m_struct_as_arg(obj) m_object_unbox (obj)
-#define m_object_as_arg(obj) obj.__priv
-#define m_array_as_arg(obj) obj.__priv
 
 #endif /* __M_H__ */

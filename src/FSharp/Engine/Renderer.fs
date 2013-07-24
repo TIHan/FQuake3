@@ -92,22 +92,6 @@ type Rgba =
     val B : byte
     val A : byte 
 
-(*
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Orientation =
-    val Origin : Vector3        // in world coordinates
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 3)>]
-    val Axis : Vector3[]        // orientation in world
-    val ViewOrigin : Vector3    // viewParams->or.origin in local coordinates
-
-    [<MarshalAs (UnmanagedType.ByValArray, SizeConst = 16)>]
-    val ModelMatrix : float32[]
-
-    new (origin, axis, viewOrigin, modelMatrix) = { Origin = origin; Axis = axis; ViewOrigin = viewOrigin; ModelMatrix = modelMatrix }
-    *)
-
 type Orientation = {
     Origin: Vector3;
     Axis: Axis;
@@ -115,24 +99,12 @@ type Orientation = {
     ModelMatrix: Matrix16;
 }
 
-[<Struct>]
-[<StructLayout (LayoutKind.Explicit, Size = 20)>]
-type Plane =
-    
-    [<FieldOffset (0)>]
-    val Normal : Vector3
-
-    [<FieldOffset (12)>]
-    val Distance : single
-
-    [<FieldOffset (16)>]
-    [<MarshalAs (UnmanagedType.I8)>]
-    val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
-
-    [<FieldOffset (17)>]
-    val SignBits : byte
-
-    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
+type Plane = {
+    Normal: Vector3;
+    Distance: single;
+    Type: PlaneType;
+    SignBits: byte;
+}
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
