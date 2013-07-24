@@ -22,6 +22,7 @@ Copyright © 1999-2005 Id Software, Inc.
 (*
     Rules of Thumb:
     1. Types that are 64 bytes or less can be structs.
+    2. Types that don't singularly try to represent a value should be records.
 *)
 
 namespace Engine
@@ -164,7 +165,7 @@ type RefEntityType =
     | PortalSurface // doesn't draw anything, just info for portals
     | MaxRefEntityType
 
-type RecordRefEntity = {
+type RefEntity = {
     Type: RefEntityType;
     RenderFx: int;
     ModelHandle: int;
@@ -185,46 +186,16 @@ type RecordRefEntity = {
     Rotation: single;
 }
 
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type RefEntity =
-    val Type : RefEntityType
-    val RenderFx : int
-    val ModelHandle : int
-    val LightningOrigin : Vector3
-    //val Axis : Vector3[] // 3
-    val Axis : Axis
-    val HasNonNormalizedAxes : bool
-    //val Origin : single[] // 3
-    val Origin : Origin
-    val Frame : int
-   // val OldOrigin : Vector3[] // 3
-    val OldOrigin : Origin
-    val OldFrame : int
-    val BackLerp : single
-    val SkinId : int
-    val CustomSkinHandle : int
-    val CustomShaderHandle : int
-    //val ShaderRgba : byte[] // 4
-    //val ShaderTextureCoordinate : single[] // 2
-    val ShaderRgba : Rgba
-    val ShaderTextureCooridnate : Vector2
-    val ShaderTime : single
-    val Radius : single
-    val Rotation : single
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type TrRefEntity =
-    val Entity : RefEntity
-    val AxisLength : single
-    val NeedDlights : bool
-    val IsLightingCalculated : bool
-    val LightDirection : Vector3
-    val AmbientLight : Vector3
-    val AmbientLightInt : int
-    val DirectedLight : Vector3
-        
+type TrRefEntity = {
+    Entity: RefEntity;
+    AxisLength: single;
+    NeedDlights: bool;
+    IsLightingCalculated: bool;
+    LightDirection: Vector3;
+    AmbientLight: Vector3;
+    AmbientLightInt: int;
+    DirectedLight: Vector3;
+}        
 
 module CvarModule =
     
