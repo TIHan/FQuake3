@@ -675,7 +675,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
-        let delta = viewParms.Orientation.Origin - orientation.Origin
+        let delta = viewParms.Orientation.Origin - newNewOrientation.Origin
 
         // compensate for scale in the axes if necessary
         let axisLength =
@@ -692,9 +692,9 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             newNewOrientation.Origin,
             newNewOrientation.Axis,
             Vector3 (
-                (Vector3.DotProduct delta orientation.Axis.X) * axisLength,
-                (Vector3.DotProduct delta orientation.Axis.Y) * axisLength,
-                (Vector3.DotProduct delta orientation.Axis.Z) * axisLength
+                (Vector3.DotProduct delta newNewOrientation.Axis.X) * axisLength,
+                (Vector3.DotProduct delta newNewOrientation.Axis.Y) * axisLength,
+                (Vector3.DotProduct delta newNewOrientation.Axis.Z) * axisLength
             ),
             newNewOrientation.ModelMatrix
         )
