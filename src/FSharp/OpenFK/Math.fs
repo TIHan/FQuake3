@@ -113,14 +113,20 @@ type Vector3 =
     static member inline (+) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
 
+    static member inline (-) (v1: Vector3, v2: Vector3) =
+        Vector3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+
     static member inline Snap (v: Vector3) =
-        new Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
+        Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
 
     static member inline DotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
     static member inline MultiplyAdd (s: float32) (v1: Vector3) (v2: Vector3) =
         s * v1 + v2
+
+    static member inline Length (v: Vector3) =
+        sqrt <| Vector3.DotProduct v v
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -161,6 +167,9 @@ type Vector4 =
         
     static member inline (+) (v1: Vector4, v2: Vector4) =
         Vector4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
+
+    static member inline (-) (v1: Vector4, v2: Vector4) =
+        Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -243,7 +252,6 @@ type Matrix16 =
 module NativeMatrix16 =
     [<DllImport ("OpenFK.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
     extern Matrix16 matrix16_multiply (Matrix16 m1, Matrix16 m2)
-
 
 type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =

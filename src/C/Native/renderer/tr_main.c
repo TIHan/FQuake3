@@ -105,14 +105,13 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 	MArray m_frustum = m_common_create_plane_array (4);
 	MArray m_visibility_bounds = m_common_create_vector3_array (2);
 
-
 	gpointer args[18];
 
 	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
 	args [0] = m_struct_as_arg (m_common_create_orientation (&view_parms->or));
-	args [1] = &view_parms->world;
+	args [1] = m_struct_as_arg (m_common_create_orientation (&view_parms->world));
 	args [2] = (vector3_t *)view_parms->pvsOrigin;
 	args [3] = &view_parms->isPortal;
 	args [4] = &view_parms->isMirror;
@@ -131,6 +130,50 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 	args [17] = &view_parms->zFar;
 
 	return m_object ("Engine", "Engine", "ViewParms", 18, args);
+}
+
+MObject
+m_map_ref_entity (const refEntity_t const* ref_entity)
+{
+	gpointer args[18];
+
+	args [0] = &ref_entity->reType;
+	args [1] = &ref_entity->renderfx;
+	args [2] = &ref_entity->hModel;
+	args [3] = (vector3_t *)ref_entity->lightingOrigin;
+	args [4] = (vector3_t *)ref_entity->axis;
+	args [5] = &ref_entity->nonNormalizedAxes;
+	args [6] = (vector3_t *)ref_entity->origin;
+	args [7] = &ref_entity->frame;
+	args [8] = (vector3_t *)ref_entity->oldorigin;
+	args [9] = &ref_entity->oldframe;
+	args [10] = &ref_entity->backlerp;
+	args [11] = &ref_entity->skinNum;
+	args [12] = &ref_entity->customSkin;
+	args [13] = ref_entity->shaderRGBA;
+	args [14] = (vector2_t *)ref_entity->shaderTexCoord;
+	args [15] = &ref_entity->shaderTime;
+	args [16] = &ref_entity->radius;
+	args [17] = &ref_entity->rotation;
+
+	return m_object ("Engine", "Engine", "RefEntity", 18, args);
+}
+
+MObject
+m_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
+{
+	gpointer args[8];
+
+	args [0] = m_object_as_arg (m_map_ref_entity (&tr_ref_entity->e));
+	args [1] = &tr_ref_entity->axisLength;
+	args [2] = &tr_ref_entity->needDlights;
+	args [3] = &tr_ref_entity->lightingCalculated;
+	args [4] = (vector3_t *)tr_ref_entity->lightDir;
+	args [5] = (vector3_t *)tr_ref_entity->ambientLight;
+	args [6] = &tr_ref_entity->ambientLightInt;
+	args [7] = (vector3_t *)tr_ref_entity->directedLight;
+
+	return m_object ("Engine", "Engine", "TrRefEntity", 8, args);
 }
 
 /*
@@ -326,62 +369,15 @@ Called by both the front end and the back end
 */
 void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 					   orientationr_t *or ) {
-	float	glMatrix[16];
-	vec3_t	delta;
-	float	axisLength;
+	MObject m_or;
 
-	if ( ent->e.reType != RT_MODEL ) {
-		*or = viewParms->world;
-		return;
-	}
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForEntity", 3, {
+		__args [0] = m_object_as_arg (m_map_tr_ref_entity (ent));
+		__args [1] = m_object_as_arg (m_common_create_view_parms (viewParms));
+		__args [2] = m_struct_as_arg (m_common_create_orientation (or));
+	}, m_or);
 
-	VectorCopy( ent->e.origin, or->origin );
-
-	VectorCopy( ent->e.axis[0], or->axis[0] );
-	VectorCopy( ent->e.axis[1], or->axis[1] );
-	VectorCopy( ent->e.axis[2], or->axis[2] );
-
-	glMatrix[0] = or->axis[0][0];
-	glMatrix[4] = or->axis[1][0];
-	glMatrix[8] = or->axis[2][0];
-	glMatrix[12] = or->origin[0];
-
-	glMatrix[1] = or->axis[0][1];
-	glMatrix[5] = or->axis[1][1];
-	glMatrix[9] = or->axis[2][1];
-	glMatrix[13] = or->origin[1];
-
-	glMatrix[2] = or->axis[0][2];
-	glMatrix[6] = or->axis[1][2];
-	glMatrix[10] = or->axis[2][2];
-	glMatrix[14] = or->origin[2];
-
-	glMatrix[3] = 0;
-	glMatrix[7] = 0;
-	glMatrix[11] = 0;
-	glMatrix[15] = 1;
-
-	myGlMultMatrix( glMatrix, viewParms->world.modelMatrix, or->modelMatrix );
-
-	// calculate the viewer origin in the model's space
-	// needed for fog, specular, and environment mapping
-	VectorSubtract( viewParms->or.origin, or->origin, delta );
-
-	// compensate for scale in the axes if necessary
-	if ( ent->e.nonNormalizedAxes ) {
-		axisLength = VectorLength( ent->e.axis[0] );
-		if ( !axisLength ) {
-			axisLength = 0;
-		} else {
-			axisLength = 1.0f / axisLength;
-		}
-	} else {
-		axisLength = 1.0f;
-	}
-
-	or->viewOrigin[0] = DotProduct( delta, or->axis[0] ) * axisLength;
-	or->viewOrigin[1] = DotProduct( delta, or->axis[1] ) * axisLength;
-	or->viewOrigin[2] = DotProduct( delta, or->axis[2] ) * axisLength;
+	*(orientationr_t *)or = *(orientationr_t *)m_object_unbox (m_or);
 }
 
 /*

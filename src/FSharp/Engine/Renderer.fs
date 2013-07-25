@@ -140,15 +140,15 @@ type ViewParms = {
 }
 
 type RefEntityType =
-    | Model
-    | Poly
-    | Sprite
-    | Beam
-    | RailCore
-    | RailRings
-    | Lightning
-    | PortalSurface // doesn't draw anything, just info for portals
-    | MaxRefEntityType
+    | Model = 0
+    | Poly = 1
+    | Sprite = 2
+    | Beam = 3
+    | RailCore = 4
+    | RailRings = 5
+    | Lightning = 6
+    | PortalSurface = 7 // doesn't draw anything, just info for portals
+    | MaxRefEntityType = 8
 
 type RefEntity = {
     Type: RefEntityType;
@@ -631,11 +631,10 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Generates an orientation for an entity and viewParms
     /// Does NOT produce any GL calls
     /// Called by both the front end and the back end
-    /// TODO: Not finished.
     /// </summary>
     let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
         match entity.Entity.Type <> RefEntityType.Model with
-        | true -> viewParms.Orientation
+        | true -> viewParms.World
         | _ ->
 
         let newOrientation =
@@ -663,7 +662,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
                 newOrientation.Origin.X,
                 newOrientation.Origin.Y,
                 newOrientation.Origin.Z,
-                0.f
+                1.f
             )
 
         let newNewOrientation =
@@ -674,5 +673,28 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
                 glMatrix * viewParms.World.ModelMatrix
             )
 
-        newNewOrientation
-        
+        // calculate the viewer origin in the model's space
+        // needed for fog, specular, and environment mapping
+        let delta = viewParms.Orientation.Origin - orientation.Origin
+
+        // compensate for scale in the axes if necessary
+        let axisLength =
+            match entity.Entity.HasNonNormalizedAxes with
+            | true ->
+                // Is it ok to compare the single like this?
+                match Vector3.Length entity.Entity.Axis.X with
+                | 0.f -> 0.f
+                | axisLength ->
+                    1.0f / axisLength
+            | _ -> 1.0f
+
+        Orientation (
+            newNewOrientation.Origin,
+            newNewOrientation.Axis,
+            Vector3 (
+                (Vector3.DotProduct delta orientation.Axis.X) * axisLength,
+                (Vector3.DotProduct delta orientation.Axis.Y) * axisLength,
+                (Vector3.DotProduct delta orientation.Axis.Z) * axisLength
+            ),
+            newNewOrientation.ModelMatrix
+        )
