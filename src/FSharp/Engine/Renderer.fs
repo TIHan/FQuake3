@@ -631,6 +631,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Generates an orientation for an entity and viewParms
     /// Does NOT produce any GL calls
     /// Called by both the front end and the back end
+    /// TODO: Make this a little bit nicer. newOrientation and newNewOrientation are horrible names.
     /// </summary>
     let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
         match entity.Entity.Type <> RefEntityType.Model with
@@ -698,3 +699,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             ),
             newNewOrientation.ModelMatrix
         )
+
+
+    let RotateForViewer (viewParms: ViewParms) =
+        ()
