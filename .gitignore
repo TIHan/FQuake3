@@ -38,6 +38,12 @@ UpgradeLog.htm
 # Text Editor
 \#*#
 
+# NuGet
+packages
+
+# NUnit
+TestResults
+
 # Mono
 lib/Mono
 
