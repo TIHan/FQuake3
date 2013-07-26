@@ -3,11 +3,10 @@
 #include <smmintrin.h>
 
 FK_EXPORT
-matrix16_t
-FK_DECL matrix16_multiply (matrix16_t m1, matrix16_t m2)
+void
+FK_DECL matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m2, matrix16_t* m)
 {
 	int i, j;
-	matrix16_t m;
 
 	for (i = 0; i < 4; ++i)
 	{
@@ -31,15 +30,13 @@ FK_DECL matrix16_multiply (matrix16_t m1, matrix16_t m2)
 			result = _mm_dp_ps (*(__m128 *)&v1, *(__m128 *)&v2, 0xFF);
 			m.values [i][j] = *(float *)&result;
 #else
-			m.values [i][j] =
-				(m1.values [i][0] * m2.values [0][j]) +
-				(m1.values [i][1] * m2.values [1][j]) +
-				(m1.values [i][2] * m2.values [2][j]) +
-				(m1.values [i][3] * m2.values [3][j]);
+			m->values [i][j] =
+				(m1->values [i][0] * m2->values [0][j]) +
+				(m1->values [i][1] * m2->values [1][j]) +
+				(m1->values [i][2] * m2->values [2][j]) +
+				(m1->values [i][3] * m2->values [3][j]);
 #endif
 
 		}
 	}
-
-	return m;
 }

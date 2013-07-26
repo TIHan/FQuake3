@@ -25,8 +25,8 @@ typedef struct {
 } matrix16_t;
 
 FK_EXPORT
-matrix16_t
-FK_DECL matrix16_multiply (matrix16_t m1, matrix16_t m2);
+void
+FK_DECL matrix16_multiply (matrix16_t* m1, matrix16_t* m2, matrix16_t* m);
 
 
 

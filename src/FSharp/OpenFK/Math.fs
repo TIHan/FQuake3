@@ -23,11 +23,13 @@ THE SOFTWARE.
 *)
 
 #nowarn "9" // No warnings for interop; we know what we are doing.
+#nowarn "51"
 
 namespace OpenFK.Math
 
 open System
 open System.Runtime.InteropServices
+open Microsoft.FSharp.NativeInterop
 
 module Math =
 
@@ -172,24 +174,25 @@ type Vector4 =
         Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
         
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
 type Matrix16 =     
-    val M00 : single
-    val M01 : single
-    val M02 : single
-    val M03 : single
-    val M10 : single
-    val M11 : single
-    val M12 : single
-    val M13 : single
-    val M20 : single
-    val M21 : single
-    val M22 : single
-    val M23 : single
-    val M30 : single
-    val M31 : single
-    val M32 : single
-    val M33 : single
+    [<FieldOffset (0)>] [<DefaultValue (false)>] val mutable private Handle : single
+    [<FieldOffset (0)>] val M00 : single
+    [<FieldOffset (4)>] val M01 : single
+    [<FieldOffset (8)>] val M02 : single
+    [<FieldOffset (12)>] val M03 : single
+    [<FieldOffset (16)>] val M10 : single
+    [<FieldOffset (20)>] val M11 : single
+    [<FieldOffset (24)>] val M12 : single
+    [<FieldOffset (28)>] val M13 : single
+    [<FieldOffset (32)>] val M20 : single
+    [<FieldOffset (36)>] val M21 : single
+    [<FieldOffset (40)>] val M22 : single
+    [<FieldOffset (44)>] val M23 : single
+    [<FieldOffset (48)>] val M30 : single
+    [<FieldOffset (52)>] val M31 : single
+    [<FieldOffset (56)>] val M32 : single
+    [<FieldOffset (60)>] val M33 : single
     
     member inline this.Item
             with get (i, j) =
@@ -251,10 +254,10 @@ type Matrix16 =
 
 module NativeMatrix16 =
     [<DllImport ("OpenFK.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
-    extern Matrix16 matrix16_multiply (Matrix16 m1, Matrix16 m2)
+    extern void matrix16_multiply (single *m1, single *m2, Matrix16 *m)
 
 type Matrix16 with
-    static member inline (*) (m1: Matrix16, m2: Matrix16) =
+    static member (*) (m1: Matrix16, m2: Matrix16) =
 #if NOT_NATIVE
         let dotProduct row column =
             (m1.[row, 0] * m2.[0, column]) +
@@ -264,5 +267,7 @@ type Matrix16 with
         
         Matrix16.Init dotProduct
 #else
-        NativeMatrix16.matrix16_multiply (m1, m2)
+        let mutable m = Matrix16.ZeroCreate ()
+        NativeMatrix16.matrix16_multiply (&&m1.Handle, &&m2.Handle, &&m)
+        m
 #endif
