@@ -195,10 +195,10 @@ module MainRenderer =
         // convert from our coordinate system (looking down X)
         // to OpenGL's coordinate system (looking down -Z)
         Matrix16 (
-        0.f, 0.f, -1.f, 0.f,
-        -1.f, 0.f, 0.f, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        0.f, 0.f, 0.f, 1.f
+            0.f, 0.f, -1.f, 0.f,
+            -1.f, 0.f, 0.f, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+            0.f, 0.f, 0.f, 1.f
         )
 
     module private LocalBox =
@@ -798,7 +798,7 @@ void R_RotateForViewer (void)
             )
         
         Orientation (
-            origin,
+            Vector3 (),
             axis,
             viewOrigin,
             // convert from our coordinate system (looking down X)
