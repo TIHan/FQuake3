@@ -377,7 +377,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 		__args [2] = m_struct_as_arg (m_common_create_orientation (or));
 	}, m_or);
 
-	*(orientationr_t *)or = *(orientationr_t *)m_object_unbox (m_or);
+	*or = *(orientationr_t *)m_object_unbox (m_or);
 }
 
 /*
@@ -387,46 +387,16 @@ R_RotateForViewer
 Sets up the modelview matrix for a given viewParm
 =================
 */
-void R_RotateForViewer (void) 
+void
+R_RotateForViewer (void) 
 {
-	float	viewerMatrix[16];
-	vec3_t	origin;
+	MObject m_or;
 
-	Com_Memset (&tr.or, 0, sizeof(tr.or));
-	tr.or.axis[0][0] = 1;
-	tr.or.axis[1][1] = 1;
-	tr.or.axis[2][2] = 1;
-	VectorCopy (tr.viewParms.or.origin, tr.or.viewOrigin);
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForViewer", 1, {
+		__args [0] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+	}, m_or);
 
-	// transform by the camera placement
-	VectorCopy( tr.viewParms.or.origin, origin );
-
-	viewerMatrix[0] = tr.viewParms.or.axis[0][0];
-	viewerMatrix[4] = tr.viewParms.or.axis[0][1];
-	viewerMatrix[8] = tr.viewParms.or.axis[0][2];
-	viewerMatrix[12] = -origin[0] * viewerMatrix[0] + -origin[1] * viewerMatrix[4] + -origin[2] * viewerMatrix[8];
-
-	viewerMatrix[1] = tr.viewParms.or.axis[1][0];
-	viewerMatrix[5] = tr.viewParms.or.axis[1][1];
-	viewerMatrix[9] = tr.viewParms.or.axis[1][2];
-	viewerMatrix[13] = -origin[0] * viewerMatrix[1] + -origin[1] * viewerMatrix[5] + -origin[2] * viewerMatrix[9];
-
-	viewerMatrix[2] = tr.viewParms.or.axis[2][0];
-	viewerMatrix[6] = tr.viewParms.or.axis[2][1];
-	viewerMatrix[10] = tr.viewParms.or.axis[2][2];
-	viewerMatrix[14] = -origin[0] * viewerMatrix[2] + -origin[1] * viewerMatrix[6] + -origin[2] * viewerMatrix[10];
-
-	viewerMatrix[3] = 0;
-	viewerMatrix[7] = 0;
-	viewerMatrix[11] = 0;
-	viewerMatrix[15] = 1;
-
-	// convert from our coordinate system (looking down X)
-	// to OpenGL's coordinate system (looking down -Z)
-	myGlMultMatrix( viewerMatrix, s_flipMatrix, tr.or.modelMatrix );
-
-	tr.viewParms.world = tr.or;
-
+	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox (m_or);
 }
 
 /*

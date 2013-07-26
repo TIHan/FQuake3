@@ -74,6 +74,8 @@ type Axis =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
+    new (x, y, z) = { X = x; Y = y; Z = z; }
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
@@ -188,6 +190,17 @@ module CvarModule =
         NativeRenderer.Cvar_GetNoCull ()
 
 module MainRenderer =
+
+    let FlipMatrix =
+        // convert from our coordinate system (looking down X)
+        // to OpenGL's coordinate system (looking down -Z)
+        Matrix16 (
+        0.f, 0.f, -1.f, 0.f,
+        -1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 0.f, 1.f
+        )
+
     module private LocalBox =
         /// <summary>
         /// Transform into world space.
@@ -700,6 +713,95 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             newNewOrientation.ModelMatrix
         )
 
+(*
+void R_RotateForViewer (void) 
+{
+	float	viewerMatrix[16];
+	vec3_t	origin;
 
+	Com_Memset (&tr.or, 0, sizeof(tr.or));
+	tr.or.axis[0][0] = 1;
+	tr.or.axis[1][1] = 1;
+	tr.or.axis[2][2] = 1;
+	VectorCopy (tr.viewParms.or.origin, tr.or.viewOrigin);
+
+	// transform by the camera placement
+	VectorCopy( tr.viewParms.or.origin, origin );
+
+	viewerMatrix[0] = tr.viewParms.or.axis[0][0];
+	viewerMatrix[4] = tr.viewParms.or.axis[0][1];
+	viewerMatrix[8] = tr.viewParms.or.axis[0][2];
+	viewerMatrix[12] = -origin[0] * viewerMatrix[0] + -origin[1] * viewerMatrix[4] + -origin[2] * viewerMatrix[8];
+
+	viewerMatrix[1] = tr.viewParms.or.axis[1][0];
+	viewerMatrix[5] = tr.viewParms.or.axis[1][1];
+	viewerMatrix[9] = tr.viewParms.or.axis[1][2];
+	viewerMatrix[13] = -origin[0] * viewerMatrix[1] + -origin[1] * viewerMatrix[5] + -origin[2] * viewerMatrix[9];
+
+	viewerMatrix[2] = tr.viewParms.or.axis[2][0];
+	viewerMatrix[6] = tr.viewParms.or.axis[2][1];
+	viewerMatrix[10] = tr.viewParms.or.axis[2][2];
+	viewerMatrix[14] = -origin[0] * viewerMatrix[2] + -origin[1] * viewerMatrix[6] + -origin[2] * viewerMatrix[10];
+
+	viewerMatrix[3] = 0;
+	viewerMatrix[7] = 0;
+	viewerMatrix[11] = 0;
+	viewerMatrix[15] = 1;
+
+	// convert from our coordinate system (looking down X)
+	// to OpenGL's coordinate system (looking down -Z)
+	myGlMultMatrix( viewerMatrix, s_flipMatrix, tr.or.modelMatrix );
+
+	tr.viewParms.world = tr.or;
+
+}
+*)
+
+    /// <summary>
+    /// R_RotateForViewer (void) 
+    ///
+    /// Sets up the modelview matrix for a given viewParm
+    /// </summary>
     let RotateForViewer (viewParms: ViewParms) =
-        ()
+        
+        let axis =
+            Axis (
+                // Looks like it is a identity matrix
+                Vector3 (1.f, 0.f, 0.f),
+                Vector3 (0.f, 1.f, 0.f),
+                Vector3 (0.f, 0.f, 1.f)
+            )
+
+        let viewOrigin = viewParms.Orientation.Origin
+
+        // transform by the camera placement
+        let origin = viewParms.Orientation.Origin
+
+        let viewerMatrix =
+            Matrix16 (
+                viewParms.Orientation.Axis.[0].[0],
+                viewParms.Orientation.Axis.[1].[0],
+                viewParms.Orientation.Axis.[2].[0],
+                0.f,
+                viewParms.Orientation.Axis.[0].[1],
+                viewParms.Orientation.Axis.[1].[1],
+                viewParms.Orientation.Axis.[2].[1],
+                0.f,
+                viewParms.Orientation.Axis.[0].[2],
+                viewParms.Orientation.Axis.[1].[2],
+                viewParms.Orientation.Axis.[2].[2],
+                0.f,
+                -origin.[0] * viewParms.Orientation.Axis.[0].[0] + -origin.[1] * viewParms.Orientation.Axis.[0].[1] + -origin.[2] * viewParms.Orientation.Axis.[0].[2],
+                -origin.[0] * viewParms.Orientation.Axis.[1].[0] + -origin.[1] * viewParms.Orientation.Axis.[1].[1] + -origin.[2] * viewParms.Orientation.Axis.[1].[2],
+                -origin.[0] * viewParms.Orientation.Axis.[2].[0] + -origin.[1] * viewParms.Orientation.Axis.[2].[1] + -origin.[2] * viewParms.Orientation.Axis.[2].[2],
+                1.f
+            )
+        
+        Orientation (
+            origin,
+            axis,
+            viewOrigin,
+            // convert from our coordinate system (looking down X)
+            // to OpenGL's coordinate system (looking down -Z)
+            viewerMatrix * FlipMatrix
+        )
