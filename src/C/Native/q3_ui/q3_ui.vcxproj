@@ -93,6 +93,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -133,6 +134,7 @@
       <ProgramDataBaseFileName>.\Release_TA/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -169,6 +171,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)\uix86.dll</OutputFile>
@@ -204,6 +207,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>

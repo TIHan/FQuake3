@@ -117,6 +117,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Debug_TA\botlib.lib</OutputFile>
@@ -142,6 +143,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Release\botlib.lib</OutputFile>
@@ -168,6 +170,7 @@
       <ProgramDataBaseFileName>.\botlib___Win32_vector0/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\botlib___Win32_vector0\botlib.lib</OutputFile>
@@ -193,6 +196,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Debug\botlib.lib</OutputFile>
@@ -218,6 +222,7 @@
       <ProgramDataBaseFileName>.\Release_TA/</ProgramDataBaseFileName>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalIncludeDirectories>..\..\..\..\lib\Mono\include\mono-2.0;..\..\..\..\lib\Mono\include\glib-2.0;..\..\..\..\lib\Mono\lib\glib-2.0\include;..\..\m;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <OutputFile>.\Release_TA\botlib.lib</OutputFile>

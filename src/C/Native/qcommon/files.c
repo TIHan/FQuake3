@@ -1108,22 +1108,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 						}
 					}
 
-					// qagame.qvm	- 13
-					// dTZT`X!di`
-					if (!(pak->referenced & FS_QAGAME_REF) && FS_ShiftedStrStr(filename, "dTZT`X!di`", 13)) {
-						pak->referenced |= FS_QAGAME_REF;
-					}
-					// cgame.qvm	- 7
-					// \`Zf^'jof
-					if (!(pak->referenced & FS_CGAME_REF) && FS_ShiftedStrStr(filename , "\\`Zf^'jof", 7)) {
-						pak->referenced |= FS_CGAME_REF;
-					}
-					// ui.qvm		- 5
-					// pd)lqh
-					if (!(pak->referenced & FS_UI_REF) && FS_ShiftedStrStr(filename , "pd)lqh", 5)) {
-						pak->referenced |= FS_UI_REF;
-					}
-
 					if ( uniqueFILE ) {
 						// open a new file on the pakfile
 						fsh[*file].handleFiles.file.z = unzReOpen (pak->pakFilename, pak->handle);

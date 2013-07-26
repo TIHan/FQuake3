@@ -35,29 +35,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // the maximum size of game relative pathnames
 #define	MAX_QPATH		64
 
-/*
-========================================================================
-
-QVM files
-
-========================================================================
-*/
-
-#define	VM_MAGIC	0x12721444
-typedef struct {
-	int		vmMagic;
-
-	int		instructionCount;
-
-	int		codeOffset;
-	int		codeLength;
-
-	int		dataOffset;
-	int		dataLength;
-	int		litLength;			// ( dataLength - litLength ) should be byteswapped on load
-	int		bssLength;			// zero filled memory appended to datalength
-} vmHeader_t;
-
 
 /*
 ========================================================================
