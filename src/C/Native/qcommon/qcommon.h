@@ -383,7 +383,9 @@ void	Cmd_RemoveCommand( const char *cmd_name );
 void	Cmd_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
-int		Cmd_Argc (void);
+M_EXPORT
+int
+M_DECL Cmd_Argc (void);
 char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 char	*Cmd_Args (void);

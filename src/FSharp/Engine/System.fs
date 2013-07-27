@@ -73,7 +73,10 @@ module private Native =
     type XCommand = delegate of unit -> unit
 
     [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Cmd_AddCommand( string cmdName, XCommand func)
+    extern void Cmd_AddCommand (string cmdName, XCommand func)
+
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    extern int Cmd_Argc ()
 
 // WIP
 type StandardIO () =
@@ -131,6 +134,10 @@ module Command =
         GCHandle.Alloc (cmd, GCHandleType.Pinned) |> ignore
         Native.Cmd_AddCommand (name, cmd)
 
+    let Argc () =
+        Native.Cmd_Argc ()
+        
+
 
 module System =
     let private fsiProcess = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\Fsi.exe"
@@ -181,7 +188,9 @@ module System =
         Native.Com_Init ("")
         Network.Init ()
 
-        Command.Add "fsi" (fun _ -> fsiProcess.Start ())
+        Command.Add "fsi" (fun _ ->
+            fsiProcess.Start ()
+        )
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems

@@ -326,7 +326,10 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 Cmd_Argc
 ============
 */
-int		Cmd_Argc( void ) {
+M_EXPORT
+int
+M_DECL Cmd_Argc (void)
+{
 	return cmd_argc;
 }
 
