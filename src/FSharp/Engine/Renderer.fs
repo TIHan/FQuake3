@@ -229,6 +229,11 @@ type DrawSurface =
     val Sort : uint32
     val Type : SurfaceType // this may be wrong
 
+[<Flags>]
+type RdFlags =
+    | NoWorldModel = 0x1
+    | Hyperspace = 0x4
+
 // TODO:
 type RefDef = {
     X: int;
@@ -238,7 +243,7 @@ type RefDef = {
     ViewOrigin: Vector3;
     ViewAxis: Axis;
     Time: int;
-    RdFlags: int;
+    RdFlags: RdFlags;
     AreaMask: byte[];
     HasAreaMaskModified: bool;
     FloatTime: single;
