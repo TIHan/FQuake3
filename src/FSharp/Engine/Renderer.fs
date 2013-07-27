@@ -880,5 +880,94 @@ void R_RotateForViewer (void)
             viewerMatrix * FlipMatrix
         )
 
-    let SetFarClip (rdflags: RdFlags) (visibilityBounds: Vector3[]) (orientation: Orientation) =
-        ()
+(*
+static void SetFarClip( void )
+{
+	float	farthestCornerDistance = 0;
+	int		i;
+
+	// if not rendering the world (icons, menus, etc)
+	// set a 2k far clip plane
+	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
+		tr.viewParms.zFar = 2048;
+		return;
+	}
+
+	//
+	// set far clipping planes dynamically
+	//
+	farthestCornerDistance = 0;
+	for ( i = 0; i < 8; i++ )
+	{
+		vec3_t v;
+		vec3_t vecTo;
+		float distance;
+
+		if ( i & 1 )
+		{
+			v[0] = tr.viewParms.visBounds[0][0];
+		}
+		else
+		{
+			v[0] = tr.viewParms.visBounds[1][0];
+		}
+
+		if ( i & 2 )
+		{
+			v[1] = tr.viewParms.visBounds[0][1];
+		}
+		else
+		{
+			v[1] = tr.viewParms.visBounds[1][1];
+		}
+
+		if ( i & 4 )
+		{
+			v[2] = tr.viewParms.visBounds[0][2];
+		}
+		else
+		{
+			v[2] = tr.viewParms.visBounds[1][2];
+		}
+
+		VectorSubtract( v, tr.viewParms.or.origin, vecTo );
+
+		distance = vecTo[0] * vecTo[0] + vecTo[1] * vecTo[1] + vecTo[2] * vecTo[2];
+
+		if ( distance > farthestCornerDistance )
+		{
+			farthestCornerDistance = distance;
+		}
+	}
+	tr.viewParms.zFar = sqrt( farthestCornerDistance );
+}
+*)
+
+    /// <summary>
+    /// SetFarClip( void )
+    /// </summary>
+    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Vector3[]) (orientation: Orientation) =
+        // if not rendering the world (icons, menus, etc)
+        // set a 2k far clip plane
+        match rdFlags.HasFlag RdFlags.NoWorldModel with
+        | true -> 2048.f
+        | _ ->
+
+        // set far clipping planes dynamically
+        let rec calculateFarthestCornerDistance distance acc =
+            match acc with
+            | 8 -> distance
+            | _ ->
+            
+            let x = match (acc &&& 1) <> 0 with | true -> visibilityBounds.[0].[0] | _ -> visibilityBounds.[1].[0]
+            let y = match (acc &&& 2) <> 0 with | true -> visibilityBounds.[0].[1] | _ -> visibilityBounds.[1].[1]
+            let z = match (acc &&& 4) <> 0 with | true -> visibilityBounds.[0].[2] | _ -> visibilityBounds.[1].[2]
+
+            let v = Vector3 (x, y, z)
+
+            let vecTo = v - orientation.Origin
+            let possibleDistance = Vector3.DotProduct vecTo vecTo
+
+            calculateFarthestCornerDistance (match possibleDistance > distance with | true -> possibleDistance | _ -> distance) (acc + 1)
+
+        sqrt <| calculateFarthestCornerDistance 0.f 0

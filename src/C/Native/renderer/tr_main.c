@@ -402,65 +402,21 @@ R_RotateForViewer (void)
 /*
 ** SetFarClip
 */
-static void SetFarClip( void )
+static void
+SetFarClip (void)
 {
-	float	farthestCornerDistance = 0;
-	int		i;
+	MArray m_vis_bounds = m_array ("Engine", "Engine", "Vector3", 2);
+	MObject m_zFar;
 
-	// if not rendering the world (icons, menus, etc)
-	// set a 2k far clip plane
-	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
-		tr.viewParms.zFar = 2048;
-		return;
-	}
+	m_array_map (m_vis_bounds, 2, vector3_t, ((vector3_t *)tr.viewParms.visBounds));
 
-	//
-	// set far clipping planes dynamically
-	//
-	farthestCornerDistance = 0;
-	for ( i = 0; i < 8; i++ )
-	{
-		vec3_t v;
-		vec3_t vecTo;
-		float distance;
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetFarClip", 3, {
+		__args [0] = &tr.refdef.rdflags;
+		__args [1] = m_array_as_arg (m_vis_bounds);
+		__args [2] = m_struct_as_arg (m_common_create_orientation (&tr.viewParms.or));
+	}, m_zFar);
 
-		if ( i & 1 )
-		{
-			v[0] = tr.viewParms.visBounds[0][0];
-		}
-		else
-		{
-			v[0] = tr.viewParms.visBounds[1][0];
-		}
-
-		if ( i & 2 )
-		{
-			v[1] = tr.viewParms.visBounds[0][1];
-		}
-		else
-		{
-			v[1] = tr.viewParms.visBounds[1][1];
-		}
-
-		if ( i & 4 )
-		{
-			v[2] = tr.viewParms.visBounds[0][2];
-		}
-		else
-		{
-			v[2] = tr.viewParms.visBounds[1][2];
-		}
-
-		VectorSubtract( v, tr.viewParms.or.origin, vecTo );
-
-		distance = vecTo[0] * vecTo[0] + vecTo[1] * vecTo[1] + vecTo[2] * vecTo[2];
-
-		if ( distance > farthestCornerDistance )
-		{
-			farthestCornerDistance = distance;
-		}
-	}
-	tr.viewParms.zFar = sqrt( farthestCornerDistance );
+	tr.viewParms.zFar = *(gfloat *)m_object_unbox (m_zFar);
 }
 
 
