@@ -27,6 +27,7 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open OpenFK
 
 module private Native =
 
@@ -149,6 +150,11 @@ module System =
     let Init () =
         SetupUnhandledExceptions ()
 
+        let fsiProcess = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\Fsi.exe"
+
+        fsiProcess.OutputReceived.Add (fun e ->
+            printfn "%s" <| e.Data.ToString ()
+        )
         use io = new StandardIO ()
 
         io.RedirectOut Native.Com_Printf
@@ -171,7 +177,7 @@ module System =
         | _ -> ()
 
         printfn "Working directory: %s" (FileSystem.GetCurrentDirectory ())
-
+        fsiProcess.Start ()
         // main game loop
         while true do
             // if not running as a game client, sleep a bit

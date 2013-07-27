@@ -23,13 +23,13 @@ type FsiSession (fsiPath: string) =
     member this.ErrorReceived = fsiProcess.ErrorDataReceived
 
     member this.Start () =
-        fsiProcess.Start ()
+        fsiProcess.Start () |> ignore
         fsiProcess.BeginOutputReadLine ()
 
     member this.AddLine (line: string) =
-        fsiProcess.StandardInput.WriteLine(line)
+        fsiProcess.StandardInput.WriteLine (line)
 
     member this.Evaluate () =
         this.AddLine (";;")
-        fsiProcess.StandardInput.Flush()
+        fsiProcess.StandardInput.Flush ()
 
