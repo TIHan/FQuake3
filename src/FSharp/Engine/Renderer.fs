@@ -880,5 +880,5 @@ void R_RotateForViewer (void)
             viewerMatrix * FlipMatrix
         )
 
-    let SetFarClip () =
+    let SetFarClip (rdflags: RdFlags) (visibilityBounds: Vector3[]) (orientation: Orientation) =
         ()
