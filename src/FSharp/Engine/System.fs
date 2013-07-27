@@ -66,6 +66,36 @@ module private Native =
     [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    extern void Com_Printf (string fmt);
+
+// WIP
+type StandardIO () =
+    let ms = new MemoryStream ()
+    let sw = new StreamWriter (ms)
+    let sr = new StreamReader (ms)
+
+    [<DefaultValue>] val mutable private redirectOut : string -> unit
+
+    member this.RedirectOut (f: string -> unit) =
+        Console.SetOut sw
+        this.redirectOut <- f
+
+    member this.FlushOut () =
+            sw.Flush ()
+            match sr.BaseStream.Length <> 0L with
+            | true ->
+                sr.BaseStream.Position <- 0L
+                this.redirectOut <| sr.ReadToEnd ()
+                sr.BaseStream.SetLength 0L
+            | _ -> ()
+
+    interface IDisposable with
+        member this.Dispose () =
+            sr.Dispose ()
+            sw.Dispose ()
+            ms.Dispose ()
+
 module Input =
     let Frame () =
         Native.IN_Frame ()
@@ -119,6 +149,10 @@ module System =
     let Init () =
         SetupUnhandledExceptions ()
 
+        use io = new StandardIO ()
+
+        io.RedirectOut Native.Com_Printf
+
         // done before Com/Sys_Init since we need this for error output
         Native.Sys_CreateConsole ()
 
@@ -136,7 +170,7 @@ module System =
         | (false, false) -> Native.Sys_ShowConsole (0, false)
         | _ -> ()
 
-        printfn "Working directory: %s\n" (FileSystem.GetCurrentDirectory ())
+        printfn "Working directory: %s" (FileSystem.GetCurrentDirectory ())
 
         // main game loop
         while true do
@@ -150,4 +184,7 @@ module System =
 
             // run the game
             Common.Frame ();
+            
+            // Flush standard out
+            io.FlushOut ()
         ()
