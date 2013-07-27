@@ -547,7 +547,9 @@ void Cmd_TokenizeString( const char *text_in ) {
 Cmd_AddCommand
 ============
 */
-void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
+M_EXPORT
+void
+M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd_function_t	*cmd;
 	
 	// fail if the command already exists

@@ -70,6 +70,11 @@ module private Native =
     [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Com_Printf (string fmt);
 
+    type XCommand = delegate of unit -> unit
+
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    extern void Cmd_AddCommand( string cmdName, XCommand func)
+
 // WIP
 type StandardIO () =
     let ms = new MemoryStream ()
@@ -120,8 +125,16 @@ module FileSystem =
         Directory.GetCurrentDirectory ()
 
 
+module Command =
+    let Add (name: string) (f: unit -> unit) =
+        let cmd = Native.XCommand (f)
+        GCHandle.Alloc (cmd, GCHandleType.Pinned) |> ignore
+        Native.Cmd_AddCommand (name, cmd)
+
+
 module System =
-    let private _stopwatch = new Stopwatch ()
+    let private fsiProcess = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\Fsi.exe"
+    let private stopwatch = new Stopwatch ()
 
     let private SetupUnhandledExceptions () =
         let errorFilename = "error.txt"
@@ -145,12 +158,10 @@ module System =
         Thread.Sleep (milliseconds)
 
     let Milliseconds () =
-        _stopwatch.ElapsedMilliseconds
+        stopwatch.ElapsedMilliseconds
 
     let Init () =
         SetupUnhandledExceptions ()
-
-        let fsiProcess = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\Fsi.exe"
 
         fsiProcess.OutputReceived.Add (fun e ->
             printfn "%s" <| e.Data.ToString ()
@@ -163,12 +174,14 @@ module System =
         Native.Sys_CreateConsole ()
 
         // get the initial time base
-        _stopwatch.Start ()
+        stopwatch.Start ()
 
         Native.Sys_InitStreamThread ()
 
         Native.Com_Init ("")
         Network.Init ()
+
+        Command.Add "fsi" (fun _ -> fsiProcess.Start ())
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
@@ -177,7 +190,7 @@ module System =
         | _ -> ()
 
         printfn "Working directory: %s" (FileSystem.GetCurrentDirectory ())
-        fsiProcess.Start ()
+
         // main game loop
         while true do
             // if not running as a game client, sleep a bit

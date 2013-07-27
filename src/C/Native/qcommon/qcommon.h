@@ -369,7 +369,9 @@ typedef void (*xcommand_t) (void);
 
 void	Cmd_Init (void);
 
-void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
+M_EXPORT
+void
+M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
