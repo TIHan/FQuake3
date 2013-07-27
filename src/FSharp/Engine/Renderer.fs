@@ -93,12 +93,13 @@ type Orientation =
     val ViewOrigin : Vector3
     val ModelMatrix : Matrix16
 
-    new (origin, axis, viewOrigin, modelMatrix) = {
-        Origin = origin;
-        Axis = axis;
-        ViewOrigin = viewOrigin;
-        ModelMatrix = modelMatrix;
-    }
+    new (origin, axis, viewOrigin, modelMatrix) =
+        {
+            Origin = origin;
+            Axis = axis;
+            ViewOrigin = viewOrigin;
+            ModelMatrix = modelMatrix;
+        }
 
 
 [<Struct>]
@@ -120,26 +121,27 @@ type Plane =
     new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
 
 // This is way too big to be a struct, makes sense for it to be a record.
-type ViewParms = {
-    Orientation: Orientation;
-    World: Orientation;
-    PvsOrigin: Vector3;
-    IsPortal: bool;
-    IsMirror: bool;
-    FrameSceneId: int;
-    FrameCount: int;
-    PortalPlane: Plane;
-    ViewportX: int;
-    ViewportY: int;
-    ViewportWidth: int;
-    ViewportHeight: int;
-    FovX: single;
-    FovY: single;
-    ProjectionMatrix: Matrix16;
-    Frustum: Plane[];
-    VisibilityBounds: Vector3[];
-    ZFar: single;
-}
+type ViewParms =
+    {
+        Orientation: Orientation;
+        World: Orientation;
+        PvsOrigin: Vector3;
+        IsPortal: bool;
+        IsMirror: bool;
+        FrameSceneId: int;
+        FrameCount: int;
+        PortalPlane: Plane;
+        ViewportX: int;
+        ViewportY: int;
+        ViewportWidth: int;
+        ViewportHeight: int;
+        FovX: single;
+        FovY: single;
+        ProjectionMatrix: Matrix16;
+        Frustum: Plane[];
+        VisibilityBounds: Vector3[];
+        ZFar: single;
+    }
 
 type RefEntityType =
     | Model = 0
@@ -152,37 +154,39 @@ type RefEntityType =
     | PortalSurface = 7 // doesn't draw anything, just info for portals
     | MaxRefEntityType = 8
 
-type RefEntity = {
-    Type: RefEntityType;
-    RenderFx: int;
-    ModelHandle: int;
-    LightningOrigin: Vector3;
-    Axis: Axis;
-    HasNonNormalizedAxes: bool;
-    Origin: Vector3;
-    Frame: int;
-    OldOrigin: Vector3;
-    OldFrame: int;
-    BackLerp: single;
-    SkinId: int;
-    CustomSkinHandle: int;
-    ShaderRgba: Rgba;
-    ShaderTextureCoordinate: Vector2;
-    ShaderTime: single;
-    Radius: single;
-    Rotation: single;
-}
+type RefEntity =
+    {
+        Type: RefEntityType;
+        RenderFx: int;
+        ModelHandle: int;
+        LightningOrigin: Vector3;
+        Axis: Axis;
+        HasNonNormalizedAxes: bool;
+        Origin: Vector3;
+        Frame: int;
+        OldOrigin: Vector3;
+        OldFrame: int;
+        BackLerp: single;
+        SkinId: int;
+        CustomSkinHandle: int;
+        ShaderRgba: Rgba;
+        ShaderTextureCoordinate: Vector2;
+        ShaderTime: single;
+        Radius: single;
+        Rotation: single;
+    }
 
-type TrRefEntity = {
-    Entity: RefEntity;
-    AxisLength: single;
-    NeedDlights: bool;
-    IsLightingCalculated: bool;
-    LightDirection: Vector3;
-    AmbientLight: Vector3;
-    AmbientLightInt: int;
-    DirectedLight: Vector3;
-}
+type TrRefEntity =
+    {
+        Entity: RefEntity;
+        AxisLength: single;
+        NeedDlights: bool;
+        IsLightingCalculated: bool;
+        LightDirection: Vector3;
+        AmbientLight: Vector3;
+        AmbientLightInt: int;
+        DirectedLight: Vector3;
+    }
 
 [<Struct>]
 type Dlight =
@@ -235,28 +239,59 @@ type RdFlags =
     | Hyperspace = 0x4
 
 // TODO:
-type RefDef = {
-    X: int;
-    Y: int;
-    Width: int;
-    Height: int;
-    ViewOrigin: Vector3;
-    ViewAxis: Axis;
-    Time: int;
-    RdFlags: RdFlags;
-    AreaMask: byte[];
-    HasAreaMaskModified: bool;
-    FloatTime: single;
-    Text: string[];
-    EntityCount: int;
-    Entities: TrRefEntity[];
-    DlightCount: int;
-    DLights: Dlight[];
-    PolyCount: int;
-    Polys:  SurfacePoly[];
-    DrawSurfaceCount: int;
-    DrawSurfaces: DrawSurface[];
-}        
+type RefDef =
+    {
+        X: int;
+        Y: int;
+        Width: int;
+        Height: int;
+        ViewOrigin: Vector3;
+        ViewAxis: Axis;
+        Time: int;
+        RdFlags: RdFlags;
+        AreaMask: byte[];
+        HasAreaMaskModified: bool;
+        FloatTime: single;
+        Text: string[];
+        EntityCount: int;
+        Entities: TrRefEntity[];
+        DlightCount: int;
+        DLights: Dlight[];
+        PolyCount: int;
+        Polys:  SurfacePoly[];
+        DrawSurfaceCount: int;
+        DrawSurfaces: DrawSurface[];
+    }
+
+[<Struct>]
+type Bounds =
+    val Start : Vector3
+    val End : Vector3     
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Start
+            | 1 -> this.End
+            | _ -> raise <| IndexOutOfRangeException ()
+
+// I think this is right?
+type Frustum =
+    {
+        Left: Plane;
+        Right: Plane;
+        Bottom: Plane;
+        Top: Plane;
+    }
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Left
+            | 1 -> this.Right
+            | 2 -> this.Bottom
+            | 3 -> this.Top
+            | _ -> raise <| IndexOutOfRangeException ()
 
 module CvarModule =
     
