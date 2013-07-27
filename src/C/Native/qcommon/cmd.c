@@ -412,7 +412,10 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
+M_EXPORT
+void
+M_DECL Cmd_ArgsBuffer (char *buffer, int bufferLength)
+{
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 

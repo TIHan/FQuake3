@@ -23,6 +23,7 @@ namespace Engine
 
 open System
 open System.IO
+open System.Text
 open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
@@ -77,6 +78,9 @@ module private Native =
 
     [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern int Cmd_Argc ()
+
+    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    extern void Cmd_ArgsBuffer (StringBuilder buffer, int length)
 
 // WIP
 type StandardIO () =
@@ -140,7 +144,6 @@ module Command =
 
 
 module System =
-    let private fsiProcess = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\Fsi.exe"
     let private stopwatch = new Stopwatch ()
 
     let private SetupUnhandledExceptions () =
@@ -170,9 +173,6 @@ module System =
     let Init () =
         SetupUnhandledExceptions ()
 
-        fsiProcess.OutputReceived.Add (fun e ->
-            printfn "%s" <| e.Data.ToString ()
-        )
         use io = new StandardIO ()
 
         io.RedirectOut Native.Com_Printf
@@ -188,8 +188,12 @@ module System =
         Native.Com_Init ("")
         Network.Init ()
 
-        Command.Add "fsi" (fun _ ->
-            fsiProcess.Start ()
+        Command.Add "f#" (fun _ -> 
+            printfn "fsharp"
+        )
+
+        Command.Add "fsharp" (fun _ ->
+            printfn "f#"
         )
 
         // hide the early console since we've reached the point where we
