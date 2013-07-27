@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="q3config.cfg" />
+  </ItemGroup>
 </Project>

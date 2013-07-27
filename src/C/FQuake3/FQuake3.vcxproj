@@ -18,6 +18,9 @@
       <Project>{1d1bb368-ad1d-4500-a62d-3eff121cec23}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="q3config.cfg" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E779B4A6-7F0A-4E78-BE2E-45A572D3A837}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
