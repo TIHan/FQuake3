@@ -406,7 +406,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// <summary>
     // R_CullLocalBox (vec3_t bounds[2])
     // </summary>
-    let CullLocalBox (bounds: Vector3[]) (orientation: Orientation) (viewParms: ViewParms) =
+    let CullLocalBox (bounds: Vector3[]) (orientation: Orientation) (frustum: Plane[]) =
         match CvarModule.GetNoCull () with
         | true -> CullType.Clip
         | _ ->
@@ -415,7 +415,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
         let transformed = LocalBox.TransformWorldSpace bounds orientation
 
         // check against frustum planes
-        LocalBox.CheckFrustumPlanes transformed viewParms.Frustum
+        LocalBox.CheckFrustumPlanes transformed frustum
 
 (*
 int R_CullPointAndRadius( vec3_t pt, float radius )
@@ -457,12 +457,12 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
     /// <summary>
     /// R_CullPointAndRadius( vec3_t pt, float radius )
     /// </summary>
-    let CullPointAndRadius (point: Vector3) (radius: single) (viewParms: ViewParms) =
+    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Plane[]) =
         match CvarModule.GetNoCull () with
         | true -> CullType.Clip
         | _ ->
 
-        PointAndRadius.CheckFrustumPlanes point radius viewParms.Frustum
+        PointAndRadius.CheckFrustumPlanes point radius frustum
 
 (*
 void R_LocalPointToWorld (vec3_t local, vec3_t world) {
@@ -533,9 +533,9 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// <summary>
     /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// </summary>
-    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (viewParms: ViewParms) =
+    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Plane[]) =
         let transformed = LocalPointToWorld point orientation
-        CullPointAndRadius transformed radius viewParms
+        CullPointAndRadius transformed radius frustum
 
 (*
 void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,

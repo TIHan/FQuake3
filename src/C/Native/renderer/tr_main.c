@@ -187,14 +187,16 @@ gint
 R_CullLocalBox (vec3_t bounds[2])
 {
 	MArray m_bounds = m_array ("Engine", "Engine", "Vector3", 2);
+	MArray m_planes = m_common_create_plane_array (4);
 	MObject m_cull_type;
 
 	m_array_map (m_bounds, 2, vector3_t, ((vector3_t *)bounds));
+	m_array_map (m_planes, 4, cplane_t, tr.viewParms.frustum);
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = m_array_as_arg (m_bounds);
 		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
-		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [2] = m_array_as_arg (m_planes);
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
@@ -206,13 +208,16 @@ R_CullLocalBox (vec3_t bounds[2])
 gint
 R_CullLocalPointAndRadius( vec3_t pt, float radius )
 {
+	MArray m_planes = m_common_create_plane_array (4);
 	MObject m_cull_type;
+
+	m_array_map (m_planes, 4, cplane_t, tr.viewParms.frustum);
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_struct_as_arg (m_common_create_orientation (&tr.or));
-		__args [3] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [3] = m_array_as_arg (m_planes);
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
@@ -224,12 +229,15 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 gint
 R_CullPointAndRadius( vec3_t pt, float radius )
 {
+	MArray m_planes = m_common_create_plane_array (4);
 	MObject m_cull_type;
+
+	m_array_map (m_planes, 4, cplane_t, tr.viewParms.frustum);
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullPointAndRadius", 3, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [2] =m_array_as_arg (m_planes);
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
