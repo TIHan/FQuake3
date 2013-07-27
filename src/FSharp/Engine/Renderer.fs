@@ -182,6 +182,75 @@ type TrRefEntity = {
     AmbientLight: Vector3;
     AmbientLightInt: int;
     DirectedLight: Vector3;
+}
+
+[<Struct>]
+type Dlight =
+    val Origin : Vector3
+    val Color : Vector3
+    val Radius : single
+    val Transformed : Vector3
+    val Additive : int
+
+type SurfaceType =
+    | Bad = 0
+    | Skip = 1
+    | Face = 2
+    | Grid = 3
+    | Triangles = 4
+    | Poly = 5
+    | Md3 = 6
+    | Md4 = 7
+    | Flare = 8
+    | Entity = 9
+    | DisplayList = 10
+    | TypeCount = 11
+    | Max = 0x7fffffff
+
+// TODO:
+[<Struct>]
+type PolyVertex =
+    val Value : Vector3
+    val St : single[] // ? What is this?
+    val Modulate : byte[] // ? What is this?
+
+// TODO:
+[<Struct>]
+type SurfacePoly =
+    val Type : SurfaceType
+    val ShaderHandle : int
+    val FogIndex : int
+    val VertexCount : int
+    val vertices : PolyVertex[]
+
+// TODO:
+[<Struct>]
+type DrawSurface =
+    val Sort : uint32
+    val Type : SurfaceType // this may be wrong
+
+// TODO:
+type RefDef = {
+    X: int;
+    Y: int;
+    Width: int;
+    Height: int;
+    ViewOrigin: Vector3;
+    ViewAxis: Axis;
+    Time: int;
+    RdFlags: int;
+    AreaMask: byte[];
+    HasAreaMaskModified: bool;
+    FloatTime: single;
+    Text: string[];
+    EntityCount: int;
+    Entities: TrRefEntity[];
+    DlightCount: int;
+    DLights: Dlight[];
+    PolyCount: int;
+    Polys:  SurfacePoly[];
+    DrawSurfaceCount: int;
+    DrawSurfaces: DrawSurface[];
 }        
 
 module CvarModule =
@@ -805,3 +874,6 @@ void R_RotateForViewer (void)
             // to OpenGL's coordinate system (looking down -Z)
             viewerMatrix * FlipMatrix
         )
+
+    let SetFarClip () =
+        ()
