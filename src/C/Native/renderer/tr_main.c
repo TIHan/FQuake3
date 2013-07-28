@@ -58,13 +58,13 @@ m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 	args [1] = &y;
 	args [2] = &z;
 
-	return m_object ("Engine", "Engine", "Vector3", 3, args);
+	return m_object ("OpenFK", "OpenFK.Math", "Vector3", 3, args);
 }
 
 MArray
 m_common_create_vector3_array (const gint size)
 {
-	return m_array ("Engine", "Engine", "Vector3", size);
+	return m_array ("OpenFK", "OpenFK.Math", "Vector3", size);
 }
 
 MObject
@@ -186,7 +186,7 @@ Returns CULL_IN, CULL_CLIP, or CULL_OUT
 gint
 R_CullLocalBox (vec3_t bounds[2])
 {
-	MArray m_bounds = m_array ("Engine", "Engine", "Vector3", 2);
+	MArray m_bounds = m_array ("OpenFK", "OpenFK.Math", "Vector3", 2);
 	MArray m_planes = m_common_create_plane_array (4);
 	MObject m_cull_type;
 
