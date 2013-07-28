@@ -1,6 +1,4 @@
 ﻿(*
-The MIT License (MIT)
-
 Copyright © 2013 OpenFK
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +30,6 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
 module Math =
-
     module Generic =       
         let inline Lerp x y t =
             x + (t * (y - x))
@@ -51,7 +48,7 @@ module Math =
             Generic.CosLerp x y t PI 2.f 0.f
         
         
-    module FloatMath =
+    module Float =
         let PI = Math.PI
         let E = Math.E
         
@@ -90,17 +87,19 @@ type Vector3 =
             | _ -> raise <| IndexOutOfRangeException ()
 
 
-    new (vector: Vector3) = {
-        X = vector.X;
-        Y = vector.Y;
-        Z = vector.Z;
-    }
+    new (vector: Vector3) =
+        {
+            X = vector.X;
+            Y = vector.Y;
+            Z = vector.Z;
+        }
     
-    new (x, y, z) = {
-        X = x;
-        Y = y;
-        Z = z;
-    }
+    new (x, y, z) =
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
 
 
     static member inline (*) (v1: Vector3, v2: Vector3) =
@@ -147,19 +146,21 @@ type Vector4 =
             | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (vector: Vector4) = {
-        X = vector.X;
-        Y = vector.Y;
-        Z = vector.Z;
-        W = vector.W;
-    }
+    new (vector: Vector4) =
+        {
+            X = vector.X;
+            Y = vector.Y;
+            Z = vector.Z;
+            W = vector.W;
+        }
     
-    new (x, y, z, w) = {
-        X = x;
-        Y = y;
-        Z = z;
-        W = w;
-    }
+    new (x, y, z, w) =
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
+        }
 
     static member inline DotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
@@ -220,7 +221,8 @@ type Matrix16 =
             m10, m11, m12, m13,
             m20, m21, m22, m23,
             m30, m31, m32, m33
-        ) = {
+        ) =
+        {
             M00 = m00; M01 = m01; M02 = m02; M03 = m03;
             M10 = m10; M11 = m11; M12 = m12; M13 = m13;
             M20 = m20; M21 = m21; M22 = m22; M23 = m23;
