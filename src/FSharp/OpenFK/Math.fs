@@ -123,6 +123,9 @@ type Vector3 =
     static member inline DotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
+    static member inline Scale (s: single) (v: Vector3) =
+        Vector3 (v.X * s, v.Y * s, v.Z * s)
+
     static member inline MultiplyAdd (s: float32) (v1: Vector3) (v2: Vector3) =
         s * v1 + v2
 

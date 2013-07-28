@@ -118,7 +118,48 @@ type Plane =
     [<FieldOffset (17)>]
     val SignBits : byte
 
-    new (normal, distance, typ, signBits) = { Normal = normal; Distance = distance; Type = typ; SignBits = signBits; }
+(*
+void SetPlaneSignbits (cplane_t *out) {
+	int	bits, j;
+
+	// for fast box on planeside test
+	bits = 0;
+	for (j=0 ; j<3 ; j++) {
+		if (out->normal[j] < 0) {
+			bits |= 1<<j;
+		}
+	}
+	out->signbits = bits;
+}
+*)
+
+    /// <summary>
+    /// void SetPlaneSignbits (cplane_t *out)
+    /// </summary>
+    static member inline CalculateSignBits (normal: Vector3) =
+        let rec calculatePlaneSignBits bits acc =
+            match acc with
+            | 3 -> bits
+            | _ ->
+                calculatePlaneSignBits (match normal.[acc] < 0.f with | true -> bits ||| (1uy <<< acc) | _ -> bits) (acc + 1)
+
+        calculatePlaneSignBits 0uy 0
+
+    new (normal, distance, typ, signBits) =
+        {
+            Normal = normal;
+            Distance = distance;
+            Type = typ;
+            SignBits = signBits;
+        }
+
+    new (normal, distance, typ) =
+        {
+            Normal = normal;
+            Distance = distance;
+            Type = typ;
+            SignBits = Plane.CalculateSignBits normal;
+        }
 
 // This is way too big to be a struct, makes sense for it to be a record.
 type ViewParms =
@@ -1080,3 +1121,85 @@ void R_SetupProjection( void ) {
             ),
             zFar
         )
+
+(*
+void R_SetupFrustum (void) {
+	int		i;
+	float	xs, xc;
+	float	ang;
+
+	ang = tr.viewParms.fovX / 180 * M_PI * 0.5f;
+	xs = sin( ang );
+	xc = cos( ang );
+
+	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[0].normal );
+	VectorMA( tr.viewParms.frustum[0].normal, xc, tr.viewParms.or.axis[1], tr.viewParms.frustum[0].normal );
+
+	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[1].normal );
+	VectorMA( tr.viewParms.frustum[1].normal, -xc, tr.viewParms.or.axis[1], tr.viewParms.frustum[1].normal );
+
+	ang = tr.viewParms.fovY / 180 * M_PI * 0.5f;
+	xs = sin( ang );
+	xc = cos( ang );
+
+	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[2].normal );
+	VectorMA( tr.viewParms.frustum[2].normal, xc, tr.viewParms.or.axis[2], tr.viewParms.frustum[2].normal );
+
+	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[3].normal );
+	VectorMA( tr.viewParms.frustum[3].normal, -xc, tr.viewParms.or.axis[2], tr.viewParms.frustum[3].normal );
+
+	for (i=0 ; i<4 ; i++) {
+		tr.viewParms.frustum[i].type = PLANE_NON_AXIAL;
+		tr.viewParms.frustum[i].dist = DotProduct (tr.viewParms.or.origin, tr.viewParms.frustum[i].normal);
+		SetPlaneSignbits( &tr.viewParms.frustum[i] );
+	}
+}
+*)
+
+    /// <summary>
+    /// R_SetupProjection( void )
+    /// 
+    /// Setup that culling frustum planes for the current view
+    /// </summary>
+    let SetupFrustum (view: ViewParms) =
+        let xAngle = view.FovX / 180.f * Math.Single.PI * 0.5f
+        let xs = sin xAngle
+        let xc = cos xAngle
+
+        let yAngle = view.FovY / 180.f * Math.Single.PI * 0.5f
+        let ys = sin yAngle
+        let yc = cos yAngle
+
+        let xNormal = Vector3.Scale xs view.Orientation.Axis.[0]
+        let yNormal = Vector3.Scale ys view.Orientation.Axis.[0]
+        let xDistance = Vector3.DotProduct view.Orientation.Origin xNormal
+        let yDistance = Vector3.DotProduct view.Orientation.Origin yNormal
+
+        {
+            Left =
+                Plane (
+                    xNormal + (view.Orientation.Axis.[1] * xc),
+                    xDistance,
+                    PlaneType.NonAxial
+                );
+            Right = 
+                Plane (
+                    xNormal + (view.Orientation.Axis.[1] * -xc),
+                    xDistance,
+                    PlaneType.NonAxial
+                );
+            Bottom =
+                Plane (
+                    yNormal + (view.Orientation.Axis.[2] * yc),
+                    yDistance,
+                    PlaneType.NonAxial
+                );
+            Top =
+                Plane (
+                    yNormal + (view.Orientation.Axis.[2] * -yc),
+                    yDistance,
+                    PlaneType.NonAxial
+                );
+        }
+
+
