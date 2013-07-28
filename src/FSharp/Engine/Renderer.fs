@@ -1006,3 +1006,77 @@ static void SetFarClip( void )
             calculateFarthestCornerDistance (match possibleDistance > distance with | true -> possibleDistance | _ -> distance) (acc + 1)
 
         sqrt <| calculateFarthestCornerDistance 0.f 0
+
+(*
+void R_SetupProjection( void ) {
+	float	xmin, xmax, ymin, ymax;
+	float	width, height, depth;
+	float	zNear, zFar;
+
+	// dynamically compute far clip plane distance
+	SetFarClip();
+
+	//
+	// set up projection matrix
+	//
+	zNear	= r_znear->value;
+	zFar	= tr.viewParms.zFar;
+
+	ymax = zNear * tan( tr.refdef.fov_y * M_PI / 360.0f );
+	ymin = -ymax;
+
+	xmax = zNear * tan( tr.refdef.fov_x * M_PI / 360.0f );
+	xmin = -xmax;
+
+	width = xmax - xmin;
+	height = ymax - ymin;
+	depth = zFar - zNear;
+
+	tr.viewParms.projectionMatrix[0] = 2 * zNear / width;
+	tr.viewParms.projectionMatrix[4] = 0;
+	tr.viewParms.projectionMatrix[8] = ( xmax + xmin ) / width;	// normally 0
+	tr.viewParms.projectionMatrix[12] = 0;
+
+	tr.viewParms.projectionMatrix[1] = 0;
+	tr.viewParms.projectionMatrix[5] = 2 * zNear / height;
+	tr.viewParms.projectionMatrix[9] = ( ymax + ymin ) / height;	// normally 0
+	tr.viewParms.projectionMatrix[13] = 0;
+
+	tr.viewParms.projectionMatrix[2] = 0;
+	tr.viewParms.projectionMatrix[6] = 0;
+	tr.viewParms.projectionMatrix[10] = -( zFar + zNear ) / depth;
+	tr.viewParms.projectionMatrix[14] = -2 * zFar * zNear / depth;
+
+	tr.viewParms.projectionMatrix[3] = 0;
+	tr.viewParms.projectionMatrix[7] = 0;
+	tr.viewParms.projectionMatrix[11] = -1;
+	tr.viewParms.projectionMatrix[15] = 0;
+}
+*)
+
+    /// <summary>
+    /// R_SetupProjection( void )
+    /// </summary>
+    let SetupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
+        // dynamically compute far clip plane distance
+        let zFar = SetFarClip rdFlags view.VisibilityBounds view.Orientation
+
+        let xMax = zNear * (tan <| fovX * Math.Single.PI / 360.f)
+        let xMin = -xMax
+
+        let yMax = zNear * (tan <| fovY * Math.Single.PI / 360.f)
+        let yMin = -yMax
+
+        let width = xMax - xMin
+        let height = yMax - yMin
+        let depth = zFar - zNear
+
+        (
+            Matrix16 (
+                2.f * zNear / width, 0.f, 0.f, 0.f,
+                0.f, 2.f * zNear / height, 0.f, 0.f,
+                (xMax + xMin) / width, (yMax + yMin) / height, -(zFar + zNear) / depth, -1.f,
+                0.f, 0.f, -2.f * zFar * zNear / depth, 0.f
+            ),
+            zFar
+        )

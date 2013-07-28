@@ -407,75 +407,27 @@ R_RotateForViewer (void)
 	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox (m_or);
 }
 
-/*
-** SetFarClip
-*/
-static void
-SetFarClip (void)
-{
-	MArray m_vis_bounds = m_array ("Engine", "Engine", "Vector3", 2);
-	MObject m_zFar;
-
-	m_array_map (m_vis_bounds, 2, vector3_t, ((vector3_t *)tr.viewParms.visBounds));
-
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetFarClip", 3, {
-		__args [0] = &tr.refdef.rdflags;
-		__args [1] = m_array_as_arg (m_vis_bounds);
-		__args [2] = m_struct_as_arg (m_common_create_orientation (&tr.viewParms.or));
-	}, m_zFar);
-
-	tr.viewParms.zFar = *(gfloat *)m_object_unbox (m_zFar);
-}
-
 
 /*
 ===============
 R_SetupProjection
 ===============
 */
-void R_SetupProjection( void ) {
-	float	xmin, xmax, ymin, ymax;
-	float	width, height, depth;
-	float	zNear, zFar;
+void
+R_SetupProjection (void)
+{
+	MObject m_tuple_projection_matrix_and_zFar;
 
-	// dynamically compute far clip plane distance
-	SetFarClip();
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetupProjection", 5, {
+		__args [0] = &r_znear->value;
+		__args [1] = &tr.refdef.rdflags;
+		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [3] = &tr.refdef.fov_x;
+		__args [4] = &tr.refdef.fov_y;
+	}, m_tuple_projection_matrix_and_zFar);
 
-	//
-	// set up projection matrix
-	//
-	zNear	= r_znear->value;
-	zFar	= tr.viewParms.zFar;
-
-	ymax = zNear * tan( tr.refdef.fov_y * M_PI / 360.0f );
-	ymin = -ymax;
-
-	xmax = zNear * tan( tr.refdef.fov_x * M_PI / 360.0f );
-	xmin = -xmax;
-
-	width = xmax - xmin;
-	height = ymax - ymin;
-	depth = zFar - zNear;
-
-	tr.viewParms.projectionMatrix[0] = 2 * zNear / width;
-	tr.viewParms.projectionMatrix[4] = 0;
-	tr.viewParms.projectionMatrix[8] = ( xmax + xmin ) / width;	// normally 0
-	tr.viewParms.projectionMatrix[12] = 0;
-
-	tr.viewParms.projectionMatrix[1] = 0;
-	tr.viewParms.projectionMatrix[5] = 2 * zNear / height;
-	tr.viewParms.projectionMatrix[9] = ( ymax + ymin ) / height;	// normally 0
-	tr.viewParms.projectionMatrix[13] = 0;
-
-	tr.viewParms.projectionMatrix[2] = 0;
-	tr.viewParms.projectionMatrix[6] = 0;
-	tr.viewParms.projectionMatrix[10] = -( zFar + zNear ) / depth;
-	tr.viewParms.projectionMatrix[14] = -2 * zFar * zNear / depth;
-
-	tr.viewParms.projectionMatrix[3] = 0;
-	tr.viewParms.projectionMatrix[7] = 0;
-	tr.viewParms.projectionMatrix[11] = -1;
-	tr.viewParms.projectionMatrix[15] = 0;
+	*(matrix16_t *)tr.viewParms.projectionMatrix = *(matrix16_t *)m_object_unbox (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item1"));
+	tr.viewParms.zFar = *(gfloat *)m_object_unbox (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item2"));
 }
 
 /*
