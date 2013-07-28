@@ -176,6 +176,15 @@ m_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
 	return m_object ("Engine", "Engine", "TrRefEntity", 8, args);
 }
 
+void
+m_frustum_map (MObject obj, frustum_t* frustum)
+{
+	frustum->left = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Left"));
+	frustum->right = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Right"));
+	frustum->bottom = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Bottom"));
+	frustum->top = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Top"));
+}
+
 /*
 =================
 R_CullLocalBox
@@ -437,36 +446,16 @@ R_SetupFrustum
 Setup that culling frustum planes for the current view
 =================
 */
-void R_SetupFrustum (void) {
-	int		i;
-	float	xs, xc;
-	float	ang;
+void
+R_SetupFrustum (void)
+{
+	MObject m_frustum;
 
-	ang = tr.viewParms.fovX / 180 * M_PI * 0.5f;
-	xs = sin( ang );
-	xc = cos( ang );
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetupFrustum", 1, {
+		__args [0] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+	}, m_frustum);
 
-	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[0].normal );
-	VectorMA( tr.viewParms.frustum[0].normal, xc, tr.viewParms.or.axis[1], tr.viewParms.frustum[0].normal );
-
-	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[1].normal );
-	VectorMA( tr.viewParms.frustum[1].normal, -xc, tr.viewParms.or.axis[1], tr.viewParms.frustum[1].normal );
-
-	ang = tr.viewParms.fovY / 180 * M_PI * 0.5f;
-	xs = sin( ang );
-	xc = cos( ang );
-
-	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[2].normal );
-	VectorMA( tr.viewParms.frustum[2].normal, xc, tr.viewParms.or.axis[2], tr.viewParms.frustum[2].normal );
-
-	VectorScale( tr.viewParms.or.axis[0], xs, tr.viewParms.frustum[3].normal );
-	VectorMA( tr.viewParms.frustum[3].normal, -xc, tr.viewParms.or.axis[2], tr.viewParms.frustum[3].normal );
-
-	for (i=0 ; i<4 ; i++) {
-		tr.viewParms.frustum[i].type = PLANE_NON_AXIAL;
-		tr.viewParms.frustum[i].dist = DotProduct (tr.viewParms.or.origin, tr.viewParms.frustum[i].normal);
-		SetPlaneSignbits( &tr.viewParms.frustum[i] );
-	}
+	m_frustum_map (m_frustum, (frustum_t *)tr.viewParms.frustum);
 }
 
 
