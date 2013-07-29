@@ -1205,4 +1205,28 @@ void R_SetupFrustum (void) {
                 );
         }
 
+(*
+void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
+	int		i;
+	vec3_t	local;
+	vec3_t	transformed;
+	float	d;
 
+	VectorSubtract( in, surface->origin, local );
+
+	VectorClear( transformed );
+	for ( i = 0 ; i < 3 ; i++ ) {
+		d = DotProduct(local, surface->axis[i]);
+		VectorMA( transformed, d, camera->axis[i], transformed );
+	}
+
+	VectorAdd( transformed, camera->origin, out );
+}
+*)
+
+    /// <summary>
+    /// R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
+    /// </summary>
+    let MirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
+        let local = v - surface.Origin
+        ()
