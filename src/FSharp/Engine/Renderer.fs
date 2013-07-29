@@ -1229,4 +1229,29 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
     /// </summary>
     let MirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let local = v - surface.Origin
+        let rec transform transformed acc =
+            match acc with
+            | 3 -> transformed
+            | _ ->
+            transform (transformed + (camera.Axis.[acc] * Vector3.DotProduct local surface.Axis.[acc])) (acc + 1)
+
+        (transform (Vector3.ZeroCreate ()) 0) + camera.Origin
+
+(*
+void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
+	int		i;
+	float	d;
+
+	VectorClear( out );
+	for ( i = 0 ; i < 3 ; i++ ) {
+		d = DotProduct(in, surface->axis[i]);
+		VectorMA( out, d, camera->axis[i], out );
+	}
+}
+*)
+
+    /// <summary>
+    /// R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
+    /// </summary>
+    let MirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
         ()

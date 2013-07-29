@@ -123,6 +123,9 @@ type Vector3 =
     static member inline DotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
+    static member inline CrossProduct (v1: Vector3) (v2: Vector3) =
+        Vector3 ((v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X))
+
     static member inline Scale (s: single) (v: Vector3) =
         Vector3 (v.X * s, v.Y * s, v.Z * s)
 
@@ -131,6 +134,9 @@ type Vector3 =
 
     static member inline Length (v: Vector3) =
         sqrt <| Vector3.DotProduct v v
+
+    static member inline ZeroCreate () =
+        Vector3 ()
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]

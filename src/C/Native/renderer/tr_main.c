@@ -464,21 +464,17 @@ R_SetupFrustum (void)
 R_MirrorPoint
 =================
 */
-void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
-	int		i;
-	vec3_t	local;
-	vec3_t	transformed;
-	float	d;
+void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
+{
+	MObject m_out;
 
-	VectorSubtract( in, surface->origin, local );
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MirrorPoint", 3, {
+		__args [0] = (vector3_t *)in;
+		__args [1] = m_struct_as_arg (m_common_create_orientation (surface));
+		__args [2] = m_struct_as_arg (m_common_create_orientation (camera));
+	}, m_out);
 
-	VectorClear( transformed );
-	for ( i = 0 ; i < 3 ; i++ ) {
-		d = DotProduct(local, surface->axis[i]);
-		VectorMA( transformed, d, camera->axis[i], transformed );
-	}
-
-	VectorAdd( transformed, camera->origin, out );
+	*(vector3_t *)out = *(vector3_t *)m_object_unbox (m_out);
 }
 
 void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
