@@ -1172,32 +1172,35 @@ void R_SetupFrustum (void) {
 
         let xNormal = Vector3.Scale xs view.Orientation.Axis.[0]
         let yNormal = Vector3.Scale ys view.Orientation.Axis.[0]
-        let xDistance = Vector3.DotProduct view.Orientation.Origin xNormal
-        let yDistance = Vector3.DotProduct view.Orientation.Origin yNormal
+
+        let leftNormal = xNormal + (view.Orientation.Axis.[1] * xc)
+        let rightNormal = xNormal + (view.Orientation.Axis.[1] * -xc)
+        let bottomNormal = yNormal + (view.Orientation.Axis.[2] * yc)
+        let topNormal = yNormal + (view.Orientation.Axis.[2] * -yc)
 
         {
             Left =
                 Plane (
-                    xNormal + (view.Orientation.Axis.[1] * xc),
-                    xDistance,
+                    leftNormal,
+                    Vector3.DotProduct view.Orientation.Origin leftNormal,
                     PlaneType.NonAxial
                 );
             Right = 
                 Plane (
-                    xNormal + (view.Orientation.Axis.[1] * -xc),
-                    xDistance,
+                    rightNormal,
+                    Vector3.DotProduct view.Orientation.Origin rightNormal,
                     PlaneType.NonAxial
                 );
             Bottom =
                 Plane (
-                    yNormal + (view.Orientation.Axis.[2] * yc),
-                    yDistance,
+                    bottomNormal,
+                    Vector3.DotProduct view.Orientation.Origin bottomNormal,
                     PlaneType.NonAxial
                 );
             Top =
                 Plane (
-                    yNormal + (view.Orientation.Axis.[2] * -yc),
-                    yDistance,
+                    topNormal,
+                    Vector3.DotProduct view.Orientation.Origin topNormal,
                     PlaneType.NonAxial
                 );
         }

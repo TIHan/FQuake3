@@ -449,6 +449,7 @@ Setup that culling frustum planes for the current view
 void
 R_SetupFrustum (void)
 {
+
 	MObject m_frustum;
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetupFrustum", 1, {
