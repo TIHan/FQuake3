@@ -1254,4 +1254,10 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
     /// R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
     /// </summary>
     let MirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
-        ()
+        let rec transform transformed acc =
+            match acc with
+            | 3 -> transformed
+            | _ ->
+            transform (transformed + (camera.Axis.[acc] * Vector3.DotProduct v surface.Axis.[acc])) (acc + 1)
+
+        transform (Vector3.ZeroCreate ()) 0
