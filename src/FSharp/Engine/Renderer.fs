@@ -262,11 +262,28 @@ type PolyVertex =
 // TODO:
 [<Struct>]
 type SurfacePoly =
-    val Type : SurfaceType
     val ShaderHandle : int
     val FogIndex : int
     val VertexCount : int
     val vertices : PolyVertex[]
+
+[<Struct>]
+type SurfaceDisplayList =
+    val ListId : int
+
+[<Struct>]
+type SurfaceFlare =
+    val Origin : Vector3
+    val Normal : Vector3
+    val Color : Vector3
+
+type Surface =
+    | Bad
+    | Skip
+    | Face
+    | Poly of SurfacePoly
+    | DisplayList of SurfaceDisplayList
+    | Flare of SurfaceFlare
 
 // TODO:
 [<Struct>]
@@ -1261,3 +1278,11 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
             transform (transformed + (camera.Axis.[acc] * Vector3.DotProduct v surface.Axis.[acc])) (acc + 1)
 
         transform (Vector3.ZeroCreate ()) 0
+
+(*
+    let PlaneforSurface (surfaceType: SurfaceType) (plane: Plane) =
+        match surfaceType with
+        | SurfaceType.Bad -> Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
+        | SurfaceType.Face -> Plane ()
+        | SurfaceType.Triangles ->
+*)
