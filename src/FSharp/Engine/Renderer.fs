@@ -161,6 +161,36 @@ void SetPlaneSignbits (cplane_t *out) {
             SignBits = Plane.CalculateSignBits normal;
         }
 
+[<Struct>]
+type Bounds =
+    val Start : Vector3
+    val End : Vector3     
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Start
+            | 1 -> this.End
+            | _ -> raise <| IndexOutOfRangeException ()
+
+// I think this is right?
+type Frustum =
+    {
+        Left: Plane;
+        Right: Plane;
+        Bottom: Plane;
+        Top: Plane;
+    }
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Left
+            | 1 -> this.Right
+            | 2 -> this.Bottom
+            | 3 -> this.Top
+            | _ -> raise <| IndexOutOfRangeException ()
+
 // This is way too big to be a struct, makes sense for it to be a record.
 type ViewParms =
     {
@@ -237,20 +267,15 @@ type Dlight =
     val Transformed : Vector3
     val Additive : int
 
-type SurfaceType =
-    | Bad = 0
-    | Skip = 1
-    | Face = 2
-    | Grid = 3
-    | Triangles = 4
-    | Poly = 5
-    | Md3 = 6
-    | Md4 = 7
-    | Flare = 8
-    | Entity = 9
-    | DisplayList = 10
-    | TypeCount = 11
-    | Max = 0x7fffffff
+[<Struct>]
+type DrawVertex =
+    val Vertex : Vector3
+    val St1 : single
+    val St2 : single
+    val LightMap1 : single
+    val LightMap2 : single
+    val Normal : Vector3
+    val Color : Rgba
 
 // TODO:
 [<Struct>]
@@ -277,19 +302,72 @@ type SurfaceFlare =
     val Normal : Vector3
     val Color : Vector3
 
+[<Struct>]
+type SurfaceGridMesh =
+    val DlightBit1 : int
+    val DlightBit2 : int
+    val MeshBounds : Bounds
+    val LocalOrigin : Vector3
+    val MeshRadius : single
+    val LodOrigin : Vector3
+    val LodRadius : single
+    val LodFixed : int
+    val LodStitched : int
+    val Width : int
+    val Height : int
+    val WidthLodError : single list
+    val HeightLodError : single list
+    val Vertex : DrawVertex
+
+[<Struct>]
+type FaceVertexPoints =
+    val Vertex0 : single
+    val Vertex1 : single
+    val Vertex2 : single
+    val Vertex3 : single
+    val Vertex4 : single
+    val Vertex5 : single
+    val Vertex6 : single
+    val Vertex7 : single
+
+[<Struct>]
+type SurfaceFace =
+    val Plane : Plane
+    val DlightBit1 : int
+    val DlightBit2 : int
+    val PointCount : int
+    val IndexCount : int
+    val OfsIndices : int
+    val Points : FaceVertexPoints
+
+[<Struct>]
+type SurfaceTriangles =
+    val DlightBit1 : int
+    val DlightBit2 : int
+    val Bounds : Bounds
+    val LocalOrigin : Vector3
+    val Radius : single
+    val Indices : int list
+    val Vertices : DrawVertex list
+
 type Surface =
     | Bad
     | Skip
-    | Face
+    | Face of SurfaceFace
+    | Grid
+    | Triangles of SurfaceTriangles
     | Poly of SurfacePoly
-    | DisplayList of SurfaceDisplayList
+    | Md3
+    | Md4
     | Flare of SurfaceFlare
+    | Entity
+    | DisplayList of SurfaceDisplayList
 
 // TODO:
 [<Struct>]
 type DrawSurface =
     val Sort : uint32
-    val Type : SurfaceType // this may be wrong
+    val Surface : Surface
 
 [<Flags>]
 type RdFlags =
@@ -320,36 +398,6 @@ type RefDef =
         DrawSurfaceCount: int;
         DrawSurfaces: DrawSurface[];
     }
-
-[<Struct>]
-type Bounds =
-    val Start : Vector3
-    val End : Vector3     
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.Start
-            | 1 -> this.End
-            | _ -> raise <| IndexOutOfRangeException ()
-
-// I think this is right?
-type Frustum =
-    {
-        Left: Plane;
-        Right: Plane;
-        Bottom: Plane;
-        Top: Plane;
-    }
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.Left
-            | 1 -> this.Right
-            | 2 -> this.Bottom
-            | 3 -> this.Top
-            | _ -> raise <| IndexOutOfRangeException ()
 
 module CvarModule =
     

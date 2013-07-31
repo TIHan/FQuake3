@@ -186,7 +186,6 @@ type Vector4 =
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 64)>]
 type Matrix16 =     
-    [<FieldOffset (0)>] [<DefaultValue (false)>] val mutable private Handle : single
     [<FieldOffset (0)>] val M00 : single
     [<FieldOffset (4)>] val M01 : single
     [<FieldOffset (8)>] val M02 : single
@@ -265,10 +264,10 @@ type Matrix16 =
 
 module NativeMatrix16 =
     [<DllImport ("OpenFK.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
-    extern void matrix16_multiply (single *m1, single *m2, Matrix16 *m)
+    extern void matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
 
 type Matrix16 with
-    static member (*) (m1: Matrix16, m2: Matrix16) =
+    static member inline (*) (m1: Matrix16, m2: Matrix16) =
 #if NOT_NATIVE
         let dotProduct row column =
             (m1.[row, 0] * m2.[0, column]) +
@@ -279,6 +278,8 @@ type Matrix16 with
         Matrix16.Init dotProduct
 #else
         let mutable m = Matrix16.ZeroCreate ()
-        NativeMatrix16.matrix16_multiply (&&m1.Handle, &&m2.Handle, &&m)
+        let mutable cm1 = m1
+        let mutable cm2 = m2
+        NativeMatrix16.matrix16_multiply (&&cm1, &&cm2, &&m)
         m
 #endif
