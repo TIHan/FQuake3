@@ -29,6 +29,7 @@ open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 open OpenFK
+open OpenFK.Core
 
 module private Native =
 
