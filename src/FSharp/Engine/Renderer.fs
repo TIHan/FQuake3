@@ -1328,9 +1328,55 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
         transform (Vector3.ZeroCreate ()) 0
 
 (*
-    let PlaneforSurface (surfaceType: SurfaceType) (plane: Plane) =
-        match surfaceType with
-        | SurfaceType.Bad -> Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
-        | SurfaceType.Face -> Plane ()
-        | SurfaceType.Triangles ->
+void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
+	srfTriangles_t	*tri;
+	srfPoly_t		*poly;
+	drawVert_t		*v1, *v2, *v3;
+	vec4_t			plane4;
+
+	if (!surfType) {
+		Com_Memset (plane, 0, sizeof( *plane));
+		plane->normal[0] = 1;
+		return;
+	}
+	switch ( *surfType) {
+	case SF_FACE:
+		*plane = ((srfSurfaceFace_t* )surfType)->plane;
+		return;
+	case SF_TRIANGLES:
+		tri = (srfTriangles_t* )surfType;
+		v1 = tri->verts + tri->indexes[0];
+		v2 = tri->verts + tri->indexes[1];
+		v3 = tri->verts + tri->indexes[2];
+		PlaneFromPoints( plane4, v1->xyz, v2->xyz, v3->xyz );
+		VectorCopy( plane4, plane->normal ); 
+		plane->dist = plane4[3];
+		return;
+	case SF_POLY:
+		poly = (srfPoly_t* )surfType;
+		PlaneFromPoints( plane4, poly->verts[0].xyz, poly->verts[1].xyz, poly->verts[2].xyz );
+		VectorCopy( plane4, plane->normal ); 
+		plane->dist = plane4[3];
+		return;
+	default:
+		Com_Memset (plane, 0, sizeof( *plane));
+		plane->normal[0] = 1;		
+		return;
+	}
+}
 *)
+
+    /// <summary>
+    /// R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
+    /// </summary>
+    let PlaneForSurface (surface: Surface) (plane: Plane) =
+        // TODO:
+        match surface with
+        | Face (value) ->
+            value.Plane
+        | Triangles (value) ->
+            Plane ()
+        | Poly (value) ->
+            Plane ()
+        | _ ->
+            Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
