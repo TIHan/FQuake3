@@ -221,6 +221,4 @@ module System =
             
             // Flush standard out
             io.FlushOut ()
-
-            
         ()

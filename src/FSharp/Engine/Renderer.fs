@@ -163,16 +163,18 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 
     /// <summary>
     /// PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+    ///
+    /// The normal will point out of the clock for clockwise ordered points
     /// </summary>
-    static member inline CheckFromPoints (a: Vector3) (b: Vector3) (c: Vector3) (plane: Plane) =
+    static member inline InitFromPoints (a: Vector3) (b: Vector3) (c: Vector3) =
         let d1 = b - a
         let d2 = c - a
         let cross = Vector3.CrossProduct d2 d1
-        let normalized = Vector3.Normalize cross
+        let normal = Vector3.Normalize cross
         
         match Vector3.Length cross with
-        | 0.f -> (Plane (normalized, plane.Distance, plane.Type, plane.SignBits), false)
-        | _ -> (Plane (Vector3 (normalized.X, normalized.Y, Vector3.DotProduct a normalized), plane.Distance, plane.Type, plane.SignBits), true)
+        | 0.f -> Plane (normal, 0.f, PlaneType.X, 0uy)
+        | _ -> Plane (normal, Vector3.DotProduct a normal, PlaneType.X, 0uy)
 
     new (normal, distance, typ, signBits) =
         {
@@ -1399,13 +1401,22 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     /// R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
     /// </summary>
     let PlaneForSurface (surface: Surface) (plane: Plane) =
-        // TODO:
         match surface with
         | Face (value) ->
             value.Plane
         | Triangles (value) ->
-            Plane ()
+            let vertices = value.Vertices
+            let indices = value.Indices
+            let v1 = vertices.[indices.[0]]
+            let v2 = vertices.[indices.[1]]
+            let v3 = vertices.[indices.[2]]
+            let plane4 = Plane.InitFromPoints v1.Vertex v2.Vertex v3.Vertex
+
+            Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | Poly (value) ->
-            Plane ()
+            let vertices = value.vertices
+            let plane4 = Plane.InitFromPoints vertices.[0].Value vertices.[1].Value vertices.[2].Value
+
+            Plane (plane.Normal, plane.Distance, plane.Type, plane.SignBits)
         | _ ->
             Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
