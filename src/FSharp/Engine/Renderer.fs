@@ -321,7 +321,15 @@ type SurfacePoly =
     val ShaderHandle : int
     val FogIndex : int
     val VertexCount : int
-    val vertices : PolyVertex[]
+    val Vertices : PolyVertex list
+
+    new (shaderHandle, fogIndex, vertexCount, vertices) =
+        {
+            ShaderHandle = shaderHandle;
+            FogIndex = fogIndex;
+            VertexCount = vertexCount;
+            Vertices = vertices;
+        }
 
 [<Struct>]
 type SurfaceDisplayList =
@@ -371,6 +379,17 @@ type SurfaceFace =
     val OfsIndices : int
     val Points : FaceVertexPoints
 
+    new (plane, dlightBit1, dlightBit2, pointCount, indexCount, ofsIndices, points) =
+        {
+            Plane = plane;
+            DlightBit1 = dlightBit1;
+            DlightBit2 = dlightBit2;
+            PointCount = pointCount;
+            IndexCount = indexCount;
+            OfsIndices = ofsIndices;
+            Points = points;
+        }
+
 [<Struct>]
 type SurfaceTriangles =
     val DlightBit1 : int
@@ -380,6 +399,17 @@ type SurfaceTriangles =
     val Radius : single
     val Indices : int list
     val Vertices : DrawVertex list
+
+    new (dlightBit1, dlightBit2, bounds, localOrigin, radius, indices, vertices) =
+        {
+            DlightBit1 = dlightBit1;
+            DlightBit2 = dlightBit2;
+            Bounds = bounds;
+            LocalOrigin = localOrigin;
+            Radius = radius;
+            Indices = indices;
+            Vertices = vertices;
+        }
 
 type Surface =
     | Bad
@@ -1414,7 +1444,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 
             Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | Poly (value) ->
-            let vertices = value.vertices
+            let vertices = value.Vertices
             let plane4 = Plane.InitFromPoints vertices.[0].Value vertices.[1].Value vertices.[2].Value
 
             Plane (plane.Normal, plane.Distance, plane.Type, plane.SignBits)

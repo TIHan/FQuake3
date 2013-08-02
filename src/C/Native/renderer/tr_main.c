@@ -176,6 +176,79 @@ m_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
 	return m_object ("Engine", "Engine", "TrRefEntity", 8, args);
 }
 
+MObject
+m_map_surface (const surfaceType_t const* surfaceType)
+{
+	MObject m_surface;
+
+	switch (*surfaceType)
+	{
+	case SF_FACE:
+		{
+		srfSurfaceFace_t* surface = (srfSurfaceFace_t*)surfaceType;
+		MObject m_type;
+		gpointer args[7];
+
+		args [0] = m_struct_as_arg (m_common_create_plane (&surface->plane));
+		args [1] = &surface->dlightBits [0];
+		args [2] = &surface->dlightBits [1];
+		args [3] = &surface->numPoints;
+		args [4] = &surface->numIndices;
+		args [5] = &surface->ofsIndices;
+		args [6] = &surface->points [0];
+		
+		m_type = m_object ("Engine", "Engine", "SurfaceFace", 7, args);
+
+		args [0] = m_struct_as_arg (m_type);
+
+		m_surface = m_object ("Engine", "Engine", "Surface.Face", 1, args);
+		}
+		break;
+	case SF_TRIANGLES:
+		{
+		srfTriangles_t* surface = (srfTriangles_t*)surfaceType;
+		MObject m_type;
+		gpointer args[7];
+
+		args [0] = &surface->dlightBits [0];
+		args [1] = &surface->dlightBits [1];
+		args [2] = (vector3_t*)surface->bounds;
+		args [3] = (vector3_t*)surface->localOrigin;
+		args [4] = (vector3_t*)surface->radius;
+		// TODO:
+
+		m_type = m_object ("Engine", "Engine", "SurfaceTriangles", 7, args);
+
+		args [0] = m_struct_as_arg (m_type);
+
+		m_surface = m_object ("Engine", "Engine", "Surface.Face", 1, args);
+		}
+		break;
+	case SF_POLY:
+		{
+		srfPoly_t* surface = (srfPoly_t*)surfaceType;
+		MObject m_type;
+		gpointer args[4];
+
+		args [0] = &surface->hShader;
+		args [1] = &surface->fogIndex;
+		args [2] = &surface->numVerts;
+		// TODO:
+
+		m_type = m_object ("Engine", "Engine", "SurfacePoly", 4, args);
+
+		args [0] = m_struct_as_arg (m_type);
+
+		m_surface = m_object ("Engine", "Engine", "Surface.Poly", 1, args);
+		}
+		break;
+	default:	
+		return;
+	}
+
+	return m_surface;
+}
+
 void
 m_frustum_map (MObject obj, frustum_t* frustum)
 {
