@@ -204,6 +204,7 @@ module System =
         | _ -> ()
 
         printfn "Working directory: %s" (FileSystem.GetCurrentDirectory ())
+        let agentPool = AgentPool (2)
 
         // main game loop
         while true do
@@ -220,4 +221,6 @@ module System =
             
             // Flush standard out
             io.FlushOut ()
+
+            
         ()

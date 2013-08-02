@@ -27,6 +27,8 @@ namespace OpenFK.Core
 
 open System
 open System.Threading
+open System.Collections
+open System.Collections.Generic
 open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
@@ -39,14 +41,63 @@ module Cpu  =
     let inline GetPhysicalCoreCount () =
         NativeCpu.fk_cpu_get_physical_core_count ()
 
-type internal EventThread (f: unit -> unit) =
-    let resetEvent = AutoResetEvent (false)
+module ConcurrentExtensions =
+    type ConcurrentQueue<'T> with
+        member __.Dequeue () =
+            let mutable item : 'T = Unchecked.defaultof<'T>
+        
+            match __.TryDequeue (&item) with
+            | false -> raise <| Exception ("Unable to dequeue item in concurrent queue.")
+            | _ -> item
+
+/// <summary>
+///
+/// </summary>
+type AgentPriorityType =
+    | Low = 0
+    | Medium = 1
+    | High = 2
+
+/// <summary>
+///
+/// </summary>
+type IAgent =
+    abstract member Process : unit -> unit
+  
+/// <summary>
+///
+/// </summary>  
+type Agent<'State, 'Msg> (initialState: 'State, f: 'State * 'Msg -> 'State) =
+    let mutable state: 'State = initialState  
+    let mutable msgs = Queue<'Msg> ()
+    
+    member val Priority = AgentPriorityType.Medium with get, set
+    
+    member __.Post msg =
+        msgs.Enqueue msg
+
+    interface IAgent with
+        member this.Process () =
+            while msgs.Count <> 0 do
+                state <- f (state, msgs.Dequeue ())
+
+/// <summary>
+///
+/// </summary>
+type internal EventAgentThread () =
+    let resetEvent = new AutoResetEvent (false)
+    let waitResetEvent = new AutoResetEvent (false)
+    let agents = List<IAgent> ()
+
     let thread =
         Thread (fun () ->
             let rec loop () =
                 async {
                     resetEvent.WaitOne () |> ignore
-                    f ()
+
+                    agents.ForEach (fun x -> x.Process ())
+
+                    waitResetEvent.Set () |> ignore
                     return! loop ()
                 }
 
@@ -57,24 +108,60 @@ type internal EventThread (f: unit -> unit) =
         thread.Start ()
 
     member __.Set () =
-        resetEvent.Set ()
+        resetEvent.Set () |> ignore
+        
+    member __.Wait () =
+        waitResetEvent.WaitOne () |> ignore
 
-type Agent (threadId, f: unit -> unit) =
-    let threadId = threadId
-    let f = f
+    member __.AddAgent agent =
+        agents.Add agent
 
-    member this.Process () =
-        f ()
+    member __.Id with get () = thread.ManagedThreadId
 
-type AgentPool (threadCount: int) =
+    member __.AgentCount with get () = agents.Count
+
+/// <summary>
+///
+/// </summary>
+type AgentPool (threadCount: int) as this =
     let threads =
         Array.init threadCount (fun i ->
-            EventThread (fun () -> ())
+            EventAgentThread ()
         )
 
     do
         threads
-        |> Array.iter (fun x -> x.Start ())
+        |> Array.iter (fun x ->
+            x.Start ()
+        )
+        this.Process ()
+
+    member __.CreateAgent<'State, 'Msg> (initialState: 'State) (f: 'State * 'Msg -> 'State) =
+        let minCount =
+            query {
+                for thread in threads do
+                minBy thread.AgentCount
+            }
+        let agents =
+            query {
+                for thread in threads do
+                where (thread.AgentCount = minCount)
+                head
+            }
+        let agent = Agent<'State, 'Msg> (initialState, f)
+        agents.AddAgent agent
+        agent
+        
+    member __.Process () =
+        threads
+        |> Array.iter (fun x ->
+            x.Set ()
+        )
+        
+        threads
+        |> Array.iter (fun x ->
+            x.Wait ()
+        )
 
     
     
