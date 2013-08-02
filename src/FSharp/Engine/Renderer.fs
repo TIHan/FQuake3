@@ -145,6 +145,35 @@ void SetPlaneSignbits (cplane_t *out) {
 
         calculatePlaneSignBits 0uy 0
 
+(*
+qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+	vec3_t	d1, d2;
+
+	VectorSubtract( b, a, d1 );
+	VectorSubtract( c, a, d2 );
+	CrossProduct( d2, d1, plane );
+	if ( VectorNormalize( plane ) == 0 ) {
+		return qfalse;
+	}
+
+	plane[3] = DotProduct( a, plane );
+	return qtrue;
+}
+*)
+
+    /// <summary>
+    /// PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+    /// </summary>
+    static member inline CheckFromPoints (a: Vector3) (b: Vector3) (c: Vector3) (plane: Plane) =
+        let d1 = b - a
+        let d2 = c - a
+        let cross = Vector3.CrossProduct d2 d1
+        let normalized = Vector3.Normalize cross
+        
+        match Vector3.Length cross with
+        | 0.f -> (Plane (normalized, plane.Distance, plane.Type, plane.SignBits), false)
+        | _ -> (Plane (Vector3 (normalized.X, normalized.Y, Vector3.DotProduct a normalized), plane.Distance, plane.Type, plane.SignBits), true)
+
     new (normal, distance, typ, signBits) =
         {
             Normal = normal;

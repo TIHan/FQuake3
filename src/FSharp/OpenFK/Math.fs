@@ -101,6 +101,11 @@ type Vector3 =
             Z = z;
         }
 
+    static member inline Init (f: int -> single) =
+        Vector3 (f 0, f 1, f 2)
+
+    static member inline ZeroCreate () =
+        Vector3 ()
 
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
@@ -135,8 +140,9 @@ type Vector3 =
     static member inline Length (v: Vector3) =
         sqrt <| Vector3.DotProduct v v
 
-    static member inline ZeroCreate () =
-        Vector3 ()
+    static member inline Normalize (v: Vector3) =
+        let length = 1.f / Vector3.Length v
+        Vector3.Init (fun i -> v.[i] * length) 
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
