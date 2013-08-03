@@ -71,6 +71,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\..\lib\Mono\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)Debug /y
+xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)Debug /y
+xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)Debug /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -90,6 +95,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\..\lib\Mono\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)Release /y
+xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)Release /y
+xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)Release /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
