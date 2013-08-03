@@ -1444,11 +1444,11 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
             let v3 = vertices.[indices.[2]]
             let plane4 = Plane.InitFromPoints v1.Vertex v2.Vertex v3.Vertex
 
-            Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
+            Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | Poly (value) ->
             let vertices = value.Vertices
             let plane4 = Plane.InitFromPoints vertices.[0].Vertex vertices.[1].Vertex vertices.[2].Vertex
 
-            Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
+            Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | _ ->
             Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
