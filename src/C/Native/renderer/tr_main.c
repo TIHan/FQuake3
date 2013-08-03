@@ -50,6 +50,12 @@ Cvar_GetNoCull (void)
 }
 
 MObject
+m_common_create_list ()
+{
+
+}
+
+MObject
 m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 {
 	gpointer *args;
@@ -65,6 +71,18 @@ MArray
 m_common_create_vector3_array (const gint size)
 {
 	return m_array ("OpenFK", "OpenFK.Math", "Vector3", size);
+}
+
+MArray
+m_common_create_draw_vertex_array (const gint size)
+{
+	return m_array ("Engine", "Engine", "DrawVertex", size);
+}
+
+MArray
+m_common_create_poly_vertex_array (const gint size)
+{
+	return m_array ("Engine", "Engine", "PolyVertex", size);
 }
 
 MObject
@@ -186,7 +204,9 @@ m_map_surface (const surfaceType_t const* surfaceType)
 	case SF_FACE:
 		{
 		srfSurfaceFace_t* surface = (srfSurfaceFace_t*)surfaceType;
+
 		MObject m_type;
+
 		gpointer args[7];
 
 		args [0] = m_struct_as_arg (m_common_create_plane (&surface->plane));
@@ -201,45 +221,57 @@ m_map_surface (const surfaceType_t const* surfaceType)
 
 		args [0] = m_struct_as_arg (m_type);
 
-		m_surface = m_object ("Engine", "Engine", "Surface.Face", 1, args);
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewFace", args);
 		}
 		break;
 	case SF_TRIANGLES:
 		{
 		srfTriangles_t* surface = (srfTriangles_t*)surfaceType;
+
+		MArray m_indices = m_array_int32 (surface->numIndexes);
+		MArray m_vertices = m_common_create_draw_vertex_array (surface->numVerts);
 		MObject m_type;
+
 		gpointer args[7];
+
+		m_array_map (m_indices, surface->numIndexes, gint, surface->indexes);
+		m_array_map (m_vertices, surface->numVerts, drawVert_t, surface->verts);
 
 		args [0] = &surface->dlightBits [0];
 		args [1] = &surface->dlightBits [1];
 		args [2] = (vector3_t*)surface->bounds;
 		args [3] = (vector3_t*)surface->localOrigin;
-		args [4] = (vector3_t*)surface->radius;
-		// TODO:
+		args [4] = &surface->radius;
+		args [5] = m_array_as_arg (m_indices);
+		args [6] = m_array_as_arg (m_vertices);
 
 		m_type = m_object ("Engine", "Engine", "SurfaceTriangles", 7, args);
 
 		args [0] = m_struct_as_arg (m_type);
 
-		m_surface = m_object ("Engine", "Engine", "Surface.Face", 1, args);
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewTriangles", args);
 		}
 		break;
 	case SF_POLY:
 		{
 		srfPoly_t* surface = (srfPoly_t*)surfaceType;
+
+		MArray m_vertices = m_common_create_poly_vertex_array (surface->numVerts);
 		MObject m_type;
+
 		gpointer args[4];
+
+		m_array_map (m_vertices, surface->numVerts, polyVert_t, surface->verts);
 
 		args [0] = &surface->hShader;
 		args [1] = &surface->fogIndex;
-		args [2] = &surface->numVerts;
-		// TODO:
+		args [2] = m_array_as_arg (m_vertices);
 
-		m_type = m_object ("Engine", "Engine", "SurfacePoly", 4, args);
+		m_type = m_object ("Engine", "Engine", "SurfacePoly", 3, args);
 
 		args [0] = m_struct_as_arg (m_type);
 
-		m_surface = m_object ("Engine", "Engine", "Surface.Poly", 1, args);
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewPoly", args);
 		}
 		break;
 	default:	
@@ -571,41 +603,22 @@ R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t
 R_PlaneForSurface
 =============
 */
-void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
-	srfTriangles_t	*tri;
-	srfPoly_t		*poly;
-	drawVert_t		*v1, *v2, *v3;
-	vec4_t			plane4;
+void
+R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
+{
+	MObject m_out;
 
 	if (!surfType) {
-		Com_Memset (plane, 0, sizeof(*plane));
-		plane->normal[0] = 1;
+		g_error ("Bad surface type.");
 		return;
 	}
-	switch (*surfType) {
-	case SF_FACE:
-		*plane = ((srfSurfaceFace_t *)surfType)->plane;
-		return;
-	case SF_TRIANGLES:
-		tri = (srfTriangles_t *)surfType;
-		v1 = tri->verts + tri->indexes[0];
-		v2 = tri->verts + tri->indexes[1];
-		v3 = tri->verts + tri->indexes[2];
-		PlaneFromPoints( plane4, v1->xyz, v2->xyz, v3->xyz );
-		VectorCopy( plane4, plane->normal ); 
-		plane->dist = plane4[3];
-		return;
-	case SF_POLY:
-		poly = (srfPoly_t *)surfType;
-		PlaneFromPoints( plane4, poly->verts[0].xyz, poly->verts[1].xyz, poly->verts[2].xyz );
-		VectorCopy( plane4, plane->normal ); 
-		plane->dist = plane4[3];
-		return;
-	default:
-		Com_Memset (plane, 0, sizeof(*plane));
-		plane->normal[0] = 1;		
-		return;
-	}
+
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "PlaneForSurface", 2, {
+		__args [0] = m_object_as_arg (m_map_surface (surfType));
+		__args [1] = m_struct_as_arg (m_common_create_plane (plane));
+	}, m_out);
+
+	*plane = *(cplane_t*)m_object_unbox (m_out);
 }
 
 /*

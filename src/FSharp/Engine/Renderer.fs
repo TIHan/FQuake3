@@ -311,23 +311,25 @@ type DrawVertex =
 // TODO:
 [<Struct>]
 type PolyVertex =
-    val Value : Vector3
-    val St : single[] // ? What is this?
-    val Modulate : byte[] // ? What is this?
+    val Vertex : Vector3
+    val St1 : single;
+    val St2 : single;
+    val Modulate1 : single;
+    val Modulate2 : single;
+    val Modulate3 : single;
+    val Modulate4 : single;
 
 // TODO:
 [<Struct>]
 type SurfacePoly =
     val ShaderHandle : int
     val FogIndex : int
-    val VertexCount : int
-    val Vertices : PolyVertex list
+    val Vertices : PolyVertex[] // TODO: Change to list.
 
     new (shaderHandle, fogIndex, vertexCount, vertices) =
         {
             ShaderHandle = shaderHandle;
             FogIndex = fogIndex;
-            VertexCount = vertexCount;
             Vertices = vertices;
         }
 
@@ -354,8 +356,8 @@ type SurfaceGridMesh =
     val LodStitched : int
     val Width : int
     val Height : int
-    val WidthLodError : single list
-    val HeightLodError : single list
+    val WidthLodError : single[] // TODO: Change to list.
+    val HeightLodError : single[] // TODO: Change to list.
     val Vertex : DrawVertex
 
 [<Struct>]
@@ -397,8 +399,8 @@ type SurfaceTriangles =
     val Bounds : Bounds
     val LocalOrigin : Vector3
     val Radius : single
-    val Indices : int list
-    val Vertices : DrawVertex list
+    val Indices : int[] // TODO: Change to list
+    val Vertices : DrawVertex[] // TODO: Change to list
 
     new (dlightBit1, dlightBit2, bounds, localOrigin, radius, indices, vertices) =
         {
@@ -1445,8 +1447,8 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
             Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | Poly (value) ->
             let vertices = value.Vertices
-            let plane4 = Plane.InitFromPoints vertices.[0].Value vertices.[1].Value vertices.[2].Value
+            let plane4 = Plane.InitFromPoints vertices.[0].Vertex vertices.[1].Vertex vertices.[2].Vertex
 
-            Plane (plane.Normal, plane.Distance, plane.Type, plane.SignBits)
+            Plane (plane.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | _ ->
             Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)

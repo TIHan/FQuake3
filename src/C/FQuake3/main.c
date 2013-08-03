@@ -12,6 +12,9 @@ main (int argc, char *argv[])
 
 	MDomain *const domain = m_domain_new ("Mono\\lib", "Mono\\etc", "FQuake3", M_RUNTIME_4_5);
 
+	// Load FSharp.Core Assembly
+	m_load_assembly ("FSharp.Core.dll");
+
 	// Load OpenFK Assembly
 	m_load_assembly ("OpenFK.dll");
 
