@@ -274,7 +274,9 @@ m_map_surface (const surfaceType_t const* surfaceType)
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewPoly", args);
 		}
 		break;
-	default:	
+	default:
+		// TODO: Need to handle more surface types. PlaneForSurface still has a bug in it of handling surface types
+		//       that are not Face, Triangles, and Poly.
 		return;
 	}
 
