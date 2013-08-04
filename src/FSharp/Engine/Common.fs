@@ -30,6 +30,19 @@ open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 
+module Constants =
+    [<Literal>]
+    let GEntityIdBits = 10
+
+    let MaxGEntities = (1 <<< GEntityIdBits)
+
+    // entityIds are communicated with GEntityIdBits, so any reserved
+    // values that are going to be communcated over the net need to
+    // also be in this range
+    let EntityIdNone = MaxGEntities - 1
+    let EntityIdWorld = MaxGEntities - 2
+    let EntityIdMaxNormal = MaxGEntities - 2
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Cvar =

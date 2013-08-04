@@ -1480,3 +1480,16 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
             Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | _ ->
             Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
+
+
+    /// <summary>
+    /// R_GetPortalOrientation
+    /// entityId is the entity that the portal surface is a part of, which may
+    /// be moving and rotating.
+
+    /// Returns true if it should be mirrored
+    /// </summary>
+    let GetPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) =
+        // create plane axis for the portal we are seeing
+        let originalPlane = PlaneForSurface drawSurface.Surface <| Plane ()
+        ()
