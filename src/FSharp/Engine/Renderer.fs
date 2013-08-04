@@ -82,7 +82,7 @@ type Rgba =
     val R : byte
     val G : byte
     val B : byte
-    val A : byte 
+    val A : byte
 
 // Should this be a record type? It is over 64 bytes, don't know for sure.
 [<Struct>]
@@ -308,7 +308,6 @@ type DrawVertex =
     val Normal : Vector3
     val Color : Rgba
 
-// TODO:
 [<Struct>]
 type PolyVertex =
     val Vertex : Vector3
@@ -319,7 +318,6 @@ type PolyVertex =
     val Modulate3 : single;
     val Modulate4 : single;
 
-// TODO:
 [<Struct>]
 type SurfacePoly =
     val ShaderHandle : int
@@ -337,11 +335,23 @@ type SurfacePoly =
 type SurfaceDisplayList =
     val ListId : int
 
+    new (listId) =
+        {
+            ListId = listId;
+        }
+
 [<Struct>]
 type SurfaceFlare =
     val Origin : Vector3
     val Normal : Vector3
     val Color : Vector3
+
+    new (origin, normal, color) =
+        {
+            Origin = origin;
+            Normal = normal;
+            Color = color;
+        }
 
 [<Struct>]
 type SurfaceGridMesh =
@@ -359,6 +369,24 @@ type SurfaceGridMesh =
     val WidthLodError : single[] // TODO: Change to list.
     val HeightLodError : single[] // TODO: Change to list.
     val Vertex : DrawVertex
+
+    new (dlightBit1, dlightBit2, meshBounds, localOrigin, meshRadius, lodOrigin, lodRadius, lodFixed, lodStitched, width, height, widthLodError, heightLodError, vertex) =
+        {
+            DlightBit1 = dlightBit1;
+            DlightBit2 = dlightBit2;
+            MeshBounds = meshBounds;
+            LocalOrigin = localOrigin;
+            MeshRadius = meshRadius;
+            LodOrigin = lodOrigin;
+            LodRadius = lodRadius;
+            LodFixed = lodFixed;
+            LodStitched = lodStitched;
+            Width = width;
+            Height = height;
+            WidthLodError = widthLodError;
+            HeightLodError = heightLodError;
+            Vertex = vertex;
+        }
 
 [<Struct>]
 type FaceVertexPoints =
@@ -417,7 +445,7 @@ type Surface =
     | Bad
     | Skip
     | Face of SurfaceFace
-    | Grid
+    | Grid of SurfaceGridMesh
     | Triangles of SurfaceTriangles
     | Poly of SurfacePoly
     | Md3
