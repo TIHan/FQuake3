@@ -477,3 +477,36 @@ type RefDef =
         DrawSurfaceCount: int;
         DrawSurfaces: DrawSurface[];
     }
+
+
+
+type Image =
+    {
+        Path : string;
+        Width : int;
+        Height : int;
+        UploadWidth : int;
+        UploadHeight : int
+        TextureId : int;
+        FrameUsed : int;
+        InternalFormat : int;
+        IsMipmap : bool;
+        CanAllowPicmip : bool;
+        //TODO:
+    }
+
+// C equivalent - trGlobals_t
+type TrState =
+    {
+        IsRegistered : bool;
+        VisCount : int;
+        FrameCount : int;
+        SceneCount : int;
+        ViewCount : int;
+        SmpFrame : int;
+        FrameSceneId : int;
+        HasWorldMapLoaded : bool;
+        //world_t *world;
+        //const byte externalVisData - NOT SET/USED
+
+    }
