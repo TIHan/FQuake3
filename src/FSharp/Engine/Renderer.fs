@@ -1489,7 +1489,27 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) =
+    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: Orientation) =
         // create plane axis for the portal we are seeing
         let originalPlane = PlaneForSurface drawSurface.Surface <| Plane ()
+
+        let plane =
+            match entity with
+            | Some (x) ->
+                // get the orientation of the entity
+                let entityOrientation = RotateForEntity x view orientation
+
+                // rotate the plane, but keep the non-rotated version for matching
+                // against the portalSurface entities
+                let normal = LocalNormalToWorld originalPlane.Normal entityOrientation
+                let distance = originalPlane.Distance + Vector3.DotProduct normal entityOrientation.Origin
+
+                // translate the original plane
+                let translatedDistance = originalPlane.Distance + Vector3.DotProduct originalPlane.Normal entityOrientation.Origin
+
+                Plane (normal, translatedDistance, PlaneType.X)
+            | None -> originalPlane
+
+        let surfaceAxisX = plane.Normal
+
         ()

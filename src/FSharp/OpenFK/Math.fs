@@ -142,7 +142,10 @@ type Vector3 =
 
     static member inline Normalize (v: Vector3) =
         let length = 1.f / Vector3.Length v
-        Vector3.Init (fun i -> v.[i] * length) 
+        Vector3.Init (fun i -> v.[i] * length)
+
+    static member inline Perpendicular (v: Vector3) =
+        ()
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
