@@ -106,6 +106,12 @@ type Vector3 =
             | true -> 1
             | _ -> 2
 
+    static member inline Map (f: int -> single -> single) (v: Vector3) =
+        Vector3 (f 0 v.[0], f 1 v.[1], f 2 v.[2])
+        
+    static member inline Map2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
+        Vector3 (f 0 v1.[0] v2.[0], f 1 v1.[1] v2.[1], f 2 v1.[2] v2.[2])
+
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
@@ -135,9 +141,6 @@ type Vector3 =
 
     static member inline Scale (s: single) (v: Vector3) =
         Vector3 (v.X * s, v.Y * s, v.Z * s)
-
-    static member inline MultiplyAdd (s: float32) (v1: Vector3) (v2: Vector3) =
-        s * v1 + v2
 
     static member inline Length (v: Vector3) =
         sqrt <| Vector3.DotProduct v v
