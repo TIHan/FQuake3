@@ -70,9 +70,9 @@ module MainRenderer =
                 let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
-                |> Vector3.MultiplyAdd v.X orientation.Axis.[0]
-                |> Vector3.MultiplyAdd v.Y orientation.Axis.[1]
-                |> Vector3.MultiplyAdd v.Z orientation.Axis.[2]
+                |> ( *+ ) (v.X, orientation.Axis.[0])
+                |> ( *+ ) (v.Y, orientation.Axis.[1])
+                |> ( *+ ) (v.Z, orientation.Axis.[2])
             )
 
         /// <summary>
@@ -881,10 +881,10 @@ void R_SetupFrustum (void) {
         let xNormal = Vector3.Scale xs view.Orientation.Axis.[0]
         let yNormal = Vector3.Scale ys view.Orientation.Axis.[0]
 
-        let leftNormal = xNormal + (view.Orientation.Axis.[1] * xc)
-        let rightNormal = xNormal + (view.Orientation.Axis.[1] * -xc)
-        let bottomNormal = yNormal + (view.Orientation.Axis.[2] * yc)
-        let topNormal = yNormal + (view.Orientation.Axis.[2] * -yc)
+        let leftNormal = (xc, view.Orientation.Axis.[1]) *+ xNormal
+        let rightNormal = (-xc, view.Orientation.Axis.[1]) *+ xNormal
+        let bottomNormal = (yc, view.Orientation.Axis.[2]) *+ yNormal
+        let topNormal = (-yc, view.Orientation.Axis.[2]) *+ yNormal
 
         {
             Left =
@@ -941,7 +941,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
             match acc with
             | 3 -> transformed
             | _ ->
-            transform (transformed + (camera.Axis.[acc] * Vector3.DotProduct local surface.Axis.[acc])) (acc + 1)
+            transform ((Vector3.DotProduct local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
         (transform (Vector3.ZeroCreate ()) 0) + camera.Origin
 
@@ -966,7 +966,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
             match acc with
             | 3 -> transformed
             | _ ->
-            transform (transformed + (camera.Axis.[acc] * Vector3.DotProduct v surface.Axis.[acc])) (acc + 1)
+            transform ((Vector3.DotProduct v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
         transform (Vector3.ZeroCreate ()) 0
 

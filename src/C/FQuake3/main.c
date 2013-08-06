@@ -15,9 +15,6 @@ main (int argc, char *argv[])
 	// Load FSharp.Core Assembly
 	m_load_assembly ("FSharp.Core.dll");
 
-	// Load OpenFK Assembly
-	m_load_assembly ("OpenFK.dll");
-
 	// Load Engine Assembly
 	m_load_assembly ("Engine.dll");
 
