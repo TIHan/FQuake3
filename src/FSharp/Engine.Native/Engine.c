@@ -1,26 +1,25 @@
 /*
-Copyright (c) 2013 OpenFK
+Copyright (C) 2013 William F. Smith
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+Derivative of Quake III Arena source:
+Copyright (C) 1999-2005 Id Software, Inc.
 */
 
-#include "OpenFK.h"
+#include "Engine.h"
 
 #ifdef _WIN32
 #include <intrin.h>
@@ -43,9 +42,9 @@ cpu_id (unsigned i, unsigned regs[4])
 #endif
 }
 
-FK_EXPORT
+ENGINE_EXPORT
 void
-FK_DECL matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m2, matrix16_t* m)
+ENGINE_DECL qmath_matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m2, matrix16_t* m)
 {
 	int i, j;
 
@@ -62,9 +61,9 @@ FK_DECL matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m
 	}
 }
 
-FK_EXPORT
+ENGINE_EXPORT
 void
-FK_DECL fk_cpu_get_vendor_name (char vendor[12])
+ENGINE_DECL system_cpu_get_vendor_name (char vendor[12])
 {
 	unsigned regs[4];
 
@@ -74,16 +73,16 @@ FK_DECL fk_cpu_get_vendor_name (char vendor[12])
 	((unsigned *)vendor) [2] = regs [2]; // ECX
 }
 
-FK_EXPORT
+ENGINE_EXPORT
 int
-FK_DECL fk_cpu_get_physical_core_count (void)
+ENGINE_DECL system_cpu_get_physical_core_count (void)
 {
 	int cores = 0;
 
 	unsigned regs[4];
 	char vendor[12];
 
-	fk_cpu_get_vendor_name (&vendor [0]);
+	system_cpu_get_vendor_name (&vendor [0]);
 
 	if (strncmp (vendor, "GenuineIntel", 12) == 0)
 	{

@@ -1,5 +1,5 @@
 ﻿(*
-Copyright (C) 2013 OpenFK
+Copyright (C) 2013 William F. Smith
 
 This program is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
     2. Types that don't singularly try to represent a value should be records.
 *)
 
+#nowarn "9"
 
 namespace Engine
 
@@ -34,7 +35,7 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
-open OpenFK.Math
+open Engine.QMath
 
 type CullType =
     | In = 0
@@ -48,7 +49,6 @@ type PlaneType =
     | NonAxial = 3
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Axis =
     val X : Vector3
     val Y : Vector3
@@ -65,7 +65,6 @@ type Axis =
     new (x, y, z) = { X = x; Y = y; Z = z; }
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
     val R : byte
     val G : byte
@@ -74,7 +73,6 @@ type Rgba =
 
 // Should this be a record type? It is over 64 bytes, don't know for sure.
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Orientation =
     val Origin : Vector3
     val Axis : Axis

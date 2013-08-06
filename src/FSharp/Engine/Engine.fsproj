@@ -43,16 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common.fs" />
+    <Compile Include="QMath.fs" />
     <Compile Include="RendererTypes.fs" />
     <Compile Include="Renderer.fs" />
     <Compile Include="System.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpenFK\OpenFK.fsproj">
-      <Name>OpenFK</Name>
-      <Project>{a8fb604b-b5bd-47fa-8f2c-487d8660afd9}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

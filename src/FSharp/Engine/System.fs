@@ -1,5 +1,5 @@
 ﻿(*
-Copyright (C) 2013 OpenFK
+Copyright (C) 2013 William F. Smith
 
 This program is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
@@ -28,16 +28,19 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
-open OpenFK
-open OpenFK.Core
 
 module private Native =
-
     [<Literal>]
     let libQuake3 = "quake3.dll"
 
     [<Literal>]
+    let libEngine = "Engine.Native.dll"
+
+    [<Literal>]
     let callingConvention = CallingConvention.Cdecl
+
+    [<DllImport (libEngine, CallingConvention = CallingConvention.Cdecl)>]
+    extern int system_cpu_get_physical_core_count ()
 
     [<DllImport(libQuake3, CallingConvention = callingConvention)>]
     extern void Sys_CreateConsole ()
@@ -170,6 +173,9 @@ module System =
 
     let Milliseconds () =
         stopwatch.ElapsedMilliseconds
+
+    let GetPhysicalCoreCount () =
+        Native.system_cpu_get_physical_core_count ()
 
     let Init () =
         SetupUnhandledExceptions ()
