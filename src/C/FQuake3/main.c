@@ -1,9 +1,12 @@
 #include <m.h>
 
+static gchar* mono_lib = "Mono\\lib";
+static gchar* mono_etc = "Mono\\etc";
+
 static GOptionEntry option_entries[] =
 {
-	{ "mono-lib", 'l', 0, G_OPTION_ARG_STRING, "Mono\\lib", "Mono lib directory path", "ML" },
-	{ "mono-etc", 'e', 0, G_OPTION_ARG_STRING, "Mono\\etc", "Mono etc directory path", "ME" },
+	{ "mono-lib", 0, 0, G_OPTION_ARG_STRING, &mono_lib, "Mono lib directory path", NULL },
+	{ "mono-etc", 0, 0, G_OPTION_ARG_STRING, &mono_etc, "Mono etc directory path", NULL },
 	{ NULL }
 };
 
@@ -28,7 +31,7 @@ main (int argc, char *argv[])
 	}
 
 	// Initialize Mono Domain
-	domain = m_domain_new ((const gchar*)option_entries [0].arg_data, (const gchar*)option_entries [0].arg_data, "FQuake3", M_RUNTIME_4_5);
+	domain = m_domain_new (mono_lib, mono_etc, "FQuake3", M_RUNTIME_4_5);
 
 	// Load FSharp.Core Assembly
 	m_load_assembly ("FSharp.Core.dll");
