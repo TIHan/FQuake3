@@ -147,28 +147,30 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 MObject
 m_map_ref_entity (const refEntity_t const* ref_entity)
 {
-	gpointer args[18];
+	gpointer args[20];
 
 	args [0] = &ref_entity->reType;
 	args [1] = &ref_entity->renderfx;
 	args [2] = &ref_entity->hModel;
 	args [3] = (vector3_t *)ref_entity->lightingOrigin;
-	args [4] = (vector3_t *)ref_entity->axis;
-	args [5] = &ref_entity->nonNormalizedAxes;
-	args [6] = (vector3_t *)ref_entity->origin;
-	args [7] = &ref_entity->frame;
-	args [8] = (vector3_t *)ref_entity->oldorigin;
-	args [9] = &ref_entity->oldframe;
-	args [10] = &ref_entity->backlerp;
-	args [11] = &ref_entity->skinNum;
-	args [12] = &ref_entity->customSkin;
-	args [13] = ref_entity->shaderRGBA;
-	args [14] = (vector2_t *)ref_entity->shaderTexCoord;
-	args [15] = &ref_entity->shaderTime;
-	args [16] = &ref_entity->radius;
-	args [17] = &ref_entity->rotation;
+	args [4] = &ref_entity->shadowPlane;
+	args [5] = (vector3_t *)ref_entity->axis;
+	args [6] = &ref_entity->nonNormalizedAxes;
+	args [7] = (vector3_t *)ref_entity->origin;
+	args [8] = &ref_entity->frame;
+	args [9] = (vector3_t *)ref_entity->oldorigin;
+	args [10] = &ref_entity->oldframe;
+	args [11] = &ref_entity->backlerp;
+	args [12] = &ref_entity->skinNum;
+	args [13] = &ref_entity->customSkin;
+	args [14] = &ref_entity->customShader;
+	args [15] = ref_entity->shaderRGBA;
+	args [16] = (vector2_t *)ref_entity->shaderTexCoord;
+	args [17] = &ref_entity->shaderTime;
+	args [18] = &ref_entity->radius;
+	args [19] = &ref_entity->rotation;
 
-	return m_object ("Engine", "Engine", "RefEntity", 18, args);
+	return m_object ("Engine", "Engine", "RefEntity", 20, args);
 }
 
 MObject

@@ -441,6 +441,7 @@ void myGlMultMatrix( const float *a, const float *b, float *out ) {
 }
 *)
 
+    // TODO: This will need to go away eventually.
     let MyGLMultMatrix (a: Matrix16) (b: Matrix16) =
         a * b
 

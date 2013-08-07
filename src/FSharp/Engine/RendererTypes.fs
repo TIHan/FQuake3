@@ -34,20 +34,37 @@ open System.IO
 open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
+open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
 open Engine.QMath
 
+/// <summary>
+/// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
+/// CullType
+///
+/// Note: This may change as there might be another "CullType" that means something different.
+/// </summary>
 type CullType =
-    | In = 0
-    | Clip = 1
-    | Out = 2
+    | In = 0    // completely unclipped
+    | Clip = 1  // clipped by one or more planes
+    | Out = 2   // completely outside the clipping planes
 
+/// <summary>
+/// Based on Q3: PLANE_X, PLANE_Y, PLANE_Z, PLANE_NON_AXIAL
+/// PlaneType
+///
+/// plane types are used to speed some tests
+/// 0-2 are axial planes
+/// </summary>
 type PlaneType =
     | X = 0
     | Y = 1
     | Z = 2
     | NonAxial = 3
 
+/// <summary>
+/// Axis
+/// </summary>
 [<Struct>]
 type Axis =
     val X : Vector3
@@ -62,8 +79,17 @@ type Axis =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (x, y, z) = { X = x; Y = y; Z = z; }
+    new (x, y, z) =
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
 
+
+/// <summary>
+/// Rgba
+/// </summary>
 [<Struct>]
 type Rgba =
     val R : byte
@@ -71,12 +97,34 @@ type Rgba =
     val B : byte
     val A : byte
 
-// Should this be a record type? It is over 64 bytes, don't know for sure.
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.R
+            | 1 -> this.G
+            | 2 -> this.B
+            | 3 -> this.A
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (r, g, b, a) =
+        {
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+        }
+
+/// <summary>
+/// Based on Q3: orientationr_t
+/// Orientation
+///
+/// Note: Should this be a record type? It is over 64 bytes, don't know for sure.
+/// </summary>
 [<Struct>]
 type Orientation =
-    val Origin : Vector3
-    val Axis : Axis
-    val ViewOrigin : Vector3
+    val Origin : Vector3        // in world coordinates
+    val Axis : Axis             // orientation in world
+    val ViewOrigin : Vector3    // viewParms->or.origin in local coordinates // FIXME: This directly points to viewParms orientation origin? Yuck.
     val ModelMatrix : Matrix16
 
     new (origin, axis, viewOrigin, modelMatrix) =
@@ -87,7 +135,10 @@ type Orientation =
             ModelMatrix = modelMatrix;
         }
 
-
+/// <summary>
+/// Based on Q3: cplane_t
+/// Plane
+/// </summary>
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 20)>]
 type Plane =
@@ -99,10 +150,10 @@ type Plane =
 
     [<FieldOffset (16)>]
     [<MarshalAs (UnmanagedType.I8)>]
-    val Type : PlaneType        // signx + (signy<<1) + (signz<<2), used as lookup during collision
+    val Type : PlaneType    // for fast side tests: 0,1,2 = axial, 3 = nonaxial
 
     [<FieldOffset (17)>]
-    val SignBits : byte
+    val SignBits : byte     // signx + (signy<<1) + (signz<<2), used as lookup during collision
 
 (*
 void SetPlaneSignbits (cplane_t *out) {
@@ -120,7 +171,8 @@ void SetPlaneSignbits (cplane_t *out) {
 *)
 
     /// <summary>
-    /// void SetPlaneSignbits (cplane_t *out)
+    /// Based on Q3: SetPlaneSignBits
+    /// CalculateSignBits
     /// </summary>
     static member inline CalculateSignBits (normal: Vector3) =
         let rec calculatePlaneSignBits bits acc =
@@ -148,7 +200,8 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 *)
 
     /// <summary>
-    /// PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+    /// Based on Q3: PlaneFromPoints
+    /// InitFromPoints
     ///
     /// The normal will point out of the clock for clockwise ordered points
     /// </summary>
@@ -178,6 +231,9 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
             SignBits = Plane.CalculateSignBits normal;
         }
 
+/// <summary>
+/// Bounds
+/// </summary>
 [<Struct>]
 type Bounds =
     val Begin : Vector3
@@ -190,7 +246,17 @@ type Bounds =
             | 1 -> this.End
             | _ -> raise <| IndexOutOfRangeException ()
 
-// TODO: Find out if this is truly left, right, bottom, and top in this order
+    new (begi, en) =
+        {
+            Begin = begi;
+            End = en;
+        }
+
+/// <summary>
+/// Frustum
+///
+/// TODO: Find out if this is truly left, right, bottom, and top in this order
+/// </summary>
 type Frustum =
     {
         Left: Plane;
@@ -208,7 +274,11 @@ type Frustum =
             | 3 -> this.Top
             | _ -> raise <| IndexOutOfRangeException ()
 
-// Too big to be a struct?
+/// <summary>
+/// Transform
+///
+/// Note: Too big to be a struct?
+/// </summary>
 [<Struct>]
 type Transform =
     val T0 : Vector3
@@ -249,17 +319,20 @@ type Transform =
         Transform (f 0, f 1, f 2, f 3, f 4, f 5, f 6, f 7)
 
 
-// This is way too big to be a struct, makes sense for it to be a record.
+/// <summary>
+/// Based on Q3: viewParms_t
+/// ViewParms
+/// </summary>
 type ViewParms =
     {
         Orientation: Orientation;
         World: Orientation;
-        PvsOrigin: Vector3;
-        IsPortal: bool;
-        IsMirror: bool;
-        FrameSceneId: int;
-        FrameCount: int;
-        PortalPlane: Plane;
+        PvsOrigin: Vector3;         // may be different than or.origin for portals
+        IsPortal: bool;             // true if this view is through a portal
+        IsMirror: bool;             // the portal is a mirror, invert the face culling
+        FrameSceneId: int;          // copied from tr.frameSceneNum
+        FrameCount: int;            // copied from tr.frameCount
+        PortalPlane: Plane;         // clip anything behind this if mirroring
         ViewportX: int;
         ViewportY: int;
         ViewportWidth: int;
@@ -272,6 +345,10 @@ type ViewParms =
         ZFar: single;
     }
 
+/// <summary>
+/// Based on Q3: refEntityType_t
+/// RefEntityType
+/// </summary>
 type RefEntityType =
     | Model = 0
     | Poly = 1
@@ -280,31 +357,40 @@ type RefEntityType =
     | RailCore = 4
     | RailRings = 5
     | Lightning = 6
-    | PortalSurface = 7 // doesn't draw anything, just info for portals
+    | PortalSurface = 7     // doesn't draw anything, just info for portals
     | MaxRefEntityType = 8
 
+/// <summary>
+/// Based on Q3: refEntity_t
+/// RefEntity
+/// </summary>
 type RefEntity =
     {
         Type: RefEntityType;
         RenderFx: int;
-        ModelHandle: int;
-        LightningOrigin: Vector3;
-        Axis: Axis;
-        HasNonNormalizedAxes: bool;
-        Origin: Vector3;
-        Frame: int;
-        OldOrigin: Vector3;
+        ModelHandle: int;                   // opaque type outside refresh
+        LightningOrigin: Vector3;           // so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
+        ShadowPlane: single;                // projection shadows go here, stencils go slightly lower
+        Axis: Axis;                         // rotation vectors
+        HasNonNormalizedAxes: bool;         // axis are not normalized, i.e. they have scale
+        Origin: Vector3;                    // also used as MODEL_BEAM's "from"
+        Frame: int;                         // also used as MODEL_BEAM's diameter
+        OldOrigin: Vector3;                 // also used as MODEL_BEAM's "to"
         OldFrame: int;
-        BackLerp: single;
-        SkinId: int;
-        CustomSkinHandle: int;
-        ShaderRgba: Rgba;
-        ShaderTextureCoordinate: Vector2;
-        ShaderTime: single;
+        BackLerp: single;                   // 0.0 = current, 1.0 = old
+        SkinId: int;                        // inline skin index
+        CustomSkinHandle: int;              // NULL for default skin
+        CustomShaderHandle: int;            // use one image for the entire thing
+        ShaderRgba: Rgba;                   // colors used by rgbgen entity shaders
+        ShaderTextureCoordinate: Vector2;   // texture coordinates used by tcMod entity modifiers
+        ShaderTime: single;                 // subtracted from refdef time to control effect start times
         Radius: single;
         Rotation: single;
     }
 
+/// <summary>
+/// TrRefEntity
+/// </summary>
 type TrRefEntity =
     {
         Entity: RefEntity;
@@ -317,6 +403,9 @@ type TrRefEntity =
         DirectedLight: Vector3;
     }
 
+/// <summary>
+/// Dlight
+/// </summary>
 [<Struct>]
 type Dlight =
     val Origin : Vector3
@@ -325,6 +414,18 @@ type Dlight =
     val Transformed : Vector3
     val Additive : int
 
+    new (origin, color, radius, transformed, additive) =
+        {
+            Origin = origin;
+            Color = color;
+            Radius = radius;
+            Transformed = transformed;
+            Additive = additive;
+        }
+
+/// <summary>
+/// DrawVertex
+/// </summary>
 [<Struct>]
 type DrawVertex =
     val Vertex : Vector3
@@ -335,6 +436,20 @@ type DrawVertex =
     val Normal : Vector3
     val Color : Rgba
 
+    new (vertex, st1, st2, lightMap1, lightMap2, normal, color) =
+        {
+            Vertex = vertex;
+            St1 = st1;
+            St2 = st2;
+            LightMap1 = lightMap1;
+            LightMap2 = lightMap2;
+            Normal = normal;
+            Color = color;
+        }
+
+/// <summary>
+/// PolyVertex
+/// </summary>
 [<Struct>]
 type PolyVertex =
     val Vertex : Vector3
@@ -345,6 +460,20 @@ type PolyVertex =
     val Modulate3 : single;
     val Modulate4 : single;
 
+    new (vertex, st1, st2, modulate1, modulate2, modulate3, modulate4) =
+        {
+            Vertex = vertex;
+            St1 = st1;
+            St2 = st2;
+            Modulate1 = modulate1;
+            Modulate2 = modulate2;
+            Modulate3 = modulate3;
+            Modulate4 = modulate4;
+        }
+
+/// <summary>
+/// SurfacePoly
+/// </summary>
 [<Struct>]
 type SurfacePoly =
     val ShaderHandle : int
@@ -358,6 +487,9 @@ type SurfacePoly =
             Vertices = vertices;
         }
 
+/// <summary>
+/// SurfaceDisplayList
+/// </summary>
 [<Struct>]
 type SurfaceDisplayList =
     val ListId : int
@@ -367,6 +499,9 @@ type SurfaceDisplayList =
             ListId = listId;
         }
 
+/// <summary>
+/// SurfaceFlare
+/// </summary>
 [<Struct>]
 type SurfaceFlare =
     val Origin : Vector3
@@ -380,6 +515,9 @@ type SurfaceFlare =
             Color = color;
         }
 
+/// <summary>
+/// SurfaceGridMesh
+/// </summary>
 [<Struct>]
 type SurfaceGridMesh =
     val DlightBit1 : int
@@ -415,6 +553,11 @@ type SurfaceGridMesh =
             Vertex = vertex;
         }
 
+/// <summary>
+/// FaceVertexPoints
+///
+/// Note: Should this be a struct?
+/// </summary>
 [<Struct>]
 type FaceVertexPoints =
     val Vertex0 : single
@@ -426,6 +569,34 @@ type FaceVertexPoints =
     val Vertex6 : single
     val Vertex7 : single
 
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Vertex0
+            | 1 -> this.Vertex1
+            | 2 -> this.Vertex2
+            | 3 -> this.Vertex3
+            | 4 -> this.Vertex4
+            | 5 -> this.Vertex5
+            | 6 -> this.Vertex6
+            | 7 -> this.Vertex7
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (vertex0, vertex1, vertex2, vertex3, vertex4, vertex5, vertex6, vertex7) =
+        {
+            Vertex0 = vertex0;
+            Vertex1 = vertex1;
+            Vertex2 = vertex2;
+            Vertex3 = vertex3;
+            Vertex4 = vertex4;
+            Vertex5 = vertex5;
+            Vertex6 = vertex6;
+            Vertex7 = vertex7;
+        }
+
+/// <summary>
+/// SurfaceFace
+/// </summary>
 [<Struct>]
 type SurfaceFace =
     val Plane : Plane
@@ -447,6 +618,9 @@ type SurfaceFace =
             Points = points;
         }
 
+/// <summary>
+/// SurfaceTriangles
+/// </summary>
 [<Struct>]
 type SurfaceTriangles =
     val DlightBit1 : int
@@ -468,6 +642,9 @@ type SurfaceTriangles =
             Vertices = vertices;
         }
 
+/// <summary>
+/// Surface
+/// </summary>
 type Surface =
     | Bad
     | Skip
@@ -481,18 +658,27 @@ type Surface =
     | Entity
     | DisplayList of SurfaceDisplayList
 
-// TODO:
+/// <summary>
+/// DrawSurface
+///
+/// TODO: This may not be finished.
+/// </summary>
 [<Struct>]
 type DrawSurface =
     val Sort : uint32
     val Surface : Surface
 
+/// <summary>
+/// RdFlags
+/// </summary>
 [<Flags>]
 type RdFlags =
     | NoWorldModel = 0x1
     | Hyperspace = 0x4
 
-// TODO:
+/// <summary>
+/// RefDef
+/// </summary>
 type RefDef =
     {
         X: int;
@@ -503,22 +689,26 @@ type RefDef =
         ViewAxis: Axis;
         Time: int;
         RdFlags: RdFlags;
-        AreaMask: byte[];
+        AreaMask: byte[]; // TODO: Remove array.
         HasAreaMaskModified: bool;
         FloatTime: single;
-        Text: string[];
+        Text: string[]; // // TODO: Remove array.
         EntityCount: int;
-        Entities: TrRefEntity[];
+        Entities: TrRefEntity[]; // // TODO: Remove array. Maybe a list?
         DlightCount: int;
-        DLights: Dlight[];
+        DLights: Dlight[]; // TODO: Remove array. Maybe a list?
         PolyCount: int;
-        Polys:  SurfacePoly[];
+        Polys:  SurfacePoly[]; // TODO: Remove array. Maybe a list?
         DrawSurfaceCount: int;
-        DrawSurfaces: DrawSurface[];
+        DrawSurfaces: DrawSurface[]; // TODO: Remove array. Maybe a list?
     }
 
 
-
+/// <summary>
+/// Image
+///
+/// TODO: Not finished. Will hold actual OpenGL values.
+/// </summary>
 type Image =
     {
         Path : string;
@@ -534,7 +724,12 @@ type Image =
         //TODO:
     }
 
-// C equivalent - trGlobals_t
+/// <summary>
+/// Based on Q3: trGlobals_t
+/// TrState
+///
+/// TODO: Not finished.
+/// </summary>
 type TrState =
     {
         IsRegistered : bool;
@@ -547,5 +742,5 @@ type TrState =
         HasWorldMapLoaded : bool;
         //world_t *world;
         //const byte externalVisData - NOT SET/USED
-
+        //TODO:
     }
