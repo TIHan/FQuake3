@@ -190,7 +190,8 @@ int R_CullLocalBox (vec3_t bounds[2]) {
 *)
 
     /// <summary>
-    // R_CullLocalBox (vec3_t bounds[2])
+    /// Based on Q3: R_CullLocalBox
+    /// CullLocalBox
     // </summary>
     [<Pure>]
     let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) =
@@ -242,7 +243,8 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 *)
 
     /// <summary>
-    /// R_CullPointAndRadius( vec3_t pt, float radius )
+    /// Based on Q3: R_CullPointAndRadius
+    /// CullPointAndRadius
     /// </summary>
     [<Pure>]
     let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) =
@@ -261,7 +263,8 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
 *)
 
     /// <summary>
-    /// R_LocalPointToWorld (vec3_t local, vec3_t world)
+    /// Based on Q3: R_LocalPointToWorld
+    /// LocalPointToWorld
     /// </summary>
     [<Pure>]
     let LocalPointToWorld (local: Vector3) (orientation: Orientation) =
@@ -280,7 +283,8 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 *)
 
     /// <summary>
-    /// R_LocalNormalToWorld (vec3_t local, vec3_t world)
+    /// Based on Q3: R_LocalNormalToWorld
+    /// LocalNormalToWorld
     /// </summary>
     [<Pure>]
     let LocalNormalToWorld (local: Vector3) (orientation: Orientation) =
@@ -299,7 +303,8 @@ void R_WorldToLocal (vec3_t world, vec3_t local) {
 *)
 
     /// <summary>
-    /// R_WorldToLocal (vec3_t world, vec3_t local)
+    /// Based on Q3: R_WorldToLocal
+    /// WorldToLocal
     /// </summary>
     [<Pure>]
     let WorldToLocal (world: Vector3) (orientation: Orientation) =
@@ -322,7 +327,8 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 *)
 
     /// <summary>
-    /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
+    /// Based on Q3: R_CullLocalPointAndRadius
+    /// CullLocalPointAndRadius
     /// </summary>
     [<Pure>]
     let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Frustum) =
@@ -353,7 +359,8 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
 *)
 
     /// <summary>
-    /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
+    /// Based on Q3: R_CullLocalPointAndRadius
+    /// TransformModelToClip
     /// </summary>
     [<Pure>]
     let TransformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
@@ -403,7 +410,8 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 *)
     
     /// <summary>
-    /// R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window )
+    /// Based on Q3: R_TransformClipToWindow
+    /// TransformClipToWindow
     /// </summary>
     [<Pure>]
     let TransformClipToWindow (clip: Vector4) (view: ViewParms) =
@@ -508,7 +516,8 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 *)
 
     /// <summary>
-    /// R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, orientationr_t *or )
+    /// Based on Q3: R_RotateForEntity
+    /// RotateForEntity
     ///
     /// Generates an orientation for an entity and viewParms
     /// Does NOT produce any GL calls
@@ -628,7 +637,8 @@ void R_RotateForViewer (void)
 *)
 
     /// <summary>
-    /// R_RotateForViewer (void) 
+    /// Based on Q3: R_RotateForViewer
+    /// RotateForViewer
     ///
     /// Sets up the modelview matrix for a given viewParm
     /// </summary>
@@ -741,7 +751,8 @@ static void SetFarClip( void )
 *)
 
     /// <summary>
-    /// SetFarClip( void )
+    /// Based on Q3: SetFarClip
+    /// SetFarClip
     /// </summary>
     let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Vector3[]) (orientation: Orientation) =
         // if not rendering the world (icons, menus, etc)
@@ -817,7 +828,8 @@ void R_SetupProjection( void ) {
 *)
 
     /// <summary>
-    /// R_SetupProjection( void )
+    /// Based on Q3: R_SetupProjection
+    /// SetupProjection
     /// </summary>
     [<Pure>]
     let SetupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
@@ -879,7 +891,8 @@ void R_SetupFrustum (void) {
 *)
 
     /// <summary>
-    /// R_SetupProjection( void )
+    /// Based on Q3: R_SetupProjection
+    /// SetupFrustum
     /// 
     /// Setup that culling frustum planes for the current view
     /// </summary>
@@ -948,7 +961,8 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
 *)
 
     /// <summary>
-    /// R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
+    /// Based on Q3: R_MirrorPoint
+    /// MirrorPoint
     /// </summary>
     [<Pure>]
     let MirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
@@ -975,7 +989,8 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
 *)
 
     /// <summary>
-    /// R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
+    /// Based on Q3: R_MirrorVector
+    /// MirrorVector
     /// </summary>
     [<Pure>]
     let MirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
@@ -1027,7 +1042,8 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 *)
 
     /// <summary>
-    /// R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
+    /// Based on Q3: R_PlaneForSurface
+    /// PlaneForSurface
     /// </summary>
     [<Pure>]
     let PlaneForSurface (surface: Surface) (plane: Plane) =
@@ -1053,10 +1069,12 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 
 
     /// <summary>
-    /// R_GetPortalOrientation
+    /// Based on Q3: R_GetPortalOrientation
+    /// GetPortalOrientation
+    ///
     /// entityId is the entity that the portal surface is a part of, which may
     /// be moving and rotating.
-
+    ///
     /// Returns true if it should be mirrored
     /// </summary>
     let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: Orientation) =
