@@ -28,6 +28,7 @@ open System.IO
 open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
+open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
 open Engine.QMath
 
@@ -63,7 +64,8 @@ module MainRenderer =
         /// <summary>
         /// Transform into world space.
         /// </summary>
-        let TransformWorldSpace (bounds: Vector3[]) (orientation: Orientation) =
+        [<Pure>]
+        let TransformWorldSpace (bounds: Bounds) (orientation: Orientation) =
             let transformed : Vector3[] = Array.zeroCreate 8
         
             transformed |> Array.mapi (fun i x ->
@@ -78,7 +80,7 @@ module MainRenderer =
         /// <summary>
         /// Check against frustum planes.
         /// </summary>
-        let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Plane[]) =
+        let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Frustum) =
             let rec checkFrustumPlane (frust: Plane) front back isFront acc =
                 match acc = Array.length transformed || isFront with
                 | true -> (front, back)
@@ -92,7 +94,7 @@ module MainRenderer =
 
 
             let rec checkFrustumPlanes anyBack isFront acc =
-                match acc = Array.length frustum || isFront = false with
+                match acc = 4 || isFront = false with
                 | true -> (anyBack, isFront)
                 | _ ->
                     let frust = frustum.[acc]
@@ -190,7 +192,8 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// <summary>
     // R_CullLocalBox (vec3_t bounds[2])
     // </summary>
-    let CullLocalBox (bounds: Vector3[]) (orientation: Orientation) (frustum: Plane[]) =
+    [<Pure>]
+    let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) =
         match CvarModule.GetNoCull () with
         | true -> CullType.Clip
         | _ ->
@@ -259,6 +262,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
     /// <summary>
     /// R_LocalPointToWorld (vec3_t local, vec3_t world)
     /// </summary>
+    [<Pure>]
     let LocalPointToWorld (local: Vector3) (orientation: Orientation) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X,
@@ -277,6 +281,7 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
     /// <summary>
     /// R_LocalNormalToWorld (vec3_t local, vec3_t world)
     /// </summary>
+    [<Pure>]
     let LocalNormalToWorld (local: Vector3) (orientation: Orientation) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X),

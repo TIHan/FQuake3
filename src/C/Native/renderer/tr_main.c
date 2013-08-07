@@ -50,12 +50,6 @@ Cvar_GetNoCull (void)
 }
 
 MObject
-m_common_create_list ()
-{
-
-}
-
-MObject
 m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 {
 	gpointer *args;
@@ -377,6 +371,23 @@ m_map_surface (const surfaceType_t const* surfaceType)
 	return m_surface;
 }
 
+MObject
+qm_map_frustum (const frustum_t* frustum)
+{
+	MObject m_frustum;
+	
+	gpointer args[4];
+
+	args [0] = m_struct_as_arg (m_common_create_plane (&frustum->left));
+	args [1] = m_struct_as_arg (m_common_create_plane (&frustum->right));
+	args [2] = m_struct_as_arg (m_common_create_plane (&frustum->bottom));
+	args [3] = m_struct_as_arg (m_common_create_plane (&frustum->top));
+	
+	m_frustum = m_object ("Engine", "Engine", "Frustum", 4, args);
+
+	return m_frustum;
+}
+
 void
 m_frustum_map (MObject obj, frustum_t* frustum)
 {
@@ -396,17 +407,12 @@ Returns CULL_IN, CULL_CLIP, or CULL_OUT
 gint
 R_CullLocalBox (vec3_t bounds[2])
 {
-	MArray m_bounds = m_array ("Engine", "Engine.QMath", "Vector3", 2);
-	MArray m_planes = m_common_create_plane_array (4);
 	MObject m_cull_type;
 
-	m_array_map (m_bounds, 2, vector3_t, ((vector3_t *)bounds));
-	m_array_map (m_planes, 4, cplane_t, tr.viewParms.frustum);
-
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
-		__args [0] = m_array_as_arg (m_bounds);
+		__args [0] = (vector3_t *)bounds;
 		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
-		__args [2] = m_array_as_arg (m_planes);
+		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
 	return *(gint *)m_object_unbox (m_cull_type);
