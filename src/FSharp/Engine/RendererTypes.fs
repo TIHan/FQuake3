@@ -389,30 +389,35 @@ type RefEntity =
     }
 
 /// <summary>
+/// Based on Q3: trRefEntity_t
 /// TrRefEntity
+///
+/// a trRefEntity_t has all the information passed in by
+/// the client game, as well as some locally derived info
 /// </summary>
 type TrRefEntity =
     {
         Entity: RefEntity;
-        AxisLength: single;
-        NeedDlights: bool;
+        AxisLength: single;         // compensate for non-normalized axis
+        NeedDlights: bool;          // true for bmodels that touch a dlight
         IsLightingCalculated: bool;
-        LightDirection: Vector3;
-        AmbientLight: Vector3;
-        AmbientLightInt: int;
+        LightDirection: Vector3;    // normalized direction towards light
+        AmbientLight: Vector3;      // color normalized to 0-255
+        AmbientLightInt: int;       // 32 bit rgba packed
         DirectedLight: Vector3;
     }
 
 /// <summary>
+/// Based on Q3: dlight_t
 /// Dlight
 /// </summary>
 [<Struct>]
 type Dlight =
     val Origin : Vector3
-    val Color : Vector3
+    val Color : Vector3         // range from 0.0 to 1.0, should be color normalized
     val Radius : single
-    val Transformed : Vector3
-    val Additive : int
+    val Transformed : Vector3   // origin in local coordinate system
+    val Additive : int          // texture detail is lost tho when the lightmap is dark
 
     new (origin, color, radius, transformed, additive) =
         {
@@ -424,6 +429,7 @@ type Dlight =
         }
 
 /// <summary>
+/// Based on Q3: drawVert_t
 /// DrawVertex
 /// </summary>
 [<Struct>]
@@ -448,6 +454,7 @@ type DrawVertex =
         }
 
 /// <summary>
+/// Based on Q3: polyVert_t
 /// PolyVertex
 /// </summary>
 [<Struct>]
@@ -472,7 +479,11 @@ type PolyVertex =
         }
 
 /// <summary>
+/// Based on Q3: srfPoly_t
 /// SurfacePoly
+///
+/// when cgame directly specifies a polygon, it becomes a srfPoly_t
+/// as soon as it is called
 /// </summary>
 [<Struct>]
 type SurfacePoly =
@@ -488,6 +499,7 @@ type SurfacePoly =
         }
 
 /// <summary>
+/// Based on Q3: srfDisplayList_t
 /// SurfaceDisplayList
 /// </summary>
 [<Struct>]
@@ -500,6 +512,7 @@ type SurfaceDisplayList =
         }
 
 /// <summary>
+/// Based on Q3: srfFlare_t
 /// SurfaceFlare
 /// </summary>
 [<Struct>]
@@ -516,24 +529,32 @@ type SurfaceFlare =
         }
 
 /// <summary>
+/// Based on Q3: srfGridMesh_t
 /// SurfaceGridMesh
 /// </summary>
 [<Struct>]
 type SurfaceGridMesh =
     val DlightBit1 : int
     val DlightBit2 : int
+
+    // culling information
     val MeshBounds : Bounds
     val LocalOrigin : Vector3
     val MeshRadius : single
+
+    // lod information, which may be different
+    // than the culling information to allow for
+    // groups of curves that LOD as a unit
     val LodOrigin : Vector3
     val LodRadius : single
     val LodFixed : int
     val LodStitched : int
+
     val Width : int
     val Height : int
     val WidthLodError : single[] // TODO: Change to list.
     val HeightLodError : single[] // TODO: Change to list.
-    val Vertex : DrawVertex
+    val Vertex : DrawVertex         // variable sized
 
     new (dlightBit1, dlightBit2, meshBounds, localOrigin, meshRadius, lodOrigin, lodRadius, lodFixed, lodStitched, width, height, widthLodError, heightLodError, vertex) =
         {
@@ -595,6 +616,7 @@ type FaceVertexPoints =
         }
 
 /// <summary>
+/// Based on Q3: srfSurfaceFace_t
 /// SurfaceFace
 /// </summary>
 [<Struct>]
@@ -602,10 +624,12 @@ type SurfaceFace =
     val Plane : Plane
     val DlightBit1 : int
     val DlightBit2 : int
+
+    // triangle definitions (no normals at points)
     val PointCount : int
     val IndexCount : int
     val OfsIndices : int
-    val Points : FaceVertexPoints
+    val Points : FaceVertexPoints   // variable sized; // there is a variable length list of indices here also
 
     new (plane, dlightBit1, dlightBit2, pointCount, indexCount, ofsIndices, points) =
         {
@@ -619,15 +643,22 @@ type SurfaceFace =
         }
 
 /// <summary>
+/// Based on Q3: srfTriangles_t
 /// SurfaceTriangles
+///
+/// // misc_models in maps are turned into direct geometry by q3map
 /// </summary>
 [<Struct>]
 type SurfaceTriangles =
     val DlightBit1 : int
     val DlightBit2 : int
+
+    // culling information (FIXME: use this!)
     val Bounds : Bounds
     val LocalOrigin : Vector3
     val Radius : single
+
+    // triangle definitions
     val Indices : int[] // TODO: Change to list
     val Vertices : DrawVertex[] // TODO: Change to list
 
@@ -643,11 +674,14 @@ type SurfaceTriangles =
         }
 
 /// <summary>
+/// Based on Q3: surfaceType_t
 /// Surface
+///
+/// any changes in surfaceType must be mirrored in rb_surfaceTable[] // FIXME: Oh crap..
 /// </summary>
 type Surface =
     | Bad
-    | Skip
+    | Skip                              // ignore
     | Face of SurfaceFace
     | Grid of SurfaceGridMesh
     | Triangles of SurfaceTriangles
@@ -655,44 +689,51 @@ type Surface =
     | Md3
     | Md4
     | Flare of SurfaceFlare
-    | Entity
+    | Entity                            // beams, rails, lightning, etc that can be determined by entity
     | DisplayList of SurfaceDisplayList
 
 /// <summary>
+/// Based on Q3: drawSurf_t
 /// DrawSurface
-///
-/// TODO: This may not be finished.
 /// </summary>
 [<Struct>]
 type DrawSurface =
-    val Sort : uint32
+    val Sort : uint32       // bit combination for fast compares
     val Surface : Surface
 
 /// <summary>
+/// Based on Q3: RDF_NOWORLDMODEL, RDF_HYPERSPACE
 /// RdFlags
 /// </summary>
 [<Flags>]
 type RdFlags =
-    | NoWorldModel = 0x1
-    | Hyperspace = 0x4
+    | NoWorldModel = 0x1    // used for player configuration screen
+    | Hyperspace = 0x4      // teleportation effect
 
 /// <summary>
-/// RefDef
+/// Based on Q3: trRefdef_t
+/// TrRefDef
+///
+/// trRefdef_t holds everything that comes in refdef_t,
+/// as well as the locally generated scene information
 /// </summary>
-type RefDef =
+type TrRefDef =
     {
         X: int;
         Y: int;
         Width: int;
         Height: int;
         ViewOrigin: Vector3;
-        ViewAxis: Axis;
-        Time: int;
+        ViewAxis: Axis;             // transformation matrix
+        Time: int;                  // time in milliseconds for shader effects and other time dependent rendering issues
         RdFlags: RdFlags;
+
+        // 1 bits will prevent the associated area from rendering at all
         AreaMask: byte[]; // TODO: Remove array.
-        HasAreaMaskModified: bool;
-        FloatTime: single;
-        Text: string[]; // // TODO: Remove array.
+        HasAreaMaskModified: bool;  // qtrue if areamask changed since last scene
+
+        FloatTime: single;          // tr.refdef.time / 1000.0
+        Text: string[]; // TODO: Remove array.
         EntityCount: int;
         Entities: TrRefEntity[]; // // TODO: Remove array. Maybe a list?
         DlightCount: int;
@@ -705,18 +746,22 @@ type RefDef =
 
 
 /// <summary>
+/// Based on Q3: image_t
 /// Image
 ///
 /// TODO: Not finished. Will hold actual OpenGL values.
 /// </summary>
 type Image =
     {
-        Path : string;
+        Path : string;          // game path, including extension
         Width : int;
         Height : int;
+
+        // after power of two and picmip but not including clamp to MAX_TEXTURE_SIZE
         UploadWidth : int;
         UploadHeight : int
-        TextureId : int;
+
+        TextureId : int;        // gl texture binding // TODO: Perhaps we should have GL specific types
         FrameUsed : int;
         InternalFormat : int;
         IsMipmap : bool;
@@ -726,21 +771,25 @@ type Image =
 
 /// <summary>
 /// Based on Q3: trGlobals_t
-/// TrState
+/// TrGlobals
 ///
+/// Most renderer globals are defined here.
+/// backend functions should never modify any of these fields,
+/// but may read fields that aren't dynamically modified
+/// by the frontend.
 /// TODO: Not finished.
 /// </summary>
-type TrState =
+type TrGlobals =
     {
-        IsRegistered : bool;
-        VisCount : int;
-        FrameCount : int;
-        SceneCount : int;
-        ViewCount : int;
-        SmpFrame : int;
-        FrameSceneId : int;
+        IsRegistered : bool;            // cleared at shutdown, set at beginRegistration
+        VisCount : int;                 // incremented every time a new vis cluster is entered
+        FrameCount : int;               // incremented every frame
+        SceneCount : int;               // incremented every scene
+        ViewCount : int;                // incremented every view (twice a scene if portaled) and every R_MarkFragments call
+        SmpFrame : int;                 // toggles from 0 to 1 every endFrame
+        FrameSceneId : int;             // zeroed at RE_BeginFrame
         HasWorldMapLoaded : bool;
         //world_t *world;
-        //const byte externalVisData - NOT SET/USED
+        //const byte externalVisData - NOT SET/USED // from RE_SetWorldVisData, shared with CM_Load
         //TODO:
     }
