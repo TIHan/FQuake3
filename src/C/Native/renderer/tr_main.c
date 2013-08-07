@@ -525,17 +525,12 @@ R_TransformModelToClip
 void
 R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
 							vec4_t eye, vec4_t dst ) {
-	MArray m_model_matrix = m_array_int32 (16);
-	MArray m_projection_matrix = m_array_int32 (16);
 	MObject m_tuple_source_and_destination;
 
-	m_array_map (m_model_matrix, 16, gfloat, modelMatrix);
-	m_array_map (m_projection_matrix, 16, gfloat, projectionMatrix);
-
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformModelToClip", 3, {
-		__args [0] = (vector3_t *)src;
-		__args [1] = m_array_as_arg (m_model_matrix);
-		__args [2] = m_array_as_arg (m_projection_matrix);
+		__args [0] = (vector3_t*)src;
+		__args [1] = (matrix16_t*)modelMatrix;
+		__args [2] = (matrix16_t*)projectionMatrix;
 	}, m_tuple_source_and_destination);
 
 	*(vector4_t *)eye = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_source_and_destination, "Item1"));

@@ -352,12 +352,12 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
     /// <summary>
     /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// </summary>
-    let TransformModelToClip (source: Vector3) (modelMatrix: single[]) (projectionMatrix: single[]) =
+    let TransformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
         let calculateEye i =
-            (source.X * modelMatrix.[i + 0 * 4]) +
-            (source.Y * modelMatrix.[i + 1 * 4]) +
-            (source.Z * modelMatrix.[i + 2 * 4]) +
-            (1.f * modelMatrix.[i + 3 * 4])
+            (source.X * modelMatrix.[0, i]) +
+            (source.Y * modelMatrix.[1, i]) +
+            (source.Z * modelMatrix.[2, i]) +
+            (1.f * modelMatrix.[3, i])
           
         let eye =
             Vector4 (
@@ -368,10 +368,10 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
             )
 
         let calculateDestination i =
-            (eye.X * projectionMatrix.[i + 0 * 4]) +
-            (eye.Y * projectionMatrix.[i + 1 * 4]) +
-            (eye.Z * projectionMatrix.[i + 2 * 4]) +
-            (eye.W * projectionMatrix.[i + 3 * 4])
+            (eye.X * projectionMatrix.[0, i]) +
+            (eye.Y * projectionMatrix.[1, i]) +
+            (eye.Z * projectionMatrix.[2, i]) +
+            (eye.W * projectionMatrix.[3, i])
 
         let destination =
             Vector4 (

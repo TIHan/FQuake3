@@ -180,17 +180,17 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 
 [<Struct>]
 type Bounds =
-    val Start : Vector3
+    val Begin : Vector3
     val End : Vector3     
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Start
+            | 0 -> this.Begin
             | 1 -> this.End
             | _ -> raise <| IndexOutOfRangeException ()
 
-// I think this is right?
+// TODO: Find out if this is truly left, right, bottom, and top in this order
 type Frustum =
     {
         Left: Plane;
@@ -207,6 +207,47 @@ type Frustum =
             | 2 -> this.Bottom
             | 3 -> this.Top
             | _ -> raise <| IndexOutOfRangeException ()
+
+// Too big to be a struct?
+[<Struct>]
+type Transform =
+    val T0 : Vector3
+    val T1 : Vector3
+    val T2 : Vector3
+    val T3 : Vector3
+    val T4 : Vector3
+    val T5 : Vector3
+    val T6 : Vector3
+    val T7 : Vector3
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.T0
+            | 1 -> this.T1
+            | 2 -> this.T2
+            | 3 -> this.T3
+            | 4 -> this.T4
+            | 5 -> this.T5
+            | 6 -> this.T6
+            | 7 -> this.T7
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (t0, t1, t2, t3, t4, t5, t6, t7) =
+        {
+            T0 = t0;
+            T1 = t1;
+            T2 = t2;
+            T3 = t3;
+            T4 = t4;
+            T5 = t5;
+            T6 = t6;
+            T7 = t7;
+        }
+
+    static member inline Init (f: int -> Vector3) =
+        Transform (f 0, f 1, f 2, f 3, f 4, f 5, f 6, f 7)
+
 
 // This is way too big to be a struct, makes sense for it to be a record.
 type ViewParms =
