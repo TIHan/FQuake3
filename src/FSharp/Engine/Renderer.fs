@@ -65,10 +65,8 @@ module MainRenderer =
         /// Transform into world space.
         /// </summary>
         [<Pure>]
-        let TransformWorldSpace (bounds: Bounds) (orientation: Orientation) =
-            let transformed : Vector3[] = Array.zeroCreate 8
-        
-            transformed |> Array.mapi (fun i x ->
+        let TransformWorldSpace (bounds: Bounds) (orientation: Orientation) =        
+            Transform.Init (fun i ->
                 let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
@@ -80,9 +78,10 @@ module MainRenderer =
         /// <summary>
         /// Check against frustum planes.
         /// </summary>
-        let CheckFrustumPlanes (transformed: Vector3[]) (frustum: Frustum) =
+        [<Pure>]
+        let CheckFrustumPlanes (transformed: Transform) (frustum: Frustum) =
             let rec checkFrustumPlane (frust: Plane) front back isFront acc =
-                match acc = Array.length transformed || isFront with
+                match acc = 8 || isFront with
                 | true -> (front, back)
                 | _ ->
                     let distance = Vector3.DotProduct transformed.[acc] frust.Normal
@@ -108,13 +107,14 @@ module MainRenderer =
             | (0, _) -> CullType.In
             | _ -> CullType.Clip
 
-    /// <summary>
-    ///
-    /// </summary>
     module private PointAndRadius =
-        let CheckFrustumPlanes (point: Vector3) (radius: single) (frustum: Plane[]) =
+        /// <summary>
+        /// CheckFrustumPlanes
+        /// </summary>
+        [<Pure>]
+        let CheckFrustumPlanes (point: Vector3) (radius: single) (frustum: Frustum) =
             let rec checkFrustumPlanes mightBeClipped canCullOut acc =
-                match acc = Array.length frustum || canCullOut with
+                match acc = 4 || canCullOut with
                 | true -> (mightBeClipped, canCullOut)
                 | _ ->
                     let frust = frustum.[acc]
@@ -244,7 +244,8 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
     /// <summary>
     /// R_CullPointAndRadius( vec3_t pt, float radius )
     /// </summary>
-    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Plane[]) =
+    [<Pure>]
+    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) =
         match CvarModule.GetNoCull () with
         | true -> CullType.Clip
         | _ ->
@@ -300,6 +301,7 @@ void R_WorldToLocal (vec3_t world, vec3_t local) {
     /// <summary>
     /// R_WorldToLocal (vec3_t world, vec3_t local)
     /// </summary>
+    [<Pure>]
     let WorldToLocal (world: Vector3) (orientation: Orientation) =
         Vector3 (
             Vector3.DotProduct world orientation.Axis.[0],
@@ -322,7 +324,8 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// <summary>
     /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// </summary>
-    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Plane[]) =
+    [<Pure>]
+    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Frustum) =
         let transformed = LocalPointToWorld point orientation
         CullPointAndRadius transformed radius frustum
 
@@ -352,6 +355,7 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
     /// <summary>
     /// R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// </summary>
+    [<Pure>]
     let TransformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
         let calculateEye i =
             (source.X * modelMatrix.[0, i]) +
@@ -401,6 +405,7 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
     /// <summary>
     /// R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window )
     /// </summary>
+    [<Pure>]
     let TransformClipToWindow (clip: Vector4) (view: ViewParms) =
         let normalized =
             Vector4 (
@@ -509,6 +514,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Called by both the front end and the back end
     /// TODO: Make this a little bit nicer. newOrientation and newNewOrientation are horrible names.
     /// </summary>
+    [<Pure>]
     let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
         match entity.Entity.Type <> RefEntityType.Model with
         | true -> viewParms.World
@@ -625,6 +631,7 @@ void R_RotateForViewer (void)
     ///
     /// Sets up the modelview matrix for a given viewParm
     /// </summary>
+    [<Pure>]
     let RotateForViewer (viewParms: ViewParms) =
         
         let axis =
@@ -811,6 +818,7 @@ void R_SetupProjection( void ) {
     /// <summary>
     /// R_SetupProjection( void )
     /// </summary>
+    [<Pure>]
     let SetupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
         // dynamically compute far clip plane distance
         let zFar = SetFarClip rdFlags view.VisibilityBounds view.Orientation
@@ -874,6 +882,7 @@ void R_SetupFrustum (void) {
     /// 
     /// Setup that culling frustum planes for the current view
     /// </summary>
+    [<Pure>]
     let SetupFrustum (view: ViewParms) =
         let xAngle = view.FovX / 180.f * QMath.PI * 0.5f
         let xs = sin xAngle
@@ -940,6 +949,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
     /// <summary>
     /// R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
     /// </summary>
+    [<Pure>]
     let MirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let local = v - surface.Origin
         let rec transform transformed acc =
@@ -966,6 +976,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
     /// <summary>
     /// R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out)
     /// </summary>
+    [<Pure>]
     let MirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let rec transform transformed acc =
             match acc with
@@ -1017,6 +1028,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     /// <summary>
     /// R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
     /// </summary>
+    [<Pure>]
     let PlaneForSurface (surface: Surface) (plane: Plane) =
         match surface with
         | Face (value) ->
