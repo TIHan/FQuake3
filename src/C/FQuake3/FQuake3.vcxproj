@@ -19,7 +19,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="q3config.cfg" />
+    <None Include="fq3.cfg">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E779B4A6-7F0A-4E78-BE2E-45A572D3A837}</ProjectGuid>
@@ -53,9 +58,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\build\</OutDir>
+    <IntDir>build\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\build\</OutDir>
+    <IntDir>build\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -72,9 +81,11 @@
       <AdditionalLibraryDirectories>..\..\..\lib\Mono\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)Debug /y
-xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)Debug /y
-xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)Debug /y</Command>
+      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)build /q /y
+xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)build /q /y
+xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)build /q /y
+xcopy $(ProjectDir)fq3.cfg $(SolutionDir)build\baseq3\ /q /y /d
+xcopy $(ProjectDir)fq3.cfg $(SolutionDir)build\missionpack\ /q /y /d</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,9 +107,11 @@ xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)Debug /y</Command>
       <AdditionalLibraryDirectories>..\..\..\lib\Mono\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)Release /y
-xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)Release /y
-xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)Release /y</Command>
+      <Command>xcopy $(SolutionDir)lib\Mono\bin\mono-2.0.dll $(SolutionDir)build /q /y
+xcopy $(SolutionDir)lib\Mono\bin\libglib-2.0-0.dll $(SolutionDir)build /q /y
+xcopy $(SolutionDir)lib\Mono\bin\intl.dll $(SolutionDir)build /q /y
+xcopy $(ProjectDir)fq3.cfg $(SolutionDir)build\baseq3\ /q /y /d
+xcopy $(ProjectDir)fq3.cfg $(SolutionDir)build\missionpack\ /q /y /d</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

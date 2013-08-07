@@ -2397,7 +2397,9 @@ Com_Init (char *commandLine) {
 
 	// skip the q3config.cfg if "safe" is on the command line
 	if ( !Com_SafeMode() ) {
-		Cbuf_AddText ("exec q3config.cfg\n");
+		// FQ3: Change config filename.
+		// Cbuf_AddText ("exec q3config.cfg\n");
+		Cbuf_AddText ("exec fq3.cfg\n");
 	}
 
 	Cbuf_AddText ("exec autoexec.cfg\n");
@@ -2548,7 +2550,9 @@ void Com_WriteConfiguration( void ) {
 	}
 	cvar_modifiedFlags &= ~CVAR_ARCHIVE;
 
-	Com_WriteConfigToFile( "q3config.cfg" );
+	// FQ3: Change config filename.
+	// Com_WriteConfigToFile( "q3config.cfg" );
+	Com_WriteConfigToFile ("fq3.cfg");
 
 	// bk001119 - tentative "not needed for dedicated"
 #ifndef DEDICATED
