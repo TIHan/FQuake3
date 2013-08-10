@@ -50,7 +50,7 @@ Cvar_GetNoCull (void)
 }
 
 MObject
-m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
+qm_create_vector3 (gfloat x, gfloat y, gfloat z)
 {
 	gpointer *args;
 
@@ -62,25 +62,25 @@ m_common_create_vector3 (gfloat x, gfloat y, gfloat z)
 }
 
 MArray
-m_common_create_vector3_array (const gint size)
+qm_create_vector3_array (const gint size)
 {
 	return m_array ("Engine", "Engine.QMath", "Vector3", size);
 }
 
 MArray
-m_common_create_draw_vertex_array (const gint size)
+qm_create_draw_vertex_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "DrawVertex", size);
 }
 
 MArray
-m_common_create_poly_vertex_array (const gint size)
+qm_create_poly_vertex_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "PolyVertex", size);
 }
 
 MObject
-m_common_create_orientation (const orientationr_t *const orientation)
+qm_map_orientation (const orientationr_t *const orientation)
 {
 	gpointer args[4];
 
@@ -93,7 +93,7 @@ m_common_create_orientation (const orientationr_t *const orientation)
 }
 
 MObject
-m_common_create_plane (const cplane_t *const plane)
+qm_map_plane (const cplane_t *const plane)
 {
 	gpointer args[4];
 
@@ -106,30 +106,30 @@ m_common_create_plane (const cplane_t *const plane)
 }
 
 MArray
-m_common_create_plane_array (const gint size)
+qm_create_plane_array (const gint size)
 {
 	return m_array ("Engine", "Engine", "Plane", size);
 }
 
 MObject
-m_common_create_view_parms (const viewParms_t *const view_parms)
+qm_map_view_parms (const viewParms_t *const view_parms)
 {
-	MArray m_frustum = m_common_create_plane_array (4);
-	MArray m_visibility_bounds = m_common_create_vector3_array (2);
+	MArray m_frustum = qm_create_plane_array (4);
+	MArray m_visibility_bounds = qm_create_vector3_array (2);
 
 	gpointer args[18];
 
 	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
-	args [0] = m_struct_as_arg (m_common_create_orientation (&view_parms->or));
-	args [1] = m_struct_as_arg (m_common_create_orientation (&view_parms->world));
+	args [0] = m_struct_as_arg (qm_map_orientation (&view_parms->or));
+	args [1] = m_struct_as_arg (qm_map_orientation (&view_parms->world));
 	args [2] = (vector3_t *)view_parms->pvsOrigin;
 	args [3] = &view_parms->isPortal;
 	args [4] = &view_parms->isMirror;
 	args [5] = &view_parms->frameSceneNum;
 	args [6] = &view_parms->frameCount;
-	args [7] = m_struct_as_arg (m_common_create_plane (&view_parms->portalPlane));
+	args [7] = m_struct_as_arg (qm_map_plane (&view_parms->portalPlane));
 	args [8] = &view_parms->viewportX;
 	args [9] = &view_parms->viewportY;
 	args [10] = &view_parms->viewportWidth;
@@ -145,7 +145,7 @@ m_common_create_view_parms (const viewParms_t *const view_parms)
 }
 
 MObject
-m_map_ref_entity (const refEntity_t const* ref_entity)
+qm_map_ref_entity (const refEntity_t const* ref_entity)
 {
 	gpointer args[20];
 
@@ -174,11 +174,11 @@ m_map_ref_entity (const refEntity_t const* ref_entity)
 }
 
 MObject
-m_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
+qm_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
 {
 	gpointer args[8];
 
-	args [0] = m_object_as_arg (m_map_ref_entity (&tr_ref_entity->e));
+	args [0] = m_object_as_arg (qm_map_ref_entity (&tr_ref_entity->e));
 	args [1] = &tr_ref_entity->axisLength;
 	args [2] = &tr_ref_entity->needDlights;
 	args [3] = &tr_ref_entity->lightingCalculated;
@@ -191,7 +191,7 @@ m_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
 }
 
 MObject
-m_map_surface (const surfaceType_t const* surfaceType)
+qm_map_surface (const surfaceType_t const* surfaceType)
 {
 	MObject m_surface;
 
@@ -205,7 +205,7 @@ m_map_surface (const surfaceType_t const* surfaceType)
 
 		gpointer args[7];
 
-		args [0] = m_struct_as_arg (m_common_create_plane (&surface->plane));
+		args [0] = m_struct_as_arg (qm_map_plane (&surface->plane));
 		args [1] = &surface->dlightBits [0];
 		args [2] = &surface->dlightBits [1];
 		args [3] = &surface->numPoints;
@@ -225,7 +225,7 @@ m_map_surface (const surfaceType_t const* surfaceType)
 		srfTriangles_t* surface = (srfTriangles_t*)surfaceType;
 
 		MArray m_indices = m_array_int32 (surface->numIndexes);
-		MArray m_vertices = m_common_create_draw_vertex_array (surface->numVerts);
+		MArray m_vertices = qm_create_draw_vertex_array (surface->numVerts);
 		MObject m_type;
 
 		gpointer args[7];
@@ -252,7 +252,7 @@ m_map_surface (const surfaceType_t const* surfaceType)
 		{
 		srfPoly_t* surface = (srfPoly_t*)surfaceType;
 
-		MArray m_vertices = m_common_create_poly_vertex_array (surface->numVerts);
+		MArray m_vertices = qm_create_poly_vertex_array (surface->numVerts);
 		MObject m_type;
 
 		gpointer args[4];
@@ -380,10 +380,10 @@ qm_map_frustum (const frustum_t* frustum)
 	
 	gpointer args[4];
 
-	args [0] = m_struct_as_arg (m_common_create_plane (&frustum->left));
-	args [1] = m_struct_as_arg (m_common_create_plane (&frustum->right));
-	args [2] = m_struct_as_arg (m_common_create_plane (&frustum->bottom));
-	args [3] = m_struct_as_arg (m_common_create_plane (&frustum->top));
+	args [0] = m_struct_as_arg (qm_map_plane (&frustum->left));
+	args [1] = m_struct_as_arg (qm_map_plane (&frustum->right));
+	args [2] = m_struct_as_arg (qm_map_plane (&frustum->bottom));
+	args [3] = m_struct_as_arg (qm_map_plane (&frustum->top));
 	
 	m_frustum = m_object ("Engine", "Engine", "Frustum", 4, args);
 
@@ -391,7 +391,7 @@ qm_map_frustum (const frustum_t* frustum)
 }
 
 void
-m_frustum_map (MObject obj, frustum_t* frustum)
+qm_frustum_map (MObject obj, frustum_t* frustum)
 {
 	frustum->left = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Left"));
 	frustum->right = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Right"));
@@ -413,7 +413,7 @@ R_CullLocalBox (vec3_t bounds[2])
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = (vector3_t *)bounds;
-		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
@@ -431,7 +431,7 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_struct_as_arg (m_common_create_orientation (&tr.or));
+		__args [2] = m_struct_as_arg (qm_map_orientation (&tr.or));
 		__args [3] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
@@ -468,7 +468,7 @@ R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalNormalToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
@@ -487,7 +487,7 @@ R_LocalPointToWorld (vec3_t local, vec3_t world)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalPointToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
@@ -506,7 +506,7 @@ R_WorldToLocal (vec3_t world, vec3_t local)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "WorldToLocal", 2, {
 		__args [0] = local;
-		__args [1] = m_struct_as_arg (m_common_create_orientation (&tr.or));
+		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
 	}, m_local);
 
 	*(vector3_t *)local = *(vector3_t *)m_object_unbox (m_local);
@@ -546,7 +546,7 @@ R_TransformClipToWindow (const vec4_t clip, const viewParms_t *view, vec4_t norm
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "TransformClipToWindow", 2, {
 		__args [0] = (vector3_t *)clip;
-		__args [1] = m_object_as_arg (m_common_create_view_parms (view));
+		__args [1] = m_object_as_arg (qm_map_view_parms (view));
 	}, m_tuple_normalized_and_window);
 
 	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item1"));
@@ -587,9 +587,9 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	MObject m_or;
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForEntity", 3, {
-		__args [0] = m_object_as_arg (m_map_tr_ref_entity (ent));
-		__args [1] = m_object_as_arg (m_common_create_view_parms (viewParms));
-		__args [2] = m_struct_as_arg (m_common_create_orientation (or));
+		__args [0] = m_object_as_arg (qm_map_tr_ref_entity (ent));
+		__args [1] = m_object_as_arg (qm_map_view_parms (viewParms));
+		__args [2] = m_struct_as_arg (qm_map_orientation (or));
 	}, m_or);
 
 	*or = *(orientationr_t *)m_object_unbox (m_or);
@@ -608,7 +608,7 @@ R_RotateForViewer (void)
 	MObject m_or;
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForViewer", 1, {
-		__args [0] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_or);
 
 	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox (m_or);
@@ -628,7 +628,7 @@ R_SetupProjection (void)
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetupProjection", 5, {
 		__args [0] = &r_znear->value;
 		__args [1] = &tr.refdef.rdflags;
-		__args [2] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [2] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 		__args [3] = &tr.refdef.fov_x;
 		__args [4] = &tr.refdef.fov_y;
 	}, m_tuple_projection_matrix_and_zFar);
@@ -650,10 +650,10 @@ R_SetupFrustum (void)
 	MObject m_frustum;
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "SetupFrustum", 1, {
-		__args [0] = m_object_as_arg (m_common_create_view_parms (&tr.viewParms));
+		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_frustum);
 
-	m_frustum_map (m_frustum, (frustum_t *)tr.viewParms.frustum);
+	qm_frustum_map (m_frustum, (frustum_t *)tr.viewParms.frustum);
 }
 
 
@@ -669,8 +669,8 @@ R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t 
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MirrorPoint", 3, {
 		__args [0] = (vector3_t *)in;
-		__args [1] = m_struct_as_arg (m_common_create_orientation (surface));
-		__args [2] = m_struct_as_arg (m_common_create_orientation (camera));
+		__args [1] = m_struct_as_arg (qm_map_orientation (surface));
+		__args [2] = m_struct_as_arg (qm_map_orientation (camera));
 	}, m_out);
 
 	*(vector3_t *)out = *(vector3_t *)m_object_unbox (m_out);
@@ -683,8 +683,8 @@ R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MirrorVector", 3, {
 		__args [0] = (vector3_t *)in;
-		__args [1] = m_struct_as_arg (m_common_create_orientation (surface));
-		__args [2] = m_struct_as_arg (m_common_create_orientation (camera));
+		__args [1] = m_struct_as_arg (qm_map_orientation (surface));
+		__args [2] = m_struct_as_arg (qm_map_orientation (camera));
 	}, m_out);
 
 	*(vector3_t *)out = *(vector3_t *)m_object_unbox (m_out);
@@ -707,8 +707,8 @@ R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
 	}
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "PlaneForSurface", 2, {
-		__args [0] = m_object_as_arg (m_map_surface (surfType));
-		__args [1] = m_struct_as_arg (m_common_create_plane (plane));
+		__args [0] = m_object_as_arg (qm_map_surface (surfType));
+		__args [1] = m_struct_as_arg (qm_map_plane (plane));
 	}, m_out);
 
 	*plane = *(cplane_t*)m_object_unbox (m_out);
