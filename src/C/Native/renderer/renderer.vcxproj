@@ -237,6 +237,7 @@
     <None Include="ref_trin.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\qm_renderer.c" />
     <ClCompile Include="tr_animation.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug TA|Win32'">Disabled</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug TA|Win32'">EnableFastChecks</BasicRuntimeChecks>
@@ -1450,6 +1451,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qcommon\cm_public.h" />
+    <ClInclude Include="..\qm_renderer.h" />
     <ClInclude Include="..\win32\glw_win.h" />
     <ClInclude Include="..\game\q_shared.h" />
     <ClInclude Include="..\qcommon\qcommon.h" />
