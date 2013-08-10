@@ -336,8 +336,17 @@ m_array_length (const MArray object)
 	return mono_array_length ((MonoArray *)object.__priv);
 }
 
+MString
+m_string (const gchar* text)
+{
+	MString result;
+
+	result.__priv = mono_string_new (mono_domain_get (), text);
+	return result;
+}
+
 //****************************
-// Object / Array Arg Specific
+// Object / Array / String Arg Specific
 //****************************
 
 gpointer
@@ -357,4 +366,10 @@ gpointer
 m_array_as_arg (MArray arr)
 {
 	return arr.__priv;
+}
+
+gpointer
+m_string_as_arg (MString str)
+{
+	return str.__priv;
 }

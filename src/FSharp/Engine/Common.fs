@@ -43,14 +43,19 @@ module Constants =
     let EntityIdWorld = MaxGEntities - 2
     let EntityIdMaxNormal = MaxGEntities - 2
 
-[<Struct>]
+/// <summary>
+/// Based on Q3: cvar_t
+/// Cvar
+/// </summary>
 type Cvar =
-    val Name : string
-    val String : string
-    val ResetString : string    // cvar_restart will reset to this value
-    val LatchedString : string  // for CVAR_LATCH vars
-    val Flags : int
-    val IsModified : bool       // set each time the cvar is changed
-    val ModificationCount : int // incremented each time the cvar is changed
-    val Value : single          // atof( string )
-    val Integer : int           // atoi( string )
+    {
+        Name: string;
+        String: string;
+        ResetString: string;        // cvar_restart will reset to this value
+        LatchedString: string;      // for CVAR_LATCH vars
+        Flags: int;
+        IsModified: bool;           // set each time the cvar is changed
+        ModificiationCount: int;    // incremented each time the cvar is changed
+        Value: single;              // atof( string )
+        Integer: int;               // atoi( string )
+    }

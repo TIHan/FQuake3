@@ -193,7 +193,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
     // </summary>
-    let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) =
+    let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) (noCull: Cvar) =
         match CvarModule.GetNoCull () with
         | true -> ClipType.Clip
         | _ ->

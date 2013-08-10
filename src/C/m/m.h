@@ -47,6 +47,10 @@ typedef struct {
 	gpointer __priv;
 } MArray;
 
+typedef struct {
+	gpointer __priv;
+} MString;
+
 typedef enum {
 	M_RUNTIME_4_0,
 	M_RUNTIME_4_5
@@ -103,11 +107,17 @@ m_array_addr_with_size (const MArray object, const gint size, const gint index);
 gint
 m_array_length (const MArray object);
 
+MString
+m_string (const gchar* text);
+
 gpointer
 m_object_as_arg (MObject obj);
 
 gpointer
 m_array_as_arg (MArray arr);
+
+gpointer
+m_string_as_arg (MString str);
 
 #define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
 #define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
