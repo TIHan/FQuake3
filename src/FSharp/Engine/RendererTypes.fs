@@ -234,20 +234,20 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 /// </summary>
 [<Struct>]
 type Bounds =
-    val Begin : Vector3
-    val End : Vector3     
+    val Alpha : Vector3
+    val Omega : Vector3     
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Begin
-            | 1 -> this.End
+            | 0 -> this.Alpha
+            | 1 -> this.Omega
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (begi, en) =
+    new (alpha, omega) =
         {
-            Begin = begi;
-            End = en;
+            Alpha = alpha;
+            Omega = omega;
         }
 
 /// <summary>

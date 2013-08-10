@@ -192,8 +192,6 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// <summary>
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
-    ///
-    /// TODO: Make pure. CvarModule.GetNoCull () is making this difficult. Should have a parameter.
     // </summary>
     let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) =
         match CvarModule.GetNoCull () with

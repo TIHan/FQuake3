@@ -165,6 +165,7 @@
     <ClCompile Include="win32\win_wndproc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="qm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\bg_public.h">
@@ -245,6 +246,7 @@
     <ClInclude Include="win32\win_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="qm.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\cursor2.cur">

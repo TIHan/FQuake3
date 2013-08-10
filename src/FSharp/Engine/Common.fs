@@ -44,24 +44,13 @@ module Constants =
     let EntityIdMaxNormal = MaxGEntities - 2
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Cvar =
-    [<MarshalAs (UnmanagedType.LPStr)>]
     val Name : string
-
-    [<MarshalAs (UnmanagedType.LPStr)>]
     val String : string
-
-    [<MarshalAs (UnmanagedType.LPStr)>]
-    val ResetString : string
-
-    [<MarshalAs (UnmanagedType.LPStr)>]
-    val LatchedString : string
-
+    val ResetString : string    // cvar_restart will reset to this value
+    val LatchedString : string  // for CVAR_LATCH vars
     val Flags : int
-    val IsModified : bool
-    val ModificationCount : int
-    val Value : single
-    val Integer : int
-    val Next : nativeint
-    val HashNext : nativeint
+    val IsModified : bool       // set each time the cvar is changed
+    val ModificationCount : int // incremented each time the cvar is changed
+    val Value : single          // atof( string )
+    val Integer : int           // atoi( string )

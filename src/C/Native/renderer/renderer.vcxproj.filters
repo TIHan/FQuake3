@@ -318,9 +318,7 @@
     <ClCompile Include="..\ft2\ttsbit.c">
       <Filter>FreeType2</Filter>
     </ClCompile>
-    <ClCompile Include="..\qm_renderer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClCompile Include="..\qm_renderer.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\qcommon\cm_public.h">
@@ -389,9 +387,7 @@
     <ClInclude Include="..\jpeg-6\jversion.h">
       <Filter>jpeg\Header Files No. 1</Filter>
     </ClInclude>
-    <ClInclude Include="..\qm_renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="..\qm_renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\ft2\ahangles.h">
