@@ -58,7 +58,7 @@ M_EXPORT
 int
 M_DECL Sys_Milliseconds (void)
 {
-	return *(int *)m_object_unbox (m_invoke_method ("Engine", "Engine", "System", "Milliseconds", NULL));
+	return *(int *)m_object_unbox_struct (m_invoke_method ("Engine", "Engine", "System", "Milliseconds", NULL));
 }
 #endif
 

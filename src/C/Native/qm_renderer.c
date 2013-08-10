@@ -99,14 +99,14 @@ qm_map_view_parms (const viewParms_t *const view_parms)
 	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
-	args [0] = m_struct_as_arg (qm_map_orientation (&view_parms->or));
-	args [1] = m_struct_as_arg (qm_map_orientation (&view_parms->world));
+	args [0] = m_object_as_arg (qm_map_orientation (&view_parms->or));
+	args [1] = m_object_as_arg (qm_map_orientation (&view_parms->world));
 	args [2] = (vector3_t *)view_parms->pvsOrigin;
 	args [3] = &view_parms->isPortal;
 	args [4] = &view_parms->isMirror;
 	args [5] = &view_parms->frameSceneNum;
 	args [6] = &view_parms->frameCount;
-	args [7] = m_struct_as_arg (qm_map_plane (&view_parms->portalPlane));
+	args [7] = m_object_as_arg (qm_map_plane (&view_parms->portalPlane));
 	args [8] = &view_parms->viewportX;
 	args [9] = &view_parms->viewportY;
 	args [10] = &view_parms->viewportWidth;
@@ -182,7 +182,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		gpointer args[7];
 
-		args [0] = m_struct_as_arg (qm_map_plane (&surface->plane));
+		args [0] = m_object_as_arg (qm_map_plane (&surface->plane));
 		args [1] = &surface->dlightBits [0];
 		args [2] = &surface->dlightBits [1];
 		args [3] = &surface->numPoints;
@@ -192,7 +192,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		
 		m_type = m_object ("Engine", "Engine", "SurfaceFace", 7, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewFace", args);
 		}
@@ -220,7 +220,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		m_type = m_object ("Engine", "Engine", "SurfaceTriangles", 7, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewTriangles", args);
 		}
@@ -242,7 +242,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		m_type = m_object ("Engine", "Engine", "SurfacePoly", 3, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewPoly", args);
 		}
@@ -259,7 +259,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		m_type = m_object ("Engine", "Engine", "SurfaceDisplayList", 1, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewDisplayList", args);
 		}
@@ -304,7 +304,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		m_type = m_object ("Engine", "Engine", "SurfaceGridMesh", 14, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewGrid", args);
 		}
@@ -333,7 +333,7 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 
 		m_type = m_object ("Engine", "Engine", "SurfaceFlare", 3, args);
 
-		args [0] = m_struct_as_arg (m_type);
+		args [0] = m_object_as_arg (m_type);
 
 		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewFlare", args);
 		}
@@ -357,10 +357,10 @@ qm_map_frustum (const frustum_t* frustum)
 	
 	gpointer args[4];
 
-	args [0] = m_struct_as_arg (qm_map_plane (&frustum->left));
-	args [1] = m_struct_as_arg (qm_map_plane (&frustum->right));
-	args [2] = m_struct_as_arg (qm_map_plane (&frustum->bottom));
-	args [3] = m_struct_as_arg (qm_map_plane (&frustum->top));
+	args [0] = m_object_as_arg (qm_map_plane (&frustum->left));
+	args [1] = m_object_as_arg (qm_map_plane (&frustum->right));
+	args [2] = m_object_as_arg (qm_map_plane (&frustum->bottom));
+	args [3] = m_object_as_arg (qm_map_plane (&frustum->top));
 	
 	m_frustum = m_object ("Engine", "Engine", "Frustum", 4, args);
 
@@ -370,8 +370,8 @@ qm_map_frustum (const frustum_t* frustum)
 void
 qm_frustum_map (MObject obj, frustum_t* frustum)
 {
-	frustum->left = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Left"));
-	frustum->right = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Right"));
-	frustum->bottom = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Bottom"));
-	frustum->top = *(cplane_t *)m_object_unbox (m_object_get_property (obj, "Top"));
+	frustum->left = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Left"));
+	frustum->right = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Right"));
+	frustum->bottom = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Bottom"));
+	frustum->top = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Top"));
 }

@@ -83,7 +83,10 @@ MObject
 m_object_invoke (const MObject object, const gchar *method_name, gint argc, gpointer *args);
 
 gpointer
-m_object_unbox (const MObject object);
+m_object_unbox_struct (const MObject object);
+
+gboolean
+m_object_is_struct (MObject obj);
 
 MObject
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
@@ -100,9 +103,11 @@ m_array_addr_with_size (const MArray object, const gint size, const gint index);
 gint
 m_array_length (const MArray object);
 
-#define m_struct_as_arg(obj) m_object_unbox (obj)
-#define m_object_as_arg(obj) obj.__priv
-#define m_array_as_arg(obj) obj.__priv
+gpointer
+m_object_as_arg (MObject obj);
+
+gpointer
+m_array_as_arg (MArray arr);
 
 #define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
 #define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 

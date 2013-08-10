@@ -65,11 +65,11 @@ R_CullLocalBox (vec3_t bounds[2])
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
 		__args [0] = (vector3_t *)bounds;
-		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
-	return *(gint *)m_object_unbox (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_cull_type);
 }
 
 /*
@@ -83,11 +83,11 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_struct_as_arg (qm_map_orientation (&tr.or));
+		__args [2] = m_object_as_arg (qm_map_orientation (&tr.or));
 		__args [3] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
-	return *(gint *)m_object_unbox (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_cull_type);
 }
 
 /*
@@ -104,7 +104,7 @@ R_CullPointAndRadius( vec3_t pt, float radius )
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 	}, m_cull_type);
 
-	return *(gint *)m_object_unbox (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_cull_type);
 }
 
 
@@ -120,10 +120,10 @@ R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalNormalToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 	}, m_world);
 
-	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
+	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
 }
 
 /*
@@ -142,7 +142,7 @@ R_LocalPointToWorld (vec3_t local, vec3_t world)
 		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 	}, m_world);
 
-	*(vector3_t *)world = *(vector3_t *)m_object_unbox (m_world);
+	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
 }
 
 /*
@@ -158,10 +158,10 @@ R_WorldToLocal (vec3_t world, vec3_t local)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "WorldToLocal", 2, {
 		__args [0] = local;
-		__args [1] = m_struct_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 	}, m_local);
 
-	*(vector3_t *)local = *(vector3_t *)m_object_unbox (m_local);
+	*(vector3_t *)local = *(vector3_t *)m_object_unbox_struct (m_local);
 }
 
 /*
@@ -181,8 +181,8 @@ R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float 
 		__args [2] = (matrix16_t*)projectionMatrix;
 	}, m_tuple_source_and_destination);
 
-	*(vector4_t *)eye = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_source_and_destination, "Item1"));
-	*(vector4_t *)dst = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_source_and_destination, "Item2"));
+	*(vector4_t *)eye = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_source_and_destination, "Item1"));
+	*(vector4_t *)dst = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_source_and_destination, "Item2"));
 }
 
 /*
@@ -201,8 +201,8 @@ R_TransformClipToWindow (const vec4_t clip, const viewParms_t *view, vec4_t norm
 		__args [1] = m_object_as_arg (qm_map_view_parms (view));
 	}, m_tuple_normalized_and_window);
 
-	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item1"));
-	*(vector4_t *)window = *(vector4_t *)m_object_unbox (m_object_get_property (m_tuple_normalized_and_window, "Item2"));
+	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_normalized_and_window, "Item1"));
+	*(vector4_t *)window = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_normalized_and_window, "Item2"));
 }
 
 
@@ -222,7 +222,7 @@ myGlMultMatrix (const gfloat *a, const gfloat *b, gfloat *out)
 		__args [1] = (matrix16_t *)b;
 	}, m_out);
 
-	*(matrix16_t *)out = *(matrix16_t *)m_object_unbox (m_out);
+	*(matrix16_t *)out = *(matrix16_t *)m_object_unbox_struct (m_out);
 }
 
 /*
@@ -241,10 +241,10 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForEntity", 3, {
 		__args [0] = m_object_as_arg (qm_map_tr_ref_entity (ent));
 		__args [1] = m_object_as_arg (qm_map_view_parms (viewParms));
-		__args [2] = m_struct_as_arg (qm_map_orientation (or));
+		__args [2] = m_object_as_arg (qm_map_orientation (or));
 	}, m_or);
 
-	*or = *(orientationr_t *)m_object_unbox (m_or);
+	*or = *(orientationr_t *)m_object_unbox_struct (m_or);
 }
 
 /*
@@ -263,7 +263,7 @@ R_RotateForViewer (void)
 		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_or);
 
-	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox (m_or);
+	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox_struct (m_or);
 }
 
 
@@ -285,8 +285,8 @@ R_SetupProjection (void)
 		__args [4] = &tr.refdef.fov_y;
 	}, m_tuple_projection_matrix_and_zFar);
 
-	*(matrix16_t *)tr.viewParms.projectionMatrix = *(matrix16_t *)m_object_unbox (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item1"));
-	tr.viewParms.zFar = *(gfloat *)m_object_unbox (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item2"));
+	*(matrix16_t *)tr.viewParms.projectionMatrix = *(matrix16_t *)m_object_unbox_struct (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item1"));
+	tr.viewParms.zFar = *(gfloat *)m_object_unbox_struct (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item2"));
 }
 
 /*
@@ -321,11 +321,11 @@ R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t 
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MirrorPoint", 3, {
 		__args [0] = (vector3_t *)in;
-		__args [1] = m_struct_as_arg (qm_map_orientation (surface));
-		__args [2] = m_struct_as_arg (qm_map_orientation (camera));
+		__args [1] = m_object_as_arg (qm_map_orientation (surface));
+		__args [2] = m_object_as_arg (qm_map_orientation (camera));
 	}, m_out);
 
-	*(vector3_t *)out = *(vector3_t *)m_object_unbox (m_out);
+	*(vector3_t *)out = *(vector3_t *)m_object_unbox_struct (m_out);
 }
 
 void
@@ -335,11 +335,11 @@ R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "MirrorVector", 3, {
 		__args [0] = (vector3_t *)in;
-		__args [1] = m_struct_as_arg (qm_map_orientation (surface));
-		__args [2] = m_struct_as_arg (qm_map_orientation (camera));
+		__args [1] = m_object_as_arg (qm_map_orientation (surface));
+		__args [2] = m_object_as_arg (qm_map_orientation (camera));
 	}, m_out);
 
-	*(vector3_t *)out = *(vector3_t *)m_object_unbox (m_out);
+	*(vector3_t *)out = *(vector3_t *)m_object_unbox_struct (m_out);
 }
 
 
@@ -360,10 +360,10 @@ R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "PlaneForSurface", 2, {
 		__args [0] = m_object_as_arg (qm_map_surface (surfType));
-		__args [1] = m_struct_as_arg (qm_map_plane (plane));
+		__args [1] = m_object_as_arg (qm_map_plane (plane));
 	}, m_out);
 
-	*plane = *(cplane_t*)m_object_unbox (m_out);
+	*plane = *(cplane_t*)m_object_unbox_struct (m_out);
 }
 
 /*

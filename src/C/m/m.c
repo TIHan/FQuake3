@@ -248,12 +248,22 @@ m_object_invoke (const MObject object, const gchar *method_name, gint argc, gpoi
 
 
 gpointer
-m_object_unbox (const MObject object)
+m_object_unbox_struct (const MObject object)
 {
 	if (!object.__priv)
 		g_error ("M: Cannot unbox null object.");
 
 	return mono_object_unbox ((MonoObject *)object.__priv);
+}
+
+
+gboolean
+m_object_is_struct (MObject obj)
+{
+	MonoClass *klass = mono_object_get_class ((MonoObject*)obj.__priv);
+	MonoType *type = mono_class_get_type (klass);
+
+	return mono_type_is_struct (type);
 }
 
 
@@ -324,4 +334,27 @@ gint
 m_array_length (const MArray object)
 {
 	return mono_array_length ((MonoArray *)object.__priv);
+}
+
+//****************************
+// Object / Array Arg Specific
+//****************************
+
+gpointer
+m_object_as_arg (MObject obj)
+{
+	if (m_object_is_struct (obj))
+	{
+		return mono_object_unbox ((MonoObject*)obj.__priv);
+	}
+	else
+	{
+		return obj.__priv;
+	}
+}
+
+gpointer
+m_array_as_arg (MArray arr)
+{
+	return arr.__priv;
 }
