@@ -1,6 +1,8 @@
 # FQuake3
 _F\# Implementation of id Software's Quake III Arena._
 
+![logo](https://raw.github.com/TIHan/FQuake3/master/fquake3_logo.png)
+
 Supported Platforms:
 
 * __Windows 32-bit__
@@ -41,7 +43,7 @@ You will need a commercial copy of Quake III Arena, preferably with Team Arena a
 ####Windows 7 / 8
 Download and install the following:
 
-* Visual Studio 2012 ( _[Trial](http://www.microsoft.com/visualstudio/eng/products/visual-studio-premium-2012)_ ) (_[Express Edition](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-windows-desktop#product-express-desktop) not tested_)
+* Visual Studio 2012 ( _[Trial](http://www.microsoft.com/visualstudio/eng/products/visual-studio-premium-2012)_ ) ( _[Express Edition](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-windows-desktop#product-express-desktop) not tested_ )
 * [F# compiler](http://go.microsoft.com/fwlink/?LinkID=261287) (if not installed)
 * [Mono 3.0.10](http://origin-download.mono-project.com/archive/3.0.10/windows-installer/mono-3.0.10-gtksharp-2.12.11-win32-0.exe)
 

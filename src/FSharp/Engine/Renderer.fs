@@ -103,9 +103,9 @@ module MainRenderer =
                         checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
 
             match checkFrustumPlanes 0 true 0 with
-            | (_, false) -> CullType.Out
-            | (0, _) -> CullType.In
-            | _ -> CullType.Clip
+            | (_, false) -> ClipType.Out
+            | (0, _) -> ClipType.In
+            | _ -> ClipType.Clip
 
     module private PointAndRadius =
         /// <summary>
@@ -126,9 +126,9 @@ module MainRenderer =
                     | _ -> checkFrustumPlanes mightBeClipped false (acc + 1)
 
             match checkFrustumPlanes false false 0 with
-            | (_, true) -> CullType.Out
-            | (true, _) -> CullType.Clip
-            | _ -> CullType.In
+            | (_, true) -> ClipType.Out
+            | (true, _) -> ClipType.Clip
+            | _ -> ClipType.In
 
 
 (*
@@ -197,7 +197,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     // </summary>
     let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) =
         match CvarModule.GetNoCull () with
-        | true -> CullType.Clip
+        | true -> ClipType.Clip
         | _ ->
 
         // transform into world space
@@ -250,7 +250,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
     [<Pure>]
     let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) =
         match CvarModule.GetNoCull () with
-        | true -> CullType.Clip
+        | true -> ClipType.Clip
         | _ ->
 
         PointAndRadius.CheckFrustumPlanes point radius frustum

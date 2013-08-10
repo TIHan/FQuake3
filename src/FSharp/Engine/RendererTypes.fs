@@ -40,11 +40,9 @@ open Engine.QMath
 
 /// <summary>
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
-/// CullType
-///
-/// Note: This may change as there might be another "CullType" that means something different.
+/// ClipType
 /// </summary>
-type CullType =
+type ClipType =
     | In = 0    // completely unclipped
     | Clip = 1  // clipped by one or more planes
     | Out = 2   // completely outside the clipping planes
@@ -767,6 +765,120 @@ type Image =
         IsMipmap : bool;
         CanAllowPicmip : bool;
         //TODO:
+    }
+
+/// <summary>
+/// Based on Q3: dshader_t
+/// DShader
+/// </summary>
+type DShader =
+    {
+        Shader: string;
+        SurfaceFlags: int;
+        ContentFlags: int;
+    }
+
+/// <summary>
+/// Based on Q3: cullType_t
+/// CullType
+/// </summary>
+type CullType =
+    | FrontSided = 0
+    | BackSided = 1
+    | TwoSided = 2
+
+/// <summary>
+/// Based on Q3: fogPass_t
+/// FogType
+/// </summary>
+type FogType =
+    | None = 0  // surface is translucent and will just be adjusted properly
+    | Equal = 1 // surface is opaque but possibly alpha tested
+    | Le = 2    // surface is trnaslucent, but still needs a fog pass (fog surface)
+
+/// <summary>
+/// Based on Q3: skyParms_t
+/// SkyParms
+/// </summary>
+type SkyParms =
+    {
+        CloudHeight: single;
+        // TODO:
+    }
+
+/// <summary>
+/// Based on Q3: fogParms_t
+/// FogParms
+/// </summary>
+type FogParms =
+    {
+        Color: Vector3;
+        DepthForOpaque: single;
+    }
+
+/// <summary>
+/// Based on Q3: shader_t
+/// Shader
+/// </summary>
+type Shader =
+    {
+        Name: string;   // game path, including extension
+        LightmapIndex: int;
+        Index: int;
+        SortedIndex: int;
+        Sort: single;
+        IsDefaultShader: bool;
+        IsExplicitlyDefined: bool;
+        SurfaceFlags: int;
+        ContentFlags: int;
+        IsEntityMergable: bool;
+        IsSky: bool;
+        Sky: SkyParms;
+        Fog: FogParms;
+        PortalRange: single;
+        MultitextureEnv: int;
+        CullType: CullType;
+        HasPolygonOffset: bool;
+        HasNoMipMaps: bool;
+        HasNoPicMip: bool;
+        FogType: FogType;
+        NeedsNormal: bool;
+        NeedsSt1: bool;
+        NeedsSt2: bool;
+        NeedsColor: bool;
+        // TODO:
+    }
+
+/// <summary>
+/// Based on Q3:
+/// DShader
+/// </summary>
+type MSurface =
+    {
+        ViewCount: int;
+        // TODO:
+    }
+
+/// <summary>
+/// Based on Q3: bmodel_t
+/// BModel
+/// </summary>
+type BModel =
+    {
+        Bounds: Bounds; // for culling
+        // TODO:
+    }
+
+/// <summary>
+/// Based on Q3: world_t
+/// World
+/// </summary>
+type World =
+    {
+        Name: string;           // ie: maps/tim_dm2.bsp
+        BaseName: string;       // ie: tim_dm2
+        DataSize: int;
+        Shaders: DShader seq;
     }
 
 /// <summary>
