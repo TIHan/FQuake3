@@ -341,7 +341,15 @@ m_string (const gchar* text)
 {
 	MString result;
 
-	result.__priv = mono_string_new (mono_domain_get (), text);
+
+	if (text)
+	{
+		result.__priv = mono_string_new (mono_domain_get (), text);
+	}
+	else
+	{
+		result.__priv = mono_string_new (mono_domain_get (), "");
+	}
 	return result;
 }
 

@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_local.h"
 #include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 trGlobals_t		tr;
 
@@ -42,14 +43,6 @@ refimport_t	ri;
 // point at this for their sorting surface
 surfaceType_t	entitySurface = SF_ENTITY;
 
-M_EXPORT
-gint
-M_DECL
-Cvar_GetNoCull (void)
-{
-	return r_nocull->integer;
-}
-
 
 /*
 =================
@@ -61,15 +54,16 @@ Returns CULL_IN, CULL_CLIP, or CULL_OUT
 gint
 R_CullLocalBox (vec3_t bounds[2])
 {
-	MObject m_cull_type;
+	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 3, {
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 4, {
 		__args [0] = (vector3_t *)bounds;
 		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
-	}, m_cull_type);
+		__args [3] = m_object_as_arg (qm_map_cvar (r_nocull));
+	}, m_clip_type);
 
-	return *(gint *)m_object_unbox_struct (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_clip_type);
 }
 
 /*
@@ -78,16 +72,17 @@ R_CullLocalBox (vec3_t bounds[2])
 gint
 R_CullLocalPointAndRadius( vec3_t pt, float radius )
 {
-	MObject m_cull_type;
+	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 4, {
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 5, {
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_object_as_arg (qm_map_orientation (&tr.or));
 		__args [3] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
-	}, m_cull_type);
+		__args [4] = m_object_as_arg (qm_map_cvar (r_nocull));
+	}, m_clip_type);
 
-	return *(gint *)m_object_unbox_struct (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_clip_type);
 }
 
 /*
@@ -96,15 +91,16 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 gint
 R_CullPointAndRadius( vec3_t pt, float radius )
 {
-	MObject m_cull_type;
+	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullPointAndRadius", 3, {
+	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
-	}, m_cull_type);
+		__args [3] = m_object_as_arg (qm_map_cvar (r_nocull));
+	}, m_clip_type);
 
-	return *(gint *)m_object_unbox_struct (m_cull_type);
+	return *(gint *)m_object_unbox_struct (m_clip_type);
 }
 
 

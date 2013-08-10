@@ -41,5 +41,5 @@ qm_map_cvar (const cvar_t *cvar)
 	args [7] = &cvar->value;
 	args [8] = &cvar->integer;
 
-	return m_object ("Engine", "Engine", "Cvar", 9, args);
+	m_object ("Engine", "Engine", "Cvar", 9, args);
 }

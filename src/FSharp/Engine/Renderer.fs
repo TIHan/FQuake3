@@ -32,22 +32,6 @@ open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
 open Engine.QMath
 
-module private NativeRenderer =
-    
-    [<Literal>]
-    let libQuake3 = "quake3.dll"
-
-    [<Literal>]
-    let callingConvention = CallingConvention.Cdecl
-
-    [<DllImport (libQuake3, CallingConvention = callingConvention)>]
-    extern bool Cvar_GetNoCull ()
-
-module CvarModule =
-    
-    let GetNoCull () =
-        NativeRenderer.Cvar_GetNoCull ()
-
 module MainRenderer =
 
     let FlipMatrix =
@@ -193,8 +177,9 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
     // </summary>
+    [<Pure>]
     let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) (noCull: Cvar) =
-        match CvarModule.GetNoCull () with
+        match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
 
@@ -246,8 +231,8 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
     /// CullPointAndRadius
     /// </summary>
     [<Pure>]
-    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) =
-        match CvarModule.GetNoCull () with
+    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noCull: Cvar) =
+        match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
 
@@ -330,9 +315,9 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// CullLocalPointAndRadius
     /// </summary>
     [<Pure>]
-    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Frustum) =
+    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Frustum) (noCull: Cvar) =
         let transformed = LocalPointToWorld point orientation
-        CullPointAndRadius transformed radius frustum
+        CullPointAndRadius transformed radius frustum noCull
 
 (*
 void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
