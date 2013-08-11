@@ -85,12 +85,10 @@ type Vector3 =
     static member inline UnitX = Vector3 (1.f, 0.f, 0.f)
     static member inline UnitY = Vector3 (0.f, 1.f, 0.f)
     static member inline UnitZ = Vector3 (0.f, 0.f, 1.f)
+    static member inline Zero = Vector3 (0.f, 0.f, 0.f)
 
     static member inline Init (f: int -> single) =
         Vector3 (f 0, f 1, f 2)
-
-    static member inline ZeroCreate () =
-        Vector3 ()
 
     static member inline Abs (v: Vector3) =
         Vector3 (abs v.X, abs v.Y, abs v.Z)
@@ -127,6 +125,9 @@ type Vector3 =
     static member inline (-) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
+    static member inline (=) (v1: Vector3, v2: Vector3) =
+        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
+
     static member inline ( *+ ) ((s: single, v1: Vector3), v2: Vector3) =
         Vector3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z)
 
@@ -147,7 +148,7 @@ type Vector3 =
 
     static member inline Normalize (v: Vector3) =
         let length = 1.f / Vector3.Length v
-        Vector3.Init (fun i -> v.[i] * length)
+        Vector3.Map (fun i x -> x * length) v
 
     static member inline Perpendicular (v: Vector3) =
         let uv =

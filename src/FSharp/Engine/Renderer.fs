@@ -957,7 +957,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
             | _ ->
             transform ((Vector3.DotProduct local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
-        (transform (Vector3.ZeroCreate ()) 0) + camera.Origin
+        (transform (Vector3.Zero) 0) + camera.Origin
 
 (*
 void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
@@ -984,7 +984,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
             | _ ->
             transform ((Vector3.DotProduct v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
-        transform (Vector3.ZeroCreate ()) 0
+        transform (Vector3.Zero) 0
 
 (*
 void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
@@ -1061,7 +1061,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     ///
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: Orientation) =
+    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: Orientation) (entities: TrRefEntity list) =
         // create plane axis for the portal we are seeing
         let originalPlane = PlaneForSurface drawSurface.Surface <| Plane ()
 
@@ -1085,5 +1085,40 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
         let surfaceAxisX = plane.Normal
         let surfaceAxisY = Vector3.Perpendicular surfaceAxisX
         let surfaceAxisZ = Vector3.CrossProduct surfaceAxisX surfaceAxisY
-        // TODO:
-        ()
+        
+        let rec getPortalOrientation isMirror (entities: TrRefEntity list) =
+            match entities with
+            | [] -> (false, false)
+            | x :: xs ->
+                match isMirror with
+                | true -> (true, true)
+                | _ ->
+
+                match x.Entity.Type = RefEntityType.PortalSurface with
+                | true -> getPortalOrientation isMirror xs
+                | _ ->
+
+                let d = Vector3.DotProduct x.Entity.Origin plane.Normal |> (-) plane.Distance
+
+                match d > 64.f || d < -64.f with
+                | true -> getPortalOrientation isMirror xs
+                | _ ->
+
+                let pvsOrigin = x.Entity.OldOrigin
+
+                match x.Entity.OldOrigin = x.Entity.Origin with
+                | true ->
+                    let surfaceOrigin = Vector3.Scale plane.Distance plane.Normal
+                    let cameraOrigin = surfaceOrigin
+                    let cameraAxisX = Vector3.Zero - surfaceAxisX
+                    let cameraAxisY = surfaceAxisY
+                    let cameraAxisZ = surfaceAxisZ
+                    (true, true)
+                | _ ->
+
+                (true, true) // TODO:
+
+         
+
+
+        getPortalOrientation false entities
