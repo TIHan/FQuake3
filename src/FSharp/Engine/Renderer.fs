@@ -890,8 +890,8 @@ void R_SetupFrustum (void) {
         let ys = sin yAngle
         let yc = cos yAngle
 
-        let xNormal = Vector3.Scale xs view.Orientation.Axis.[0]
-        let yNormal = Vector3.Scale ys view.Orientation.Axis.[0]
+        let xNormal = xs * view.Orientation.Axis.[0]
+        let yNormal = ys * view.Orientation.Axis.[0]
 
         let leftNormal = (xc, view.Orientation.Axis.[1]) *+ xNormal
         let rightNormal = (-xc, view.Orientation.Axis.[1]) *+ xNormal
@@ -1108,7 +1108,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 
                 match x.Entity.OldOrigin = x.Entity.Origin with
                 | true ->
-                    let surfaceOrigin = Vector3.Scale plane.Distance plane.Normal
+                    let surfaceOrigin = plane.Distance * plane.Normal
                     let cameraOrigin = surfaceOrigin
                     let cameraAxisX = Vector3.Zero - surfaceAxisX
                     let cameraAxisY = surfaceAxisY
