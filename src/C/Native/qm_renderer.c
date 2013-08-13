@@ -57,7 +57,18 @@ qm_create_poly_vertex_array (const gint size)
 }
 
 MObject
-qm_map_orientation (const orientationr_t *const orientation)
+qm_map_orientation (const orientation_t *const orientation)
+{
+	gpointer args[2];
+
+	args [0] = (vector3_t *)orientation->origin;
+	args [1] = (vector3_t *)orientation->axis;
+
+	return m_object ("Engine", "Engine", "Orientation", 2, args);
+}
+
+MObject
+qm_map_orientationr (const orientationr_t *const orientation)
 {
 	gpointer args[4];
 
@@ -66,7 +77,7 @@ qm_map_orientation (const orientationr_t *const orientation)
 	args [2] = (vector3_t *)orientation->viewOrigin;
 	args [3] = (matrix16_t *)orientation->modelMatrix;
 
-	return m_object ("Engine", "Engine", "Orientation", 4, args);
+	return m_object ("Engine", "Engine", "OrientationR", 4, args);
 }
 
 MObject
@@ -99,8 +110,8 @@ qm_map_view_parms (const viewParms_t *const view_parms)
 	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
 	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
-	args [0] = m_object_as_arg (qm_map_orientation (&view_parms->or));
-	args [1] = m_object_as_arg (qm_map_orientation (&view_parms->world));
+	args [0] = m_object_as_arg (qm_map_orientationr (&view_parms->or));
+	args [1] = m_object_as_arg (qm_map_orientationr (&view_parms->world));
 	args [2] = (vector3_t *)view_parms->pvsOrigin;
 	args [3] = &view_parms->isPortal;
 	args [4] = &view_parms->isMirror;

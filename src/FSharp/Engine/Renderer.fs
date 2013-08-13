@@ -49,7 +49,7 @@ module MainRenderer =
         /// Transform into world space.
         /// </summary>
         [<Pure>]
-        let TransformWorldSpace (bounds: Bounds) (orientation: Orientation) =        
+        let TransformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
             Transform.Init (fun i ->
                 let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
@@ -178,7 +178,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// CullLocalBox
     // </summary>
     [<Pure>]
-    let CullLocalBox (bounds: Bounds) (orientation: Orientation) (frustum: Frustum) (noCull: Cvar) =
+    let CullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
         match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
@@ -251,7 +251,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
     /// LocalPointToWorld
     /// </summary>
     [<Pure>]
-    let LocalPointToWorld (local: Vector3) (orientation: Orientation) =
+    let LocalPointToWorld (local: Vector3) (orientation: OrientationR) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X,
             (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y,
@@ -271,7 +271,7 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
     /// LocalNormalToWorld
     /// </summary>
     [<Pure>]
-    let LocalNormalToWorld (local: Vector3) (orientation: Orientation) =
+    let LocalNormalToWorld (local: Vector3) (orientation: OrientationR) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X),
             (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y),
@@ -291,7 +291,7 @@ void R_WorldToLocal (vec3_t world, vec3_t local) {
     /// WorldToLocal
     /// </summary>
     [<Pure>]
-    let WorldToLocal (world: Vector3) (orientation: Orientation) =
+    let WorldToLocal (world: Vector3) (orientation: OrientationR) =
         Vector3 (
             Vector3.DotProduct world orientation.Axis.[0],
             Vector3.DotProduct world orientation.Axis.[1],
@@ -315,7 +315,7 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// CullLocalPointAndRadius
     /// </summary>
     [<Pure>]
-    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orientation) (frustum: Frustum) (noCull: Cvar) =
+    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
         let transformed = LocalPointToWorld point orientation
         CullPointAndRadius transformed radius frustum noCull
 
@@ -509,13 +509,13 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// TODO: Make this a little bit nicer. newOrientation and newNewOrientation are horrible names.
     /// </summary>
     [<Pure>]
-    let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: Orientation) =
+    let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: OrientationR) =
         match entity.Entity.Type <> RefEntityType.Model with
         | true -> viewParms.World
         | _ ->
 
         let newOrientation =
-            Orientation (
+            OrientationR (
                 entity.Entity.Origin,
                 entity.Entity.Axis,
                 orientation.ViewOrigin,
@@ -543,7 +543,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             )
 
         let newNewOrientation =
-            Orientation (
+            OrientationR (
                 newOrientation.Origin,
                 newOrientation.Axis,
                 newOrientation.ViewOrigin,
@@ -565,7 +565,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
                     1.0f / axisLength
             | _ -> 1.0f
 
-        Orientation (
+        OrientationR (
             newNewOrientation.Origin,
             newNewOrientation.Axis,
             Vector3 (
@@ -662,7 +662,7 @@ void R_RotateForViewer (void)
                 1.f
             )
         
-        Orientation (
+        OrientationR (
             Vector3 (),
             axis,
             viewOrigin,
@@ -738,7 +738,7 @@ static void SetFarClip( void )
     /// Based on Q3: SetFarClip
     /// SetFarClip
     /// </summary>
-    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Vector3[]) (orientation: Orientation) =
+    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Vector3[]) (orientation: OrientationR) =
         // if not rendering the world (icons, menus, etc)
         // set a 2k far clip plane
         match rdFlags.HasFlag RdFlags.NoWorldModel with
@@ -1061,7 +1061,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     ///
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: Orientation) (entities: TrRefEntity list) =
+    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: OrientationR) (entities: TrRefEntity list) =
         // create plane axis for the portal we are seeing
         let originalPlane = PlaneForSurface drawSurface.Surface <| Plane ()
 

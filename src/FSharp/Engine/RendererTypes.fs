@@ -113,13 +113,28 @@ type Rgba =
         }
 
 /// <summary>
-/// Based on Q3: orientationr_t
+/// Based on Q3: orientation_t
 /// Orientation
+/// </summary>
+[<Struct>]
+type Orientation =
+    val Origin : Vector3
+    val Axis : Axis
+
+    new (origin, axis) =
+        {
+            Origin = origin;
+            Axis = axis;
+        }
+
+/// <summary>
+/// Based on Q3: orientationr_t
+/// OrientationR
 ///
 /// Note: Should this be a record type? It is over 64 bytes, don't know for sure.
 /// </summary>
 [<Struct>]
-type Orientation =
+type OrientationR =
     val Origin : Vector3        // in world coordinates
     val Axis : Axis             // orientation in world
     val ViewOrigin : Vector3    // viewParms->or.origin in local coordinates // FIXME: This directly points to viewParms orientation origin? Yuck.
@@ -323,8 +338,8 @@ type Transform =
 /// </summary>
 type ViewParms =
     {
-        Orientation: Orientation;
-        World: Orientation;
+        Orientation: OrientationR;
+        World: OrientationR;
         PvsOrigin: Vector3;         // may be different than or.origin for portals
         IsPortal: bool;             // true if this view is through a portal
         IsMirror: bool;             // the portal is a mirror, invert the face culling

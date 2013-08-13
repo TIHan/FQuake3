@@ -42,7 +42,10 @@ MArray
 qm_create_poly_vertex_array (const gint size);
 
 MObject
-qm_map_orientation (const orientationr_t *const orientation);
+qm_map_orientation (const orientation_t *const orientation);
+
+MObject
+qm_map_orientationr (const orientationr_t *const orientation);
 
 MObject
 qm_map_plane (const cplane_t *const plane);

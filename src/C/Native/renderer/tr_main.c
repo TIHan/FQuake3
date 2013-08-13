@@ -58,7 +58,7 @@ R_CullLocalBox (vec3_t bounds[2])
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalBox", 4, {
 		__args [0] = (vector3_t *)bounds;
-		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 		__args [2] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 		__args [3] = m_object_as_arg (qm_map_cvar (r_nocull));
 	}, m_clip_type);
@@ -77,7 +77,7 @@ R_CullLocalPointAndRadius( vec3_t pt, float radius )
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CullLocalPointAndRadius", 5, {
 		__args [0] = pt;
 		__args [1] = &radius;
-		__args [2] = m_object_as_arg (qm_map_orientation (&tr.or));
+		__args [2] = m_object_as_arg (qm_map_orientationr (&tr.or));
 		__args [3] = m_object_as_arg (qm_map_frustum ((frustum_t*)&tr.viewParms.frustum));
 		__args [4] = m_object_as_arg (qm_map_cvar (r_nocull));
 	}, m_clip_type);
@@ -116,7 +116,7 @@ R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalNormalToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
@@ -135,7 +135,7 @@ R_LocalPointToWorld (vec3_t local, vec3_t world)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "LocalPointToWorld", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_world);
 
 	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
@@ -154,7 +154,7 @@ R_WorldToLocal (vec3_t world, vec3_t local)
 
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "WorldToLocal", 2, {
 		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientation (&tr.or));
+		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_local);
 
 	*(vector3_t *)local = *(vector3_t *)m_object_unbox_struct (m_local);
@@ -237,7 +237,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "RotateForEntity", 3, {
 		__args [0] = m_object_as_arg (qm_map_tr_ref_entity (ent));
 		__args [1] = m_object_as_arg (qm_map_view_parms (viewParms));
-		__args [2] = m_object_as_arg (qm_map_orientation (or));
+		__args [2] = m_object_as_arg (qm_map_orientationr (or));
 	}, m_or);
 
 	*or = *(orientationr_t *)m_object_unbox_struct (m_or);
