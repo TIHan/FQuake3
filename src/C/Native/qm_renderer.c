@@ -102,13 +102,7 @@ qm_create_plane_array (const gint size)
 MObject
 qm_map_view_parms (const viewParms_t *const view_parms)
 {
-	MArray m_frustum = qm_create_plane_array (4);
-	MArray m_visibility_bounds = qm_create_vector3_array (2);
-
 	gpointer args[18];
-
-	m_array_map (m_frustum, 4, cplane_t, view_parms->frustum);
-	m_array_map (m_visibility_bounds, 2, vector3_t, ((vector3_t *)view_parms->visBounds));
 
 	args [0] = m_object_as_arg (qm_map_orientationr (&view_parms->or));
 	args [1] = m_object_as_arg (qm_map_orientationr (&view_parms->world));
@@ -124,9 +118,9 @@ qm_map_view_parms (const viewParms_t *const view_parms)
 	args [11] = &view_parms->viewportHeight;
 	args [12] = &view_parms->fovX;
 	args [13] = &view_parms->fovY;
-	args [14] = (matrix16_t *)view_parms->projectionMatrix;
-	args [15] = m_array_as_arg (m_frustum);
-	args [16] = m_array_as_arg (m_visibility_bounds);
+	args [14] = (matrix16_t*)view_parms->projectionMatrix;
+	args [15] = m_object_as_arg (qm_map_frustum ((frustum_t*)view_parms->frustum));
+	args [16] = (vector3_t*)view_parms->visBounds;
 	args [17] = &view_parms->zFar;
 
 	return m_object ("Engine", "Engine", "ViewParms", 18, args);

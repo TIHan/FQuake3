@@ -738,7 +738,8 @@ static void SetFarClip( void )
     /// Based on Q3: SetFarClip
     /// SetFarClip
     /// </summary>
-    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Vector3[]) (orientation: OrientationR) =
+    [<Pure>]
+    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: OrientationR) =
         // if not rendering the world (icons, menus, etc)
         // set a 2k far clip plane
         match rdFlags.HasFlag RdFlags.NoWorldModel with

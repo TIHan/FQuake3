@@ -355,8 +355,8 @@ type ViewParms =
         FovX: single;
         FovY: single;
         ProjectionMatrix: Matrix16;
-        Frustum: Plane[];
-        VisibilityBounds: Vector3[];
+        Frustum: Frustum;
+        VisibilityBounds: Bounds;
         ZFar: single;
     }
 
