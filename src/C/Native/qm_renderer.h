@@ -71,4 +71,7 @@ qm_map_frustum (const frustum_t* frustum);
 void
 qm_frustum_map (MObject obj, frustum_t* frustum);
 
+MObject
+qm_map_draw_surf (drawSurf_t* draw_surf);
+
 #endif /* __QM_RENDERER_H__ */

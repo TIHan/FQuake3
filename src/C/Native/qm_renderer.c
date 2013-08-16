@@ -386,3 +386,14 @@ qm_frustum_map (MObject obj, frustum_t* frustum)
 	frustum->bottom = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Bottom"));
 	frustum->top = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Top"));
 }
+
+MObject
+qm_map_draw_surf (drawSurf_t* draw_surf)
+{
+	gpointer args[2];
+
+	args [0] = &draw_surf->sort;
+	args [1] = m_object_as_arg (qm_map_surface (draw_surf->surface));
+
+	return m_object ("Engine", "Engine", "DrawSurface", 2, args);
+}

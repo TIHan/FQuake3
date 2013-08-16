@@ -1051,6 +1051,142 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
         | _ ->
             Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
 
+(*
+/*
+=================
+R_GetPortalOrientation
+
+entityNum is the entity that the portal surface is a part of, which may
+be moving and rotating.
+
+Returns qtrue if it should be mirrored
+=================
+*/
+qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
+							 orientation_t *surface, orientation_t *camera,
+							 vec3_t pvsOrigin, qboolean *mirror ) {
+	int			i;
+	cplane_t	originalPlane, plane;
+	trRefEntity_t	*e;
+	float		d;
+	vec3_t		transformed;
+
+	// create plane axis for the portal we are seeing
+	R_PlaneForSurface( drawSurf->surface, &originalPlane );
+
+	// rotate the plane if necessary
+	if ( entityNum != ENTITYNUM_WORLD ) {
+		tr.currentEntityNum = entityNum;
+		tr.currentEntity = &tr.refdef.entities[entityNum];
+
+		// get the orientation of the entity
+		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
+
+		// rotate the plane, but keep the non-rotated version for matching
+		// against the portalSurface entities
+		R_LocalNormalToWorld( originalPlane.normal, plane.normal );
+		plane.dist = originalPlane.dist + DotProduct( plane.normal, tr.or.origin );
+
+		// translate the original plane
+		originalPlane.dist = originalPlane.dist + DotProduct( originalPlane.normal, tr.or.origin );
+	} else {
+		plane = originalPlane;
+	}
+
+	VectorCopy( plane.normal, surface->axis[0] );
+	PerpendicularVector( surface->axis[1], surface->axis[0] );
+	CrossProduct( surface->axis[0], surface->axis[1], surface->axis[2] );
+
+	// locate the portal entity closest to this plane.
+	// origin will be the origin of the portal, origin2 will be
+	// the origin of the camera
+	for ( i = 0 ; i < tr.refdef.num_entities ; i++ ) {
+		e = &tr.refdef.entities[i];
+		if ( e->e.reType != RT_PORTALSURFACE ) {
+			continue;
+		}
+
+		d = DotProduct( e->e.origin, originalPlane.normal ) - originalPlane.dist;
+		if ( d > 64 || d < -64) {
+			continue;
+		}
+
+		// get the pvsOrigin from the entity
+		VectorCopy( e->e.oldorigin, pvsOrigin );
+
+		// if the entity is just a mirror, don't use as a camera point
+		if ( e->e.oldorigin[0] == e->e.origin[0] && 
+			e->e.oldorigin[1] == e->e.origin[1] && 
+			e->e.oldorigin[2] == e->e.origin[2] ) {
+			VectorScale( plane.normal, plane.dist, surface->origin );
+			VectorCopy( surface->origin, camera->origin );
+			VectorSubtract( vec3_origin, surface->axis[0], camera->axis[0] );
+			VectorCopy( surface->axis[1], camera->axis[1] );
+			VectorCopy( surface->axis[2], camera->axis[2] );
+
+			*mirror = qtrue;
+			return qtrue;
+		}
+
+		// project the origin onto the surface plane to get
+		// an origin point we can rotate around
+		d = DotProduct( e->e.origin, plane.normal ) - plane.dist;
+		VectorMA( e->e.origin, -d, surface->axis[0], surface->origin );
+			
+		// now get the camera origin and orientation
+		VectorCopy( e->e.oldorigin, camera->origin );
+		AxisCopy( e->e.axis, camera->axis );
+		VectorSubtract( vec3_origin, camera->axis[0], camera->axis[0] );
+		VectorSubtract( vec3_origin, camera->axis[1], camera->axis[1] );
+
+		// optionally rotate
+		if ( e->e.oldframe ) {
+			// if a speed is specified
+			if ( e->e.frame ) {
+				// continuous rotate
+				d = (tr.refdef.time/1000.0f) * e->e.frame;
+				VectorCopy( camera->axis[1], transformed );
+				RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
+				CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
+			} else {
+				// bobbing rotate, with skinNum being the rotation offset
+				d = sin( tr.refdef.time * 0.003f );
+				d = e->e.skinNum + d * 4;
+				VectorCopy( camera->axis[1], transformed );
+				RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
+				CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
+			}
+		}
+		else if ( e->e.skinNum ) {
+			d = e->e.skinNum;
+			VectorCopy( camera->axis[1], transformed );
+			RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
+			CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
+		}
+		*mirror = qfalse;
+		return qtrue;
+	}
+
+	// if we didn't locate a portal entity, don't render anything.
+	// We don't want to just treat it as a mirror, because without a
+	// portal entity the server won't have communicated a proper entity set
+	// in the snapshot
+
+	// unfortunately, with local movement prediction it is easily possible
+	// to see a surface before the server has communicated the matching
+	// portal surface entity, so we don't want to print anything here...
+
+	//ri.Printf( PRINT_ALL, "Portal surface without a portal entity\n" );
+
+	return qfalse;
+}
+*)
+
+    // This is for GetPortalOrientation
+    //// create plane axis for the portal we are seeing
+    let CreatePlaneAxis (drawSurface: DrawSurface) =
+        PlaneForSurface drawSurface.Surface Plane.Zero
+
 
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
@@ -1061,64 +1197,75 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     ///
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) (orientation: OrientationR) (entities: TrRefEntity list) =
-        // create plane axis for the portal we are seeing
-        let originalPlane = PlaneForSurface drawSurface.Surface <| Plane ()
+    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) =
+        ()
 
-        let plane =
-            match entity with
-            | Some (x) ->
-                // get the orientation of the entity
-                let entityOrientation = RotateForEntity x view orientation
+(*
+static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
+{
+	int			i;
+	cplane_t	originalPlane, plane;
+	trRefEntity_t	*e;
+	float		d;
 
-                // rotate the plane, but keep the non-rotated version for matching
-                // against the portalSurface entities
-                let normal = LocalNormalToWorld originalPlane.Normal entityOrientation
-                let distance = originalPlane.Distance + Vector3.DotProduct normal entityOrientation.Origin
+	// create plane axis for the portal we are seeing
+	R_PlaneForSurface( drawSurf->surface, &originalPlane );
 
-                // translate the original plane
-                let translatedDistance = originalPlane.Distance + Vector3.DotProduct originalPlane.Normal entityOrientation.Origin
+	// rotate the plane if necessary
+	if ( entityNum != ENTITYNUM_WORLD ) 
+	{
+		tr.currentEntityNum = entityNum;
+		tr.currentEntity = &tr.refdef.entities[entityNum];
 
-                Plane (normal, translatedDistance, PlaneType.X)
-            | None -> originalPlane
+		// get the orientation of the entity
+		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
 
-        let surfaceAxisX = plane.Normal
-        let surfaceAxisY = Vector3.Perpendicular surfaceAxisX
-        let surfaceAxisZ = Vector3.CrossProduct surfaceAxisX surfaceAxisY
-        
-        let rec getPortalOrientation isMirror (entities: TrRefEntity list) =
-            match entities with
-            | [] -> (false, false)
-            | x :: xs ->
-                match isMirror with
-                | true -> (true, true)
-                | _ ->
+		// rotate the plane, but keep the non-rotated version for matching
+		// against the portalSurface entities
+		R_LocalNormalToWorld( originalPlane.normal, plane.normal );
+		plane.dist = originalPlane.dist + DotProduct( plane.normal, tr.or.origin );
 
-                match x.Entity.Type = RefEntityType.PortalSurface with
-                | true -> getPortalOrientation isMirror xs
-                | _ ->
+		// translate the original plane
+		originalPlane.dist = originalPlane.dist + DotProduct( originalPlane.normal, tr.or.origin );
+	} 
+	else 
+	{
+		plane = originalPlane;
+	}
 
-                let d = Vector3.DotProduct x.Entity.Origin plane.Normal |> (-) plane.Distance
+	// locate the portal entity closest to this plane.
+	// origin will be the origin of the portal, origin2 will be
+	// the origin of the camera
+	for ( i = 0 ; i < tr.refdef.num_entities ; i++ ) 
+	{
+		e = &tr.refdef.entities[i];
+		if ( e->e.reType != RT_PORTALSURFACE ) {
+			continue;
+		}
 
-                match d > 64.f || d < -64.f with
-                | true -> getPortalOrientation isMirror xs
-                | _ ->
+		d = DotProduct( e->e.origin, originalPlane.normal ) - originalPlane.dist;
+		if ( d > 64 || d < -64) {
+			continue;
+		}
 
-                let pvsOrigin = x.Entity.OldOrigin
+		// if the entity is just a mirror, don't use as a camera point
+		if ( e->e.oldorigin[0] == e->e.origin[0] && 
+			e->e.oldorigin[1] == e->e.origin[1] && 
+			e->e.oldorigin[2] == e->e.origin[2] ) 
+		{
+			return qtrue;
+		}
 
-                match x.Entity.OldOrigin = x.Entity.Origin with
-                | true ->
-                    let surfaceOrigin = plane.Distance * plane.Normal
-                    let cameraOrigin = surfaceOrigin
-                    let cameraAxisX = Vector3.Zero - surfaceAxisX
-                    let cameraAxisY = surfaceAxisY
-                    let cameraAxisZ = surfaceAxisZ
-                    (true, true)
-                | _ ->
+		return qfalse;
+	}
+	return qfalse;
+}
+*)
 
-                (true, true) // TODO:
-
-         
-
-
-        getPortalOrientation false entities
+    /// <summary>
+    /// Based on Q3: IsMirror
+    /// IsMirror
+    /// </summary>
+    // Note: this is internal
+    let IsMirror (drawSurface: DrawSurface) (entity: TrRefEntity) =
+        ()

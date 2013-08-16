@@ -183,6 +183,8 @@ void SetPlaneSignbits (cplane_t *out) {
 }
 *)
 
+    static member inline Zero = Plane (Vector3.Zero, 0.f, PlaneType.X, 0uy)
+
     /// <summary>
     /// Based on Q3: SetPlaneSignBits
     /// CalculateSignBits
@@ -709,10 +711,11 @@ type Surface =
 /// Based on Q3: drawSurf_t
 /// DrawSurface
 /// </summary>
-[<Struct>]
 type DrawSurface =
-    val Sort : uint32       // bit combination for fast compares
-    val Surface : Surface
+    {
+        Sort: uint32;       // bit combination for fast compares
+        Surface : Surface
+    }
 
 /// <summary>
 /// Based on Q3: RDF_NOWORLDMODEL, RDF_HYPERSPACE

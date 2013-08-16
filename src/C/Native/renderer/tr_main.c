@@ -382,7 +382,15 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	vec3_t		transformed;
 
 	// create plane axis for the portal we are seeing
-	R_PlaneForSurface( drawSurf->surface, &originalPlane );
+	{
+		MObject m_original_plane;
+
+		m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CreatePlaneAxis", 1, {
+			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
+		}, m_original_plane)
+
+		originalPlane = *(cplane_t*)m_object_unbox_struct (m_original_plane);
+	}
 
 	// rotate the plane if necessary
 	if ( entityNum != ENTITYNUM_WORLD ) {
@@ -499,7 +507,15 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	float		d;
 
 	// create plane axis for the portal we are seeing
-	R_PlaneForSurface( drawSurf->surface, &originalPlane );
+	{
+		MObject m_original_plane;
+
+		m_invoke_method_easy ("Engine", "Engine", "MainRenderer", "CreatePlaneAxis", 1, {
+			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
+		}, m_original_plane)
+
+		originalPlane = *(cplane_t*)m_object_unbox_struct (m_original_plane);
+	}
 
 	// rotate the plane if necessary
 	if ( entityNum != ENTITYNUM_WORLD ) 
