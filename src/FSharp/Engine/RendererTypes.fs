@@ -782,7 +782,9 @@ type Image =
         InternalFormat : int;
         IsMipmap : bool;
         CanAllowPicmip : bool;
-        //TODO:
+        WrapClampMode: int;     // GL_CLAMP or GL_REPEAT
+        
+        Next: Image; // Is this a good idea?
     }
 
 /// <summary>
@@ -835,40 +837,111 @@ type FogParms =
     }
 
 /// <summary>
+/// Based on Q3: genFunc_t
+/// WaveFormType
+/// </summary>
+type WaveFormType =
+    | None = 0
+    | Sin = 1
+    | Square = 2
+    | Triangle = 3
+    | Sawtooth = 4
+    | InverseSawtooth = 5
+    | Noise = 6
+
+/// <summary>
+/// Based on Q3: waveForm_t
+/// WaveForm
+/// </summary>
+type WaveForm =
+    {
+        Type: WaveFormType;
+        Base: single;
+        Amplitude: single;
+        Phase: single;
+        Frequency: single;
+    }
+
+/// <summary>
+/// Based on Q3: deform_t
+/// DeformType
+/// </summary>
+type DeformType =
+    | None = 0
+    | Wave = 1
+    | Normals = 2
+    | Bulge = 3
+    | Move = 4
+    | ProjectionShadow = 5
+    | Autosprite = 6
+    | Autosprite2 = 7
+    | Text0 = 8
+    | Text1 = 9
+    | Text2 = 10
+    | Text3 = 11
+    | Text4 = 12
+    | Text5 = 13
+    | Text6 = 14
+    | Text7 = 15
+
+/// <summary>
+/// Based on Q3: deformStage_t
+/// DeformStage
+/// </summary>
+type DeformStage =
+    {
+        Type: DeformType;       // vertex coordinate modification type
+        MoveVector: Vector3;
+        Wave: WaveForm;
+        Spread: single;
+        BulgeWidth: single;
+        BulgeHeight: single;
+        BulgeSpeed: single;
+    }
+
+/// <summary>
 /// Based on Q3: shader_t
 /// Shader
 /// </summary>
 type Shader =
     {
-        Name: string;   // game path, including extension
-        LightmapIndex: int;
-        Index: int;
-        SortedIndex: int;
-        Sort: single;
+        Name: string;               // game path, including extension
+        LightmapIndex: int;         // for a shader to match, both name and lightmapIndex must match
+        Index: int;                 // this shader == tr.shaders[index]
+        SortedIndex: int;           // this shader == tr.sortedShaders[sortedIndex]
+        Sort: single;               // lower numbered shaders draw before higher numbered
+
+        // we want to return index 0 if the shader failed to
+        // load for some reason, but R_FindShader should
+        // still keep a name allocated for it, so if
+        // something calls RE_RegisterShader again with
+        // the same name, we don't try looking for it again
         IsDefaultShader: bool;
-        IsExplicitlyDefined: bool;
-        SurfaceFlags: int;
+
+        IsExplicitlyDefined: bool;  // found in a .shader file
+        SurfaceFlags: int;          // if explicitlyDefined, this will have SURF_* flags
         ContentFlags: int;
-        IsEntityMergable: bool;
+        IsEntityMergable: bool;     // merge across entites optimizable (smoke, blood)
         IsSky: bool;
         Sky: SkyParms;
         Fog: FogParms;
-        PortalRange: single;
-        MultitextureEnv: int;
-        CullType: CullType;
-        HasPolygonOffset: bool;
-        HasNoMipMaps: bool;
-        HasNoPicMip: bool;
-        FogType: FogType;
-        NeedsNormal: bool;
+        PortalRange: single;        // distance to fog out at
+        MultitextureEnv: int;       // 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
+        CullType: CullType;         // CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
+        HasPolygonOffset: bool;     // set for decals and other items that must be offset 
+        HasNoMipMaps: bool;         // for console fonts, 2D elements, etc.
+        HasNoPicMip: bool;          // for images that must always be full resolution
+        FogType: FogType;           // draw a blended pass, possibly with depth test equals
+        NeedsNormal: bool;          // not all shaders will need all data to be gathered
         NeedsSt1: bool;
         NeedsSt2: bool;
         NeedsColor: bool;
+        Deforms: DeformStage seq;
         // TODO:
     }
 
 /// <summary>
-/// Based on Q3:
+/// Based on Q3: msurface_t
 /// DShader
 /// </summary>
 type MSurface =
@@ -883,8 +956,8 @@ type MSurface =
 /// </summary>
 type BModel =
     {
-        Bounds: Bounds; // for culling
-        // TODO:
+        Bounds: Bounds;         // for culling
+        Surfaces: MSurface seq;
     }
 
 /// <summary>
@@ -897,6 +970,7 @@ type World =
         BaseName: string;       // ie: tim_dm2
         DataSize: int;
         Shaders: DShader seq;
+        // TODO:
     }
 
 /// <summary>

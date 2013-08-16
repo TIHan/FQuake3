@@ -1187,7 +1187,6 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     let CreatePlaneAxis (drawSurface: DrawSurface) =
         PlaneForSurface drawSurface.Surface Plane.Zero
 
-
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
     /// GetPortalOrientation
