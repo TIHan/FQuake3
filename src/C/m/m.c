@@ -68,6 +68,8 @@ get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *
 	g_sprintf (name, "%s.%s:%s", name_space, class_name, method_name);
 }
 
+// Not sure if we need this. Launch from Xamarin Studio for debugging seems to work.
+#if 0
 void
 m_setup_debugger (MDomain* domain)
 {
@@ -79,6 +81,7 @@ m_setup_debugger (MDomain* domain)
 	mono_debug_domain_create (domain->domain);
 	mono_jit_parse_options(1, (gchar**)options);
 }
+#endif
 
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)

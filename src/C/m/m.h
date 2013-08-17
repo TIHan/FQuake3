@@ -56,8 +56,10 @@ typedef enum {
 	M_RUNTIME_4_5
 } MRuntime;
 
+#if 0
 void
 m_setup_debugger (MDomain* domain);
+#endif
 
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime);
