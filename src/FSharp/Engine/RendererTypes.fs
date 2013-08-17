@@ -764,8 +764,6 @@ type TrRefDef =
 /// <summary>
 /// Based on Q3: image_t
 /// Image
-///
-/// TODO: Not finished. Will hold actual OpenGL values.
 /// </summary>
 type Image =
     {
@@ -784,7 +782,7 @@ type Image =
         CanAllowPicmip : bool;
         WrapClampMode: int;     // GL_CLAMP or GL_REPEAT
         
-        Next: Image; // Is this a good idea?
+        Next: Image option; // Is this a good idea?
     }
 
 /// <summary>
@@ -897,6 +895,63 @@ type DeformStage =
         BulgeWidth: single;
         BulgeHeight: single;
         BulgeSpeed: single;
+    }
+
+/// <summary>
+/// Based on Q3: texCoordGen_t
+/// TextureCoordinateType
+/// </summary>
+type TextureCoordinateType =
+    | Bad = 0
+    | Identity = 1          // clear to 0,0
+    | Lightmap = 2
+    | Texture = 3
+    | EnvironmentMapped = 4
+    | Fog = 5
+    | Vector = 6            // S and T from world coordinates
+
+/// <summary>
+/// TextureCoordinateVectors
+/// </summary>
+[<Struct>]
+type TextureCoordinateVectors =
+    val X : Vector3
+    val Y : Vector3
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (x, y) =
+        {
+            X = x;
+            Y = y;
+        }
+
+/// <summary>
+/// Based on Q3: textureBundle_t
+/// TextureBundle
+/// </summary>
+type TextureBundle =
+    {
+        ImageAnimations: Image seq;
+        ImageAnimationSpeed: single;
+        TextureCoordinateType: TextureCoordinateType;
+        TextureCoordinateVectors: TextureCoordinateVectors;
+        // TODO:
+    }
+
+/// <summary>
+/// Based on Q3: shaderStage_t
+/// ShaderStage
+/// </summary>
+type ShaderStage =
+    {
+        Active: bool;
+
     }
 
 /// <summary>

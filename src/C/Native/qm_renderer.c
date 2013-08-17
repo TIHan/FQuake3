@@ -56,6 +56,12 @@ qm_create_poly_vertex_array (const gint size)
 	return m_array ("Engine", "Engine", "PolyVertex", size);
 }
 
+MArray
+qm_create_tr_ref_entity_array (const gint size)
+{
+	return m_array ("Engine", "Engine", "TrRefEntity", size);
+}
+
 MObject
 qm_map_orientation (const orientation_t *const orientation)
 {
