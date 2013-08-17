@@ -50,6 +50,9 @@ lib/Mono
 # Exclusions
 !lib/
 
+# Xamarin Studio
+*.userprefs
+
 # Quake Specific
 Debug_TA
 Debug TA

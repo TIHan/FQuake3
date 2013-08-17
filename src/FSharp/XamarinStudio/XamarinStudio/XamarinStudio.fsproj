@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A977A781-4282-45DD-BFAB-7BE68CEFD3FA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>XamarinStudio</RootNamespace>
+    <AssemblyName>XamarinStudio</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <BuildOrder>
+      <BuildOrder>
+        <String>..\..\Engine\QMath.fs</String>
+        <String>..\..\Engine\Common.fs</String>
+        <String>..\..\Engine\System.fs</String>
+        <String>..\..\Engine\RendererTypes.fs</String>
+        <String>..\..\Engine\Renderer.fs</String>
+        <String>Program.fs</String>
+      </BuildOrder>
+    </BuildOrder>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <OutputPath>..\..\..\..\build</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\build</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <Tailcalls>true</Tailcalls>
+    <Externalconsole>true</Externalconsole>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\..\lib\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Engine">
+      <HintPath>..\..\..\..\build\Engine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" />
+  <ItemGroup>
+    <Folder Include="Engine\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Engine\Common.fs">
+      <Link>Engine\Common.fs</Link>
+    </None>
+    <None Include="..\..\Engine\QMath.fs">
+      <Link>Engine\QMath.fs</Link>
+    </None>
+    <None Include="..\..\Engine\Renderer.fs">
+      <Link>Engine\Renderer.fs</Link>
+    </None>
+    <None Include="..\..\Engine\RendererTypes.fs">
+      <Link>Engine\RendererTypes.fs</Link>
+    </None>
+    <None Include="..\..\Engine\System.fs">
+      <Link>Engine\System.fs</Link>
+    </None>
+  </ItemGroup>
+</Project>
