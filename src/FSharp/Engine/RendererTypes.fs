@@ -951,7 +951,7 @@ type TextureBundle =
 type ShaderStage =
     {
         Active: bool;
-
+        // TODO:
     }
 
 /// <summary>
