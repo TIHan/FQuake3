@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include <glib/gprintf.h>
 #include <mono/jit/jit.h>
+#include <mono/metadata/mono-debug.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 
@@ -65,6 +66,18 @@ static void
 get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *method_name, gchar *name)
 {
 	g_sprintf (name, "%s.%s:%s", name_space, class_name, method_name);
+}
+
+void
+m_setup_debugger (MDomain* domain)
+{
+	const char* options[] =
+	{
+		 "--debugger-agent=transport=dt_socket,address=127.0.0.1:10000"
+	};
+	mono_debug_init (MONO_DEBUG_FORMAT_MONO);
+	mono_debug_domain_create (domain->domain);
+	mono_jit_parse_options(1, (gchar**)options);
 }
 
 MDomain*

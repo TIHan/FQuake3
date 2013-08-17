@@ -33,6 +33,8 @@ main (int argc, char *argv[])
 	// Initialize Mono Domain
 	domain = m_domain_new (mono_lib, mono_etc, "FQuake3", M_RUNTIME_4_5);
 
+	m_setup_debugger (domain);
+
 	// Load FSharp.Core Assembly
 	m_load_assembly ("FSharp.Core.dll");
 
