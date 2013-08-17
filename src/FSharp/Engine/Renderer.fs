@@ -1185,6 +1185,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 
     // This is for GetPortalOrientation
     //// create plane axis for the portal we are seeing
+    [<Pure>]
     let CreatePlaneAxis (drawSurface: DrawSurface) =
         PlaneForSurface drawSurface.Surface Plane.Zero
 
@@ -1197,8 +1198,30 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     ///
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entity: TrRefEntity option) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (view: ViewParms) =
+    let GetPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
+    (*
+        let originalPlane = CreatePlaneAxis drawSurface
+
+        // rotate the plane if necessary
+        match TrGlobals.CheckIsWorldEntityById entityId tr with
+        | false -> ()
+        | _ ->
+
+        let tr = TrGlobals.UpdateCurrentEntity entityId tr
+
+        // get the orientation of the entity
+        let orientation = RotateForEntity Some tr.currentEntity tr.ViewParms tr.Orientation
+        
+        let tr = { tr with Orientation = orientation }
+
+        // rotate the plane, but keep the non-rotated version for matching
+        // against the portalSurface entities
+        let normal = LocalNormalToWorld originalPlane.Normal tr.Orientation
+        let distance = originalPlane.Distance + Vector3.DotProduct normal tr.Orientation.Origin
+        *)
         ()
+
+
 
 (*
 static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )

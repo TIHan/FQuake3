@@ -750,8 +750,7 @@ type TrRefDef =
 
         FloatTime: single;          // tr.refdef.time / 1000.0
         Text: string[]; // TODO: Remove array.
-        EntityCount: int;
-        Entities: TrRefEntity[]; // // TODO: Remove array. Maybe a list?
+        Entities: TrRefEntity seq;
         DlightCount: int;
         DLights: Dlight[]; // TODO: Remove array. Maybe a list?
         PolyCount: int;
@@ -759,6 +758,16 @@ type TrRefDef =
         DrawSurfaceCount: int;
         DrawSurfaces: DrawSurface[]; // TODO: Remove array. Maybe a list?
     }
+
+    static member inline FindEntityById (entityId: int) (trRefDef: TrRefDef) =
+        let length = Seq.length trRefDef.Entities
+
+        // The entityId is based on the index of the sequence.
+        match entityId >= length with
+        | true -> raise <| IndexOutOfRangeException ()
+        | _ ->  
+        trRefDef.Entities
+        |> Seq.nth entityId
 
 
 /// <summary>
@@ -1308,4 +1317,18 @@ type TrGlobals =
         ShiftedEntityId: int;                   // currentEntityNum << QSORT_ENTITYNUM_SHIFT
         CurrentModel: Model option;
         // TODO:
+
+
+        // May not be in order.
+        RefDef: TrRefDef;
+        ViewParms: ViewParms;
+        Orientation: OrientationR;
     }
+
+    static member inline UpdateCurrentEntityById entityId (tr: TrGlobals) =
+        let entity = TrRefDef.FindEntityById entityId tr.RefDef
+        { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
+
+    static member inline CheckIsWorldEntityById entityId (tr: TrGlobals) =
+        entityId = Constants.EntityIdWorld
+        
