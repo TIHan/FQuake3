@@ -199,6 +199,33 @@ type Vector4 =
         Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
 
 /// <summary>
+/// Matrix4
+/// </summary>
+type Matrix4 =
+    val M00 : single
+    val M01 : single
+    val M10 : single
+    val M11 : single
+
+    member inline this.Item
+            with get (i, j) =
+                    match (i, j) with
+                    | (0, 0) -> this.M00
+                    | (0, 1) -> this.M01
+                    | (1, 0) -> this.M10
+                    | (1, 1) -> this.M11
+                    | _ -> raise <| IndexOutOfRangeException ()
+
+    new (
+            m00, m01,
+            m10, m11
+        ) =
+        {
+            M00 = m00; M01 = m01;
+            M10 = m10; M11 = m11;
+        }
+
+/// <summary>
 /// Matrix16
 /// </summary>        
 [<Struct>]

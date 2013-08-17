@@ -251,20 +251,20 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 /// </summary>
 [<Struct>]
 type Bounds =
-    val Alpha : Vector3
-    val Omega : Vector3     
+    val Bound0 : Vector3
+    val Bound1 : Vector3     
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Alpha
-            | 1 -> this.Omega
+            | 0 -> this.Bound0
+            | 1 -> this.Bound1
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (alpha, omega) =
+    new (bound0, bound1) =
         {
-            Alpha = alpha;
-            Omega = omega;
+            Bound0 = bound0;
+            Bound1 = bound1;
         }
 
 /// <summary>
@@ -815,13 +815,38 @@ type FogType =
     | Le = 2    // surface is trnaslucent, but still needs a fog pass (fog surface)
 
 /// <summary>
+/// Skybox
+/// </summary>
+type Skybox =
+    {
+        Image0: Image;
+        Image1: Image;
+        Image2: Image;
+        Image3: Image;
+        Image4: Image;
+        Image5: Image;
+    }
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Image0
+            | 1 -> this.Image1
+            | 2 -> this.Image2
+            | 3 -> this.Image3
+            | 4 -> this.Image4
+            | 5 -> this.Image5
+            | _ -> raise <| IndexOutOfRangeException ()
+
+/// <summary>
 /// Based on Q3: skyParms_t
 /// SkyParms
 /// </summary>
 type SkyParms =
     {
         CloudHeight: single;
-        // TODO:
+        Outerbox: Skybox option;
+        Innerbox: Skybox option;
     }
 
 /// <summary>
@@ -932,6 +957,48 @@ type TextureCoordinateVectors =
         }
 
 /// <summary>
+/// Based on Q3: texMod_t
+/// TextureModification
+/// </summary>
+type TextureModificationType =
+    | None = 0
+    | Transform = 1
+    | Turbulent = 2
+    | Scroll = 3
+    | Scale = 4
+    | Stretch = 5
+    | Rotate = 7
+    | EntityTranslate = 7
+
+/// <summary>
+/// Based on Q3: texModInfo_t
+/// TextureModification
+/// </summary>
+type TextureModification =
+    {
+        Type: TextureModificationType;
+
+        // used for TMOD_TURBULENT and TMOD_STRETCH
+        Wave: WaveForm;
+
+        // used for TMOD_TRANSFORM
+        Matrix: Matrix4;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
+        Translate: Vector2;     // t' = s * m[0][1] + t * m[0][1] + trans[1]
+
+        // used for TMOD_SCALE
+        Scale: Vector2;         // s *= scale[0]
+                                // t *= scale[1]
+
+        // used for TMOD_SCROLL
+        Scroll: Vector2;        // s' = s + scroll[0] * time
+                                // t' = t + scroll[1] * time
+
+        // + = clockwise
+        // - = counterclockwise
+        RotateSpeed: single;
+    }
+
+/// <summary>
 /// Based on Q3: textureBundle_t
 /// TextureBundle
 /// </summary>
@@ -941,8 +1008,56 @@ type TextureBundle =
         ImageAnimationSpeed: single;
         TextureCoordinateType: TextureCoordinateType;
         TextureCoordinateVectors: TextureCoordinateVectors;
-        // TODO:
+        TextureModifications: TextureModification seq;
+        VideMapHandle: int;
+        IsLightmap: bool;
+        IsVertexLightmap: bool;
+        IsVideoMap: bool;
     }
+
+/// <summary>
+/// Based on Q3: colorGen_t
+/// ShaderColorType
+/// </summary>
+type ShaderColorType =
+    | Bad = 0
+    | IdentityLighting = 1  // tr.identityLight
+    | Identity = 2          // always (1,1,1,1)
+    | Entity = 3            // grabbed from entity's modulate field
+    | OneMinusEntity = 4    // grabbed from 1 - entity.modulate
+    | ExactVertex = 5       // tess.vertexColors
+    | Vertex = 6            // tess.vertexColors * tr.identityLight
+    | OneMinuxVertex = 7
+    | Waveform = 8          // programmatically generated
+    | LightingDiffuse = 9
+    | Fog = 10              // standard fog
+    | Const = 11            // fixed color
+
+/// <summary>
+/// Based on Q3: alphaGen_t
+/// ShaderAlphaType
+/// </summary>
+type ShaderAlphaType =
+    | Identity = 0
+    | Skip = 1
+    | Entity = 2
+    | OneMinusEntity = 3
+    | Vertex = 4
+    | OneMinusVertex = 5
+    | LightingSpecular = 6
+    | Waveform = 7
+    | Portal = 8
+    | Const = 9
+
+/// <summary>
+/// Based on Q3: acff_t (acff stands for adjustColorForFog .. lol)
+/// FogColorType
+/// </summary>
+type FogColorType =
+    | None = 0
+    | Rgb = 1
+    | Rgba = 2
+    | Alpha = 3
 
 /// <summary>
 /// Based on Q3: shaderStage_t
@@ -951,7 +1066,16 @@ type TextureBundle =
 type ShaderStage =
     {
         Active: bool;
-        // TODO:
+        TextureBundle1: TextureBundle;
+        TextureBundle2: TextureBundle;
+        RgbWave: WaveForm;
+        RgbColorType: ShaderColorType;
+        AlphaWave: WaveForm;
+        AlphaType: ShaderAlphaType;
+        ConstantColor: Rgba;            // for CGEN_CONST and AGEN_CONST
+        StateBits: int;                 // GLS_xxxx mask
+        FogColorType: FogColorType;
+        IsDetail: bool;
     }
 
 /// <summary>
@@ -992,7 +1116,20 @@ type Shader =
         NeedsSt2: bool;
         NeedsColor: bool;
         Deforms: DeformStage seq;
-        // TODO:
+        Stages: ShaderStage seq;
+        // void (*optimimalStageIteratorFunc)( void ); <-- TODO: Need to figure what to do with this guy.
+        ClampTime: single;              // time this shader is clamped to
+        TimeOffset: single;             // current time offset for this shader
+
+        // Is StateId a better name vs. numStates?
+        StateId: int;                   // if non-zero this is a state shader
+        CurrentShader: Shader option;   // current state if this is a state shader
+        ParentShader: Shader option;    // current state if this is a state shader
+        CurrentState: int;              // current state index for cycle purposes
+        ExpireTime: int64;              // time in milliseconds this expires
+        RemappedShader: Shader option;  // current shader this one is remapped too
+        ShaderStates: int seq;          // index to valid shader states
+        Next: Shader option;
     }
 
 /// <summary>
@@ -1001,8 +1138,10 @@ type Shader =
 /// </summary>
 type MSurface =
     {
-        ViewCount: int;
-        // TODO:
+        ViewCount: int;         // if == tr.viewCount, already added
+        Shader: Shader option;
+        FogIndex: int;
+        Data: Surface option;   // any of srf*_t
     }
 
 /// <summary>
@@ -1016,6 +1155,71 @@ type BModel =
     }
 
 /// <summary>
+/// Based on Q3: mnode_t
+/// MNode
+/// </summary>
+type MNode =
+    {
+        // common with leaf and node
+        Contents: int;          // -1 for nodes, to differentiate from leafs
+        VisFrame: int;          // node needs to be traversed if current
+
+        // for bounding box culling
+        Mins: Vector3;
+        Maxs: Vector3;
+        Parent: MNode option;
+
+        // node specific
+        Plane: Plane option;
+        Child1: MNode option;
+        Child2: MNode option;
+
+        // leaf specific
+        Cluster: int;
+        Area: int;
+
+        MarkSurfaces: MSurface seq;
+    }
+
+/// <summary>
+/// Based on Q3: fog_t
+/// Fog
+/// </summary>
+type Fog =
+    {
+        OriginalBrushId: int;
+        Bounds: Bounds;
+        Color: Rgba;                    // in packed byte format
+        TextureCoordinateScale: single; // texture coordinate vector scales
+        Parms: FogParms;
+
+        // for clipping distance in fog when outside
+        HasSurface: bool;
+        Surface: Vector4;
+    }
+
+[<Struct>]
+type LightGridBounds =
+    val Bound0 : int
+    val Bound1 : int
+    val Bound2 : int
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Bound0
+            | 1 -> this.Bound1
+            | 2 -> this.Bound2
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    new (bound0, bound1, bound2) =
+        {
+            Bound0 = bound0;
+            Bound1 = bound1;
+            Bound2 = bound2;
+        }
+
+/// <summary>
 /// Based on Q3: world_t
 /// World
 /// </summary>
@@ -1025,6 +1229,35 @@ type World =
         BaseName: string;       // ie: tim_dm2
         DataSize: int;
         Shaders: DShader seq;
+        BModels: BModel seq;
+        Planes: Plane seq;
+        Nodes: MNode seq;
+        Surfaces: MSurface seq;
+        MarkSurfaces: MSurface seq;
+        Fogs: Fog seq;
+        LightGridOrigin: Vector3;
+        LightGridSize: Vector3;
+        LightGridInverseSize: Vector3;
+        LightGridBounds: LightGridBounds;
+        LightGridData: byte option; // FIXME: this right? byte *lightGridData
+        ClusterCount: int;
+        ClusterByteCount: int;
+
+        // FIXME: I dont think this is right, looks like it may be just data. We'll see.
+        Vis: byte option;           // may be passed in by CM_LoadMap to save space
+        NoVis: byte option;         // clusterBytes of 0xff
+
+        EntityString: string;
+        EntityParsePoint: string;
+    }
+
+/// <summary>
+/// Based on Q3: model_t
+/// Model
+/// </summary>
+type Model =
+    {
+        Name: string;
         // TODO:
     }
 
@@ -1048,7 +1281,31 @@ type TrGlobals =
         SmpFrame : int;                 // toggles from 0 to 1 every endFrame
         FrameSceneId : int;             // zeroed at RE_BeginFrame
         HasWorldMapLoaded : bool;
-        //world_t *world;
-        //const byte externalVisData - NOT SET/USED // from RE_SetWorldVisData, shared with CM_Load
-        //TODO:
+        World: World;
+
+        // FIXME: This is data. We need a immutable array type structure. A list may be ok, not sure.
+        ExternalVisData: byte option;   // from RE_SetWorldVisData, shared with CM_Load
+        
+        DefaultImage: Image option;
+        ScratchImages: Image seq;
+        FogImage: Image option;
+        DlightImage: Image option;              // inverse-quare highlight for projective adding
+        FlareImage: Image option;
+        WhiteImage: Image option;               // full of 0xff
+        IentityLightImage: Image option;        // full of tr.identityLightByte
+
+        DefaultShader: Shader option;
+        ShadowShader: Shader option;
+        ProjectionShadowShader: Shader option;
+        FlareShader: Shader option;
+        SunShader: Shader option;
+
+        Lightmaps: Image seq;
+
+        CurrentEntity: TrRefEntity option;
+        WorldEntity: TrRefEntity;               // point currentEntity at this when rendering world
+        CurrentEntityId: int;
+        ShiftedEntityId: int;                   // currentEntityNum << QSORT_ENTITYNUM_SHIFT
+        CurrentModel: Model option;
+        // TODO:
     }
