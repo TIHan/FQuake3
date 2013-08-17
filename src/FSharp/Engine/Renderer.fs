@@ -1199,27 +1199,35 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     /// Returns true if it should be mirrored
     /// </summary>
     let GetPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
-    (*
+        // create plane axis for the portal we are seeing
         let originalPlane = CreatePlaneAxis drawSurface
 
         // rotate the plane if necessary
-        match TrGlobals.CheckIsWorldEntityById entityId tr with
-        | false -> ()
+        match entityId <> Constants.EntityIdWorld with
+        | false -> (originalPlane, originalPlane, tr)
         | _ ->
 
-        let tr = TrGlobals.UpdateCurrentEntity entityId tr
+        let tr = TrGlobals.UpdateCurrentEntityById entityId tr
+        match tr.CurrentEntity with
+        | None -> raise <| Exception "Current entity does not exist."
+        | Some (entity) ->
 
         // get the orientation of the entity
-        let orientation = RotateForEntity Some tr.currentEntity tr.ViewParms tr.Orientation
-        
-        let tr = { tr with Orientation = orientation }
+        let orientation = RotateForEntity entity tr.ViewParms tr.Orientation
 
         // rotate the plane, but keep the non-rotated version for matching
         // against the portalSurface entities
-        let normal = LocalNormalToWorld originalPlane.Normal tr.Orientation
-        let distance = originalPlane.Distance + Vector3.DotProduct normal tr.Orientation.Origin
-        *)
-        ()
+        let normal = LocalNormalToWorld originalPlane.Normal orientation
+        let distance = originalPlane.Distance + Vector3.DotProduct normal orientation.Origin
+
+        // translate the original plane
+        let originalDistance = originalPlane.Distance + Vector3.DotProduct originalPlane.Normal orientation.Origin
+
+        (
+            Plane.UpdateDistance originalDistance originalPlane,
+            Plane (normal, distance, PlaneType.X, 0uy),
+            { tr with Orientation = orientation }
+        )
 
 
 

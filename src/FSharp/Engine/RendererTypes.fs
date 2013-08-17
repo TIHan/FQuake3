@@ -198,6 +198,8 @@ void SetPlaneSignbits (cplane_t *out) {
 
         calculatePlaneSignBits 0uy 0
 
+    static member inline UpdateDistance distance (plane: Plane) =
+        Plane (plane.Normal, distance, plane.Type, plane.SignBits);
 (*
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
 	vec3_t	d1, d2;
@@ -1328,7 +1330,4 @@ type TrGlobals =
     static member inline UpdateCurrentEntityById entityId (tr: TrGlobals) =
         let entity = TrRefDef.FindEntityById entityId tr.RefDef
         { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
-
-    static member inline CheckIsWorldEntityById entityId (tr: TrGlobals) =
-        entityId = Constants.EntityIdWorld
         
