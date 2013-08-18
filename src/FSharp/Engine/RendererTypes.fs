@@ -751,14 +751,11 @@ type TrRefDef =
         HasAreaMaskModified: bool;  // qtrue if areamask changed since last scene
 
         FloatTime: single;          // tr.refdef.time / 1000.0
-        Text: string[]; // TODO: Remove array.
+        Text: string seq;
         Entities: TrRefEntity seq;
-        DlightCount: int;
-        DLights: Dlight[]; // TODO: Remove array. Maybe a list?
-        PolyCount: int;
-        Polys:  SurfacePoly[]; // TODO: Remove array. Maybe a list?
-        DrawSurfaceCount: int;
-        DrawSurfaces: DrawSurface[]; // TODO: Remove array. Maybe a list?
+        Dlights: Dlight seq;
+        Polys:  SurfacePoly seq;
+        DrawSurfaces: DrawSurface seq;
     }
 
     static member inline FindEntityById (entityId: int) (trRefDef: TrRefDef) =
@@ -1263,13 +1260,68 @@ type World =
     }
 
 /// <summary>
+/// Based on Q3: md3Header_t
+/// Md3Header
+/// </summary>
+[<Struct>]
+type Md3Header =
+    val Id : int
+    val Version : int
+    val Name : string       // model name
+    val Flags : int
+    val FrameCount : int
+    val TagCount : int
+    val SurfaceCount : int
+    val SkinCount : int
+    val FrameOffset : int   // first surface
+    val TagOffset : int     // numFrames * numTags
+    val SurfaceOffset : int // first surface, others follow
+    val EndOffset : int     // end of file
+
+/// <summary>
+/// Based on Q3: md4Header_t
+/// M43Header
+/// </summary>
+[<Struct>]
+type Md4Header =
+    val Id : int
+    val Version : int
+    val Name : string           // model name
+
+    // frames and bones are shared by all levels of detail
+    val FrameCount : int
+    val BoneCount : int
+    val BoneNameOffset : int    // char name[ MAX_QPATH ]   
+    val FrameOffset : int       // md4Frame_t[numFrames]
+
+    // each level of detail has completely separate sets of surfaces
+    val LodCount : int
+    val LodOffset : int
+    val EndOffset : int         // end of file
+
+/// <summary>
+/// Based on Q3: modtype_t
+/// ModelType
+/// </summary>
+type ModelType =
+    | Bad = 0
+    | Brush = 1
+    | Mesh = 2
+    | Md4 = 3
+
+/// <summary>
 /// Based on Q3: model_t
 /// Model
 /// </summary>
 type Model =
     {
         Name: string;
-        // TODO:
+        Type: ModelType;
+        Index: int;
+        DataSize: int;
+        BModel: BModel option;
+        Md3: Md3Header;
+
     }
 
 /// <summary>

@@ -13,6 +13,8 @@
     <Name>Engine</Name>
     <TargetFrameworkProfile />
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,7 +39,27 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>..\..\..\build\Engine.XML</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(TargetDir)..\lib\Mono\bin\mono.exe" "$(TargetDir)..\lib\Mono\lib\mono\4.5\pdb2mdb.exe" "$(TargetDir)$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="QMath.fs" />
+    <Compile Include="RendererTypes.fs" />
+    <Compile Include="Renderer.fs" />
+    <Compile Include="System.fs" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="FSharpx.Core">
+      <HintPath>..\..\..\packages\FSharpx.Core.1.8.36\lib\40\FSharpx.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -46,20 +68,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Common.fs" />
-    <Compile Include="QMath.fs" />
-    <Compile Include="RendererTypes.fs" />
-    <Compile Include="Renderer.fs" />
-    <Compile Include="System.fs" />
-  </ItemGroup>
-  <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
-  <PropertyGroup>
-    <PostBuildEvent>"$(TargetDir)..\lib\Mono\bin\mono.exe" "$(TargetDir)..\lib\Mono\lib\mono\4.5\pdb2mdb.exe" "$(TargetDir)$(TargetFileName)"</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

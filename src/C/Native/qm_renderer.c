@@ -397,3 +397,9 @@ qm_map_draw_surf (drawSurf_t* draw_surf)
 
 	return m_object ("Engine", "Engine", "DrawSurface", 2, args);
 }
+
+MObject
+qm_map_tr_globals (trGlobals_t* tr_globals)
+{
+
+}
