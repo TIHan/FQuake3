@@ -60,29 +60,24 @@ module NativeTypes =
     [<StructLayout (LayoutKind.Sequential)>]
     type drawVert_t =
         val mutable xyz : NativeQMath.vec3_t
-
-        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
         val mutable st : single
-
-        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable st1 : single
         val mutable lightmap : single
-
+        val mutable lightmap1 : single
         val mutable normal : NativeQMath.vec3_t
-
-        [<MarshalAs (UnmanagedType.Struct, SizeConst = 4)>]
         val mutable color : byte
+        val mutable color1 : byte
+        val mutable color2 : byte
+        val mutable coloe3 : byte
         
     [<Struct>]
     [<StructLayout (LayoutKind.Sequential)>]
     type srfTriangles_t =
         val mutable surfaceType : surfaceType_t
-
-        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
         val mutable dlightBits : int
-
-        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable dlightBits1 : int
         val mutable bounds : NativeQMath.vec3_t
-
+        val mutable bounds1 : NativeQMath.vec3_t
         val mutable localOrigin : NativeQMath.vec3_t
         val mutable radius : single
         val mutable numIndexes : int
@@ -142,6 +137,7 @@ type Axis =
 /// Rgba
 /// </summary>
 [<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
     val R : byte
     val G : byte
@@ -305,6 +301,7 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 /// Bounds
 /// </summary>
 [<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Bounds =
     val Bound0 : Vector3
     val Bound1 : Vector3     
@@ -525,12 +522,12 @@ type DrawVertex =
 
     static member ofNative (native: NativeTypes.drawVert_t) =
         DrawVertex (
-            Vector3.ofNative native.xyz,
+            NativePtr.toStructure &&native.xyz,
             NativePtr.get &&native.st 0,
             NativePtr.get &&native.st 1,
             NativePtr.get &&native.lightmap 0,
             NativePtr.get &&native.lightmap 1,
-            Vector3.ofNative native.normal,
+            NativePtr.toStructure &&native.normal,
             NativePtr.toStructure &&native.color
         )
 
@@ -754,17 +751,6 @@ type SurfaceTriangles =
             Vertices = vertices;
         }
 
-    static member ofNative (native: NativeTypes.srfTriangles_t) =
-        SurfaceTriangles (
-            NativePtr.get &&native.dlightBits 0,
-            NativePtr.get &&native.dlightBits 1,
-            NativePtr.toStructure &&native.bounds,
-            Vector3.ofNative (native.localOrigin),
-            native.radius,
-            List.ofNativePtrArray native.numIndexes native.indexes,
-            List.ofNativePtrObjArray native.numVerts native.verts
-        )
-
 /// <summary>
 /// Based on Q3: surfaceType_t
 /// Surface
@@ -783,6 +769,18 @@ type Surface =
     | Flare of SurfaceFlare
     | Entity                            // beams, rails, lightning, etc that can be determined by entity
     | DisplayList of SurfaceDisplayList
+
+    static member ofNativeTriangles (native: NativeTypes.srfTriangles_t) =
+        SurfaceTriangles (
+            NativePtr.get &&native.dlightBits 0,
+            NativePtr.get &&native.dlightBits 1,
+            NativePtr.toStructure &&native.bounds,
+            NativePtr.toStructure &&native.localOrigin,
+            native.radius,
+            List.ofNativePtrArray native.numIndexes native.indexes,
+            List.ofNativePtrObjArray native.numVerts native.verts
+        )
+        |> Triangles
 
 /// <summary>
 /// Based on Q3: drawSurf_t

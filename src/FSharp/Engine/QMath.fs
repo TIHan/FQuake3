@@ -33,9 +33,11 @@ module NativeQMath =
     /// single[3]
     /// </summary>
     [<Struct>]
-    [<StructLayout (LayoutKind.Sequential, Size = 12)>]
+    [<StructLayout (LayoutKind.Sequential)>]
     type vec3_t =
-        val mutable Value : single
+        val mutable value : single
+        val mutable value1 : single
+        val mutable value2 : single
 
 module QMath =
     let PI = single Math.PI
@@ -56,6 +58,7 @@ type Vector2 =
 /// Vector3
 /// </summary>        
 [<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =    
     val X : single
     val Y : single
@@ -159,12 +162,6 @@ type Vector3 =
 
         let uvNormal = Vector3.Normalize uv
         Vector3.CrossProduct v uvNormal
-
-    static member ofNative (native: NativeQMath.vec3_t) =
-        let mutable v = Vector3.Zero
-        let ptr = &&native.Value |> NativePtr.toNativeInt
-        Marshal.PtrToStructure (ptr, v)
-        v
 
 /// <summary>
 /// Vector4

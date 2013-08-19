@@ -210,30 +210,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		break;
 	case SF_TRIANGLES:
 		{
-		srfTriangles_t* surface = (srfTriangles_t*)surfaceType;
+		gpointer args[1];
 
-		MArray m_indices = m_array_int32 (surface->numIndexes);
-		MArray m_vertices = qm_create_draw_vertex_array (surface->numVerts);
-		MObject m_type;
-
-		gpointer args[7];
-
-		m_array_map (m_indices, surface->numIndexes, gint, surface->indexes);
-		m_array_map (m_vertices, surface->numVerts, drawVert_t, surface->verts);
-
-		args [0] = &surface->dlightBits [0];
-		args [1] = &surface->dlightBits [1];
-		args [2] = (vector3_t*)surface->bounds;
-		args [3] = (vector3_t*)surface->localOrigin;
-		args [4] = &surface->radius;
-		args [5] = m_array_as_arg (m_indices);
-		args [6] = m_array_as_arg (m_vertices);
-
-		m_type = m_object ("Engine", "Engine", "SurfaceTriangles", 7, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewTriangles", args);
+		args [0] =  (srfTriangles_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeTriangles", args);
 		}
 		break;
 	case SF_POLY:

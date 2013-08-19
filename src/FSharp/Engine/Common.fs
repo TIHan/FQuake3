@@ -32,9 +32,7 @@ open Microsoft.FSharp.NativeInterop
 
 module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (native: nativeptr<'U>) =
-        let mutable s = Unchecked.defaultof<'T>
-        Marshal.PtrToStructure (NativePtr.toNativeInt native, s)
-        s
+        Marshal.PtrToStructure (NativePtr.toNativeInt native, typeof<'T>) :?> 'T
 
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (native: nativeptr<'T>) =
