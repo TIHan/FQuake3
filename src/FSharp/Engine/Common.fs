@@ -30,6 +30,23 @@ open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 
+module NativePtr =
+    let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (native: nativeptr<'U>) =
+        let mutable s = Unchecked.defaultof<'T>
+        Marshal.PtrToStructure (NativePtr.toNativeInt native, s)
+        s
+
+module List =
+    let inline ofNativePtrArray<'T when 'T : unmanaged> size (native: nativeptr<'T>) =
+        List.init size (fun i ->
+            NativePtr.get native i
+        )
+
+    let inline ofNativePtrObjArray<'T,'U when 'T : (static member ofNative : 'U -> 'T) and 'U : unmanaged> size (native: nativeptr<'U>) =
+        List.init size (fun i ->
+            (^T : (static member ofNative : 'U -> 'T) (NativePtr.get native i))
+        )
+
 module Constants =
     [<Literal>]
     let GEntityIdBits = 10

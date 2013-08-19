@@ -28,6 +28,15 @@ open System
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
+module NativeQMath =
+    /// <summary>
+    /// single[3]
+    /// </summary>
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential, Size = 12)>]
+    type vec3_t =
+        val mutable Value : single
+
 module QMath =
     let PI = single Math.PI
     let E = single Math.E
@@ -150,6 +159,12 @@ type Vector3 =
 
         let uvNormal = Vector3.Normalize uv
         Vector3.CrossProduct v uvNormal
+
+    static member ofNative (native: NativeQMath.vec3_t) =
+        let mutable v = Vector3.Zero
+        let ptr = &&native.Value |> NativePtr.toNativeInt
+        Marshal.PtrToStructure (ptr, v)
+        v
 
 /// <summary>
 /// Vector4

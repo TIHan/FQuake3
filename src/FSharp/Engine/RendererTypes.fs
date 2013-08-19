@@ -36,7 +36,60 @@ open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
+open FSharpx.Collections
 open Engine.QMath
+
+module NativeTypes =
+    
+    type surfaceType_t =
+        | SF_BAD = 0
+        | SF_SKIP = 1
+        | SF_FACE = 2
+        | SF_GRID = 3
+        | SF_TRIANGLES = 3
+        | SF_POLY = 4
+        | SF_MD3 = 5
+        | SF_MD4 = 6
+        | SF_FLARE = 7
+        | SF_ENTITY = 8
+        | SF_DISPLAY_LIST = 9
+        | SF_NUM_SURFACE_TYPES = 10
+        | SF_MAX = 0x7fffffff
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type drawVert_t =
+        val mutable xyz : NativeQMath.vec3_t
+
+        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable st : single
+
+        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable lightmap : single
+
+        val mutable normal : NativeQMath.vec3_t
+
+        [<MarshalAs (UnmanagedType.Struct, SizeConst = 4)>]
+        val mutable color : byte
+        
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfTriangles_t =
+        val mutable surfaceType : surfaceType_t
+
+        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable dlightBits : int
+
+        [<MarshalAs (UnmanagedType.Struct, SizeConst = 2)>]
+        val mutable bounds : NativeQMath.vec3_t
+
+        val mutable localOrigin : NativeQMath.vec3_t
+        val mutable radius : single
+        val mutable numIndexes : int
+        val mutable indexes : nativeptr<int>
+        val mutable numVerts : int
+        val mutable verts : nativeptr<drawVert_t>
+
 
 /// <summary>
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
@@ -470,6 +523,17 @@ type DrawVertex =
             Color = color;
         }
 
+    static member ofNative (native: NativeTypes.drawVert_t) =
+        DrawVertex (
+            Vector3.ofNative native.xyz,
+            NativePtr.get &&native.st 0,
+            NativePtr.get &&native.st 1,
+            NativePtr.get &&native.lightmap 0,
+            NativePtr.get &&native.lightmap 1,
+            Vector3.ofNative native.normal,
+            NativePtr.toStructure &&native.color
+        )
+
 /// <summary>
 /// Based on Q3: polyVert_t
 /// PolyVertex
@@ -676,8 +740,8 @@ type SurfaceTriangles =
     val Radius : single
 
     // triangle definitions
-    val Indices : int[] // TODO: Change to list
-    val Vertices : DrawVertex[] // TODO: Change to list
+    val Indices : int list
+    val Vertices : DrawVertex list
 
     new (dlightBit1, dlightBit2, bounds, localOrigin, radius, indices, vertices) =
         {
@@ -689,6 +753,17 @@ type SurfaceTriangles =
             Indices = indices;
             Vertices = vertices;
         }
+
+    static member ofNative (native: NativeTypes.srfTriangles_t) =
+        SurfaceTriangles (
+            NativePtr.get &&native.dlightBits 0,
+            NativePtr.get &&native.dlightBits 1,
+            NativePtr.toStructure &&native.bounds,
+            Vector3.ofNative (native.localOrigin),
+            native.radius,
+            List.ofNativePtrArray native.numIndexes native.indexes,
+            List.ofNativePtrObjArray native.numVerts native.verts
+        )
 
 /// <summary>
 /// Based on Q3: surfaceType_t
