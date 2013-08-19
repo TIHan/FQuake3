@@ -187,25 +187,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 	{
 	case SF_FACE:
 		{
-		srfSurfaceFace_t* surface = (srfSurfaceFace_t*)surfaceType;
+		gpointer args[1];
 
-		MObject m_type;
-
-		gpointer args[7];
-
-		args [0] = m_object_as_arg (qm_map_plane (&surface->plane));
-		args [1] = &surface->dlightBits [0];
-		args [2] = &surface->dlightBits [1];
-		args [3] = &surface->numPoints;
-		args [4] = &surface->numIndices;
-		args [5] = &surface->ofsIndices;
-		args [6] = &surface->points [0];
-		
-		m_type = m_object ("Engine", "Engine", "SurfaceFace", 7, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewFace", args);
+		args [0] = (srfSurfaceFace_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFace", args);
 		}
 		break;
 	case SF_TRIANGLES:

@@ -40,6 +40,18 @@ open FSharpx.Collections
 open Engine.QMath
 
 module NativeTypes =
+
+    type qhandle_t = int
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type cplane_t =
+        val mutable normal : NativeQMath.vec3_t
+        val mutable dist : single
+        val mutable type_ : byte
+        val mutable signbits : byte
+        val mutable pad : byte
+        val mutable pad1 : byte
     
     type surfaceType_t =
         | SF_BAD = 0
@@ -68,7 +80,87 @@ module NativeTypes =
         val mutable color : byte
         val mutable color1 : byte
         val mutable color2 : byte
-        val mutable coloe3 : byte
+        val mutable color3 : byte
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type polyVert_t =
+        val mutable xyz : NativeQMath.vec3_t
+        val mutable st : single
+        val mutable st1 : single
+        val mutable modulate : byte
+        val mutable modulate1 : byte
+        val mutable modulate2 : byte
+        val mutable modulate3 : byte
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type poly_t =
+        val mutable hShader : qhandle_t
+        val mutable numVerts : int
+        val mutable verts : nativeptr<polyVert_t>
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfPoly_t =
+        val mutable surfaceType : surfaceType_t
+        val mutable hShader : qhandle_t
+        val mutable fogIndex : int
+        val mutable numVerts : int
+        val mutable verts : nativeptr<polyVert_t>
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfDisplayList_t =
+        val mutable surfaceType : surfaceType_t
+        val mutable listNum : int
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfGridMesh_t =
+        val mutable surfaceType : surfaceType_t
+        val mutable dlightBits : int
+        val mutable dlightBits1 : int
+        val mutable meshBounds : NativeQMath.vec3_t
+        val mutable meshBounds1 : NativeQMath.vec3_t
+        val mutable localOrigin : NativeQMath.vec3_t
+        val mutable meshRadius : single
+        val mutable lodOrigin : NativeQMath.vec3_t
+        val mutable lodRadius : NativeQMath.vec3_t
+        val mutable lodFixed : NativeQMath.vec3_t
+        val mutable lodStitched : NativeQMath.vec3_t
+        val mutable width : int
+        val mutable height : int
+        val mutable widthLodError : nativeptr<single>
+        val mutable heightLodError : nativeptr<single>
+        val mutable verts : drawVert_t
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfFlare_t =
+        val mutable surfaceType : surfaceType_t
+        val mutable origin : NativeQMath.vec3_t
+        val mutable normal : NativeQMath.vec3_t
+        val mutable color : NativeQMath.vec3_t
+
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type srfSurfaceFace_t =
+        val mutable surfaceType : surfaceType_t
+        val mutable plane : cplane_t
+        val mutable dlightBits : int
+        val mutable dlightBits1 : int
+        val mutable numPoints : int
+        val mutable numIndices : int
+        val mutable ofsIndices : int
+        val mutable points : single
+        val mutable points1 : single
+        val mutable points2 : single
+        val mutable points3 : single
+        val mutable points4 : single
+        val mutable points5 : single
+        val mutable points6 : single
+        val mutable points7 : single
         
     [<Struct>]
     [<StructLayout (LayoutKind.Sequential)>]
@@ -296,6 +388,14 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
             Type = typ;
             SignBits = Plane.CalculateSignBits normal;
         }
+
+    static member ofNative (native: NativeTypes.cplane_t) =
+        Plane (
+            NativePtr.toStructure &&native.normal,
+            native.dist,
+            NativePtr.toStructure &&native.type_,
+            native.signbits
+        )
 
 /// <summary>
 /// Bounds
@@ -769,6 +869,18 @@ type Surface =
     | Flare of SurfaceFlare
     | Entity                            // beams, rails, lightning, etc that can be determined by entity
     | DisplayList of SurfaceDisplayList
+
+    static member ofNativeFace (native: NativeTypes.srfSurfaceFace_t) =
+        SurfaceFace (
+            Plane.ofNative native.plane,
+            native.dlightBits,
+            native.dlightBits1,
+            native.numPoints,
+            native.numIndices,
+            native.ofsIndices,
+            NativePtr.toStructure &&native.points
+        )
+        |> Face
 
     static member ofNativeTriangles (native: NativeTypes.srfTriangles_t) =
         SurfaceTriangles (
