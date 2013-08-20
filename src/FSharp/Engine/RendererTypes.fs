@@ -1392,6 +1392,10 @@ Interop Types
 =======================================================================================================================
 *)
 
+type qboolean =
+    | qfalse = 0
+    | qtrue = 1
+
 type qhandle_t = int
 
 [<Struct>]
@@ -1443,8 +1447,8 @@ type viewParms_t =
     val mutable or' : orientationr_t
     val mutable world : orientationr_t
     val mutable pvsOrigin : vec3_t
-    val mutable isPortal : bool
-    val mutable isMirror : bool
+    val mutable isPortal : int
+    val mutable isMirror : int
     val mutable frameSceneNum : int
     val mutable frameCount : int
     val mutable portalPlane : cplane_t
@@ -1476,7 +1480,7 @@ type viewParms_t =
     val private frustum3 : cplane_t
     val mutable visBounds : vec3_t
     val private visBounds1 : vec3_t
-    val zFar : single
+    val mutable zFar : single
     
 type surfaceType_t =
     | SF_BAD = 0
@@ -1603,14 +1607,14 @@ type srfTriangles_t =
     val mutable verts : nativeptr<drawVert_t>
 
 type Orientation with
-    static member ofNative (native: orientation_t) =
+    static member inline ofNative (native: orientation_t) =
         Orientation (
             NativePtr.toStructure &&native.origin,
             NativePtr.toStructure &&native.axis
         )
 
 type OrientationR with
-    static member ofNative (native: orientationr_t) =
+    static member inline ofNative (native: orientationr_t) =
         OrientationR (
             NativePtr.toStructure &&native.origin,
             NativePtr.toStructure &&native.axis,
@@ -1619,7 +1623,7 @@ type OrientationR with
         )
 
 type Plane with
-    static member ofNative (native: cplane_t) =
+    static member inline ofNative (native: cplane_t) =
         Plane (
             NativePtr.toStructure &&native.normal,
             native.dist,
@@ -1627,47 +1631,26 @@ type Plane with
             native.signbits
         )
 
-(*
-        Orientation: OrientationR;
-        World: OrientationR;
-        PvsOrigin: Vector3;         // may be different than or.origin for portals
-        IsPortal: bool;             // true if this view is through a portal
-        IsMirror: bool;             // the portal is a mirror, invert the face culling
-        FrameSceneId: int;          // copied from tr.frameSceneNum
-        FrameCount: int;            // copied from tr.frameCount
-        PortalPlane: Plane;         // clip anything behind this if mirroring
-        ViewportX: int;
-        ViewportY: int;
-        ViewportWidth: int;
-        ViewportHeight: int;
-        FovX: single;
-        FovY: single;
-        ProjectionMatrix: Matrix16;
-        Frustum: Frustum;
-        VisibilityBounds: Bounds;
-        ZFar: single;
-*)
-
 type Frustum with
-    static member ofNativePtr (native: nativeptr<cplane_t>) =
+    static member inline ofNativePtr (native: nativeptr<cplane_t>) =
         {
-            Left = NativePtr.toStructure <| NativePtr.add native 0;
-            Right = NativePtr.toStructure <| NativePtr.add native 1;
-            Bottom = NativePtr.toStructure <| NativePtr.add native 2;
-            Top = NativePtr.toStructure <| NativePtr.add native 3;
+            Left = Plane.ofNative <| NativePtr.get native 0;
+            Right = Plane.ofNative <| NativePtr.get native 1;
+            Bottom = Plane.ofNative <| NativePtr.get native 2;
+            Top = Plane.ofNative <| NativePtr.get native 3;
         }
 
 type ViewParms with
-    static member ofNative (native: viewParms_t) =
+    static member inline ofNative (native: viewParms_t) =
         {
-            Orientation = NativePtr.toStructure &&native.or';
-            World = NativePtr.toStructure &&native.world;
+            Orientation = OrientationR.ofNative native.or';
+            World = OrientationR.ofNative native.world;
             PvsOrigin = NativePtr.toStructure &&native.pvsOrigin;
-            IsPortal = native.isPortal;
-            IsMirror = native.isMirror;
+            IsPortal = Convert.ToBoolean native.isPortal;
+            IsMirror = Convert.ToBoolean native.isMirror;
             FrameSceneId = native.frameSceneNum;
             FrameCount = native.frameCount;
-            PortalPlane = NativePtr.toStructure &&native.portalPlane;
+            PortalPlane = Plane.ofNative native.portalPlane;
             ViewportX = native.viewportX;
             ViewportY = native.viewportY;
             ViewportWidth = native.viewportWidth;
@@ -1681,7 +1664,7 @@ type ViewParms with
         }
 
 type DrawVertex with
-    static member ofNative (native: drawVert_t) =
+    static member inline ofNative (native: drawVert_t) =
         DrawVertex (
             NativePtr.toStructure &&native.xyz,
             NativePtr.get &&native.st 0,
@@ -1693,7 +1676,7 @@ type DrawVertex with
         )
 
 type PolyVertex with
-    static member ofNative (native: polyVert_t) =
+    static member inline ofNative (native: polyVert_t) =
         PolyVertex (
             NativePtr.toStructure &&native.xyz,
             NativePtr.get &&native.st 0,
@@ -1705,7 +1688,7 @@ type PolyVertex with
         )
 
 type Surface with
-    static member ofNativeFace (native: srfSurfaceFace_t) =
+    static member inline ofNativeFace (native: srfSurfaceFace_t) =
         SurfaceFace (
             Plane.ofNative native.plane,
             NativePtr.get &&native.dlightBits 0,
@@ -1729,7 +1712,7 @@ type Surface with
         )
         |> Triangles
 
-    static member ofNativePoly (native: srfPoly_t) =
+    static member inline ofNativePoly (native: srfPoly_t) =
         SurfacePoly (
             native.hShader,
             native.fogIndex,
@@ -1737,13 +1720,13 @@ type Surface with
         )
         |> Poly
 
-    static member ofNativeDisplayList (native: srfDisplayList_t) =
+    static member inline ofNativeDisplayList (native: srfDisplayList_t) =
         SurfaceDisplayList (
             native.listNum
         )
         |> DisplayList
 
-    static member ofNativeGridMesh (native: srfGridMesh_t) =
+    static member inline ofNativeGridMesh (native: srfGridMesh_t) =
         SurfaceGridMesh (
             NativePtr.get &&native.dlightBits 0,
             NativePtr.get &&native.dlightBits 1,
@@ -1762,7 +1745,7 @@ type Surface with
         )
         |> Grid
 
-    static member ofNativeFlare (native: srfFlare_t) =
+    static member inline ofNativeFlare (native: srfFlare_t) =
         SurfaceFlare (
             NativePtr.toStructure &&native.origin,
             NativePtr.toStructure &&native.normal,

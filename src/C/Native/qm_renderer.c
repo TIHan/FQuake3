@@ -63,7 +63,7 @@ qm_create_tr_ref_entity_array (const gint size)
 }
 
 MObject
-qm_map_orientation (orientation_t *const orientation)
+qm_map_orientation (orientation_t* orientation)
 {
 	gpointer args[1];
 
@@ -96,34 +96,6 @@ qm_create_plane_array (const gint size)
 }
 
 MObject
-qm_map_view_parms (const viewParms_t *const view_parms)
-{
-	gpointer args[18];
-
-	args [0] = m_object_as_arg (qm_map_orientationr (&view_parms->or));
-	args [1] = m_object_as_arg (qm_map_orientationr (&view_parms->world));
-	args [2] = (vector3_t *)view_parms->pvsOrigin;
-	args [3] = &view_parms->isPortal;
-	args [4] = &view_parms->isMirror;
-	args [5] = &view_parms->frameSceneNum;
-	args [6] = &view_parms->frameCount;
-	args [7] = m_object_as_arg (qm_map_plane (&view_parms->portalPlane));
-	args [8] = &view_parms->viewportX;
-	args [9] = &view_parms->viewportY;
-	args [10] = &view_parms->viewportWidth;
-	args [11] = &view_parms->viewportHeight;
-	args [12] = &view_parms->fovX;
-	args [13] = &view_parms->fovY;
-	args [14] = (matrix16_t*)view_parms->projectionMatrix;
-	args [15] = m_object_as_arg (qm_map_frustum ((frustum_t*)view_parms->frustum));
-	args [16] = (vector3_t*)view_parms->visBounds;
-	args [17] = &view_parms->zFar;
-
-	return m_object ("Engine", "Engine", "ViewParms", 18, args);
-}
-
-/*
-MObject
 qm_map_view_parms (viewParms_t* view_parms)
 {
 	gpointer args[1];
@@ -131,7 +103,6 @@ qm_map_view_parms (viewParms_t* view_parms)
 	args [0] = view_parms;
 	return m_invoke_method ("Engine", "Engine", "ViewParms", "ofNative", args);
 }
-*/
 
 MObject
 qm_map_ref_entity (const refEntity_t const* ref_entity)
