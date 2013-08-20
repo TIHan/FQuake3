@@ -1148,10 +1148,6 @@
       <Project>{ab424155-fbed-4d8d-b007-5b6cf93ea395}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="splines\Splines.vcxproj">
-      <Project>{dbaf2c53-3858-455d-a1ae-3fc093515314}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
