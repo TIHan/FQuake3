@@ -1568,9 +1568,6 @@ type Orientation with
             NativePtr.toStructure &&native.axis
         )
 
-    static member ofNativePtr (native: nativeptr<orientation_t>) : Orientation =
-        NativePtr.toStructure native
-
 type OrientationR with
     static member ofNative (native: orientationr_t) =
         OrientationR (
@@ -1579,9 +1576,6 @@ type OrientationR with
             NativePtr.toStructure &&native.viewOrigin,
             NativePtr.toStructure &&native.modelMatrix
         )
-
-    static member ofNativePtr (native: nativeptr<orientationr_t>) : OrientationR =
-        NativePtr.toStructure native
 
 type Plane with
     static member ofNative (native: cplane_t) =

@@ -68,7 +68,7 @@ qm_map_orientation (orientation_t *const orientation)
 	gpointer args[1];
 
 	args [0] = orientation;
-	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNativePtr", args);
+	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", args);
 }
 
 MObject
@@ -77,20 +77,16 @@ qm_map_orientationr (orientationr_t* orientation)
 	gpointer args[1];
 
 	args [0] = orientation;
-	return m_invoke_method ("Engine", "Engine", "OrientationR", "ofNativePtr", args);
+	return m_invoke_method ("Engine", "Engine", "OrientationR", "ofNative", args);
 }
 
 MObject
-qm_map_plane (const cplane_t *const plane)
+qm_map_plane (cplane_t* plane)
 {
-	gpointer args[4];
+	gpointer args[1];
 
-	args [0] = (vector3_t *)plane->normal;
-	args [1] = &plane->dist;
-	args [2] = &plane->type;
-	args [3] = &plane->signbits;
-
-	return m_object ("Engine", "Engine", "Plane", 4, args);
+	args [0] = plane;
+	return m_invoke_method ("Engine", "Engine", "Plane", "ofNative", args);
 }
 
 MArray
