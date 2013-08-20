@@ -1447,8 +1447,8 @@ type viewParms_t =
     val mutable or' : orientationr_t
     val mutable world : orientationr_t
     val mutable pvsOrigin : vec3_t
-    val mutable isPortal : int
-    val mutable isMirror : int
+    val mutable isPortal : qboolean
+    val mutable isMirror : qboolean
     val mutable frameSceneNum : int
     val mutable frameCount : int
     val mutable portalPlane : cplane_t
