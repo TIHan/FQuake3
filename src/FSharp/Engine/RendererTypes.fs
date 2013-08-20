@@ -1411,6 +1411,31 @@ type orientation_t =
     val mutable axis : vec3_t
     val private axis1 : vec3_t
     val private axis2 : vec3_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type orientationr_t =
+    val mutable origin : vec3_t
+    val mutable axis : vec3_t
+    val private axis1 : vec3_t
+    val private axis2 : vec3_t
+    val mutable viewOrigin : vec3_t
+    val mutable modelMatrix : single
+    val private modelMatrix1 : single
+    val private modelMatrix2 : single
+    val private modelMatrix3 : single
+    val private modelMatrix4 : single
+    val private modelMatrix5 : single
+    val private modelMatrix6 : single
+    val private modelMatrix7 : single
+    val private modelMatrix8 : single
+    val private modelMatrix9 : single
+    val private modelMatrix10 : single
+    val private modelMatrix11 : single
+    val private modelMatrix12 : single
+    val private modelMatrix13 : single
+    val private modelMatrix14 : single
+    val private modelMatrix15 : single
     
 type surfaceType_t =
     | SF_BAD = 0
@@ -1542,6 +1567,21 @@ type Orientation with
             NativePtr.toStructure &&native.origin,
             NativePtr.toStructure &&native.axis
         )
+
+    static member ofNativePtr (native: nativeptr<orientation_t>) : Orientation =
+        NativePtr.toStructure native
+
+type OrientationR with
+    static member ofNative (native: orientationr_t) =
+        OrientationR (
+            NativePtr.toStructure &&native.origin,
+            NativePtr.toStructure &&native.axis,
+            NativePtr.toStructure &&native.viewOrigin,
+            NativePtr.toStructure &&native.modelMatrix
+        )
+
+    static member ofNativePtr (native: nativeptr<orientationr_t>) : OrientationR =
+        NativePtr.toStructure native
 
 type Plane with
     static member ofNative (native: cplane_t) =

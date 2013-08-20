@@ -68,20 +68,16 @@ qm_map_orientation (orientation_t *const orientation)
 	gpointer args[1];
 
 	args [0] = orientation;
-	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNativePtr", args);
 }
 
 MObject
-qm_map_orientationr (const orientationr_t *const orientation)
+qm_map_orientationr (orientationr_t* orientation)
 {
-	gpointer args[4];
+	gpointer args[1];
 
-	args [0] = (vector3_t *)orientation->origin;
-	args [1] = (vector3_t *)orientation->axis;
-	args [2] = (vector3_t *)orientation->viewOrigin;
-	args [3] = (matrix16_t *)orientation->modelMatrix;
-
-	return m_object ("Engine", "Engine", "OrientationR", 4, args);
+	args [0] = orientation;
+	return m_invoke_method ("Engine", "Engine", "OrientationR", "ofNativePtr", args);
 }
 
 MObject
