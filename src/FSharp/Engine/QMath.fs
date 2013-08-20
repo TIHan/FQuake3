@@ -28,17 +28,6 @@ open System
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
-module NativeQMath =
-    /// <summary>
-    /// single[3]
-    /// </summary>
-    [<Struct>]
-    [<StructLayout (LayoutKind.Sequential)>]
-    type vec3_t =
-        val mutable value : single
-        val mutable value1 : single
-        val mutable value2 : single
-
 module QMath =
     let PI = single Math.PI
     let E = single Math.E
@@ -338,3 +327,16 @@ type Matrix16 with
         NativeMatrix16.qmath_matrix16_multiply (&&cm1, &&cm2, &&m)
         m
 #endif
+
+(*
+=======================================================================================================================
+Interop Types
+=======================================================================================================================
+*)
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type vec3_t =
+    val mutable value : single
+    val mutable value1 : single
+    val mutable value2 : single

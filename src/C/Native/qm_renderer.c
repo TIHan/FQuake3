@@ -203,24 +203,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		break;
 	case SF_POLY:
 		{
-		srfPoly_t* surface = (srfPoly_t*)surfaceType;
+		gpointer args[1];
 
-		MArray m_vertices = qm_create_poly_vertex_array (surface->numVerts);
-		MObject m_type;
-
-		gpointer args[4];
-
-		m_array_map (m_vertices, surface->numVerts, polyVert_t, surface->verts);
-
-		args [0] = &surface->hShader;
-		args [1] = &surface->fogIndex;
-		args [2] = m_array_as_arg (m_vertices);
-
-		m_type = m_object ("Engine", "Engine", "SurfacePoly", 3, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewPoly", args);
+		args [0] = (srfPoly_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativePoly", args);
 		}
 		break;
 	case SF_DISPLAY_LIST:
