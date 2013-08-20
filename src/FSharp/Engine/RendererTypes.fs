@@ -572,8 +572,8 @@ type SurfaceGridMesh =
 
     val Width : int
     val Height : int
-    val WidthLodError : single[] // TODO: Change to list.
-    val HeightLodError : single[] // TODO: Change to list.
+    val WidthLodError : single list
+    val HeightLodError : single list
     val Vertex : DrawVertex         // variable sized
 
     new (dlightBit1, dlightBit2, meshBounds, localOrigin, meshRadius, lodOrigin, lodRadius, lodFixed, lodStitched, width, height, widthLodError, heightLodError, vertex) =
@@ -1477,9 +1477,9 @@ type srfGridMesh_t =
     val mutable localOrigin : vec3_t
     val mutable meshRadius : single
     val mutable lodOrigin : vec3_t
-    val mutable lodRadius : vec3_t
-    val mutable lodFixed : vec3_t
-    val mutable lodStitched : vec3_t
+    val mutable lodRadius : single
+    val mutable lodFixed : int
+    val mutable lodStitched : int
     val mutable width : int
     val mutable height : int
     val mutable widthLodError : nativeptr<single>
@@ -1592,4 +1592,38 @@ type Surface with
             native.fogIndex,
             List.ofNativePtrObjArray native.numVerts native.verts
         )
+        |> Poly
+
+    static member ofNativeDisplayList (native: srfDisplayList_t) =
+        SurfaceDisplayList (
+            native.listNum
+        )
+        |> DisplayList
+
+    static member ofNativeGridMesh (native: srfGridMesh_t) =
+        SurfaceGridMesh (
+            NativePtr.get &&native.dlightBits 0,
+            NativePtr.get &&native.dlightBits 1,
+            NativePtr.toStructure &&native.meshBounds,
+            NativePtr.toStructure &&native.localOrigin,
+            native.meshRadius,
+            NativePtr.toStructure &&native.lodOrigin,
+            native.lodRadius,
+            native.lodFixed,
+            native.lodStitched,
+            native.width,
+            native.height,
+            List.ofNativePtrArray native.width native.widthLodError,
+            List.ofNativePtrArray native.height native.heightLodError,
+            NativePtr.toStructure &&native.verts
+        )
+        |> Grid
+
+    static member ofNativeFlare (native: srfFlare_t) =
+        SurfaceFlare (
+            NativePtr.toStructure &&native.origin,
+            NativePtr.toStructure &&native.normal,
+            NativePtr.toStructure &&native.color
+        )
+        |> Flare
         

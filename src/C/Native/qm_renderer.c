@@ -211,19 +211,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		break;
 	case SF_DISPLAY_LIST:
 		{
-		srfDisplayList_t* surface = (srfDisplayList_t*)surfaceType;
-
-		MObject m_type;
-
 		gpointer args[1];
 
-		args [0] = &surface->listNum;
-
-		m_type = m_object ("Engine", "Engine", "SurfaceDisplayList", 1, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewDisplayList", args);
+		args [0] = (srfDisplayList_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeDisplayList", args);
 		}
 		break;
 	case SF_BAD:
@@ -238,37 +229,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		break;
 	case SF_GRID:
 		{
-		srfGridMesh_t* surface = (srfGridMesh_t*)surfaceType;
+		gpointer args[1];
 
-		MArray m_width_lod_error = m_array_int32 (surface->width);
-		MArray m_height_lod_error = m_array_int32 (surface->height);
-		MObject m_type;
-
-		gpointer args[14];
-
-		m_array_map (m_width_lod_error, surface->width, gfloat, surface->widthLodError);
-		m_array_map (m_height_lod_error, surface->width, gfloat, surface->heightLodError);
-
-		args [0] = &surface->dlightBits [0];
-		args [1] = &surface->dlightBits [1];
-		args [2] = (vector3_t*)surface->meshBounds;
-		args [3] = (vector3_t*)surface->localOrigin;
-		args [4] = &surface->meshRadius;
-		args [5] = (vector3_t*)surface->lodOrigin;
-		args [6] = &surface->lodRadius;
-		args [7] = &surface->lodFixed;
-		args [8] = &surface->lodStitched;
-		args [9] = &surface->width;
-		args [10] = &surface->height;
-		args [11] = m_array_as_arg (m_width_lod_error);
-		args [12] = m_array_as_arg (m_height_lod_error);
-		args [13] = &surface->verts [0];
-
-		m_type = m_object ("Engine", "Engine", "SurfaceGridMesh", 14, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewGrid", args);
+		args [0] = (srfGridMesh_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeGridMesh", args);
 		}
 		break;
 	case SF_MD3:
@@ -283,21 +247,10 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 		break;
 	case SF_FLARE:
 		{
-		srfFlare_t* surface = (srfFlare_t*)surfaceType;
+		gpointer args[1];
 
-		MObject m_type;
-
-		gpointer args[3];
-
-		args [0] = (vector3_t*)surface->origin;
-		args [1] = (vector3_t*)surface->normal;
-		args [2] = (vector3_t*)surface->color;
-
-		m_type = m_object ("Engine", "Engine", "SurfaceFlare", 3, args);
-
-		args [0] = m_object_as_arg (m_type);
-
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewFlare", args);
+		args [0] = (srfFlare_t*)surfaceType;
+		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFlare", args);
 		}
 		break;
 	case SF_ENTITY:
