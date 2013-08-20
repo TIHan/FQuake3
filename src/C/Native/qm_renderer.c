@@ -63,14 +63,12 @@ qm_create_tr_ref_entity_array (const gint size)
 }
 
 MObject
-qm_map_orientation (const orientation_t *const orientation)
+qm_map_orientation (orientation_t *const orientation)
 {
-	gpointer args[2];
+	gpointer args[1];
 
-	args [0] = (vector3_t *)orientation->origin;
-	args [1] = (vector3_t *)orientation->axis;
-
-	return m_object ("Engine", "Engine", "Orientation", 2, args);
+	args [0] = orientation;
+	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", args);
 }
 
 MObject

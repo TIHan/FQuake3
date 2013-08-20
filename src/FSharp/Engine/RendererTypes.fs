@@ -1399,18 +1399,18 @@ type qhandle_t = int
 type cplane_t =
     val mutable normal : vec3_t
     val mutable dist : single
-    val mutable type_ : byte
+    val mutable type' : byte
     val mutable signbits : byte
     val mutable pad : byte
-    val pad1 : byte
+    val private pad1 : byte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type orientation_t =
     val mutable origin : vec3_t
     val mutable axis : vec3_t
-    val axis1 : vec3_t
-    val axis2 : vec3_t
+    val private axis1 : vec3_t
+    val private axis2 : vec3_t
     
 type surfaceType_t =
     | SF_BAD = 0
@@ -1432,25 +1432,25 @@ type surfaceType_t =
 type drawVert_t =
     val mutable xyz : vec3_t
     val mutable st : single
-    val st1 : single
+    val private st1 : single
     val mutable lightmap : single
     val mutable lightmap1 : single
     val mutable normal : vec3_t
     val mutable color : byte
-    val color1 : byte
-    val color2 : byte
-    val color3 : byte
+    val private color1 : byte
+    val private color2 : byte
+    val private color3 : byte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type polyVert_t =
     val mutable xyz : vec3_t
     val mutable st : single
-    val st1 : single
+    val private st1 : single
     val mutable modulate : byte
-    val modulate1 : byte
-    val modulate2 : byte
-    val modulate3 : byte
+    val private modulate1 : byte
+    val private modulate2 : byte
+    val private modulate3 : byte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -1479,9 +1479,9 @@ type srfDisplayList_t =
 type srfGridMesh_t =
     val mutable surfaceType : surfaceType_t
     val mutable dlightBits : int
-    val dlightBits1 : int
+    val private dlightBits1 : int
     val mutable meshBounds : vec3_t
-    val meshBounds1 : vec3_t
+    val private meshBounds1 : vec3_t
     val mutable localOrigin : vec3_t
     val mutable meshRadius : single
     val mutable lodOrigin : vec3_t
@@ -1508,27 +1508,27 @@ type srfSurfaceFace_t =
     val mutable surfaceType : surfaceType_t
     val mutable plane : cplane_t
     val mutable dlightBits : int
-    val dlightBits1 : int
+    val private dlightBits1 : int
     val mutable numPoints : int
     val mutable numIndices : int
     val mutable ofsIndices : int
     val mutable points : single
-    val points1 : single
-    val points2 : single
-    val points3 : single
-    val points4 : single
-    val points5 : single
-    val points6 : single
-    val points7 : single
+    val private points1 : single
+    val private points2 : single
+    val private points3 : single
+    val private points4 : single
+    val private points5 : single
+    val private points6 : single
+    val private points7 : single
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type srfTriangles_t =
     val mutable surfaceType : surfaceType_t
     val mutable dlightBits : int
-    val dlightBits1 : int
+    val private dlightBits1 : int
     val mutable bounds : vec3_t
-    val bounds1 : vec3_t
+    val private bounds1 : vec3_t
     val mutable localOrigin : vec3_t
     val mutable radius : single
     val mutable numIndexes : int
@@ -1536,12 +1536,19 @@ type srfTriangles_t =
     val mutable numVerts : int
     val mutable verts : nativeptr<drawVert_t>
 
+type Orientation with
+    static member ofNative (native: orientation_t) =
+        Orientation (
+            NativePtr.toStructure &&native.origin,
+            NativePtr.toStructure &&native.axis
+        )
+
 type Plane with
     static member ofNative (native: cplane_t) =
         Plane (
             NativePtr.toStructure &&native.normal,
             native.dist,
-            NativePtr.toStructure &&native.type_,
+            NativePtr.toStructure &&native.type',
             native.signbits
         )
 
@@ -1573,8 +1580,8 @@ type Surface with
     static member ofNativeFace (native: srfSurfaceFace_t) =
         SurfaceFace (
             Plane.ofNative native.plane,
-            native.dlightBits,
-            native.dlightBits1,
+            NativePtr.get &&native.dlightBits 0,
+            NativePtr.get &&native.dlightBits 1,
             native.numPoints,
             native.numIndices,
             native.ofsIndices,
