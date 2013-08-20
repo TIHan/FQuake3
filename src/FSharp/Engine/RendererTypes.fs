@@ -1402,7 +1402,15 @@ type cplane_t =
     val mutable type_ : byte
     val mutable signbits : byte
     val mutable pad : byte
-    val mutable pad1 : byte
+    val pad1 : byte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type orientation_t =
+    val mutable origin : vec3_t
+    val mutable axis : vec3_t
+    val axis1 : vec3_t
+    val axis2 : vec3_t
     
 type surfaceType_t =
     | SF_BAD = 0
@@ -1424,25 +1432,25 @@ type surfaceType_t =
 type drawVert_t =
     val mutable xyz : vec3_t
     val mutable st : single
-    val mutable st1 : single
+    val st1 : single
     val mutable lightmap : single
     val mutable lightmap1 : single
     val mutable normal : vec3_t
     val mutable color : byte
-    val mutable color1 : byte
-    val mutable color2 : byte
-    val mutable color3 : byte
+    val color1 : byte
+    val color2 : byte
+    val color3 : byte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type polyVert_t =
     val mutable xyz : vec3_t
     val mutable st : single
-    val mutable st1 : single
+    val st1 : single
     val mutable modulate : byte
-    val mutable modulate1 : byte
-    val mutable modulate2 : byte
-    val mutable modulate3 : byte
+    val modulate1 : byte
+    val modulate2 : byte
+    val modulate3 : byte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -1471,9 +1479,9 @@ type srfDisplayList_t =
 type srfGridMesh_t =
     val mutable surfaceType : surfaceType_t
     val mutable dlightBits : int
-    val mutable dlightBits1 : int
+    val dlightBits1 : int
     val mutable meshBounds : vec3_t
-    val mutable meshBounds1 : vec3_t
+    val meshBounds1 : vec3_t
     val mutable localOrigin : vec3_t
     val mutable meshRadius : single
     val mutable lodOrigin : vec3_t
@@ -1500,27 +1508,27 @@ type srfSurfaceFace_t =
     val mutable surfaceType : surfaceType_t
     val mutable plane : cplane_t
     val mutable dlightBits : int
-    val mutable dlightBits1 : int
+    val dlightBits1 : int
     val mutable numPoints : int
     val mutable numIndices : int
     val mutable ofsIndices : int
     val mutable points : single
-    val mutable points1 : single
-    val mutable points2 : single
-    val mutable points3 : single
-    val mutable points4 : single
-    val mutable points5 : single
-    val mutable points6 : single
-    val mutable points7 : single
+    val points1 : single
+    val points2 : single
+    val points3 : single
+    val points4 : single
+    val points5 : single
+    val points6 : single
+    val points7 : single
         
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type srfTriangles_t =
     val mutable surfaceType : surfaceType_t
     val mutable dlightBits : int
-    val mutable dlightBits1 : int
+    val dlightBits1 : int
     val mutable bounds : vec3_t
-    val mutable bounds1 : vec3_t
+    val bounds1 : vec3_t
     val mutable localOrigin : vec3_t
     val mutable radius : single
     val mutable numIndexes : int
