@@ -1436,6 +1436,47 @@ type orientationr_t =
     val private modelMatrix13 : single
     val private modelMatrix14 : single
     val private modelMatrix15 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type viewParms_t =
+    val mutable or' : orientationr_t
+    val mutable world : orientationr_t
+    val mutable pvsOrigin : vec3_t
+    val mutable isPortal : bool
+    val mutable isMirror : bool
+    val mutable frameSceneNum : int
+    val mutable frameCount : int
+    val mutable portalPlane : cplane_t
+    val mutable viewportX : int
+    val mutable viewportY : int
+    val mutable viewportWidth : int
+    val mutable viewportHeight : int
+    val mutable fovX : single
+    val mutable fovY : single
+    val mutable projectionMatrix : single
+    val private projectionMatrix1 : single
+    val private projectionMatrix2 : single
+    val private projectionMatrix3 : single
+    val private projectionMatrix4 : single
+    val private projectionMatrix5 : single
+    val private projectionMatrix6 : single
+    val private projectionMatrix7 : single
+    val private projectionMatrix8 : single
+    val private projectionMatrix9 : single
+    val private projectionMatrix10 : single
+    val private projectionMatrix11 : single
+    val private projectionMatrix12 : single
+    val private projectionMatrix13 : single
+    val private projectionMatrix14 : single
+    val private projectionMatrix15 : single
+    val mutable frustum : cplane_t
+    val private frustum1 : cplane_t
+    val private frustum2 : cplane_t
+    val private frustum3 : cplane_t
+    val mutable visBounds : vec3_t
+    val private visBounds1 : vec3_t
+    val zFar : single
     
 type surfaceType_t =
     | SF_BAD = 0
@@ -1585,6 +1626,59 @@ type Plane with
             NativePtr.toStructure &&native.type',
             native.signbits
         )
+
+(*
+        Orientation: OrientationR;
+        World: OrientationR;
+        PvsOrigin: Vector3;         // may be different than or.origin for portals
+        IsPortal: bool;             // true if this view is through a portal
+        IsMirror: bool;             // the portal is a mirror, invert the face culling
+        FrameSceneId: int;          // copied from tr.frameSceneNum
+        FrameCount: int;            // copied from tr.frameCount
+        PortalPlane: Plane;         // clip anything behind this if mirroring
+        ViewportX: int;
+        ViewportY: int;
+        ViewportWidth: int;
+        ViewportHeight: int;
+        FovX: single;
+        FovY: single;
+        ProjectionMatrix: Matrix16;
+        Frustum: Frustum;
+        VisibilityBounds: Bounds;
+        ZFar: single;
+*)
+
+type Frustum with
+    static member ofNativePtr (native: nativeptr<cplane_t>) =
+        {
+            Left = NativePtr.toStructure <| NativePtr.add native 0;
+            Right = NativePtr.toStructure <| NativePtr.add native 1;
+            Bottom = NativePtr.toStructure <| NativePtr.add native 2;
+            Top = NativePtr.toStructure <| NativePtr.add native 3;
+        }
+
+type ViewParms with
+    static member ofNative (native: viewParms_t) =
+        {
+            Orientation = NativePtr.toStructure &&native.or';
+            World = NativePtr.toStructure &&native.world;
+            PvsOrigin = NativePtr.toStructure &&native.pvsOrigin;
+            IsPortal = native.isPortal;
+            IsMirror = native.isMirror;
+            FrameSceneId = native.frameSceneNum;
+            FrameCount = native.frameCount;
+            PortalPlane = NativePtr.toStructure &&native.portalPlane;
+            ViewportX = native.viewportX;
+            ViewportY = native.viewportY;
+            ViewportWidth = native.viewportWidth;
+            ViewportHeight = native.viewportHeight;
+            FovX = native.fovX;
+            FovY = native.fovY;
+            ProjectionMatrix = NativePtr.toStructure &&native.projectionMatrix;
+            Frustum = Frustum.ofNativePtr &&native.frustum;
+            VisibilityBounds = NativePtr.toStructure &&native.visBounds;
+            ZFar = native.zFar;
+        }
 
 type DrawVertex with
     static member ofNative (native: drawVert_t) =

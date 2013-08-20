@@ -122,6 +122,17 @@ qm_map_view_parms (const viewParms_t *const view_parms)
 	return m_object ("Engine", "Engine", "ViewParms", 18, args);
 }
 
+/*
+MObject
+qm_map_view_parms (viewParms_t* view_parms)
+{
+	gpointer args[1];
+
+	args [0] = view_parms;
+	return m_invoke_method ("Engine", "Engine", "ViewParms", "ofNative", args);
+}
+*/
+
 MObject
 qm_map_ref_entity (const refEntity_t const* ref_entity)
 {

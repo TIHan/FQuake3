@@ -230,6 +230,7 @@ type Matrix4 =
 /// Matrix16
 /// </summary>        
 [<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type Matrix16 =     
     val M00 : single
     val M01 : single
