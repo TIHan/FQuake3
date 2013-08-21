@@ -105,32 +105,12 @@ qm_map_view_parms (viewParms_t* view_parms)
 }
 
 MObject
-qm_map_ref_entity (const refEntity_t const* ref_entity)
+qm_map_ref_entity (refEntity_t* ref_entity)
 {
-	gpointer args[20];
+	gpointer args[1];
 
-	args [0] = &ref_entity->reType;
-	args [1] = &ref_entity->renderfx;
-	args [2] = &ref_entity->hModel;
-	args [3] = (vector3_t *)ref_entity->lightingOrigin;
-	args [4] = &ref_entity->shadowPlane;
-	args [5] = (vector3_t *)ref_entity->axis;
-	args [6] = &ref_entity->nonNormalizedAxes;
-	args [7] = (vector3_t *)ref_entity->origin;
-	args [8] = &ref_entity->frame;
-	args [9] = (vector3_t *)ref_entity->oldorigin;
-	args [10] = &ref_entity->oldframe;
-	args [11] = &ref_entity->backlerp;
-	args [12] = &ref_entity->skinNum;
-	args [13] = &ref_entity->customSkin;
-	args [14] = &ref_entity->customShader;
-	args [15] = ref_entity->shaderRGBA;
-	args [16] = (vector2_t *)ref_entity->shaderTexCoord;
-	args [17] = &ref_entity->shaderTime;
-	args [18] = &ref_entity->radius;
-	args [19] = &ref_entity->rotation;
-
-	return m_object ("Engine", "Engine", "RefEntity", 20, args);
+	args [0] = ref_entity;
+	return m_invoke_method ("Engine", "Engine", "RefEntity", "ofNative", args);
 }
 
 MObject

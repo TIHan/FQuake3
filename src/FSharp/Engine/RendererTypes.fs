@@ -389,7 +389,7 @@ type RefEntity =
         Type: RefEntityType;
         RenderFx: int;
         ModelHandle: int;                   // opaque type outside refresh
-        LightningOrigin: Vector3;           // so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
+        LightingOrigin: Vector3;            // so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
         ShadowPlane: single;                // projection shadows go here, stencils go slightly lower
         Axis: Axis;                         // rotation vectors
         HasNonNormalizedAxes: bool;         // axis are not normalized, i.e. they have scale
@@ -1606,6 +1606,51 @@ type srfTriangles_t =
     val mutable numVerts : int
     val mutable verts : nativeptr<drawVert_t>
 
+type refEntityType_t =
+    | RT_MODEL = 0
+    | RT_POLY = 1
+    | RT_SPRITE = 2
+    | RT_BEAM = 3
+    | RT_RAIL_CORE = 4
+    | RT_RAIL_RINGS = 5
+    | RT_LIGHTNING = 6
+    | RT_PORTALSURFACE = 7
+    | RT_MAX_REF_ENTITY_TYPE = 8
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type refEntity_t =
+    val mutable reType : refEntityType_t
+    val mutable renderfx : int
+    val mutable hModel : qhandle_t
+    val mutable lightingOrigin : vec3_t
+    val mutable shadowPlane : single
+    val mutable axis : vec3_t
+    val private axis1 : vec3_t
+    val private axis2 : vec3_t
+    val mutable nonNormalizedAxes : qboolean
+    val mutable origin : single
+    val private origin1 : single
+    val private origin2 : single
+    val mutable frame : int
+    val mutable oldorigin : single
+    val private oldorigin1 : single
+    val private oldorigin2 : single
+    val mutable oldframe : int
+    val mutable backlerp : single
+    val mutable skinNum : int
+    val mutable customSkin : qhandle_t
+    val mutable customShader : qhandle_t
+    val mutable shaderRGBA : byte
+    val private shaderRGBA1 : byte
+    val private shaderRGBA2 : byte
+    val private shaderRGBA3 : byte
+    val mutable shaderTexCoord : single
+    val private shaderTexCoord1 : single
+    val mutable shaderTime : single
+    val mutable radius : single
+    val mutable rotation : single
+
 type Orientation with
     static member inline ofNative (native: orientation_t) =
         Orientation (
@@ -1752,4 +1797,29 @@ type Surface with
             NativePtr.toStructure &&native.color
         )
         |> Flare
+
+type RefEntity with
+    static member inline ofNative (native: refEntity_t) =
+        {
+            RefEntity.Type = enum<RefEntityType> (int native.reType);
+            RenderFx = native.renderfx;
+            ModelHandle = native.hModel;
+            LightingOrigin = NativePtr.toStructure &&native.lightingOrigin;
+            ShadowPlane = native.shadowPlane;
+            Axis = NativePtr.toStructure &&native.axis;
+            HasNonNormalizedAxes = Convert.ToBoolean native.nonNormalizedAxes;
+            Origin = NativePtr.toStructure &&native.origin;
+            Frame = native.frame;
+            OldOrigin = NativePtr.toStructure &&native.oldorigin;
+            OldFrame = native.oldframe;
+            BackLerp = native.backlerp;
+            SkinId = native.skinNum;
+            CustomSkinHandle = native.customSkin;
+            CustomShaderHandle = native.customShader;
+            ShaderRgba = NativePtr.toStructure &&native.shaderRGBA;
+            ShaderTextureCoordinate = NativePtr.toStructure &&native.shaderTexCoord;
+            ShaderTime = native.shaderTime;
+            Radius = native.radius;
+            Rotation = native.rotation;
+        }
         
