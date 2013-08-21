@@ -1651,6 +1651,18 @@ type refEntity_t =
     val mutable radius : single
     val mutable rotation : single
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type trRefEntity_t =
+    val mutable e : refEntity_t
+    val mutable axisLength : single
+    val mutable needDlights : qboolean
+    val mutable lightingCalculated : qboolean
+    val mutable lightDir : vec3_t
+    val mutable ambientLight : vec3_t
+    val mutable ambientLightInt : int
+    val mutable directedLight : vec3_t
+
 type Orientation with
     static member inline ofNative (native: orientation_t) =
         Orientation (
@@ -1745,7 +1757,7 @@ type Surface with
         )
         |> Face
 
-    static member ofNativeTriangles (native: srfTriangles_t) =
+    static member inline ofNativeTriangles (native: srfTriangles_t) =
         SurfaceTriangles (
             NativePtr.get &&native.dlightBits 0,
             NativePtr.get &&native.dlightBits 1,
@@ -1821,5 +1833,18 @@ type RefEntity with
             ShaderTime = native.shaderTime;
             Radius = native.radius;
             Rotation = native.rotation;
+        }
+
+type TrRefEntity with
+    static member inline ofNative (native: trRefEntity_t) =
+        {
+            Entity = RefEntity.ofNative native.e;
+            AxisLength = native.axisLength;
+            NeedDlights = Convert.ToBoolean native.needDlights;
+            IsLightingCalculated = Convert.ToBoolean native.lightingCalculated;
+            LightDirection = NativePtr.toStructure &&native.lightDir;
+            AmbientLight = NativePtr.toStructure &&native.ambientLight;
+            AmbientLightInt = native.ambientLightInt;
+            DirectedLight = NativePtr.toStructure &&native.directedLight;
         }
         

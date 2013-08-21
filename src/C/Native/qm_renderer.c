@@ -114,20 +114,12 @@ qm_map_ref_entity (refEntity_t* ref_entity)
 }
 
 MObject
-qm_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity)
+qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity)
 {
-	gpointer args[8];
+	gpointer args[1];
 
-	args [0] = m_object_as_arg (qm_map_ref_entity (&tr_ref_entity->e));
-	args [1] = &tr_ref_entity->axisLength;
-	args [2] = &tr_ref_entity->needDlights;
-	args [3] = &tr_ref_entity->lightingCalculated;
-	args [4] = (vector3_t *)tr_ref_entity->lightDir;
-	args [5] = (vector3_t *)tr_ref_entity->ambientLight;
-	args [6] = &tr_ref_entity->ambientLightInt;
-	args [7] = (vector3_t *)tr_ref_entity->directedLight;
-
-	return m_object ("Engine", "Engine", "TrRefEntity", 8, args);
+	args [0] = tr_ref_entity;
+	return m_invoke_method ("Engine", "Engine", "TrRefEntity", "ofNative", args);
 }
 
 MObject
