@@ -65,28 +65,19 @@ qm_create_tr_ref_entity_array (const gint size)
 MObject
 qm_map_orientation (orientation_t* orientation)
 {
-	gpointer args[1];
-
-	args [0] = orientation;
-	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", &orientation);
 }
 
 MObject
 qm_map_orientationr (orientationr_t* orientation)
 {
-	gpointer args[1];
-
-	args [0] = orientation;
-	return m_invoke_method ("Engine", "Engine", "OrientationR", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "OrientationR", "ofNative", &orientation);
 }
 
 MObject
 qm_map_plane (cplane_t* plane)
 {
-	gpointer args[1];
-
-	args [0] = plane;
-	return m_invoke_method ("Engine", "Engine", "Plane", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "Plane", "ofNative", &plane);
 }
 
 MArray
@@ -98,115 +89,51 @@ qm_create_plane_array (const gint size)
 MObject
 qm_map_view_parms (viewParms_t* view_parms)
 {
-	gpointer args[1];
-
-	args [0] = view_parms;
-	return m_invoke_method ("Engine", "Engine", "ViewParms", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "ViewParms", "ofNative", &view_parms);
 }
 
 MObject
 qm_map_ref_entity (refEntity_t* ref_entity)
 {
-	gpointer args[1];
-
-	args [0] = ref_entity;
-	return m_invoke_method ("Engine", "Engine", "RefEntity", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "RefEntity", "ofNative", &ref_entity);
 }
 
 MObject
 qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity)
 {
-	gpointer args[1];
-
-	args [0] = tr_ref_entity;
-	return m_invoke_method ("Engine", "Engine", "TrRefEntity", "ofNative", args);
+	return m_invoke_method ("Engine", "Engine", "TrRefEntity", "ofNative", &tr_ref_entity);
 }
 
 MObject
 qm_map_surface (const surfaceType_t const* surfaceType)
 {
-	MObject m_surface;
-
 	switch (*surfaceType)
 	{
 	case SF_FACE:
-		{
-		gpointer args[1];
-
-		args [0] = (srfSurfaceFace_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFace", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFace", (srfSurfaceFace_t**)&surfaceType);
 	case SF_TRIANGLES:
-		{
-		gpointer args[1];
-
-		args [0] =  (srfTriangles_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeTriangles", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeTriangles", (srfTriangles_t**)&surfaceType);
 	case SF_POLY:
-		{
-		gpointer args[1];
-
-		args [0] = (srfPoly_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativePoly", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativePoly", (srfPoly_t**)&surfaceType);
 	case SF_DISPLAY_LIST:
-		{
-		gpointer args[1];
-
-		args [0] = (srfDisplayList_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeDisplayList", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeDisplayList", (srfDisplayList_t**)&surfaceType);
 	case SF_BAD:
-		{
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewBad", NULL);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "NewBad", NULL);
 	case SF_SKIP:
-		{
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewSkip", NULL);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "NewSkip", NULL);
 	case SF_GRID:
-		{
-		gpointer args[1];
-
-		args [0] = (srfGridMesh_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeGridMesh", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeGridMesh", (srfGridMesh_t**)&surfaceType);
 	case SF_MD3:
-		{
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewMd3", NULL);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "NewMd3", NULL);
 	case SF_MD4:
-		{
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewMd4", NULL);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "NewMd4", NULL);
 	case SF_FLARE:
-		{
-		gpointer args[1];
-
-		args [0] = (srfFlare_t*)surfaceType;
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFlare", args);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFlare", (srfFlare_t**)&surfaceType);
 	case SF_ENTITY:
-		{
-		m_surface = m_invoke_method ("Engine", "Engine", "Surface", "NewEntity", NULL);
-		}
-		break;
+		return m_invoke_method ("Engine", "Engine", "Surface", "NewEntity", NULL);
 	default:
 		g_error ("Invalid surface type.");
 	}
-
-	return m_surface;
 }
 
 MObject
