@@ -137,20 +137,9 @@ qm_map_surface (const surfaceType_t const* surfaceType)
 }
 
 MObject
-qm_map_frustum (const frustum_t* frustum)
+qm_map_frustum (cplane_t* frustum)
 {
-	MObject m_frustum;
-	
-	gpointer args[4];
-
-	args [0] = m_object_as_arg (qm_map_plane (&frustum->left));
-	args [1] = m_object_as_arg (qm_map_plane (&frustum->right));
-	args [2] = m_object_as_arg (qm_map_plane (&frustum->bottom));
-	args [3] = m_object_as_arg (qm_map_plane (&frustum->top));
-	
-	m_frustum = m_object ("Engine", "Engine", "Frustum", 4, args);
-
-	return m_frustum;
+	return m_invoke_method ("Engine", "Engine", "Frustum", "ofNativePtr", &frustum);
 }
 
 void

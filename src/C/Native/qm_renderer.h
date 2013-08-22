@@ -69,7 +69,7 @@ MObject
 qm_map_surface (const surfaceType_t const* surfaceType);
 
 MObject
-qm_map_frustum (const frustum_t* frustum);
+qm_map_frustum (cplane_t* frustum);
 
 void
 qm_frustum_map (MObject obj, frustum_t* frustum);
