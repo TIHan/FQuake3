@@ -27,42 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "qm_renderer.h"
 
 MObject
-qm_create_vector3 (gfloat x, gfloat y, gfloat z)
-{
-	gpointer *args;
-
-	args [0] = &x;
-	args [1] = &y;
-	args [2] = &z;
-
-	return m_object ("Engine", "Engine.QMath", "Vector3", 3, args);
-}
-
-MArray
-qm_create_vector3_array (const gint size)
-{
-	return m_array ("Engine", "Engine.QMath", "Vector3", size);
-}
-
-MArray
-qm_create_draw_vertex_array (const gint size)
-{
-	return m_array ("Engine", "Engine", "DrawVertex", size);
-}
-
-MArray
-qm_create_poly_vertex_array (const gint size)
-{
-	return m_array ("Engine", "Engine", "PolyVertex", size);
-}
-
-MArray
-qm_create_tr_ref_entity_array (const gint size)
-{
-	return m_array ("Engine", "Engine", "TrRefEntity", size);
-}
-
-MObject
 qm_map_orientation (orientation_t* orientation)
 {
 	return m_invoke_method ("Engine", "Engine", "Orientation", "ofNative", &orientation);
@@ -105,35 +69,9 @@ qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity)
 }
 
 MObject
-qm_map_surface (const surfaceType_t const* surfaceType)
+qm_map_surface (surfaceType_t* surfaceType)
 {
-	switch (*surfaceType)
-	{
-	case SF_FACE:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFace", (srfSurfaceFace_t**)&surfaceType);
-	case SF_TRIANGLES:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeTriangles", (srfTriangles_t**)&surfaceType);
-	case SF_POLY:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativePoly", (srfPoly_t**)&surfaceType);
-	case SF_DISPLAY_LIST:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeDisplayList", (srfDisplayList_t**)&surfaceType);
-	case SF_BAD:
-		return m_invoke_method ("Engine", "Engine", "Surface", "NewBad", NULL);
-	case SF_SKIP:
-		return m_invoke_method ("Engine", "Engine", "Surface", "NewSkip", NULL);
-	case SF_GRID:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeGridMesh", (srfGridMesh_t**)&surfaceType);
-	case SF_MD3:
-		return m_invoke_method ("Engine", "Engine", "Surface", "NewMd3", NULL);
-	case SF_MD4:
-		return m_invoke_method ("Engine", "Engine", "Surface", "NewMd4", NULL);
-	case SF_FLARE:
-		return m_invoke_method ("Engine", "Engine", "Surface", "ofNativeFlare", (srfFlare_t**)&surfaceType);
-	case SF_ENTITY:
-		return m_invoke_method ("Engine", "Engine", "Surface", "NewEntity", NULL);
-	default:
-		g_error ("Invalid surface type.");
-	}
+	return m_invoke_method ("Engine", "Engine", "Surface", "ofNativePtr", &surfaceType);
 }
 
 MObject
@@ -155,12 +93,7 @@ qm_frustum_map (MObject obj, cplane_t* frustum)
 MObject
 qm_map_draw_surf (drawSurf_t* draw_surf)
 {
-	gpointer args[2];
-
-	args [0] = &draw_surf->sort;
-	args [1] = m_object_as_arg (qm_map_surface (draw_surf->surface));
-
-	return m_object ("Engine", "Engine", "DrawSurface", 2, args);
+	return m_invoke_method ("Engine", "Engine", "DrawSurface", "ofNative", &draw_surf);
 }
 
 MObject

@@ -1487,14 +1487,14 @@ type surfaceType_t =
     | SF_SKIP = 1
     | SF_FACE = 2
     | SF_GRID = 3
-    | SF_TRIANGLES = 3
-    | SF_POLY = 4
-    | SF_MD3 = 5
-    | SF_MD4 = 6
-    | SF_FLARE = 7
-    | SF_ENTITY = 8
-    | SF_DISPLAY_LIST = 9
-    | SF_NUM_SURFACE_TYPES = 10
+    | SF_TRIANGLES = 4
+    | SF_POLY = 5
+    | SF_MD3 = 6
+    | SF_MD4 = 7
+    | SF_FLARE = 8
+    | SF_ENTITY = 9
+    | SF_DISPLAY_LIST = 10
+    | SF_NUM_SURFACE_TYPES = 11
     | SF_MAX = 0x7fffffff
 
 [<Struct>]
@@ -1605,6 +1605,12 @@ type srfTriangles_t =
     val mutable indexes : nativeptr<int>
     val mutable numVerts : int
     val mutable verts : nativeptr<drawVert_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type drawSurf_t =
+    val mutable sort : uint32
+    val mutable surface : nativeptr<surfaceType_t>
 
 type refEntityType_t =
     | RT_MODEL = 0
@@ -1824,6 +1830,47 @@ type Surface with
             NativePtr.toStructure &&native.color
         )
         |> Flare
+
+    static member inline ofNativePtr (nativePtr: nativeptr<surfaceType_t>) =
+        let type' = NativePtr.read nativePtr
+        match type' with
+        | surfaceType_t.SF_BAD -> Bad
+        | surfaceType_t.SF_SKIP -> Skip
+        | surfaceType_t.SF_FACE ->
+            let nativePtr = NativePtr.ofNativeInt<srfSurfaceFace_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativeFace native            
+        | surfaceType_t.SF_GRID ->
+            let nativePtr = NativePtr.ofNativeInt<srfGridMesh_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativeGridMesh native
+        | surfaceType_t.SF_TRIANGLES ->
+            let nativePtr = NativePtr.ofNativeInt<srfTriangles_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativeTriangles native
+        | surfaceType_t.SF_POLY ->
+            let nativePtr = NativePtr.ofNativeInt<srfPoly_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativePoly native
+        | surfaceType_t.SF_MD3 -> Md3
+        | surfaceType_t.SF_MD4 -> Md4
+        | surfaceType_t.SF_FLARE ->
+            let nativePtr = NativePtr.ofNativeInt<srfFlare_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativeFlare native 
+        | surfaceType_t.SF_ENTITY -> Entity
+        | surfaceType_t.SF_DISPLAY_LIST ->
+            let nativePtr = NativePtr.ofNativeInt<srfDisplayList_t> <| NativePtr.toNativeInt nativePtr
+            let native = NativePtr.read nativePtr
+            Surface.ofNativeDisplayList native
+        | _ -> raise <| Exception "Invalid Surface Type"          
+
+type DrawSurface with
+    static member inline ofNative (native: drawSurf_t) =
+        {
+            Sort = native.sort;
+            Surface = Surface.ofNativePtr native.surface;
+        }
 
 type RefEntity with
     static member inline ofNative (native: refEntity_t) =

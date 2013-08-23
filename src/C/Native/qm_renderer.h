@@ -30,21 +30,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "renderer\tr_local.h"
 
 MObject
-qm_create_vector3 (gfloat x, gfloat y, gfloat z);
-
-MArray
-qm_create_vector3_array (const gint size);
-
-MArray
-qm_create_draw_vertex_array (const gint size);
-
-MArray
-qm_create_poly_vertex_array (const gint size);
-
-MArray
-qm_create_tr_ref_entity_array (const gint size);
-
-MObject
 qm_map_orientation (const orientation_t *const orientation);
 
 MObject
