@@ -301,7 +301,7 @@ R_SetupFrustum (void)
 		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_frustum);
 
-	qm_frustum_map (m_frustum, (frustum_t *)tr.viewParms.frustum);
+	qm_frustum_map (m_frustum, &tr.viewParms.frustum);
 }
 
 

@@ -1688,14 +1688,29 @@ type Plane with
             native.signbits
         )
 
+    static member inline toNative (plane: Plane) =
+        let mutable native = cplane_t ()
+        NativePtr.ofStructure plane.Normal &&native.normal
+        native.dist <- plane.Distance
+        NativePtr.ofStructure plane.Type &&native.type'
+        native.signbits <- plane.SignBits
+        native
+
 type Frustum with
-    static member inline ofNativePtr (native: nativeptr<cplane_t>) =
+    static member inline ofNativePtr (nativePtr: nativeptr<cplane_t>) =
         {
-            Left = Plane.ofNative <| NativePtr.get native 0;
-            Right = Plane.ofNative <| NativePtr.get native 1;
-            Bottom = Plane.ofNative <| NativePtr.get native 2;
-            Top = Plane.ofNative <| NativePtr.get native 3;
+            Left = Plane.ofNative <| NativePtr.get nativePtr 0;
+            Right = Plane.ofNative <| NativePtr.get nativePtr 1;
+            Bottom = Plane.ofNative <| NativePtr.get nativePtr 2;
+            Top = Plane.ofNative <| NativePtr.get nativePtr 3;
         }
+
+    static member inline toNativePtr (frustum: Frustum) (nativePtr: nativeptr<cplane_t>) =
+        NativePtr.set nativePtr 0 <| Plane.toNative frustum.Left
+        NativePtr.set nativePtr 1 <| Plane.toNative frustum.Right
+        NativePtr.set nativePtr 2 <| Plane.toNative frustum.Bottom
+        NativePtr.set nativePtr 3 <| Plane.toNative frustum.Top
+        nativePtr
 
 type ViewParms with
     static member inline ofNative (native: viewParms_t) =

@@ -34,6 +34,9 @@ module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (native: nativeptr<'U>) =
         Marshal.PtrToStructure (NativePtr.toNativeInt native, typeof<'T>) :?> 'T
 
+    let inline ofStructure<'T,'U when 'T : struct and 'U : unmanaged> (structure: 'T) (native: nativeptr<'U>) =
+        Marshal.StructureToPtr (structure, NativePtr.toNativeInt native, true)
+
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (native: nativeptr<'T>) =
         List.init size (fun i ->

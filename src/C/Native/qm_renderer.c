@@ -143,12 +143,13 @@ qm_map_frustum (cplane_t* frustum)
 }
 
 void
-qm_frustum_map (MObject obj, frustum_t* frustum)
+qm_frustum_map (MObject obj, cplane_t* frustum)
 {
-	frustum->left = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Left"));
-	frustum->right = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Right"));
-	frustum->bottom = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Bottom"));
-	frustum->top = *(cplane_t *)m_object_unbox_struct (m_object_get_property (obj, "Top"));
+	gpointer args [2];
+	
+	args [0] = m_object_as_arg (obj);
+	args [1] = frustum;
+	m_invoke_method ("Engine", "Engine", "Frustum", "toNativePtr", args);
 }
 
 MObject

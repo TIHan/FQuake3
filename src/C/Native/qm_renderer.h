@@ -72,7 +72,7 @@ MObject
 qm_map_frustum (cplane_t* frustum);
 
 void
-qm_frustum_map (MObject obj, frustum_t* frustum);
+qm_frustum_map (MObject obj, cplane_t* frustum);
 
 MObject
 qm_map_draw_surf (drawSurf_t* draw_surf);
