@@ -30,28 +30,25 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "renderer\tr_local.h"
 
 MObject
-qm_map_orientation (const orientation_t *const orientation);
+qm_map_orientation (orientation_t* orientation);
 
 MObject
-qm_map_orientationr (const orientationr_t *const orientation);
+qm_map_orientationr (orientationr_t* orientation);
 
 MObject
-qm_map_plane (const cplane_t *const plane);
-
-MArray
-qm_create_plane_array (const gint size);
+qm_map_plane (cplane_t* plane);
 
 MObject
-qm_map_view_parms (const viewParms_t *const view_parms);
+qm_map_view_parms (viewParms_t* view_parms);
 
 MObject
-qm_map_ref_entity (const refEntity_t const* ref_entity);
+qm_map_ref_entity (refEntity_t* ref_entity);
 
 MObject
-qm_map_tr_ref_entity (const trRefEntity_t const* tr_ref_entity);
+qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity);
 
 MObject
-qm_map_surface (const surfaceType_t const* surfaceType);
+qm_map_surface (surfaceType_t* surfaceType);
 
 MObject
 qm_map_frustum (cplane_t* frustum);

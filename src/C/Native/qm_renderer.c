@@ -44,12 +44,6 @@ qm_map_plane (cplane_t* plane)
 	return m_invoke_method ("Engine", "Engine", "Plane", "ofNative", &plane);
 }
 
-MArray
-qm_create_plane_array (const gint size)
-{
-	return m_array ("Engine", "Engine", "Plane", size);
-}
-
 MObject
 qm_map_view_parms (viewParms_t* view_parms)
 {
