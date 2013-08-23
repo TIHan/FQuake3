@@ -77,3 +77,30 @@ type Cvar =
         Value: single;              // atof( string )
         Integer: int;               // atoi( string )
     }
+
+(*
+=======================================================================================================================
+Interop Types
+=======================================================================================================================
+*)
+
+type qboolean =
+    | qfalse = 0
+    | qtrue = 1
+
+type qhandle_t = int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type cvar_t =
+    val mutable name : nativeptr<char>
+    val mutable string : nativeptr<char>
+    val mutable resetString : nativeptr<char>
+    val mutable latchedString : nativeptr<char>
+    val mutable flags : int
+    val mutable modified : qboolean
+    val mutable modificationCount : int
+    val mutable value : single
+    val mutable integer : int
+    val mutable next : nativeptr<cvar_t>
+    val mutable hashNext : nativeptr<cvar_t>

@@ -1392,12 +1392,6 @@ Interop Types
 =======================================================================================================================
 *)
 
-type qboolean =
-    | qfalse = 0
-    | qtrue = 1
-
-type qhandle_t = int
-
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type cplane_t =

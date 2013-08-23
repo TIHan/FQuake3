@@ -30,6 +30,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "game/q_shared.h"
 
 MObject
-qm_map_cvar (const cvar_t *cvar);
+qm_map_cvar (cvar_t* cvar);
 
 #endif /* __QM_H__ */
