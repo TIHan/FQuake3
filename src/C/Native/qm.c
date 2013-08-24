@@ -29,17 +29,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 MObject
 qm_map_cvar (cvar_t* cvar)
 {
-	gpointer args[9];
-
-	args [0] = m_string_as_arg (m_string (cvar->name));
-	args [1] = m_string_as_arg (m_string (cvar->string));
-	args [2] = m_string_as_arg (m_string (cvar->resetString));
-	args [3] = m_string_as_arg (m_string (cvar->latchedString));
-	args [4] = &cvar->flags;
-	args [5] = &cvar->modified;
-	args [6] = &cvar->modificationCount;
-	args [7] = &cvar->value;
-	args [8] = &cvar->integer;
-
-	return m_object ("Engine", "Engine", "Cvar", 9, args);
+	return m_invoke_method ("Engine", "Engine", "Cvar", "ofNative", &cvar);
 }

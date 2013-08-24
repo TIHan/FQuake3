@@ -1663,6 +1663,78 @@ type trRefEntity_t =
     val mutable ambientLightInt : int
     val mutable directedLight : vec3_t
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type world_t =
+    val mutable name : char
+    // TODO:
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type image_t =
+    val mutable imgName : char
+    // TODO:
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type shader_t =
+    val mutable shaderName : char
+    // TODO:
+
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type trGlobals_t =
+    val mutable registered : qboolean
+    val mutable visCount : int
+    val mutable frameCount : int
+    val mutable sceneCount : int
+    val mutable viewCount : int
+    val mutable smpFrame : int
+    val mutable frameSceneNum : int
+    val mutable worldMapLoaded : qboolean
+    val mutable world : nativeptr<world_t>
+    val mutable externalVisData : nativeptr<byte>
+    val mutable defaultImage : nativeptr<image_t>
+    val mutable scratchImage : nativeptr<image_t>
+    val private scratchImage1 : nativeptr<image_t>
+    val private scratchImage2 : nativeptr<image_t>
+    val private scratchImage3 : nativeptr<image_t>
+    val private scratchImage4 : nativeptr<image_t>
+    val private scratchImage5 : nativeptr<image_t>
+    val private scratchImage6 : nativeptr<image_t>
+    val private scratchImage7 : nativeptr<image_t>
+    val private scratchImage8 : nativeptr<image_t>
+    val private scratchImage9 : nativeptr<image_t>
+    val private scratchImage10 : nativeptr<image_t>
+    val private scratchImage11 : nativeptr<image_t>
+    val private scratchImage12 : nativeptr<image_t>
+    val private scratchImage13 : nativeptr<image_t>
+    val private scratchImage14 : nativeptr<image_t>
+    val private scratchImage15 : nativeptr<image_t>
+    val private scratchImage16 : nativeptr<image_t>
+    val private scratchImage17 : nativeptr<image_t>
+    val private scratchImage18 : nativeptr<image_t>
+    val private scratchImage19 : nativeptr<image_t>
+    val private scratchImage20 : nativeptr<image_t>
+    val private scratchImage21 : nativeptr<image_t>
+    val private scratchImage22 : nativeptr<image_t>
+    val private scratchImage23 : nativeptr<image_t>
+    val private scratchImage24 : nativeptr<image_t>
+    val private scratchImage25 : nativeptr<image_t>
+    val private scratchImage26 : nativeptr<image_t>
+    val private scratchImage27 : nativeptr<image_t>
+    val private scratchImage28 : nativeptr<image_t>
+    val private scratchImage29 : nativeptr<image_t>
+    val private scratchImage30 : nativeptr<image_t>
+    val private scratchImage31 : nativeptr<image_t>
+    val mutable fogImage : nativeptr<image_t>
+    val mutable dlightImage : nativeptr<image_t>
+    val mutable flareImage : nativeptr<image_t>
+    val mutable whiteImage : nativeptr<image_t>
+    val mutable identityLightImage : nativeptr<image_t>
+    // TODO:
+
 type Orientation with
     static member inline ofNative (native: orientation_t) =
         Orientation (

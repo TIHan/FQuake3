@@ -31,11 +31,15 @@ open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 
 module NativePtr =
+
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (native: nativeptr<'U>) =
-        Marshal.PtrToStructure (NativePtr.toNativeInt native, typeof<'T>) :?> 'T
+        System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt native, typeof<'T>) :?> 'T
 
     let inline ofStructure<'T,'U when 'T : struct and 'U : unmanaged> (structure: 'T) (native: nativeptr<'U>) =
-        Marshal.StructureToPtr (structure, NativePtr.toNativeInt native, true)
+        System.Runtime.InteropServices.Marshal.StructureToPtr (structure, NativePtr.toNativeInt native, true)
+
+    let inline toString (native: nativeptr<'T>) =
+        System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt native)
 
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (native: nativeptr<'T>) =
@@ -73,7 +77,7 @@ type Cvar =
         LatchedString: string;      // for CVAR_LATCH vars
         Flags: int;
         IsModified: bool;           // set each time the cvar is changed
-        ModificiationCount: int;    // incremented each time the cvar is changed
+        ModificationCount: int;     // incremented each time the cvar is changed
         Value: single;              // atof( string )
         Integer: int;               // atoi( string )
     }
@@ -104,3 +108,17 @@ type cvar_t =
     val mutable integer : int
     val mutable next : nativeptr<cvar_t>
     val mutable hashNext : nativeptr<cvar_t>
+
+type Cvar with
+    static member inline ofNative (native: cvar_t) =
+        {
+            Name = NativePtr.toString native.name;
+            String = NativePtr.toString native.string;
+            ResetString = NativePtr.toString native.resetString;
+            LatchedString = NativePtr.toString native.latchedString;
+            Flags = native.flags;
+            IsModified = Convert.ToBoolean native.modified;
+            ModificationCount = native.modificationCount;
+            Value = native.value;
+            Integer = native.integer;
+        }
