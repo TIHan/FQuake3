@@ -493,33 +493,27 @@ typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
 
+// FQ3
 typedef struct {
-	float x;
-} vector_t;
-
-typedef struct {
-	float x;
-	float y;
+	vec2_t value;
 } vector2_t;
 
+// FQ3
 typedef struct {
-	float x;
-	float y;
-	float z;
+	vec3_t value;
 } vector3_t;
 
+// FQ3
 typedef struct {
-	float x;
-	float y;
-	float z;
-	float w;
+	vec4_t value;
 } vector4_t;
 
+// FQ3
 typedef struct {
-	vector4_t x;
-	vector4_t y;
-	vector4_t z;
-	vector4_t w;
+	vec4_t x;
+	vec4_t y;
+	vec4_t z;
+	vec4_t w;
 } matrix16_t;
 
 #ifndef M_PI

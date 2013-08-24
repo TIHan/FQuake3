@@ -23,7 +23,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #nowarn "9"
 #nowarn "51"
 
-namespace Engine.Common
+namespace Engine.Input
 
 open System
 open System.IO
@@ -36,38 +36,14 @@ open Engine.NativeInterop
 
 module private Native =
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Init (string commandLine)
-
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern bool Com_IsDedicated ()
-
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern bool Com_IsViewLogEnabled ()
-
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Frame ()
-
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Printf (string fmt);
+    extern void IN_Frame ()
 
 /// <summary>
-/// Common
+/// Input
 ///
 /// Note: Revisit to make purely functional.
 /// </summary
-module Common =
-    let Init commandLine =
-        Native.Com_Init commandLine
-
-    let CheckIsDedicated () =
-        Native.Com_IsDedicated ()
-
-    let CheckIsViewLogEnabled () =
-        Native.Com_IsViewLogEnabled ()
-
+module Input =
     let Frame () =
-        Native.Com_Frame ()
-
-    let Printf fmt =
-        Native.Com_Printf fmt
+        Native.IN_Frame ()
 

@@ -23,7 +23,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #nowarn "9"
 #nowarn "51"
 
-namespace Engine.Common
+namespace Engine.IO
 
 open System
 open System.IO
@@ -34,40 +34,34 @@ open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
-module private Native =
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Init (string commandLine)
+// WIP
+type StandardIO () =
+    let ms = new MemoryStream ()
+    let sw = new StreamWriter (ms)
+    let sr = new StreamReader (ms)
 
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern bool Com_IsDedicated ()
+    [<DefaultValue>] val mutable private redirectOut : string -> unit
 
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern bool Com_IsViewLogEnabled ()
+    member this.RedirectOut (f: string -> unit) =
+        Console.SetOut sw
+        this.redirectOut <- f
 
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Frame ()
+    member this.FlushOut () =
+            sw.Flush ()
+            match sr.BaseStream.Length <> 0L with
+            | true ->
+                sr.BaseStream.Position <- 0L
+                this.redirectOut <| sr.ReadToEnd ()
+                sr.BaseStream.SetLength 0L
+            | _ -> ()
 
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void Com_Printf (string fmt);
+    interface IDisposable with
+        member this.Dispose () =
+            sr.Dispose ()
+            sw.Dispose ()
+            ms.Dispose ()
 
-/// <summary>
-/// Common
-///
-/// Note: Revisit to make purely functional.
-/// </summary
-module Common =
-    let Init commandLine =
-        Native.Com_Init commandLine
-
-    let CheckIsDedicated () =
-        Native.Com_IsDedicated ()
-
-    let CheckIsViewLogEnabled () =
-        Native.Com_IsViewLogEnabled ()
-
-    let Frame () =
-        Native.Com_Frame ()
-
-    let Printf fmt =
-        Native.Com_Printf fmt
+module QFile =
+    let GetCurrentDirectory () =
+        Directory.GetCurrentDirectory ()
 

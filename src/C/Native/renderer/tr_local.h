@@ -1609,12 +1609,4 @@ void R_InitFreeType();
 void R_DoneFreeType();
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
-typedef struct {
-	cplane_t left;
-	cplane_t right;
-	cplane_t bottom;
-	cplane_t top;
-} frustum_t;
-
-
 #endif //TR_LOCAL_H

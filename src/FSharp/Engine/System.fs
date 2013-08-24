@@ -19,7 +19,11 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine
+// Disable native interop warnings
+#nowarn "9"
+#nowarn "51"
+
+namespace Engine.System
 
 open System
 open System.IO
@@ -28,125 +32,34 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open Engine.Input
+open Engine.Common
+open Engine.Network
+open Engine.IO
+open Engine.Command
+open Engine.NativeInterop
 
 module private Native =
-    [<Literal>]
-    let libQuake3 = "quake3.dll"
-
-    [<Literal>]
-    let libEngine = "Engine.Native.dll"
-
-    [<Literal>]
-    let callingConvention = CallingConvention.Cdecl
-
-    [<DllImport (libEngine, CallingConvention = CallingConvention.Cdecl)>]
+    [<DllImport (LibEngine, CallingConvention = DefaultCallingConvention)>]
     extern int system_cpu_get_physical_core_count ()
 
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_CreateConsole ()
 
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_Milliseconds ()
 
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_InitStreamThread ()
 
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Com_Init (string commandLine)
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void NET_Init ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern bool Com_IsDedicated ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern bool Com_IsViewLogEnabled ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void IN_Frame ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Com_Frame ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Com_Printf (string fmt);
-
-    type XCommand = delegate of unit -> unit
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Cmd_AddCommand (string cmdName, XCommand func)
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern int Cmd_Argc ()
-
-    [<DllImport(libQuake3, CallingConvention = callingConvention)>]
-    extern void Cmd_ArgsBuffer (StringBuilder buffer, int length)
-
-// WIP
-type StandardIO () =
-    let ms = new MemoryStream ()
-    let sw = new StreamWriter (ms)
-    let sr = new StreamReader (ms)
-
-    [<DefaultValue>] val mutable private redirectOut : string -> unit
-
-    member this.RedirectOut (f: string -> unit) =
-        Console.SetOut sw
-        this.redirectOut <- f
-
-    member this.FlushOut () =
-            sw.Flush ()
-            match sr.BaseStream.Length <> 0L with
-            | true ->
-                sr.BaseStream.Position <- 0L
-                this.redirectOut <| sr.ReadToEnd ()
-                sr.BaseStream.SetLength 0L
-            | _ -> ()
-
-    interface IDisposable with
-        member this.Dispose () =
-            sr.Dispose ()
-            sw.Dispose ()
-            ms.Dispose ()
-
-module Input =
-    let Frame () =
-        Native.IN_Frame ()
-
-
-module Common =
-    let Frame () =
-        Native.Com_Frame ()
-
-    let IsDedicated () =
-        Native.Com_IsDedicated ()
-
-
-module Network =
-    let Init () =
-        Native.NET_Init ()
-
-
-module FileSystem =
-    let GetCurrentDirectory () =
-        Directory.GetCurrentDirectory ()
-
-
-module Command =
-    let Add (name: string) (f: unit -> unit) =
-        let cmd = Native.XCommand (f)
-        GCHandle.Alloc (cmd, GCHandleType.Pinned) |> ignore
-        Native.Cmd_AddCommand (name, cmd)
-
-    let Argc () =
-        Native.Cmd_Argc ()
-        
-
-
+/// <summary>
+/// System
+///
+/// Note: Revisit to make purely functional.
+/// </summary
 module System =
     let private stopwatch = new Stopwatch ()
 
@@ -182,7 +95,7 @@ module System =
 
         use io = new StandardIO ()
 
-        io.RedirectOut Native.Com_Printf
+        io.RedirectOut Common.Printf
 
         // done before Com/Sys_Init since we need this for error output
         Native.Sys_CreateConsole ()
@@ -192,7 +105,7 @@ module System =
 
         Native.Sys_InitStreamThread ()
 
-        Native.Com_Init ("")
+        Common.Init ""
         Network.Init ()
 
         Command.Add "f#" (fun _ -> 
@@ -205,16 +118,16 @@ module System =
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
-        match (Native.Com_IsDedicated (), Native.Com_IsViewLogEnabled ()) with
+        match (Common.CheckIsDedicated (), Common.CheckIsViewLogEnabled ()) with
         | (false, false) -> Native.Sys_ShowConsole (0, false)
         | _ -> ()
 
-        printfn "Working directory: %s" (FileSystem.GetCurrentDirectory ())
+        printfn "Working directory: %s" (QFile.GetCurrentDirectory ())
 
         // main game loop
         while true do
             // if not running as a game client, sleep a bit
-            match Common.IsDedicated () with
+            match Common.CheckIsDedicated () with
             | true -> Sleep (5)
             | _ -> ()
 

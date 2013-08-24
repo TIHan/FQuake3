@@ -39,8 +39,11 @@ main (int argc, char *argv[])
 	// Load Engine Assembly
 	m_load_assembly ("Engine.dll");
 
+	// Load Engine Assembly
+	m_load_assembly ("Engine.Renderer.dll");
+
 	// Invoke Engine Init
-	m_invoke_method ("Engine", "Engine", "System", "Init", NULL);
+	m_invoke_method ("Engine", "Engine.System", "System", "Init", NULL);
 
 	// Free Domain
 	m_domain_free (domain);

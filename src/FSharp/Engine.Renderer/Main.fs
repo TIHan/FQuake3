@@ -19,9 +19,11 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine
+namespace Engine.Renderer
 
+// Disable native interop warnings
 #nowarn "9"
+#nowarn "51"
 
 open System
 open System.IO
@@ -30,10 +32,11 @@ open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
-open Engine.QMath
+open Engine.Core
+open Engine.Math
+open Engine.NativeInterop
 
-module MainRenderer =
-
+module Main =
     let FlipMatrix =
         // convert from our coordinate system (looking down X)
         // to OpenGL's coordinate system (looking down -Z)

@@ -25,9 +25,11 @@ Copyright (C) 1999-2005 Id Software, Inc.
     2. Types that don't singularly try to represent a value should be records.
 *)
 
+// Disable native interop warnings
 #nowarn "9"
+#nowarn "51"
 
-namespace Engine
+namespace Engine.Renderer
 
 open System
 open System.IO
@@ -36,8 +38,9 @@ open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
-open FSharpx.Collections
-open Engine.QMath
+open Engine.Core
+open Engine.Math
+open Engine.NativeInterop
 
 /// <summary>
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
