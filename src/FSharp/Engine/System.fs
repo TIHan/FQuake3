@@ -95,6 +95,12 @@ module System =
     let CheckIsFsiRunning () =
         fsi.IsRunning
 
+    let WriteFsiLine line =
+        match fsi.IsRunning with
+        | false -> raise <| Exception "Fsi is not running"
+        | _ ->
+        fsi.WriteLine line
+
     let Init () =
         SetupUnhandledExceptions ()
 
