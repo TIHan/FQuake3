@@ -92,6 +92,7 @@
     <ClCompile Include="..\ui\ui_shared.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\qm_cgame.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_public.h">
@@ -109,6 +110,7 @@
     <ClInclude Include="..\game\surfaceflags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\qm_cgame.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="cgame.def" />
