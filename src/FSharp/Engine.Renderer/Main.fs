@@ -507,7 +507,6 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// Generates an orientation for an entity and viewParms
     /// Does NOT produce any GL calls
     /// Called by both the front end and the back end
-    /// TODO: Make this a little bit nicer. newOrientation and newNewOrientation are horrible names.
     /// </summary>
     [<Pure>]
     let rotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: OrientationR) =
@@ -515,7 +514,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
         | true -> viewParms.World
         | _ ->
 
-        let newOrientation =
+        let orientation =
             OrientationR (
                 entity.Entity.Origin,
                 entity.Entity.Axis,
@@ -525,35 +524,35 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 
         let glMatrix =
             Matrix16 (
-                newOrientation.Axis.[0].[0],
-                newOrientation.Axis.[0].[1],
-                newOrientation.Axis.[0].[2],
+                orientation.Axis.[0].[0],
+                orientation.Axis.[0].[1],
+                orientation.Axis.[0].[2],
                 0.f,
-                newOrientation.Axis.[1].[0],
-                newOrientation.Axis.[1].[1],
-                newOrientation.Axis.[1].[2],
+                orientation.Axis.[1].[0],
+                orientation.Axis.[1].[1],
+                orientation.Axis.[1].[2],
                 0.f,
-                newOrientation.Axis.[2].[0],
-                newOrientation.Axis.[2].[1],
-                newOrientation.Axis.[2].[2],
+                orientation.Axis.[2].[0],
+                orientation.Axis.[2].[1],
+                orientation.Axis.[2].[2],
                 0.f,
-                newOrientation.Origin.X,
-                newOrientation.Origin.Y,
-                newOrientation.Origin.Z,
+                orientation.Origin.X,
+                orientation.Origin.Y,
+                orientation.Origin.Z,
                 1.f
             )
 
-        let newNewOrientation =
+        let orientation =
             OrientationR (
-                newOrientation.Origin,
-                newOrientation.Axis,
-                newOrientation.ViewOrigin,
+                orientation.Origin,
+                orientation.Axis,
+                orientation.ViewOrigin,
                 glMatrix * viewParms.World.ModelMatrix
             )
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
-        let delta = viewParms.Orientation.Origin - newNewOrientation.Origin
+        let delta = viewParms.Orientation.Origin - orientation.Origin
 
         // compensate for scale in the axes if necessary
         let axisLength =
@@ -567,14 +566,14 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             | _ -> 1.0f
 
         OrientationR (
-            newNewOrientation.Origin,
-            newNewOrientation.Axis,
+            orientation.Origin,
+            orientation.Axis,
             Vector3 (
-                (Vector3.dot delta newNewOrientation.Axis.X) * axisLength,
-                (Vector3.dot delta newNewOrientation.Axis.Y) * axisLength,
-                (Vector3.dot delta newNewOrientation.Axis.Z) * axisLength
+                (Vector3.dot delta orientation.Axis.X) * axisLength,
+                (Vector3.dot delta orientation.Axis.Y) * axisLength,
+                (Vector3.dot delta orientation.Axis.Z) * axisLength
             ),
-            newNewOrientation.ModelMatrix
+            orientation.ModelMatrix
         )
 
 (*
