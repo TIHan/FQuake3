@@ -65,7 +65,6 @@ type CGame =
 // End Types
 
 module Weapons =
-
     /// <summary>
     /// Based on Q3: CG_CalculateWeaponPosition
     /// CalculateWeaponPosition
