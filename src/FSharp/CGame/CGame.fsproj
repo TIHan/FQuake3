@@ -41,9 +41,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Weapons.fs" />
-    <None Include="Weapons.fsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Compile Include="Native.fs" />
   </ItemGroup>
   <ItemGroup>
