@@ -62,6 +62,7 @@ module private Native =
 /// Note: Revisit to make purely functional.
 /// </summary
 module System =
+    let fsi = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\fsi.exe"
     let private stopwatch = new Stopwatch ()
 
     let private SetupUnhandledExceptions () =
@@ -91,6 +92,9 @@ module System =
     let GetPhysicalCoreCount () =
         Native.system_cpu_get_physical_core_count ()
 
+    let CheckIsFsiRunning () =
+        fsi.IsRunning
+
     let Init () =
         SetupUnhandledExceptions ()
 
@@ -110,7 +114,6 @@ module System =
         Network.Init ()
 
 #if USE_FSI_SESSION
-        let fsi = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\fsi.exe"
         Command.Add "fsi" (fun _ -> 
             match fsi.IsRunning with
             | true -> ()
