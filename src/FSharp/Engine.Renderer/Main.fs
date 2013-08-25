@@ -88,9 +88,9 @@ module Main =
                         checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
 
             match checkFrustumPlanes 0 true 0 with
-            | (_, false) -> ClipType.Out
-            | (0, _) -> ClipType.In
-            | _ -> ClipType.Clip
+            | (_, false) -> ClipType.Out // all points were behind one of the planes
+            | (0, _) -> ClipType.In // completely inside frustum
+            | _ -> ClipType.Clip // partially clipped
 
     module private PointAndRadius =
         /// <summary>
@@ -111,9 +111,9 @@ module Main =
                     | _ -> checkFrustumPlanes mightBeClipped false (acc + 1)
 
             match checkFrustumPlanes false false 0 with
-            | (_, true) -> ClipType.Out
-            | (true, _) -> ClipType.Clip
-            | _ -> ClipType.In
+            | (_, true) -> ClipType.Out // all points were behind one of the planes
+            | (true, _) -> ClipType.Clip // partially clipped
+            | _ -> ClipType.In // completely inside frustum
 
 
 (*
