@@ -330,6 +330,22 @@ type shader_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type refdef_t =
+    val mutable x : int
+    val mutable y : int
+    val mutable width : int
+    val mutable height : int
+    val mutable vieworg : vec3_t
+    val mutable viewaxis : vec3_t
+    val private viewaxis1 : vec3_t
+    val private viewaxis2 : vec3_t
+    val mutable time : int;
+    val mutable rdflags : int;
+    // TODO:
+
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type trGlobals_t =
     val mutable registered : qboolean
     val mutable visCount : int
@@ -626,4 +642,17 @@ module TrRefEntity =
             AmbientLight = NativePtr.toStructure &&native.ambientLight;
             AmbientLightInt = native.ambientLightInt;
             DirectedLight = NativePtr.toStructure &&native.directedLight;
+        }
+
+module RefDef =
+    let inline ofNative (native: refdef_t) =
+        {
+            X = native.x;
+            Y = native.y;
+            Width = native.width;
+            Height = native.height;
+            ViewOrigin = NativePtr.toStructure &&native.vieworg;
+            ViewAxis = NativePtr.toStructure &&native.viewaxis;
+            Time = native.time;
+            RdFlags = enum<RdFlags> (native.rdflags)
         }

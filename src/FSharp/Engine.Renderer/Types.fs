@@ -1341,6 +1341,25 @@ type Model =
     }
 
 /// <summary>
+/// Based on Q3: refdef_t
+/// RefDef
+/// </summary>
+type RefDef =
+    {
+        X: int;
+        Y: int;
+        Width: int;
+        Height: int;
+        ViewOrigin: Vector3;
+        ViewAxis: Axis;         // transformation matrix
+
+        // time in milliseconds for shader effects and other time dependent rendering issues
+        Time: int;
+        RdFlags: RdFlags;
+        // TODO:
+    }
+
+/// <summary>
 /// Based on Q3: trGlobals_t
 /// TrGlobals
 ///
