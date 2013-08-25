@@ -30,10 +30,13 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
 module QMath =
-    let PI = single Math.PI
-    let E = single Math.E
+    [<Literal>]
+    let PI = 3.14159265358979323846f
+
+    [<Literal>]
+    let E = 2.7182818284590452354f
         
-    let inline Lerp (x: single) (y: single) (t: single) =
+    let inline lerp (x: single) (y: single) (t: single) =
         x + (t * (y - x))
 
 /// <summary>
@@ -77,34 +80,6 @@ type Vector3 =
             Z = z;
         }
 
-    static member inline UnitX = Vector3 (1.f, 0.f, 0.f)
-    static member inline UnitY = Vector3 (0.f, 1.f, 0.f)
-    static member inline UnitZ = Vector3 (0.f, 0.f, 1.f)
-    static member inline Zero = Vector3 (0.f, 0.f, 0.f)
-
-    static member inline Init (f: int -> single) =
-        Vector3 (f 0, f 1, f 2)
-
-    static member inline Abs (v: Vector3) =
-        Vector3 (abs v.X, abs v.Y, abs v.Z)
-
-    static member inline MinDimension (v: Vector3) =
-        match v.X < v.Y with
-        | true ->
-            match v.X < v.Z with
-            | true -> 0
-            | _ -> 2
-        | _ ->
-            match v.Y < v.Z with
-            | true -> 1
-            | _ -> 2
-
-    static member inline Map (f: int -> single -> single) (v: Vector3) =
-        Vector3 (f 0 v.[0], f 1 v.[1], f 2 v.[2])
-        
-    static member inline Map2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        Vector3 (f 0 v1.[0] v2.[0], f 1 v1.[1] v2.[1], f 2 v1.[2] v2.[2])
-
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
@@ -126,32 +101,63 @@ type Vector3 =
     static member inline ( *+ ) ((s: single, v1: Vector3), v2: Vector3) =
         Vector3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z)
 
-    static member inline Snap (v: Vector3) =
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vector3 =
+    let unitX = Vector3 (1.f, 0.f, 0.f)
+    let unitY = Vector3 (0.f, 1.f, 0.f)
+    let unitZ = Vector3 (0.f, 0.f, 1.f)
+
+    let zero = Vector3 ()
+
+    let inline init (f: int -> single) =
+        Vector3 (f 0, f 1, f 2)
+
+    let inline abs (v: Vector3) =
+        Vector3 (abs v.X, abs v.Y, abs v.Z)
+
+    let inline minDimension (v: Vector3) =
+        match v.X < v.Y with
+        | true ->
+            match v.X < v.Z with
+            | true -> 0
+            | _ -> 2
+        | _ ->
+            match v.Y < v.Z with
+            | true -> 1
+            | _ -> 2
+
+    let inline map (f: int -> single -> single) (v: Vector3) =
+        Vector3 (f 0 v.[0], f 1 v.[1], f 2 v.[2])
+        
+    let inline map2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
+        Vector3 (f 0 v1.[0] v2.[0], f 1 v1.[1] v2.[1], f 2 v1.[2] v2.[2])
+
+    let inline snap (v: Vector3) =
         Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
 
-    static member inline DotProduct (v1: Vector3) (v2: Vector3) =
+    let inline dot (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
-    static member inline CrossProduct (v1: Vector3) (v2: Vector3) =
+    let inline cross (v1: Vector3) (v2: Vector3) =
         Vector3 ((v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X))
 
-    static member inline Length (v: Vector3) =
-        sqrt <| Vector3.DotProduct v v
+    let inline length (v: Vector3) =
+        sqrt <| dot v v
 
-    static member inline Normalize (v: Vector3) =
-        let length = 1.f / Vector3.Length v
-        Vector3.Map (fun i x -> x * length) v
+    let inline normalize (v: Vector3) =
+        let length = 1.f / length v
+        map (fun i x -> x * length) v
 
-    static member inline Perpendicular (v: Vector3) =
+    let inline perpendicular (v: Vector3) =
         let uv =
-            match Vector3.Abs v |> Vector3.MinDimension with
-            | 0 -> Vector3.UnitX
-            | 1 -> Vector3.UnitY
-            | 2 -> Vector3.UnitZ
+            match abs v |> minDimension with
+            | 0 -> unitX
+            | 1 -> unitY
+            | 2 -> unitZ
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
-        let uvNormal = Vector3.Normalize uv
-        Vector3.CrossProduct v uvNormal
+        let uvNormal = normalize uv
+        cross v uvNormal
 
 /// <summary>
 /// Vector4
@@ -188,9 +194,6 @@ type Vector4 =
             W = w;
         }
 
-    static member inline DotProduct (v1: Vector4) (v2: Vector4) =
-        (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
-
     static member inline (*) (v1: Vector4, v2: Vector4) =
         Vector4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
         
@@ -199,6 +202,12 @@ type Vector4 =
 
     static member inline (-) (v1: Vector4, v2: Vector4) =
         Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vector4 =
+    let inline dot (v1: Vector4) (v2: Vector4) =
+        (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
+
 
 /// <summary>
 /// Matrix4
@@ -283,30 +292,6 @@ type Matrix16 =
             M20 = m20; M21 = m21; M22 = m22; M23 = m23;
             M30 = m30; M31 = m31; M32 = m32; M33 = m33;
         }    
-    
-    static member inline Init (f: int -> int -> single) =
-        Matrix16 (
-            f 0 0, f 0 1, f 0 2, f 0 3,
-            f 1 0, f 1 1, f 1 2, f 1 3,
-            f 2 0, f 2 1, f 2 2, f 2 3,
-            f 3 0, f 3 1, f 3 2, f 3 3
-        )
-        
-    static member inline ZeroCreate () =
-        Matrix16 ()
-        
-    static member inline Iter (f: int -> int -> single -> unit) (m1: Matrix16) =
-        for i = 0 to 3 do
-            for j = 0 to 3 do
-                f i j m1.[i, j]
-                
-    static member inline Map (f: int -> int -> single -> single) (m1: Matrix16) =
-        Matrix16 (
-            f 0 0 m1.[0, 0], f 0 1 m1.[0, 1], f 0 2 m1.[0, 2], f 0 3 m1.[0, 3],
-            f 1 0 m1.[1, 0], f 1 1 m1.[1, 1], f 1 2 m1.[1, 2], f 1 3 m1.[1, 3],
-            f 2 0 m1.[2, 0], f 2 1 m1.[2, 1], f 2 2 m1.[2, 2], f 2 3 m1.[2, 3],
-            f 3 0 m1.[3, 0], f 3 1 m1.[3, 1], f 3 2 m1.[3, 2], f 3 3 m1.[3, 3]
-        )
 
 module NativeMatrix16 =
     [<DllImport ("Engine.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
@@ -323,12 +308,38 @@ type Matrix16 with
         
         Matrix16.Init dotProduct
 #else
-        let mutable m = Matrix16.ZeroCreate ()
+        let mutable m = Matrix16 ()
         let mutable cm1 = m1
         let mutable cm2 = m2
         NativeMatrix16.qmath_matrix16_multiply (&&cm1, &&cm2, &&m)
         m
 #endif
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Matrix16 =
+    let zero = Matrix16 ()
+
+    let inline init (f: int -> int -> single) =
+        Matrix16 (
+            f 0 0, f 0 1, f 0 2, f 0 3,
+            f 1 0, f 1 1, f 1 2, f 1 3,
+            f 2 0, f 2 1, f 2 2, f 2 3,
+            f 3 0, f 3 1, f 3 2, f 3 3
+        )
+        
+    let inline iter (f: int -> int -> single -> unit) (m1: Matrix16) =
+        for i = 0 to 3 do
+            for j = 0 to 3 do
+                f i j m1.[i, j]
+                
+    let inline map (f: int -> int -> single -> single) (m1: Matrix16) =
+        Matrix16 (
+            f 0 0 m1.[0, 0], f 0 1 m1.[0, 1], f 0 2 m1.[0, 2], f 0 3 m1.[0, 3],
+            f 1 0 m1.[1, 0], f 1 1 m1.[1, 1], f 1 2 m1.[1, 2], f 1 3 m1.[1, 3],
+            f 2 0 m1.[2, 0], f 2 1 m1.[2, 1], f 2 2 m1.[2, 2], f 2 3 m1.[2, 3],
+            f 3 0 m1.[3, 0], f 3 1 m1.[3, 1], f 3 2 m1.[3, 2], f 3 3 m1.[3, 3]
+        )
+
 
 (*
 =======================================================================================================================

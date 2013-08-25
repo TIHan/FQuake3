@@ -71,7 +71,7 @@ module Main =
                 match acc = 8 || isFront with
                 | true -> (front, back)
                 | _ ->
-                    let distance = Vector3.DotProduct transformed.[acc] frust.Normal
+                    let distance = Vector3.dot transformed.[acc] frust.Normal
 
                     match distance > frust.Distance with
                     | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
@@ -105,7 +105,7 @@ module Main =
                 | true -> (mightBeClipped, canCullOut)
                 | _ ->
                     let frust = frustum.[acc]
-                    let distance = (Vector3.DotProduct point frust.Normal) - frust.Distance
+                    let distance = (Vector3.dot point frust.Normal) - frust.Distance
 
                     match distance < -radius with
                     | true -> checkFrustumPlanes mightBeClipped true (acc + 1)
@@ -296,9 +296,9 @@ void R_WorldToLocal (vec3_t world, vec3_t local) {
     [<Pure>]
     let WorldToLocal (world: Vector3) (orientation: OrientationR) =
         Vector3 (
-            Vector3.DotProduct world orientation.Axis.[0],
-            Vector3.DotProduct world orientation.Axis.[1],
-            Vector3.DotProduct world orientation.Axis.[2]
+            Vector3.dot world orientation.Axis.[0],
+            Vector3.dot world orientation.Axis.[1],
+            Vector3.dot world orientation.Axis.[2]
         )
 
 
@@ -562,7 +562,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             match entity.Entity.HasNonNormalizedAxes with
             | true ->
                 // Is it ok to compare the single like this?
-                match Vector3.Length entity.Entity.Axis.X with
+                match Vector3.length entity.Entity.Axis.X with
                 | 0.f -> 0.f
                 | axisLength ->
                     1.0f / axisLength
@@ -572,9 +572,9 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
             newNewOrientation.Origin,
             newNewOrientation.Axis,
             Vector3 (
-                (Vector3.DotProduct delta newNewOrientation.Axis.X) * axisLength,
-                (Vector3.DotProduct delta newNewOrientation.Axis.Y) * axisLength,
-                (Vector3.DotProduct delta newNewOrientation.Axis.Z) * axisLength
+                (Vector3.dot delta newNewOrientation.Axis.X) * axisLength,
+                (Vector3.dot delta newNewOrientation.Axis.Y) * axisLength,
+                (Vector3.dot delta newNewOrientation.Axis.Z) * axisLength
             ),
             newNewOrientation.ModelMatrix
         )
@@ -762,7 +762,7 @@ static void SetFarClip( void )
             let v = Vector3 (x, y, z)
 
             let vecTo = v - orientation.Origin
-            let possibleDistance = Vector3.DotProduct vecTo vecTo
+            let possibleDistance = Vector3.dot vecTo vecTo
 
             calculateFarthestCornerDistance (match possibleDistance > distance with | true -> possibleDistance | _ -> distance) (acc + 1)
 
@@ -906,25 +906,25 @@ void R_SetupFrustum (void) {
             Left =
                 Plane (
                     leftNormal,
-                    Vector3.DotProduct view.Orientation.Origin leftNormal,
+                    Vector3.dot view.Orientation.Origin leftNormal,
                     PlaneType.NonAxial
                 );
             Right = 
                 Plane (
                     rightNormal,
-                    Vector3.DotProduct view.Orientation.Origin rightNormal,
+                    Vector3.dot view.Orientation.Origin rightNormal,
                     PlaneType.NonAxial
                 );
             Bottom =
                 Plane (
                     bottomNormal,
-                    Vector3.DotProduct view.Orientation.Origin bottomNormal,
+                    Vector3.dot view.Orientation.Origin bottomNormal,
                     PlaneType.NonAxial
                 );
             Top =
                 Plane (
                     topNormal,
-                    Vector3.DotProduct view.Orientation.Origin topNormal,
+                    Vector3.dot view.Orientation.Origin topNormal,
                     PlaneType.NonAxial
                 );
         }
@@ -959,9 +959,9 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.DotProduct local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform ((Vector3.dot local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
-        (transform (Vector3.Zero) 0) + camera.Origin
+        (transform (Vector3.zero) 0) + camera.Origin
 
 (*
 void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
@@ -986,9 +986,9 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.DotProduct v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform ((Vector3.dot v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
-        transform (Vector3.Zero) 0
+        transform (Vector3.zero) 0
 
 (*
 void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
@@ -1221,10 +1221,10 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
         // rotate the plane, but keep the non-rotated version for matching
         // against the portalSurface entities
         let normal = LocalNormalToWorld originalPlane.Normal orientation
-        let distance = originalPlane.Distance + Vector3.DotProduct normal orientation.Origin
+        let distance = originalPlane.Distance + Vector3.dot normal orientation.Origin
 
         // translate the original plane
-        let originalDistance = originalPlane.Distance + Vector3.DotProduct originalPlane.Normal orientation.Origin
+        let originalDistance = originalPlane.Distance + Vector3.dot originalPlane.Normal orientation.Origin
 
         (
             Plane.UpdateDistance originalDistance originalPlane,

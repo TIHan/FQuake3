@@ -188,7 +188,7 @@ void SetPlaneSignbits (cplane_t *out) {
 }
 *)
 
-    static member inline Zero = Plane (Vector3.Zero, 0.f, PlaneType.X, 0uy)
+    static member inline Zero = Plane (Vector3.zero, 0.f, PlaneType.X, 0uy)
 
     /// <summary>
     /// Based on Q3: SetPlaneSignBits
@@ -230,12 +230,12 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
     static member inline InitFromPoints (a: Vector3) (b: Vector3) (c: Vector3) =
         let d1 = b - a
         let d2 = c - a
-        let cross = Vector3.CrossProduct d2 d1
-        let normal = Vector3.Normalize cross
+        let cross = Vector3.cross d2 d1
+        let normal = Vector3.normalize cross
         
-        match Vector3.Length cross with
+        match Vector3.length cross with
         | 0.f -> Plane (normal, 0.f, PlaneType.X, 0uy)
-        | _ -> Plane (normal, Vector3.DotProduct a normal, PlaneType.X, 0uy)
+        | _ -> Plane (normal, Vector3.dot a normal, PlaneType.X, 0uy)
 
     new (normal, distance, typ, signBits) =
         {
