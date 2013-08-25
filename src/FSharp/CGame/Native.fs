@@ -36,6 +36,7 @@ open Engine.Core
 open Engine.Math
 open Engine.Native
 open Engine.NativeInterop
+open Engine.Renderer.Native
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -152,6 +153,10 @@ type playerState_t =
     val private ammo14 : int
     val private ammo15 : int
 
+    val mutable generic1 : int
+    val mutable loopSound : int
+    val mutable jumppad_ent : int
+
     val mutable ping : int
     val mutable pmove_framecount : int
     val mutable jumppad_frame : int
@@ -165,6 +170,7 @@ type trType_t =
     | TR_SINE = 4
     | TR_GRAVITY = 5
 
+// Size: 36
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type trajectory_t =
@@ -174,6 +180,7 @@ type trajectory_t =
     val mutable trBase : vec3_t
     val mutable trDelta : vec3_t
 
+// Size: 208
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type entityState_t =
@@ -205,6 +212,13 @@ type entityState_t =
     val mutable legsAnim : int
     val mutable torsoanim : int
     val mutable generic1 : int
+
+// 256 Entities
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 53248)>]
+type snapshot_t_entities =
+    [<FieldOffset (0)>]
+    val private value : entityState_t
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -248,7 +262,76 @@ type snapshot_t =
 
     val mutable ps : playerState_t
     val mutable numEntities : int
-    // TODO:
+    val mutable entities : snapshot_t_entities
+    val mutable numServerCommands : int
+    val mutable serverCommandSequence : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type animation_t =
+    val mutable firstFrame : int
+    val mutable numFrames : int
+    val mutable loopFrames : int
+    val mutable frameLerp : int
+    val mutable initialLerp : int
+    val mutable reversed : int
+    val mutable flipflop : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type lerpFrame_t =
+    val mutable oldFrame : int
+    val mutable oldFrameTime : int
+    val mutable frame : int
+    val mutable frameTime : int
+    val mutable backLerp : single
+    val mutable yawAngle : single
+    val mutable yawing : qboolean
+    val mutable pitchAngle : single
+    val mutable pitching : qboolean
+    val mutable animationNumber : int
+    val mutable animation : nativeptr<animation_t>
+    val mutable animationTime : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type playerEntity_t =
+    val legs : lerpFrame_t
+    val torso : lerpFrame_t
+    val flag : lerpFrame_t
+    val painTime : int
+    val painDirection : int
+    val lightningFiring : int
+    val railgunImpact : vec3_t
+    val railgunFlash : qboolean
+    val barrelAngle : single
+    val barrelTime : single
+    val barrelSpinning : qboolean
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type centity_t =
+    val mutable currentState : entityState_t
+    val mutable nextState : entityState_t
+    val mutable interpolate : qboolean
+    val mutable currentValid : qboolean
+    val mutable muzzleFlashtime : int
+    val mutable previousEvent : int
+    val mutable teleportFlag : int
+    val mutable trailTime : int
+    val mutable dustTrailTime : int
+    val mutable miscTime : int
+    val mutable snapShotTime : int
+    val mutable pe : playerEntity_t
+    val mutable errorTime : int
+    val mutable errorOrigin : vec3_t
+    val mutable errorAngles : vec3_t
+    val mutable extrapolated : qboolean
+    val mutable rawOrigin : vec3_t
+    val mutable rawAngles : vec3_t
+    val mutable beamEnd : vec3_t
+    val mutable lerpOrigin : vec3_t
+    val mutable lerpAngles : vec3_t
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -262,4 +345,67 @@ type cg_t =
     val mutable intermissionStarted : qboolean
     val mutable latestSnapshotNum : int
     val mutable latestSnapshotTime : int
+    val mutable snap : nativeptr<snapshot_t>
+    val mutable nextSnap : nativeptr<snapshot_t>
+    
+    val mutable activeSnapshots : snapshot_t
+    val private activeSnapshots1 : snapshot_t
+
+    val mutable frameInterpolation : single
+    val mutable thisFrameTeleport : qboolean
+    val mutable nextFrameTeleport : qboolean
+    val mutable frametime : int
+    val mutable time : int
+    val mutable oldTime : int
+    val mutable physicsTime : int
+    val mutable timelimitWarnings : int
+    val mutable fraglimitWarnings : int
+    val mutable mapRestart : qboolean
+    val mutable renderingThirdPerson : qboolean
+    val mutable hyperspace : qboolean
+    val mutable predictedPlayerState : playerState_t
+    val mutable predictedPlayerEntity : centity_t
+    val mutable validPPS : qboolean
+    val mutable predictedErrorTime : int
+    val mutable predictedError : vec3_t
+    val mutable eventSequence : int
+
+    val mutable predictableEvents : int
+    val private predictableEvents1 : int
+    val private predictableEvents2 : int
+    val private predictableEvents3 : int
+    val private predictableEvents4 : int
+    val private predictableEvents5 : int
+    val private predictableEvents6 : int
+    val private predictableEvents7 : int
+    val private predictableEvents8 : int
+    val private predictableEvents9 : int
+    val private predictableEvents10 : int
+    val private predictableEvents11 : int
+    val private predictableEvents12 : int
+    val private predictableEvents13 : int
+    val private predictableEvents14 : int
+    val private predictableEvents15 : int
+
+    val mutable stepChange : single
+    val mutable stepTime : int
+    val mutable duckChange : single
+    val mutable duckTime : single
+    val mutable landChange : single
+    val mutable landTime : int
+    val mutable weaponSelect : int
+    val mutable autoAngles : vec3_t
+
+    val mutable autoAxis : vec3_t
+    val private autoAxis1 : vec3_t
+    val private autoAxis2 : vec3_t
+
+    val mutable autoAnglesFast : vec3_t
+    
+    val mutable autoAxisFast : vec3_t
+    val private autoAxisFast1 : vec3_t
+    val private autoAxisFast2 : vec3_t
+
+    val mutable refdef : refdef_t
+    val mutable refdefViewAngles : vec3_t
     // TODO:
