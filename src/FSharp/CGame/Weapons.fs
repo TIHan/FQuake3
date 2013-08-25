@@ -29,7 +29,7 @@ open Engine.Math
 open Engine.Renderer
 
 // Types
-// Note: Move this to a Types.fs
+// TODO: Move this to a Types.fs
 
 module Constants =
     [<Literal>]

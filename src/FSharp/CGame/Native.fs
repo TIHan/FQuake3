@@ -333,6 +333,79 @@ type centity_t =
     val mutable lerpOrigin : vec3_t
     val mutable lerpAngles : vec3_t
 
+// Size: 60
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type score_t =
+    val mutable client : int
+    val mutable score : int
+    val mutable ping : int
+    val mutable time : int
+    val mutable scoreFlags : int
+    val mutable powerUps : int
+    val mutable accuracy : int
+    val mutable impressiveCount : int
+    val mutable excellentCount : int
+    val mutable guantletCount : int
+    val mutable defendCount : int
+    val mutable assistCount : int
+    val mutable captures : int
+    val mutable perfect : qboolean
+    val mutable team : int
+
+// Size: 124
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type skulltrail_t =
+    val mutable positions : vec3_t
+    val private positions1 : vec3_t
+    val private positions2 : vec3_t
+    val private positions3 : vec3_t
+    val private positions4 : vec3_t
+    val private positions5 : vec3_t
+    val private positions6 : vec3_t
+    val private positions7 : vec3_t
+    val private positions8 : vec3_t
+    val private positions9 : vec3_t
+    val mutable numpositions : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 1024)>]
+type cg_t_infoScreenText =
+    [<FieldOffset (0)>]
+    val private value : char
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 3840)>]
+type cg_t_scores =
+    [<FieldOffset (0)>]
+    val private value : score_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 32)>]
+type cg_t_killerName =
+    [<FieldOffset (0)>]
+    val private value : char
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 1024)>]
+type cg_t_spectatorList =
+    [<FieldOffset (0)>]
+    val private value : char
+
+// maxclients = 64
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 7936)>]
+type cg_t_skulltrails =
+    [<FieldOffset (0)>]
+    val private value : skulltrail_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 1024)>]
+type cg_t_centerPrint =
+    [<FieldOffset (0)>]
+    val private value : char
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type cg_t =
@@ -408,4 +481,44 @@ type cg_t =
 
     val mutable refdef : refdef_t
     val mutable refdefViewAngles : vec3_t
+    val mutable zoomed : qboolean
+    val mutable zoomTime : int
+    val mutable zoomSensitivity : single
+    val mutable infoScreenText : cg_t_infoScreenText
+    val mutable scoresRequestTime : int
+    val mutable numScores : int
+    val mutable selectedScore : int
+
+    val mutable teamScores : int
+    val private teamScores1 : int
+
+    val mutable scores : cg_t_scores
+    val mutable showScores : qboolean
+    val mutable scoreBoardShowing : qboolean
+    val mutable scoreFadeTime : int
+    val mutable killerName : cg_t_killerName
+    val mutable spectatorList : cg_t_spectatorList
+    val mutable spectatorLen : int
+    val mutable spectatorWidth : single
+    val mutable spectatorTime : int
+    val mutable spectatorPaintX : int
+    val mutable spectatorPaintX2 : int
+    val mutable spectatorOffset : int
+    val mutable spectatorPaintLen : int
+    val mutable skulltrails : cg_t_skulltrails
+    val mutable centerPrintTime : int
+    val mutable centerPrintCharWidth : int
+    val mutable centerPrintY : int
+    val mutable centerPrint : cg_t_centerPrint
+    val mutable centerPrintLines : int
+    val mutable lowAmmoWarning : int
+    val mutable lastKillTime : int
+    val mutable crosshairClientNum : int
+    val mutable crosshairClientTime : int
+    val mutable powerupActive : int
+    val mutable powerupTime : int
+    val mutable attackerTime : int
+    val mutable voiceTime : int
+    val mutable rewardStack : int
+    val mutable rewardTime : int
     // TODO:
