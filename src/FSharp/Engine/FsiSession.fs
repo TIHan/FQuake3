@@ -25,8 +25,9 @@ open System.Diagnostics
 
 type FsiSession (fsiPath: string) =
 
-    let info = new ProcessStartInfo ()
-    let fsiProcess = new Process ()
+    let info = ProcessStartInfo ()
+
+    let mutable fsiProcess = Unchecked.defaultof<Process>
 
     do
         info.RedirectStandardInput <- true
@@ -36,8 +37,6 @@ type FsiSession (fsiPath: string) =
         info.CreateNoWindow <- true
         info.FileName <- fsiPath
 
-        fsiProcess.StartInfo <- info
-
     [<CLIEvent>]
     member this.OutputReceived = fsiProcess.OutputDataReceived
 
@@ -45,18 +44,23 @@ type FsiSession (fsiPath: string) =
     member this.ErrorReceived = fsiProcess.ErrorDataReceived
 
     member this.Start () =
+        fsiProcess <- Process ()
+        fsiProcess.StartInfo <- info
         fsiProcess.Start ()
         fsiProcess.BeginOutputReadLine ()
 
-    member this.AddLine (line: string) =
-        fsiProcess.StandardInput.WriteLine (line)
-
-    member this.Evaluate () =
-        this.AddLine(";;")
-        fsiProcess.StandardInput.Flush ()
-
-    member this.WaitForExit () =
+    member this.Quit () =
+        this.WriteLine "#quit;;"
         fsiProcess.WaitForExit ()
+        fsiProcess.Close ()
+        fsiProcess.Dispose ()
+        fsiProcess <- null
+
+    member this.IsRunning = fsiProcess <> null && not fsiProcess.HasExited
+
+    member this.WriteLine (line: string) =
+        fsiProcess.StandardInput.WriteLine (line)
+        fsiProcess.StandardInput.Flush ()
 
     member this.ReadError () =
         fsiProcess.StandardError.ReadToEnd ()

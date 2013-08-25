@@ -55,3 +55,8 @@ module Command =
     let Argc () =
         Native.Cmd_Argc ()
 
+    let ArgsBuffer () =
+        let sb = StringBuilder (1024)
+        Native.Cmd_ArgsBuffer (sb, 1024)
+        sb.ToString ()
+

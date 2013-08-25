@@ -38,6 +38,7 @@ open Engine.Network
 open Engine.IO
 open Engine.Command
 open Engine.NativeInterop
+open Engine.Fsi
 
 module private Native =
     [<DllImport (LibEngine, CallingConvention = DefaultCallingConvention)>]
@@ -108,13 +109,38 @@ module System =
         Common.Init ""
         Network.Init ()
 
-        Command.Add "f#" (fun _ -> 
-            printfn "fsharp"
+#if USE_FSI_SESSION
+        let fsi = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\fsi.exe"
+        Command.Add "fsi" (fun _ -> 
+            match fsi.IsRunning with
+            | true -> ()
+            | _ ->
+            fsi.Start ()
+            // Redirect output for Fsi
+            fsi.OutputReceived.Add (fun evArgs ->
+                printfn "%s" evArgs.Data
+            )
+
+            // this doesn't work? =/
+            fsi.ErrorReceived.Add (fun evArgs ->
+                printfn "%s" evArgs.Data
+            )
         )
 
-        Command.Add "fsharp" (fun _ ->
-            printfn "f#"
+        Command.Add "fsi_write" (fun _ ->
+            match fsi.IsRunning with
+            | false -> ()
+            | _ ->
+            fsi.WriteLine <| Command.ArgsBuffer ()
         )
+
+        Command.Add "fsi_quit" (fun _ ->
+            match fsi.IsRunning with
+            | false -> ()
+            | _ ->
+            fsi.Quit ()
+        )
+#endif
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
