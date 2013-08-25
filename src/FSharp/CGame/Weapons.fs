@@ -26,8 +26,93 @@ namespace CGame
 #nowarn "51"
 
 open Engine.Math
+open Engine.Renderer
+
+// Types
+// Note: Move this to a Types.fs
+
+module Constants =
+    [<Literal>]
+    let LandDeflectTime = 150
+
+    [<Literal>]
+    let LandReturnTime = 300
+
+/// <summary>
+/// Based on Q3: cg_t
+/// CGame
+///
+/// types are currently unordered, sort of
+/// TODO: No-where near finished with this record.
+/// </summary>
+type CGame =
+    {
+        Time: int;              // this is the time value that the client
+                                // is rendering at.
+
+        LandChange: single;     // for landing hard
+        LandTime: int;
+
+        RefDef: RefDef;
+        RefDefViewAngles: Vector3;
+
+        // temp working variables for player view
+        BobCycle: int;
+        BobFractionSin: single;
+        XYSpeed: single;
+    }
+
+// End Types
 
 module Weapons =
-    let calculateWeaponPosition (origin: Vector3) (angles: Vector3) (bobCycle: int) (xyspeed: int) =
-        ()
+
+    /// <summary>
+    /// Based on Q3: CG_CalculateWeaponPosition
+    /// CalculateWeaponPosition
+    /// </summary>
+    let calculateWeaponPosition (cg: CGame) =
+        let origin = cg.RefDef.ViewOrigin
+        let angles = cg.RefDefViewAngles
+
+        // on odd legs, invert some angles
+        let scale =
+            match cg.BobCycle &&& 1 with
+            | 0 -> -cg.XYSpeed
+            | _ -> cg.XYSpeed
+
+        // gun angles from bobbing
+        let angles =
+            Vector3 (
+                angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f), // PITCH
+                angles.Y + (scale * cg.BobFractionSin * 0.01f), // YAW
+                angles.Z + (scale * cg.BobFractionSin * 0.005f) // ROLL
+            )
+
+
+        let deltaTime = cg.Time - cg.LandTime
+        
+        let originZ =
+            // drop the weapon when landing
+            match deltaTime with
+            | x when x < Constants.LandDeflectTime ->
+                origin.Z + (cg.LandChange * 0.25f * (single x / single Constants.LandDeflectTime))
+            | x when x < Constants.LandDeflectTime + Constants.LandReturnTime ->
+                origin.Z + (cg.LandChange * 0.25f * single (Constants.LandDeflectTime + Constants.LandReturnTime - x) / single Constants.LandReturnTime)
+            | _ -> origin.Z
+
+        let scale = cg.XYSpeed + 40.f
+        let fractionSin = sin <| single cg.Time * 0.001f
+        let angles =
+            Vector3 (
+                angles.X + (scale * fractionSin * 0.01f), // PITCH
+                angles.Y + (scale * fractionSin * 0.01f), // YAW
+                angles.Z + (scale * fractionSin * 0.01f) // ROLL
+            )
+        let origin =
+            Vector3 (
+                origin.X,
+                origin.Y,
+                originZ
+            )
+        (origin, angles)
 
