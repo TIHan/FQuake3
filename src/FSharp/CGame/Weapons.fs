@@ -100,6 +100,7 @@ module Weapons =
                 origin.Z + (cg.LandChange * 0.25f * single (Constants.LandDeflectTime + Constants.LandReturnTime - x) / single Constants.LandReturnTime)
             | _ -> origin.Z
 
+        // idle drift
         let scale = cg.XYSpeed + 40.f
         let fractionSin = sin <| single cg.Time * 0.001f
         let angles =
