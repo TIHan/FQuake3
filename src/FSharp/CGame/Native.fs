@@ -476,7 +476,7 @@ type cg_t =
     val mutable stepChange : single
     val mutable stepTime : int
     val mutable duckChange : single
-    val mutable duckTime : single
+    val mutable duckTime : int
     val mutable landChange : single
     val mutable landTime : int
     val mutable weaponSelect : int

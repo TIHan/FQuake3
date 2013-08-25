@@ -327,6 +327,11 @@ type shader_t =
     val mutable shaderName : char
     // TODO:
 
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 256)>]
+type refdef_t_text =
+    [<FieldOffset (0)>]
+    val private value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -335,14 +340,49 @@ type refdef_t =
     val mutable y : int
     val mutable width : int
     val mutable height : int
+    val mutable fov_x : single
+    val mutable fov_y : single
     val mutable vieworg : vec3_t
     val mutable viewaxis : vec3_t
     val private viewaxis1 : vec3_t
     val private viewaxis2 : vec3_t
     val mutable time : int;
     val mutable rdflags : int;
-    // TODO:
 
+    val mutable areamask : byte
+    val private areamask1 : byte
+    val private areamask2 : byte
+    val private areamask3 : byte
+    val private areamask4 : byte
+    val private areamask5 : byte
+    val private areamask6 : byte
+    val private areamask7 : byte
+    val private areamask8 : byte
+    val private areamask9 : byte
+    val private areamask10 : byte
+    val private areamask11 : byte
+    val private areamask12 : byte
+    val private areamask13 : byte
+    val private areamask14 : byte
+    val private areamask15 : byte
+    val private areamask16 : byte
+    val private areamask17 : byte
+    val private areamask18 : byte
+    val private areamask19 : byte
+    val private areamask20 : byte
+    val private areamask21 : byte
+    val private areamask22 : byte
+    val private areamask23 : byte
+    val private areamask24 : byte
+    val private areamask25 : byte
+    val private areamask26 : byte
+    val private areamask27 : byte
+    val private areamask28 : byte
+    val private areamask29 : byte
+    val private areamask30 : byte
+    val private areamask31 : byte
+
+    val mutable text : refdef_t_text
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
