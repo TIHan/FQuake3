@@ -48,8 +48,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RendererTypes.fs" />
+    <Compile Include="Types.fs" />
     <Compile Include="Main.fs" />
+    <Compile Include="Native.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

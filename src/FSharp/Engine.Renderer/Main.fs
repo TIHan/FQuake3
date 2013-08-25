@@ -53,7 +53,7 @@ module Main =
         /// </summary>
         [<Pure>]
         let TransformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
-            Transform.Init (fun i ->
+            Transform.init (fun i ->
                 let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
@@ -1044,12 +1044,12 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
             let v1 = vertices.[indices.[0]]
             let v2 = vertices.[indices.[1]]
             let v3 = vertices.[indices.[2]]
-            let plane4 = Plane.InitFromPoints v1.Vertex v2.Vertex v3.Vertex
+            let plane4 = Plane.ofPoints v1.Vertex v2.Vertex v3.Vertex
 
             Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | Poly (value) ->
             let vertices = value.Vertices
-            let plane4 = Plane.InitFromPoints vertices.[0].Vertex vertices.[1].Vertex vertices.[2].Vertex
+            let plane4 = Plane.ofPoints vertices.[0].Vertex vertices.[1].Vertex vertices.[2].Vertex
 
             Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | _ ->
@@ -1190,7 +1190,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     //// create plane axis for the portal we are seeing
     [<Pure>]
     let CreatePlaneAxis (drawSurface: DrawSurface) =
-        PlaneForSurface drawSurface.Surface Plane.Zero
+        PlaneForSurface drawSurface.Surface Plane.zero
 
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
@@ -1210,7 +1210,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
         | false -> (originalPlane, originalPlane, tr)
         | _ ->
 
-        let tr = TrGlobals.UpdateCurrentEntityById entityId tr
+        let tr = TrGlobals.updateCurrentEntityById entityId tr
         match tr.CurrentEntity with
         | None -> raise <| Exception "Current entity does not exist."
         | Some (entity) ->
@@ -1227,7 +1227,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
         let originalDistance = originalPlane.Distance + Vector3.dot originalPlane.Normal orientation.Origin
 
         (
-            Plane.UpdateDistance originalDistance originalPlane,
+            Plane.updateDistance originalDistance originalPlane,
             Plane (normal, distance, PlaneType.X, 0uy),
             { tr with Orientation = orientation }
         )

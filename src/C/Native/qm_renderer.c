@@ -29,49 +29,49 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 MObject
 qm_map_orientation (orientation_t* orientation)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "Orientation", "ofNative", &orientation);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "Orientation", "ofNative", &orientation);
 }
 
 MObject
 qm_map_orientationr (orientationr_t* orientation)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "OrientationR", "ofNative", &orientation);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "OrientationR", "ofNative", &orientation);
 }
 
 MObject
 qm_map_plane (cplane_t* plane)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "Plane", "ofNative", &plane);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "Plane", "ofNative", &plane);
 }
 
 MObject
 qm_map_view_parms (viewParms_t* view_parms)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "ViewParms", "ofNative", &view_parms);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "ViewParms", "ofNative", &view_parms);
 }
 
 MObject
 qm_map_ref_entity (refEntity_t* ref_entity)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "RefEntity", "ofNative", &ref_entity);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "RefEntity", "ofNative", &ref_entity);
 }
 
 MObject
 qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "TrRefEntity", "ofNative", &tr_ref_entity);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "TrRefEntity", "ofNative", &tr_ref_entity);
 }
 
 MObject
 qm_map_surface (surfaceType_t* surfaceType)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "Surface", "ofNativePtr", &surfaceType);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "Surface", "ofNativePtr", &surfaceType);
 }
 
 MObject
 qm_map_frustum (cplane_t* frustum)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "Frustum", "ofNativePtr", &frustum);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "Frustum", "ofNativePtr", &frustum);
 }
 
 void
@@ -81,13 +81,13 @@ qm_frustum_map (MObject obj, cplane_t* frustum)
 	
 	args [0] = m_object_as_arg (obj);
 	args [1] = frustum;
-	m_invoke_method ("Engine.Renderer", "Engine.Renderer", "Frustum", "toNativePtr", args);
+	m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "Frustum", "toNativePtr", args);
 }
 
 MObject
 qm_map_draw_surf (drawSurf_t* draw_surf)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer", "DrawSurface", "ofNative", &draw_surf);
+	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "DrawSurface", "ofNative", &draw_surf);
 }
 
 MObject

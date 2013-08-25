@@ -55,8 +55,8 @@ module List =
             NativePtr.get native i
         )
 
-    let inline ofNativePtrObjArray<'T,'U when 'T : (static member ofNative : 'U -> 'T) and 'U : unmanaged> size (native: nativeptr<'U>) =
+    let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: 'T -> 'U) (native: nativeptr<'T>) =
         List.init size (fun i ->
-            (^T : (static member ofNative : 'U -> 'T) (NativePtr.get native i))
+            f <| NativePtr.get native i
         )
 
