@@ -43,10 +43,10 @@ type qhandle_t = int
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type cvar_t =
-    val mutable name : nativeptr<char>
-    val mutable string : nativeptr<char>
-    val mutable resetString : nativeptr<char>
-    val mutable latchedString : nativeptr<char>
+    val mutable name : nativeptr<sbyte>
+    val mutable string : nativeptr<sbyte>
+    val mutable resetString : nativeptr<sbyte>
+    val mutable latchedString : nativeptr<sbyte>
     val mutable flags : int
     val mutable modified : qboolean
     val mutable modificationCount : int

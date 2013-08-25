@@ -373,7 +373,7 @@ type skulltrail_t =
 [<StructLayout (LayoutKind.Explicit, Size = 1024)>]
 type cg_t_infoScreenText =
     [<FieldOffset (0)>]
-    val private value : char
+    val private value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 3840)>]
@@ -385,13 +385,13 @@ type cg_t_scores =
 [<StructLayout (LayoutKind.Explicit, Size = 32)>]
 type cg_t_killerName =
     [<FieldOffset (0)>]
-    val private value : char
+    val private value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 1024)>]
 type cg_t_spectatorList =
     [<FieldOffset (0)>]
-    val private value : char
+    val private value : sbyte
 
 // maxclients = 64
 [<Struct>]
@@ -404,7 +404,19 @@ type cg_t_skulltrails =
 [<StructLayout (LayoutKind.Explicit, Size = 1024)>]
 type cg_t_centerPrint =
     [<FieldOffset (0)>]
-    val private value : char
+    val private value : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 80)>]
+type cg_t_soundBuffer =
+    [<FieldOffset (0)>]
+    val private value : qhandle_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
+type cg_t_testModelName =
+    [<FieldOffset (0)>]
+    val private value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -521,4 +533,75 @@ type cg_t =
     val mutable voiceTime : int
     val mutable rewardStack : int
     val mutable rewardTime : int
-    // TODO:
+    
+    val mutable rewardCount : int
+    val private rewardCount1 : int
+    val private rewardCount2 : int
+    val private rewardCount3 : int
+    val private rewardCount4 : int
+    val private rewardCount5 : int
+    val private rewardCount6 : int
+    val private rewardCount7 : int
+    val private rewardCount8 : int
+    val private rewardCount9 : int
+
+    val mutable rewardShader : qhandle_t
+    val private rewardShader1 : qhandle_t
+    val private rewardShader2 : qhandle_t
+    val private rewardShader3 : qhandle_t
+    val private rewardShader4 : qhandle_t
+    val private rewardShader5 : qhandle_t
+    val private rewardShader6 : qhandle_t
+    val private rewardShader7 : qhandle_t
+    val private rewardShader8 : qhandle_t
+    val private rewardShader9 : qhandle_t
+
+    val mutable rewardSound : qhandle_t
+    val private rewardSound1 : qhandle_t
+    val private rewardSound2 : qhandle_t
+    val private rewardSound3 : qhandle_t
+    val private rewardSound4 : qhandle_t
+    val private rewardSound5 : qhandle_t
+    val private rewardSound6 : qhandle_t
+    val private rewardSound7 : qhandle_t
+    val private rewardSound8 : qhandle_t
+    val private rewardSound9 : qhandle_t
+
+    val mutable soundBufferIn : int
+    val mutable soundBufferOut : int
+    val mutable soundtime : int
+    val mutable soundBuffer : cg_t_soundBuffer
+    val mutable voiceChatTime : int
+    val mutable voiceChatBufferIn : int
+    val mutable voiceChatBufferOut : int
+    val mutable warmup : int
+    val mutable warmupCount : int
+    val mutable itemPickup : int
+    val mutable itemPickupTime : int
+    val mutable itemPickupBlendTime : int
+    val mutable weaponSelectTime : int
+    val mutable weaponAnimation : int
+    val mutable weaponAnimationTime : int
+    val mutable damageTime : single
+    val mutable damageX : single
+    val mutable damageY : single
+    val mutable damageValue : single
+    val mutable headYaw : single
+    val mutable headEndPitch : single
+    val mutable headEndYaw : single
+    val mutable headEndTime : int
+    val mutable headStartPitch : single
+    val mutable headStartYaw : single
+    val mutable headStartTime : int
+    val mutable v_dmg_time : single
+    val mutable v_dmg_pitch : single
+    val mutable v_dmg_roll : single
+    val mutable kick_angles : vec3_t
+    val mutable kick_origin : vec3_t
+    val mutable bobfracsin : single
+    val mutable bobcycle : int
+    val mutable xyspeed : single
+    val mutable nextOrbitTime : int
+    val mutable testModelEntity : refEntity_t
+    val mutable testModelName : cg_t_testModelName
+    val mutable testGun : qboolean
