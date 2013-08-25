@@ -35,6 +35,7 @@ open Microsoft.FSharp.NativeInterop
 open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
+open Engine.Native
 open Engine.Renderer
 
 [<Struct>]

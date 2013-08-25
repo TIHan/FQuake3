@@ -29,5 +29,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 MObject
 qm_map_cvar (cvar_t* cvar)
 {
-	return m_invoke_method ("Engine", "Engine.Core", "Cvar", "ofNative", &cvar);
+	return m_invoke_method ("Engine", "Engine.Native", "Cvar", "ofNative", &cvar);
 }
