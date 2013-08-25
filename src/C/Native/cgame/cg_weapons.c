@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
+#include "../qm_cgame.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 /*
 ==========================

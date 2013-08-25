@@ -19,6 +19,10 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
+
+#ifndef __CG_LOCAL_H
+#define __CG_LOCAL_H
+
 //
 #include "../game/q_shared.h"
 #include "tr_types.h"
@@ -1664,4 +1668,4 @@ void	CG_ParticleExplosion (char *animStr, vec3_t origin, vec3_t vel, int duratio
 extern qboolean		initparticles;
 int CG_NewParticleArea ( int num );
 
-
+#endif	// __CG_LOCAL_H
