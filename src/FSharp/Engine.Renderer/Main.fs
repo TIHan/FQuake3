@@ -37,7 +37,7 @@ open Engine.Math
 open Engine.NativeInterop
 
 module Main =
-    let FlipMatrix =
+    let flipMatrix =
         // convert from our coordinate system (looking down X)
         // to OpenGL's coordinate system (looking down -Z)
         Matrix16 (
@@ -52,7 +52,7 @@ module Main =
         /// Transform into world space.
         /// </summary>
         [<Pure>]
-        let TransformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
+        let transformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
             Transform.init (fun i ->
                 let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
@@ -66,7 +66,7 @@ module Main =
         /// Check against frustum planes.
         /// </summary>
         [<Pure>]
-        let CheckFrustumPlanes (transformed: Transform) (frustum: Frustum) =
+        let checkFrustumPlanes (transformed: Transform) (frustum: Frustum) =
             let rec checkFrustumPlane (frust: Plane) front back isFront acc =
                 match acc = 8 || isFront with
                 | true -> (front, back)
@@ -76,8 +76,6 @@ module Main =
                     match distance > frust.Distance with
                     | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
                     | _ -> checkFrustumPlane frust front 1 false (acc + 1)
-
-
 
             let rec checkFrustumPlanes anyBack isFront acc =
                 match acc = 4 || isFront = false with
@@ -99,7 +97,7 @@ module Main =
         /// CheckFrustumPlanes
         /// </summary>
         [<Pure>]
-        let CheckFrustumPlanes (point: Vector3) (radius: single) (frustum: Frustum) =
+        let checkFrustumPlanes (point: Vector3) (radius: single) (frustum: Frustum) =
             let rec checkFrustumPlanes mightBeClipped canCullOut acc =
                 match acc = 4 || canCullOut with
                 | true -> (mightBeClipped, canCullOut)
@@ -181,16 +179,16 @@ int R_CullLocalBox (vec3_t bounds[2]) {
     /// CullLocalBox
     // </summary>
     [<Pure>]
-    let CullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
+    let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
         match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
 
         // transform into world space
-        let transformed = LocalBox.TransformWorldSpace bounds orientation
+        let transformed = LocalBox.transformWorldSpace bounds orientation
 
         // check against frustum planes
-        LocalBox.CheckFrustumPlanes transformed frustum
+        LocalBox.checkFrustumPlanes transformed frustum
 
 (*
 int R_CullPointAndRadius( vec3_t pt, float radius )
@@ -234,12 +232,12 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
     /// CullPointAndRadius
     /// </summary>
     [<Pure>]
-    let CullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noCull: Cvar) =
+    let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noCull: Cvar) =
         match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
 
-        PointAndRadius.CheckFrustumPlanes point radius frustum
+        PointAndRadius.checkFrustumPlanes point radius frustum
 
 (*
 void R_LocalPointToWorld (vec3_t local, vec3_t world) {
@@ -254,7 +252,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world) {
     /// LocalPointToWorld
     /// </summary>
     [<Pure>]
-    let LocalPointToWorld (local: Vector3) (orientation: OrientationR) =
+    let localPointToWorld (local: Vector3) (orientation: OrientationR) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X,
             (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y,
@@ -274,7 +272,7 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
     /// LocalNormalToWorld
     /// </summary>
     [<Pure>]
-    let LocalNormalToWorld (local: Vector3) (orientation: OrientationR) =
+    let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
         Vector3 (
             (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X),
             (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y),
@@ -294,7 +292,7 @@ void R_WorldToLocal (vec3_t world, vec3_t local) {
     /// WorldToLocal
     /// </summary>
     [<Pure>]
-    let WorldToLocal (world: Vector3) (orientation: OrientationR) =
+    let worldToLocal (world: Vector3) (orientation: OrientationR) =
         Vector3 (
             Vector3.dot world orientation.Axis.[0],
             Vector3.dot world orientation.Axis.[1],
@@ -318,9 +316,9 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
     /// CullLocalPointAndRadius
     /// </summary>
     [<Pure>]
-    let CullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
-        let transformed = LocalPointToWorld point orientation
-        CullPointAndRadius transformed radius frustum noCull
+    let cullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
+        let transformed = localPointToWorld point orientation
+        cullPointAndRadius transformed radius frustum noCull
 
 (*
 void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
@@ -350,7 +348,7 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
     /// TransformModelToClip
     /// </summary>
     [<Pure>]
-    let TransformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
+    let transformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
         let calculateEye i =
             (source.X * modelMatrix.[0, i]) +
             (source.Y * modelMatrix.[1, i]) +
@@ -401,7 +399,7 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
     /// TransformClipToWindow
     /// </summary>
     [<Pure>]
-    let TransformClipToWindow (clip: Vector4) (view: ViewParms) =
+    let transformClipToWindow (clip: Vector4) (view: ViewParms) =
         let normalized =
             Vector4 (
                 clip.X / clip.W,
@@ -437,7 +435,7 @@ void myGlMultMatrix( const float *a, const float *b, float *out ) {
 *)
 
     // TODO: This will need to go away eventually.
-    let MyGLMultMatrix (a: Matrix16) (b: Matrix16) =
+    let myGLMultMatrix (a: Matrix16) (b: Matrix16) =
         a * b
 
 (*
@@ -512,7 +510,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
     /// TODO: Make this a little bit nicer. newOrientation and newNewOrientation are horrible names.
     /// </summary>
     [<Pure>]
-    let RotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: OrientationR) =
+    let rotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: OrientationR) =
         match entity.Entity.Type <> RefEntityType.Model with
         | true -> viewParms.World
         | _ ->
@@ -630,7 +628,7 @@ void R_RotateForViewer (void)
     /// Sets up the modelview matrix for a given viewParm
     /// </summary>
     [<Pure>]
-    let RotateForViewer (viewParms: ViewParms) =
+    let rotateForViewer (viewParms: ViewParms) =
         
         let axis =
             Axis (
@@ -671,7 +669,7 @@ void R_RotateForViewer (void)
             viewOrigin,
             // convert from our coordinate system (looking down X)
             // to OpenGL's coordinate system (looking down -Z)
-            viewerMatrix * FlipMatrix
+            viewerMatrix * flipMatrix
         )
 
 (*
@@ -742,7 +740,7 @@ static void SetFarClip( void )
     /// SetFarClip
     /// </summary>
     [<Pure>]
-    let SetFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: OrientationR) =
+    let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: OrientationR) =
         // if not rendering the world (icons, menus, etc)
         // set a 2k far clip plane
         match rdFlags.HasFlag RdFlags.NoWorldModel with
@@ -820,9 +818,9 @@ void R_SetupProjection( void ) {
     /// SetupProjection
     /// </summary>
     [<Pure>]
-    let SetupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
+    let setupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
         // dynamically compute far clip plane distance
-        let zFar = SetFarClip rdFlags view.VisibilityBounds view.Orientation
+        let zFar = setFarClip rdFlags view.VisibilityBounds view.Orientation
 
         let xMax = zNear * (tan <| fovX * QMath.PI / 360.f)
         let xMin = -xMax
@@ -885,7 +883,7 @@ void R_SetupFrustum (void) {
     /// Setup that culling frustum planes for the current view
     /// </summary>
     [<Pure>]
-    let SetupFrustum (view: ViewParms) =
+    let setupFrustum (view: ViewParms) =
         let xAngle = view.FovX / 180.f * QMath.PI * 0.5f
         let xs = sin xAngle
         let xc = cos xAngle
@@ -953,7 +951,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
     /// MirrorPoint
     /// </summary>
     [<Pure>]
-    let MirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
+    let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let local = v - surface.Origin
         let rec transform transformed acc =
             match acc with
@@ -981,7 +979,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
     /// MirrorVector
     /// </summary>
     [<Pure>]
-    let MirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
+    let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let rec transform transformed acc =
             match acc with
             | 3 -> transformed
@@ -1034,7 +1032,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
     /// PlaneForSurface
     /// </summary>
     [<Pure>]
-    let PlaneForSurface (surface: Surface) (plane: Plane) =
+    let planeForSurface (surface: Surface) (plane: Plane) =
         match surface with
         | Face (value) ->
             value.Plane
@@ -1189,8 +1187,8 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     // This is for GetPortalOrientation
     //// create plane axis for the portal we are seeing
     [<Pure>]
-    let CreatePlaneAxis (drawSurface: DrawSurface) =
-        PlaneForSurface drawSurface.Surface Plane.zero
+    let createPlaneAxis (drawSurface: DrawSurface) =
+        planeForSurface drawSurface.Surface Plane.zero
 
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
@@ -1201,9 +1199,9 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
     ///
     /// Returns true if it should be mirrored
     /// </summary>
-    let GetPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
+    let getPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
         // create plane axis for the portal we are seeing
-        let originalPlane = CreatePlaneAxis drawSurface
+        let originalPlane = createPlaneAxis drawSurface
 
         // rotate the plane if necessary
         match entityId <> Constants.EntityIdWorld with
@@ -1216,11 +1214,11 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
         | Some (entity) ->
 
         // get the orientation of the entity
-        let orientation = RotateForEntity entity tr.ViewParms tr.Orientation
+        let orientation = rotateForEntity entity tr.ViewParms tr.Orientation
 
         // rotate the plane, but keep the non-rotated version for matching
         // against the portalSurface entities
-        let normal = LocalNormalToWorld originalPlane.Normal orientation
+        let normal = localNormalToWorld originalPlane.Normal orientation
         let distance = originalPlane.Distance + Vector3.dot normal orientation.Origin
 
         // translate the original plane
@@ -1301,5 +1299,5 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
     /// IsMirror
     /// </summary>
     // Note: this is internal
-    let IsMirror (drawSurface: DrawSurface) (entity: TrRefEntity) =
+    let isMirror (drawSurface: DrawSurface) (entity: TrRefEntity) =
         ()
