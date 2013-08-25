@@ -37,6 +37,7 @@ open Engine.Math
 open Engine.Native
 open Engine.NativeInterop
 open Engine.Renderer.Native
+open CGame
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -605,3 +606,16 @@ type cg_t =
     val mutable testModelEntity : refEntity_t
     val mutable testModelName : cg_t_testModelName
     val mutable testGun : qboolean
+
+module CGame =
+    let inline ofNative (native: cg_t) =
+        {
+            Time = native.time;
+            LandChange = native.landChange;
+            LandTime = native.landTime;
+            RefDef = RefDef.ofNative native.refdef;
+            RefDefViewAngles = NativePtr.toStructure &&native.refdefViewAngles
+            BobCycle = native.bobcycle;
+            BobFractionSin = native.bobfracsin;
+            XYSpeed = native.xyspeed;
+        }
