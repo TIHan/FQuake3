@@ -124,16 +124,7 @@ module System =
             match fsi.IsRunning with
             | true -> ()
             | _ ->
-            fsi.Start ()
-            // Redirect output for Fsi
-            fsi.OutputReceived.Add (fun evArgs ->
-                printfn "%s" evArgs.Data
-            )
-
-            // this doesn't work? =/
-            fsi.ErrorReceived.Add (fun evArgs ->
-                printfn "%s" evArgs.Data
-            )
+            fsi.Start () |> ignore
         )
 #endif
 
@@ -158,6 +149,18 @@ module System =
             // run the game
             Common.Frame ();
             
+#if USE_FSI_SESSION
+            match fsi.IsRunning with
+            | true ->
+                match fsi.ReadOutput () with
+                | "" -> ()
+                | x -> printf "%s" x 
+
+                match fsi.ReadError () with
+                | "" -> ()
+                | x -> printf "%s" x 
+            | _ -> ()
+#endif
             // Flush standard out
             io.FlushOut ()
         ()

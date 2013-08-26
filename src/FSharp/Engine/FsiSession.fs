@@ -21,13 +21,22 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Fsi
 
+open System.Threading
+open System.Text
 open System.Diagnostics
 
+// based on: http://clear-lines.com/blog/post/Using-FSI-to-execute-FSharp-code-from-a-dot-NET-app.aspx
 type FsiSession (fsiPath: string) =
 
     let info = ProcessStartInfo ()
 
     let mutable fsiProcess = Unchecked.defaultof<Process>
+
+    let outputObj = obj ()
+    let sbOutput = StringBuilder ()
+
+    let errorObj = obj ()
+    let sbError = StringBuilder ()
 
     do
         info.RedirectStandardInput <- true
@@ -37,33 +46,66 @@ type FsiSession (fsiPath: string) =
         info.CreateNoWindow <- true
         info.FileName <- fsiPath
 
-    [<CLIEvent>]
-    member this.OutputReceived = fsiProcess.OutputDataReceived
-
-    [<CLIEvent>]
-    member this.ErrorReceived = fsiProcess.ErrorDataReceived
-
-    member this.Start () =
-        fsiProcess <- Process ()
-        fsiProcess.StartInfo <- info
-        fsiProcess.Start ()
-        fsiProcess.BeginOutputReadLine ()
-
-    member this.Quit () =
-        this.WriteLine "#quit;;"
-        fsiProcess.WaitForExit ()
-        fsiProcess.Close ()
-        fsiProcess.Dispose ()
-        fsiProcess <- null
-
     member this.IsRunning = fsiProcess <> null && not fsiProcess.HasExited
 
     member this.WriteLine (line: string) =
         fsiProcess.StandardInput.WriteLine (line)
         fsiProcess.StandardInput.Flush ()
 
+    member this.ReadOutput () =
+        lock outputObj (fun _ ->
+            let output = sbOutput.ToString ()
+            sbOutput.Clear ()
+            output
+        )
+
     member this.ReadError () =
-        fsiProcess.StandardError.ReadToEnd ()
+        lock errorObj (fun _ ->
+            let error = sbError.ToString ()
+            sbError.Clear ()
+            error
+        )
+
+    member this.Start () =
+        match this.IsRunning with
+        | true -> ()
+        | _ ->
+
+        match fsiProcess = null with
+        | false ->
+            // cleanup
+            fsiProcess.Close ()
+            fsiProcess.Dispose ()
+        | _ -> ()
+
+        fsiProcess <- Process ()
+        fsiProcess.StartInfo <- info
+        fsiProcess.Start ()
+        |> ignore
+
+        sbOutput.Clear ()
+        sbError.Clear ()
+
+        fsiProcess.OutputDataReceived.Add (fun args ->
+            lock outputObj (fun _ ->
+                sbOutput.AppendLine args.Data
+                |> ignore
+            )
+        )
+        fsiProcess.BeginOutputReadLine ()
+
+        // handle standard error asynchronously
+        async {
+            while not fsiProcess.HasExited do
+                while not fsiProcess.StandardError.EndOfStream do
+                    lock errorObj (fun _ ->
+                        sbError.AppendLine <| fsiProcess.StandardError.ReadLine ()
+                        |> ignore
+                    )
+                // sleep a small amount
+                Async.Sleep 5
+            printfn "F# Interactive Terminated"
+        } |> Async.Start
 
     static member inline StartNew (fsiPath: string) =
         let session = FsiSession fsiPath
