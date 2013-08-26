@@ -135,20 +135,6 @@ module System =
                 printfn "%s" evArgs.Data
             )
         )
-
-        Command.Add "fsi_write" (fun _ ->
-            match fsi.IsRunning with
-            | false -> ()
-            | _ ->
-            fsi.WriteLine <| Command.ArgsBuffer ()
-        )
-
-        Command.Add "fsi_quit" (fun _ ->
-            match fsi.IsRunning with
-            | false -> ()
-            | _ ->
-            fsi.Quit ()
-        )
 #endif
 
         // hide the early console since we've reached the point where we

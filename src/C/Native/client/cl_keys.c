@@ -483,6 +483,19 @@ void Console_Key (int key) {
 
 	// enter finishes the line
 	if ( key == K_ENTER || key == K_KP_ENTER ) {
+// FSI
+#if 1
+		guchar is_fsi_running = *(guchar*)m_object_unbox_struct (m_invoke_method ("Engine", "Engine.System", "System", "CheckIsFsiRunning", NULL));
+		if (is_fsi_running)
+		{
+			MObject m_null;
+			m_invoke_method_easy ("Engine", "Engine.System", "System", "WriteFsiLine", 1, {
+				__args [0] = m_string_as_arg (m_string (g_consoleField.buffer));
+			}, m_null);
+			Field_Clear (&g_consoleField);
+			return;
+		}
+#endif
 		// if not in the game explicitly prepent a slash if needed
 		if ( cls.state != CA_ACTIVE && g_consoleField.buffer[0] != '\\' 
 			&& g_consoleField.buffer[0] != '/' ) {
