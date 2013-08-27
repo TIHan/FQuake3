@@ -23,7 +23,6 @@ namespace Engine.Fsi
 
 open System.Text
 open System.Diagnostics
-open System.Reflection
 
 // based on: http://clear-lines.com/blog/post/Using-FSI-to-execute-FSharp-code-from-a-dot-NET-app.aspx
 type FsiSession (fsiPath: string) =
