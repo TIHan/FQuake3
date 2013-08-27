@@ -31,6 +31,7 @@ open System.Text
 open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
+open System.Reflection
 open Microsoft.FSharp.NativeInterop
 open Engine.Input
 open Engine.Common
