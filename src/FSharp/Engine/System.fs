@@ -120,14 +120,14 @@ module System =
         Common.Init ""
         Network.Init ()
 
-//#if USE_FSI_SESSION
+#if USE_FSI_SESSION
         Command.Add "fsi" (fun _ -> 
             match fsi.IsRunning with
             | true -> ()
             | _ ->
             fsi.Start () |> ignore
         )
-//#endif
+#endif
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
@@ -150,7 +150,7 @@ module System =
             // run the game
             Common.Frame ();
             
-//#if USE_FSI_SESSION
+#if USE_FSI_SESSION
             match fsi.IsRunning with
             | true ->
                 match fsi.ReadOutput () with
@@ -161,7 +161,7 @@ module System =
                 | "" -> ()
                 | x -> printf "%s" x 
             | _ -> ()
-//#endif
+#endif
             // Flush standard out
             io.FlushOut ()
         ()
