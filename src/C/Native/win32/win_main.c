@@ -629,11 +629,7 @@ BACKGROUND FILE STREAMING
 
 #if 1
 
-M_EXPORT
-void
-M_DECL
-Sys_InitStreamThread (void)
-{
+M_EXPORT void M_DECL Sys_InitStreamThread( void ) {
 }
 
 void Sys_ShutdownStreamThread( void ) {
@@ -1175,6 +1171,95 @@ void Sys_Init( void ) {
 	IN_Init();		// FIXME: not in dedicated?
 }
 
+#if 0
+//=======================================================================
+
+int	totalMsec, countMsec;
+
+/*
+==================
+WinMain
+
+==================
+*/
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+	char		cwd[MAX_OSPATH];
+	int			startTime, endTime;
+
+    // should never get a previous instance in Win32
+    if ( hPrevInstance ) {
+        return 0;
+	}
+
+	g_wv.hInstance = hInstance;
+	Q_strncpyz( sys_cmdline, lpCmdLine, sizeof( sys_cmdline ) );
+
+	// done before Com/Sys_Init since we need this for error output
+	Sys_CreateConsole();
+
+	// no abort/retry/fail errors
+	SetErrorMode( SEM_FAILCRITICALERRORS );
+
+	// get the initial time base
+	Sys_Milliseconds();
+#if 0
+	// if we find the CD, add a +set cddir xxx command line
+	Sys_ScanForCD();
+#endif
+
+	Sys_InitStreamThread();
+
+	Com_Init( sys_cmdline );
+	NET_Init();
+
+	_getcwd (cwd, sizeof(cwd));
+	Com_Printf("Working directory: %s\n", cwd);
+
+	// hide the early console since we've reached the point where we
+	// have a working graphics subsystems
+	if ( !com_dedicated->integer && !com_viewlog->integer ) {
+		Sys_ShowConsole( 0, qfalse );
+	}
+
+    // main game loop
+	while( 1 ) {
+		// if not running as a game client, sleep a bit
+		if ( g_wv.isMinimized || ( com_dedicated && com_dedicated->integer ) ) {
+			Sleep( 5 );
+		}
+
+		// set low precision every frame, because some system calls
+		// reset it arbitrarily
+//		_controlfp( _PC_24, _MCW_PC );
+//    _controlfp( -1, _MCW_EM  ); // no exceptions, even if some crappy
+                                // syscall turns them back on!
+
+		startTime = Sys_Milliseconds();
+
+		// make sure mouse and joystick are only called once a frame
+		IN_Frame();
+
+		// run the game
+		Com_Frame();
+
+		endTime = Sys_Milliseconds();
+		totalMsec += endTime - startTime;
+		countMsec++;
+	}
+
+	// never gets here
+}
+#endif
+
+
+/*
+========================================================================
+
+FQuake3 Specific
+
+========================================================================
+*/
+
 
 /*
 ==================
@@ -1182,7 +1267,7 @@ Com_IsDedicated
 ==================
 */
 M_EXPORT
-int 
+gint 
 M_DECL
 Com_IsDedicated (void)
 {
@@ -1196,7 +1281,7 @@ Com_IsDedicated
 ==================
 */
 M_EXPORT
-int
+gint
 M_DECL
 Com_IsViewLogEnabled (void)
 {

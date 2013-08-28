@@ -54,7 +54,7 @@
     <Compile Include="Math.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Common.fs" />
-    <Compile Include="Network.fs" />
+    <Compile Include="Net.fs" />
     <Compile Include="IO.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="System.fs" />

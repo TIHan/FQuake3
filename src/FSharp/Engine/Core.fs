@@ -63,3 +63,7 @@ type Cvar =
         Integer: int;               // atoi( string )
     }
 
+
+module Option =
+    let ofNullable x = match x with null -> None | _ -> Some x
+

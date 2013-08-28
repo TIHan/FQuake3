@@ -326,10 +326,7 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 Cmd_Argc
 ============
 */
-M_EXPORT
-int
-M_DECL Cmd_Argc (void)
-{
+M_EXPORT int	M_DECL Cmd_Argc( void ) {
 	return cmd_argc;
 }
 
@@ -412,10 +409,7 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-M_EXPORT
-void
-M_DECL Cmd_ArgsBuffer (char *buffer, int bufferLength)
-{
+M_EXPORT void	M_DECL Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 
@@ -553,9 +547,7 @@ void Cmd_TokenizeString( const char *text_in ) {
 Cmd_AddCommand
 ============
 */
-M_EXPORT
-void
-M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
+M_EXPORT void	M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd_function_t	*cmd;
 	
 	// fail if the command already exists

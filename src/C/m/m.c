@@ -83,27 +83,27 @@ m_setup_debugger (MDomain* domain)
 }
 #endif
 
+
 MDomain*
-m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime)
+m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename)
 {
 	MDomain *const domain = (MDomain *)g_malloc0 (sizeof (MDomain));
-	gchar *version;
-
-	switch (runtime)
-	{
-	case M_RUNTIME_4_0:
-		version = "v4.0.30319";
-		break;
-	case M_RUNTIME_4_5:
-		version = "v4.0.30319";
-		break;
-	default:
-		g_error ("M: Invalid runtime version.");
-	}
 
 	mono_set_dirs (assembly_dir, config_dir);
-	domain->domain = mono_jit_init_version (root_domain_name, version);
+	domain->domain = mono_jit_init (filename);
 	return domain;
+}
+
+
+void
+m_domain_exec (const MDomain const* domain, const gchar *assembly_name, const gint argc, gchar *argv[])
+{
+	MonoAssembly* assembly = mono_domain_assembly_open (domain->domain, assembly_name);
+
+	if (!assembly)
+		g_error ("M: Unable to load %s assembly.\n", assembly_name);
+
+	mono_jit_exec (domain->domain, assembly, argc, argv);
 }
 
 
@@ -112,17 +112,6 @@ m_domain_free (MDomain *const domain)
 {
 	mono_jit_cleanup (domain->domain);
 	g_free (domain);
-}
-
-
-void
-m_domain_exec (MDomain *const domain, const gchar *name, gint argc, gchar *argv[])
-{
-	MonoAssembly *const assembly = mono_domain_assembly_open (domain->domain, name);
-	if (!assembly)
-		g_error ("M: Unable to load %s assembly.\n", name);
-
-	mono_jit_exec (domain->domain, assembly, argc - 1, argv + 1);
 }
 
 

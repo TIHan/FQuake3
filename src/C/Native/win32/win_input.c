@@ -733,10 +733,7 @@ IN_Frame
 Called every frame, even if not generating commands
 ==================
 */
-M_EXPORT
-void
-M_DECL 
-IN_Frame (void) {
+M_EXPORT void M_DECL IN_Frame (void) {
 	// post joystick events
 	IN_JoyMove();
 

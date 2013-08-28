@@ -23,10 +23,12 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #nowarn "9"
 #nowarn "51"
 
-namespace Engine.Network
+namespace Engine.Net
 
 open System
 open System.IO
+open System.Net
+open System.Net.Sockets
 open System.Text
 open System.Runtime.InteropServices
 open System.Threading
@@ -38,8 +40,45 @@ module private Native =
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void NET_Init ()
 
-module Network =
+module Net =
     let Init () =
         Native.NET_Init ()
+
+    let IPSocket (netInterface: string option) (port: int) =
+        match netInterface with
+        | Some x -> printfn "Opening IP socket: %s:%i" x port
+        | None -> printfn "Opening IP socket: localhost:%i" port
+
+        let socket = 
+            try
+                Some <| Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
+            with ex ->
+                printfn "WARNING: IPSocket: Socket: %s" ex.Message
+                None
+
+        match socket with
+        | None -> 0
+        | Some socket ->
+
+        socket.Blocking <- false
+        socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true)
+
+        let address =
+            try
+                IPAddress.Parse netInterface.Value
+            with ex -> IPAddress.Any
+
+        let port =
+            match port with
+            | -1 -> 0
+            | _ -> port
+
+        try
+            socket.Bind (IPEndPoint (address, port))
+            socket.Handle.ToInt32 ()
+        with ex ->
+            printfn "WARNING: IPSocket: Bind: %s" ex.Message
+            socket.Close ()
+            0
 
 

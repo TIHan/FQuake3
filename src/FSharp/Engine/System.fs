@@ -35,11 +35,10 @@ open System.Reflection
 open Microsoft.FSharp.NativeInterop
 open Engine.Input
 open Engine.Common
-open Engine.Network
+open Engine.Net
 open Engine.IO
 open Engine.Command
 open Engine.NativeInterop
-open Engine.Fsi
 
 module private Native =
     [<DllImport (LibEngine, CallingConvention = DefaultCallingConvention)>]
@@ -63,7 +62,6 @@ module private Native =
 /// Note: Revisit to make purely functional.
 /// </summary
 module System =
-    let fsi = FsiSession @"C:\Program Files (x86)\Microsoft SDKs\F#\3.0\Framework\v4.0\fsi.exe"
     let private stopwatch = new Stopwatch ()
 
     let private SetupUnhandledExceptions () =
@@ -93,15 +91,6 @@ module System =
     let GetPhysicalCoreCount () =
         Native.system_cpu_get_physical_core_count ()
 
-    let CheckIsFsiRunning () =
-        fsi.IsRunning
-
-    let WriteFsiLine line =
-        match fsi.IsRunning with
-        | false -> raise <| Exception "Fsi is not running"
-        | _ ->
-        fsi.WriteLine line
-
     let Init () =
         SetupUnhandledExceptions ()
 
@@ -118,16 +107,7 @@ module System =
         Native.Sys_InitStreamThread ()
 
         Common.Init ""
-        Network.Init ()
-
-#if USE_FSI_SESSION
-        Command.Add "fsi" (fun _ -> 
-            match fsi.IsRunning with
-            | true -> ()
-            | _ ->
-            fsi.Start () |> ignore
-        )
-#endif
+        Net.Init ()
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
@@ -149,19 +129,7 @@ module System =
 
             // run the game
             Common.Frame ();
-            
-#if USE_FSI_SESSION
-            match fsi.IsRunning with
-            | true ->
-                match fsi.ReadOutput () with
-                | "" -> ()
-                | x -> printf "%s" x 
 
-                match fsi.ReadError () with
-                | "" -> ()
-                | x -> printf "%s" x 
-            | _ -> ()
-#endif
             // Flush standard out
             io.FlushOut ()
         ()

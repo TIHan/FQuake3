@@ -2352,10 +2352,7 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 Com_Init
 =================
 */
-M_EXPORT
-void
-M_DECL
-Com_Init (char *commandLine) {
+M_EXPORT void M_DECL Com_Init( char *commandLine ) {
 	char	*s;
 
 	Com_Printf( "%s %s %s\n", Q3_VERSION, CPUSTRING, __DATE__ );
@@ -2643,10 +2640,7 @@ int Com_ModifyMsec( int msec ) {
 Com_Frame
 =================
 */
-M_EXPORT
-void
-M_DECL
-Com_Frame (void) {
+M_EXPORT void M_DECL Com_Frame( void ) {
 
 	int		msec, minMsec;
 	static int	lastTime;

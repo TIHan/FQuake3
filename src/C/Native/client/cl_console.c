@@ -466,8 +466,7 @@ DRAWING
 ==============================================================================
 */
 
-// FSI
-#if 0
+
 /*
 ================
 Con_DrawInput
@@ -491,39 +490,6 @@ void Con_DrawInput (void) {
 	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
 		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
 }
-#else
-/*
-================
-Con_DrawInput
-
-Draw the editline after a ] prompt
-================
-*/
-void Con_DrawInput (void) {
-	int		y;
-	guchar is_fsi_running = *(guchar*)m_object_unbox_struct (m_invoke_method ("Engine", "Engine.System", "System", "CheckIsFsiRunning", NULL));
-
-	if ( cls.state != CA_DISCONNECTED && !(cls.keyCatchers & KEYCATCH_CONSOLE ) ) {
-		return;
-	}
-
-	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
-
-	re.SetColor( con.color );
-
-	if (!is_fsi_running)
-	{
-		SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
-	}
-	else
-	{
-		SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, '>' );
-	}
-
-	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
-		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue );
-}
-#endif
 
 
 /*

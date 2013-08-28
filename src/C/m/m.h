@@ -51,24 +51,19 @@ typedef struct {
 	gpointer __priv;
 } MString;
 
-typedef enum {
-	M_RUNTIME_4_0,
-	M_RUNTIME_4_5
-} MRuntime;
-
 #if 0
 void
 m_setup_debugger (MDomain* domain);
 #endif
 
 MDomain*
-m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const char *root_domain_name, const MRuntime runtime);
+m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename);
+
+void
+m_domain_exec (const MDomain const* domain, const gchar *assembly_name, const gint argc, gchar *argv[]);
 
 void
 m_domain_free (MDomain *const domain);
-
-void
-m_domain_exec (MDomain *const domain, const gchar *name, gint argc, gchar *argv[]);
 
 void
 m_load_assembly (const gchar *name);

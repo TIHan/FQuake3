@@ -466,6 +466,7 @@ NET_IPSocket
 ====================
 */
 int NET_IPSocket( char *net_interface, int port ) {
+#if 1
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
 	qboolean			_true = qtrue;
@@ -522,6 +523,17 @@ int NET_IPSocket( char *net_interface, int port ) {
 	}
 
 	return newsocket;
+#else
+	MObject m_new_socket;
+
+	m_invoke_method_easy ("Engine", "Engine.Network", "Network", "IPSocket", 2, {
+		MString m_str = m_string (net_interface);
+		__args [0] = m_object_as_arg (m_invoke_method ("FSharp.Core", "Microsoft.FSharp.Core", "Option", "NewSome", &m_str));
+		__args [1] = &port;
+	}, m_new_socket);
+
+	return *(gint*)m_object_unbox_struct (m_new_socket);
+#endif
 }
 
 
@@ -975,10 +987,7 @@ void NET_Config( qboolean enableNetworking ) {
 NET_Init
 ====================
 */
-M_EXPORT
-void
-M_DECL 
-NET_Init (void) {
+M_EXPORT void M_DECL NET_Init( void ) {
 	int		r;
 
 	r = WSAStartup( MAKEWORD( 1, 1 ), &winsockdata );

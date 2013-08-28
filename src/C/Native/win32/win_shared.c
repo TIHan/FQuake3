@@ -54,9 +54,7 @@ int Sys_Milliseconds (void)
 	return sys_curtime;
 }
 #else
-M_EXPORT
-int
-M_DECL Sys_Milliseconds (void)
+M_EXPORT int M_DECL Sys_Milliseconds (void)
 {
 	return *(int *)m_object_unbox_struct (m_invoke_method ("Engine", "Engine.System", "System", "Milliseconds", NULL));
 }

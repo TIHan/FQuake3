@@ -149,11 +149,7 @@ typedef struct {
 	unsigned short	port;
 } netadr_t;
 
-M_EXPORT
-void
-M_DECL
-NET_Init (void);
-
+M_EXPORT void		M_DECL NET_Init( void );
 void		NET_Shutdown( void );
 void		NET_Restart( void );
 void		NET_Config( qboolean enableNetworking );
@@ -369,9 +365,7 @@ typedef void (*xcommand_t) (void);
 
 void	Cmd_Init (void);
 
-M_EXPORT
-void
-M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function );
+M_EXPORT void	M_DECL Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
@@ -383,16 +377,12 @@ void	Cmd_RemoveCommand( const char *cmd_name );
 void	Cmd_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
 
-M_EXPORT
-int
-M_DECL Cmd_Argc (void);
+M_EXPORT int	M_DECL Cmd_Argc (void);
 char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 char	*Cmd_Args (void);
 char	*Cmd_ArgsFrom( int arg );
-M_EXPORT
-void
-M_DECL Cmd_ArgsBuffer (char *buffer, int bufferLength);
+M_EXPORT void	M_DECL Cmd_ArgsBuffer( char *buffer, int bufferLength );
 char	*Cmd_Cmd (void);
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv () will return an empty string, not a NULL

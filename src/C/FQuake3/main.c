@@ -30,23 +30,29 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
-	// Initialize Mono Domain
-	domain = m_domain_new (mono_lib, mono_etc, "FQuake3", M_RUNTIME_4_5);
+#if EXEC_FSI
+	domain = m_domain_new (mono_lib, mono_etc, "Fsi.exe");
+#else
+	domain = m_domain_new (mono_lib, mono_etc, "Engine.dll");
+#endif
 
-	// Load FSharp.Core Assembly
+	// Load Core
 	m_load_assembly ("FSharp.Core.dll");
 
-	// Load Engine Assembly
+	// Load Engine
 	m_load_assembly ("Engine.dll");
 
-	// Load Engine Assembly
+	// Load Renderer
 	m_load_assembly ("Engine.Renderer.dll");
 
-	// Load CGame Assembly (temporary)
+	// Load CGame (temporary)
 	m_load_assembly ("CGame.dll");
 
-	// Invoke Engine Init
+#if EXEC_FSI
+	m_domain_exec (domain, "Fsi.exe", argc, argv);
+#else
 	m_invoke_method ("Engine", "Engine.System", "System", "Init", NULL);
+#endif
 
 	// Free Domain
 	m_domain_free (domain);
