@@ -491,6 +491,10 @@ void Console_Key (int key) {
 			MObject m_null;
 
 			Com_Printf (">%s\n", g_consoleField.buffer);
+			// copy line to history buffer
+			historyEditLines [nextHistoryLine % COMMAND_HISTORY] = g_consoleField;
+			nextHistoryLine++;
+			historyLine = nextHistoryLine;
 			m_invoke_method_easy ("Engine", "Engine.System", "System", "WriteFsiLine", 1, {
 				__args [0] = m_string_as_arg (m_string (g_consoleField.buffer));
 			}, m_null);

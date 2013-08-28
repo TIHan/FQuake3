@@ -27,6 +27,7 @@ namespace CGame
 
 open Engine.Math
 open Engine.Renderer
+open System.Diagnostics.Contracts
 
 // Types
 // TODO: Move this to a Types.fs
@@ -117,6 +118,7 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
     /// Based on Q3: CG_CalculateWeaponPosition
     /// CalculateWeaponPosition
     /// </summary>
+    [<Pure>]
     let calculateWeaponPosition (cg: CGame) =
         let origin = cg.RefDef.ViewOrigin
         let angles = cg.RefDefViewAngles
