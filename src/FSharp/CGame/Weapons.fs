@@ -66,6 +66,7 @@ type CGame =
 // End Types
 
 module Weapons =
+    let mutable calculateWeaponPositionFunc = (fun (x: CGame) -> (Vector3.zero, Vector3.zero))
     /// <summary>
     /// Based on Q3: CG_CalculateWeaponPosition
     /// CalculateWeaponPosition
