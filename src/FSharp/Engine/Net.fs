@@ -44,7 +44,11 @@ module Net =
     let Init () =
         Native.NET_Init ()
 
-    let IPSocket (netInterface: string option) (port: int) =
+    /// <summary>
+    /// Based on Q3: NET_IPSocket
+    /// Socket
+    /// </summary
+    let createIPSocket (netInterface: string option) (port: int) =
         match netInterface with
         | Some x -> printfn "Opening IP socket: %s:%i" x port
         | None -> printfn "Opening IP socket: localhost:%i" port
@@ -75,7 +79,8 @@ module Net =
 
         try
             socket.Bind (IPEndPoint (address, port))
-            socket.Handle.ToInt32 ()
+            GCHandle.Alloc (socket, GCHandleType.Pinned) |> ignore // FIXME: We are only doing this to prevent GC when passed to unmanaged.
+            int socket.Handle
         with ex ->
             printfn "WARNING: IPSocket: Bind: %s" ex.Message
             socket.Close ()

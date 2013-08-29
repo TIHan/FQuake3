@@ -49,7 +49,7 @@ module private Native =
 module Command =
     let Add (name: string) (f: unit -> unit) =
         let cmd = Native.XCommand (f)
-        GCHandle.Alloc (cmd, GCHandleType.Pinned) |> ignore
+        GCHandle.Alloc (cmd, GCHandleType.Pinned) |> ignore // FIXME: We are only doing this to prevent GC when passed to unmanaged.
         Native.Cmd_AddCommand (name, cmd)
 
     let Argc () =
