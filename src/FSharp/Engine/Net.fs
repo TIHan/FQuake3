@@ -53,7 +53,7 @@ module Net =
             try
                 Some <| Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
             with ex ->
-                printfn "WARNING: IPSocket: Socket: %s" ex.Message
+                printfn "WARNING: IPSocket: Socket: %s" ex.InnerException.Message
                 None
 
         match socket with

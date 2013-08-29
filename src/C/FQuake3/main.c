@@ -34,7 +34,7 @@ main (int argc, char *argv[])
 #if EXEC_FSI
 	domain = m_domain_new (mono_lib, mono_etc, "Fsi.exe");
 #else
-	domain = m_domain_new (mono_lib, mono_etc, "Engine.dll");
+	domain = m_domain_new (mono_lib, mono_etc, "Launcher.exe");
 #endif
 
 	// Load Core
@@ -55,7 +55,7 @@ main (int argc, char *argv[])
 #if EXEC_FSI
 	m_domain_exec (domain, "Fsi.exe", argc, argv);
 #else
-	m_invoke_method ("Engine", "Engine.System", "System", "Start", NULL);
+	m_domain_exec (domain, "Launcher.exe", argc, argv);
 #endif
 
 	// Free Domain

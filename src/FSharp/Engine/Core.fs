@@ -65,5 +65,5 @@ type Cvar =
 
 
 module Option =
-    let ofNullable x = match x with null -> None | _ -> Some x
+    let inline ofString str = match str with null -> None | "" -> None | _ -> Some str
 
