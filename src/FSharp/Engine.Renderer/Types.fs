@@ -173,21 +173,6 @@ type Plane =
     [<FieldOffset (17)>]
     val SignBits : byte     // signx + (signy<<1) + (signz<<2), used as lookup during collision
 
-(*
-void SetPlaneSignbits (cplane_t *out) {
-	int	bits, j;
-
-	// for fast box on planeside test
-	bits = 0;
-	for (j=0 ; j<3 ; j++) {
-		if (out->normal[j] < 0) {
-			bits |= 1<<j;
-		}
-	}
-	out->signbits = bits;
-}
-*)
-
     /// <summary>
     /// Based on Q3: SetPlaneSignBits
     /// CalculateSignBits
@@ -223,22 +208,6 @@ module Plane =
 
     let calculateSignBits (plane: Plane) =
         Plane.CalculateSignBits plane.Normal
-
-(*
-qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
-	vec3_t	d1, d2;
-
-	VectorSubtract( b, a, d1 );
-	VectorSubtract( c, a, d2 );
-	CrossProduct( d2, d1, plane );
-	if ( VectorNormalize( plane ) == 0 ) {
-		return qfalse;
-	}
-
-	plane[3] = DotProduct( a, plane );
-	return qtrue;
-}
-*)
 
     /// <summary>
     /// Based on Q3: PlaneFromPoints

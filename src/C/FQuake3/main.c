@@ -10,6 +10,7 @@ static GOptionEntry option_entries[] =
 	{ NULL }
 };
 
+#define EXEC_FSI 0
 /*
 ==================
 main
@@ -38,6 +39,9 @@ main (int argc, char *argv[])
 
 	// Load Core
 	m_load_assembly ("FSharp.Core.dll");
+
+	// Load Extension Core
+	m_load_assembly ("FSharpx.Core.dll");
 
 	// Load Engine
 	m_load_assembly ("Engine.dll");
