@@ -88,10 +88,19 @@ module System =
     let Milliseconds () =
         stopwatch.ElapsedMilliseconds
 
+    let CreateConsole () = 
+        Native.Sys_CreateConsole ()
+
+    let ShowConsole level canQuitOnClose =
+        Native.Sys_ShowConsole (level, canQuitOnClose)
+
+    let StartStreamThread () =
+        Native.Sys_InitStreamThread ()
+
     let GetPhysicalCoreCount () =
         Native.system_cpu_get_physical_core_count ()
 
-    let Init () =
+    let Start () =
         SetupUnhandledExceptions ()
 
         use io = new StandardIO ()
@@ -99,12 +108,12 @@ module System =
         io.RedirectOut Common.Printf
 
         // done before Com/Sys_Init since we need this for error output
-        Native.Sys_CreateConsole ()
+        CreateConsole ()
 
         // get the initial time base
         stopwatch.Start ()
 
-        Native.Sys_InitStreamThread ()
+        StartStreamThread ()
 
         Common.Init ""
         Net.Init ()
@@ -112,7 +121,7 @@ module System =
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
         match (Common.CheckIsDedicated (), Common.CheckIsViewLogEnabled ()) with
-        | (false, false) -> Native.Sys_ShowConsole (0, false)
+        | (false, false) -> ShowConsole 0 false
         | _ -> ()
 
         printfn "Working directory: %s" (QFile.GetCurrentDirectory ())

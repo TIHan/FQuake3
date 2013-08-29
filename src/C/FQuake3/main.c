@@ -51,7 +51,7 @@ main (int argc, char *argv[])
 #if EXEC_FSI
 	m_domain_exec (domain, "Fsi.exe", argc, argv);
 #else
-	m_invoke_method ("Engine", "Engine.System", "System", "Init", NULL);
+	m_invoke_method ("Engine", "Engine.System", "System", "Start", NULL);
 #endif
 
 	// Free Domain
