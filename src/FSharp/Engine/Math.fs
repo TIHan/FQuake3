@@ -126,10 +126,16 @@ module Vector3 =
             | true -> 1
             | _ -> 2
 
-    let inline map (f: int -> single -> single) (v: Vector3) =
+    let inline map (f: single -> single) (v: Vector3) =
+        Vector3 (f v.[0], f v.[1], f v.[2])
+
+    let inline mapi (f: int -> single -> single) (v: Vector3) =
         Vector3 (f 0 v.[0], f 1 v.[1], f 2 v.[2])
+
+    let inline map2 (f: single -> single -> single) (v1: Vector3) (v2: Vector3) =
+        Vector3 (f v1.[0] v2.[0], f v1.[1] v2.[1], f v1.[2] v2.[2])
         
-    let inline map2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
+    let inline mapi2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
         Vector3 (f 0 v1.[0] v2.[0], f 1 v1.[1] v2.[1], f 2 v1.[2] v2.[2])
 
     let inline snap (v: Vector3) =
@@ -146,7 +152,7 @@ module Vector3 =
 
     let inline normalize (v: Vector3) =
         let length = 1.f / length v
-        map (fun i x -> x * length) v
+        mapi (fun i x -> x * length) v
 
     let inline perpendicular (v: Vector3) =
         let uv =
@@ -326,13 +332,26 @@ module Matrix16 =
             f 2 0, f 2 1, f 2 2, f 2 3,
             f 3 0, f 3 1, f 3 2, f 3 3
         )
+
+    let inline iter (f: single -> unit) (m1: Matrix16) =
+        for i = 0 to 3 do
+            for j = 0 to 3 do
+                f m1.[i, j]
         
-    let inline iter (f: int -> int -> single -> unit) (m1: Matrix16) =
+    let inline iteri (f: int -> int -> single -> unit) (m1: Matrix16) =
         for i = 0 to 3 do
             for j = 0 to 3 do
                 f i j m1.[i, j]
+
+    let inline map (f: single -> single) (m1: Matrix16) =
+        Matrix16 (
+            f m1.[0, 0], f m1.[0, 1], f m1.[0, 2], f m1.[0, 3],
+            f m1.[1, 0], f m1.[1, 1], f m1.[1, 2], f m1.[1, 3],
+            f m1.[2, 0], f m1.[2, 1], f m1.[2, 2], f m1.[2, 3],
+            f m1.[3, 0], f m1.[3, 1], f m1.[3, 2], f m1.[3, 3]
+        )        
                 
-    let inline map (f: int -> int -> single -> single) (m1: Matrix16) =
+    let inline mapi (f: int -> int -> single -> single) (m1: Matrix16) =
         Matrix16 (
             f 0 0 m1.[0, 0], f 0 1 m1.[0, 1], f 0 2 m1.[0, 2], f 0 3 m1.[0, 3],
             f 1 0 m1.[1, 0], f 1 1 m1.[1, 1], f 1 2 m1.[1, 2], f 1 3 m1.[1, 3],
