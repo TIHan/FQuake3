@@ -71,7 +71,7 @@ module Main =
                 match acc = 8 || isFront with
                 | true -> (front, back)
                 | _ ->
-                    let distance = Vector3.dot transformed.[acc] frust.Normal
+                    let distance = Vector3.dotProduct transformed.[acc] frust.Normal
 
                     match distance > frust.Distance with
                     | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
@@ -103,7 +103,7 @@ module Main =
                 | true -> (mightBeClipped, canCullOut)
                 | _ ->
                     let frust = frustum.[acc]
-                    let distance = (Vector3.dot point frust.Normal) - frust.Distance
+                    let distance = (Vector3.dotProduct point frust.Normal) - frust.Distance
 
                     match distance < -radius with
                     | true -> checkFrustumPlanes mightBeClipped true (acc + 1)
@@ -174,9 +174,9 @@ module Main =
     [<Pure>]
     let worldToLocal (world: Vector3) (orientation: OrientationR) =
         Vector3 (
-            Vector3.dot world orientation.Axis.[0],
-            Vector3.dot world orientation.Axis.[1],
-            Vector3.dot world orientation.Axis.[2]
+            Vector3.dotProduct world orientation.Axis.[0],
+            Vector3.dotProduct world orientation.Axis.[1],
+            Vector3.dotProduct world orientation.Axis.[2]
         )
 
     /// <summary>
@@ -321,9 +321,9 @@ module Main =
             orientation.Origin,
             orientation.Axis,
             Vector3 (
-                (Vector3.dot delta orientation.Axis.X) * axisLength,
-                (Vector3.dot delta orientation.Axis.Y) * axisLength,
-                (Vector3.dot delta orientation.Axis.Z) * axisLength
+                (Vector3.dotProduct delta orientation.Axis.X) * axisLength,
+                (Vector3.dotProduct delta orientation.Axis.Y) * axisLength,
+                (Vector3.dotProduct delta orientation.Axis.Z) * axisLength
             ),
             orientation.ModelMatrix
         )
@@ -404,7 +404,7 @@ module Main =
             let v = Vector3 (x, y, z)
 
             let vecTo = v - orientation.Origin
-            let possibleDistance = Vector3.dot vecTo vecTo
+            let possibleDistance = Vector3.dotProduct vecTo vecTo
 
             calculateFarthestCornerDistance (match possibleDistance > distance with | true -> possibleDistance | _ -> distance) (acc + 1)
 
@@ -467,25 +467,25 @@ module Main =
             Left =
                 Plane (
                     leftNormal,
-                    Vector3.dot view.Orientation.Origin leftNormal,
+                    Vector3.dotProduct view.Orientation.Origin leftNormal,
                     PlaneType.NonAxial
                 );
             Right = 
                 Plane (
                     rightNormal,
-                    Vector3.dot view.Orientation.Origin rightNormal,
+                    Vector3.dotProduct view.Orientation.Origin rightNormal,
                     PlaneType.NonAxial
                 );
             Bottom =
                 Plane (
                     bottomNormal,
-                    Vector3.dot view.Orientation.Origin bottomNormal,
+                    Vector3.dotProduct view.Orientation.Origin bottomNormal,
                     PlaneType.NonAxial
                 );
             Top =
                 Plane (
                     topNormal,
-                    Vector3.dot view.Orientation.Origin topNormal,
+                    Vector3.dotProduct view.Orientation.Origin topNormal,
                     PlaneType.NonAxial
                 );
         }
@@ -501,7 +501,7 @@ module Main =
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.dot local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform ((Vector3.dotProduct local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
         (transform (Vector3.zero) 0) + camera.Origin
 
@@ -515,7 +515,7 @@ module Main =
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.dot v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform ((Vector3.dotProduct v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
 
         transform (Vector3.zero) 0
 
@@ -580,10 +580,10 @@ module Main =
         // rotate the plane, but keep the non-rotated version for matching
         // against the portalSurface entities
         let normal = localNormalToWorld originalPlane.Normal orientation
-        let distance = originalPlane.Distance + Vector3.dot normal orientation.Origin
+        let distance = originalPlane.Distance + Vector3.dotProduct normal orientation.Origin
 
         // translate the original plane
-        let originalDistance = originalPlane.Distance + Vector3.dot originalPlane.Normal orientation.Origin
+        let originalDistance = originalPlane.Distance + Vector3.dotProduct originalPlane.Normal orientation.Origin
 
         (
             Plane.updateDistance originalDistance originalPlane,

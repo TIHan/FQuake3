@@ -218,12 +218,12 @@ module Plane =
     let inline ofPoints (a: Vector3) (b: Vector3) (c: Vector3) =
         let d1 = b - a
         let d2 = c - a
-        let cross = Vector3.cross d2 d1
+        let cross = Vector3.crossProduct d2 d1
         let normal = Vector3.normalize cross
         
         match Vector3.length cross with
         | 0.f -> Plane (normal, 0.f, PlaneType.X, 0uy)
-        | _ -> Plane (normal, Vector3.dot a normal, PlaneType.X, 0uy)
+        | _ -> Plane (normal, Vector3.dotProduct a normal, PlaneType.X, 0uy)
 
     let inline updateDistance distance (plane: Plane) =
         Plane (plane.Normal, distance, plane.Type, plane.SignBits);

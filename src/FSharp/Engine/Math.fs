@@ -141,14 +141,14 @@ module Vector3 =
     let inline snap (v: Vector3) =
         Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
 
-    let inline dot (v1: Vector3) (v2: Vector3) =
+    let inline dotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
-    let inline cross (v1: Vector3) (v2: Vector3) =
+    let inline crossProduct (v1: Vector3) (v2: Vector3) =
         Vector3 ((v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X))
 
     let inline length (v: Vector3) =
-        sqrt <| dot v v
+        sqrt <| dotProduct v v
 
     let inline normalize (v: Vector3) =
         let length = 1.f / length v
@@ -163,7 +163,7 @@ module Vector3 =
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let uvNormal = normalize uv
-        cross v uvNormal
+        crossProduct v uvNormal
 
 /// <summary>
 /// Vector4
@@ -211,7 +211,7 @@ type Vector4 =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector4 =
-    let inline dot (v1: Vector4) (v2: Vector4) =
+    let inline dotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 
