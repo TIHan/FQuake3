@@ -63,7 +63,6 @@ type Cvar =
         Integer: int;               // atoi( string )
     }
 
-
 module Option =
     let inline ofString str = match str with null -> None | "" -> None | _ -> Some str
 

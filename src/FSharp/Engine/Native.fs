@@ -31,7 +31,9 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open FSharpx.Collections
 open Engine.Core
+open Engine.Net
 open Engine.NativeInterop
 
 type qboolean =
@@ -55,6 +57,47 @@ type cvar_t =
     val mutable next : nativeptr<cvar_t>
     val mutable hashNext : nativeptr<cvar_t>
 
+type netadrtype_t =
+    | NA_BOT = 0
+    | NA_BAD = 1
+    | NA_LOOPBACK = 2
+    | NA_BROADCAST = 3
+    | NA_IP = 4
+    | NA_IPX = 5
+    | NA_BROADCAST_IPX = 6
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type netadr_t =
+    val mutable type' : netadrtype_t
+    val mutable ip : byte
+    val private ip1 : byte
+    val private ip2 : byte
+    val private ip3 : byte
+    val mutable ipx : byte
+    val private ipx1 : byte
+    val private ipx2 : byte
+    val private ipx3 : byte
+    val private ipx4 : byte
+    val private ipx5 : byte
+    val private ipx6 : byte
+    val private ipx7 : byte
+    val private ipx8 : byte
+    val private ipx9 : byte
+    val port : uint16
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type msg_t =
+    val mutable allowoverflow : qboolean
+    val mutable overflowed : qboolean
+    val mutable oob : qboolean
+    val mutable data : nativeptr<byte>
+    val mutable maxsize : int
+    val mutable cursize : int
+    val mutable readcount : int
+    val mutable bit : int
+
 (*
 =======================================================================================================================
 Mappings
@@ -75,3 +118,18 @@ module Cvar =
             Integer = native.integer;
         }
 
+module ByteString =
+    let inline ofNativePtr (size: int) (nativePtr: nativeptr<byte>) =
+        ByteString.create <| NativePtr.toArray size nativePtr
+
+module Message =
+    let inline ofNative (native: msg_t) =
+        {
+            IsAllowedOverflow = Convert.ToBoolean native.allowoverflow;
+            IsOverflowed = Convert.ToBoolean native.overflowed;
+            IsOutOfBand = Convert.ToBoolean native.oob;
+            Data = ByteString.ofNativePtr native.cursize native.data;
+            MaxSize = native.maxsize;
+            ReadCount = native.readcount;
+            Bit = native.bit;
+        }

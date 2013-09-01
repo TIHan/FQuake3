@@ -34,11 +34,67 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open FSharpx.Collections
 open Engine.NativeInterop
 
 module private Native =
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void NET_Init ()
+
+/// <summary>
+/// Based on Q3: msg_t
+/// Message
+/// </summary>
+type Message =
+    {
+        IsAllowedOverflow: bool;    // if false, do a Com_Error
+        IsOverflowed: bool;         // set to true if the buffer size failed (with allowoverflow set)
+        IsOutOfBand: bool;          // set to true if the buffer size failed (with allowoverflow set)
+        Data: ByteString;
+        MaxSize: int;
+        ReadCount: int;
+        Bit: int;                   // for bitwise reads and writes
+    }
+
+/// <summary>
+/// Based on Q3: netadrtype_t
+/// AddressType
+/// </summary>
+type AddressType =
+    | Bot = 0
+    | Bad = 1           // an address lookup failed
+    | Loopback = 2
+    | Broadcast = 3
+    | IP = 4
+    | IPX = 5           // TODO: Remove IPX.
+    | BroadcastIPX = 6  // TODO: Remove IPX.
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type IPAddress =
+    val Octet0 : byte
+    val Octet1 : byte
+    val Octet2 : byte
+    val Octet3 : byte
+
+    new (octet0, octet1, octet2, octet3) =
+        {
+            Octet0 = octet0;
+            Octet1 = octet1;
+            Octet2 = octet2;
+            Octet3 = octet3;
+        }
+
+/// <summary>
+/// Based on Q3: netadr_t
+/// Address
+/// </summary>
+type Address =
+    {
+        Type: AddressType;
+        IP: IPAddress;
+        Port: uint16;
+    }
 
 module Net =
     let Init () =
