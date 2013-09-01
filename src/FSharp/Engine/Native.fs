@@ -44,6 +44,13 @@ type qhandle_t = int
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type vec3_t =
+    val mutable value : single
+    val mutable value1 : single
+    val mutable value2 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type cvar_t =
     val mutable name : nativeptr<sbyte>
     val mutable string : nativeptr<sbyte>

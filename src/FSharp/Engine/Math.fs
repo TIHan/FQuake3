@@ -23,11 +23,13 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #nowarn "9"
 #nowarn "51"
 
-namespace Engine.Math
+namespace Engine
+module Math =
 
 open System
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
+open Engine.NativeInterop
 
 module QMath =
     [<Literal>]
@@ -65,55 +67,27 @@ type Vector3 =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-
-    new (vector: Vector3) =
-        {
-            X = vector.X;
-            Y = vector.Y;
-            Z = vector.Z;
-        }
-    
-    new (x, y, z) =
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-    static member inline (*) (v1: Vector3, v2: Vector3) =
-        Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
-
-    static member inline (*) (v: Vector3, s: single) =
-        Vector3 (v.X * s, v.Y * s, v.Z * s)
-
-    static member inline (*) (s: single, v: Vector3) =
-        Vector3 (v.X * s, v.Y * s, v.Z * s)
-
-    static member inline (+) (v1: Vector3, v2: Vector3) =
-        Vector3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
-
-    static member inline (-) (v1: Vector3, v2: Vector3) =
-        Vector3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
-
-    static member inline (=) (v1: Vector3, v2: Vector3) =
-        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
-
-    static member inline ( *+ ) ((s: single, v1: Vector3), v2: Vector3) =
-        Vector3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z)
-
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
-    let unitX = Vector3 (1.f, 0.f, 0.f)
-    let unitY = Vector3 (0.f, 1.f, 0.f)
-    let unitZ = Vector3 (0.f, 0.f, 1.f)
-
     let zero = Vector3 ()
 
+    let inline create x y z =
+        let mutable v = zero
+        let ptr = NativePtr.toNativePtr &&v
+        NativePtr.set ptr 0 x
+        NativePtr.set ptr 1 y
+        NativePtr.set ptr 2 z
+        v
+
+    let unitX = create 1.f 0.f 0.f
+    let unitY = create 0.f 1.f 0.f
+    let unitZ = create 0.f 0.f 1.f
+
     let inline init (f: int -> single) =
-        Vector3 (f 0, f 1, f 2)
+        create (f 0) (f 1) (f 2)
 
     let inline abs (v: Vector3) =
-        Vector3 (abs v.X, abs v.Y, abs v.Z)
+        create (abs v.X) (abs v.Y) (abs v.Z)
 
     let inline minDimension (v: Vector3) =
         match v.X < v.Y with
@@ -127,25 +101,25 @@ module Vector3 =
             | _ -> 2
 
     let inline map (f: single -> single) (v: Vector3) =
-        Vector3 (f v.[0], f v.[1], f v.[2])
+        create (f v.[0]) (f v.[1]) (f v.[2])
 
     let inline mapi (f: int -> single -> single) (v: Vector3) =
-        Vector3 (f 0 v.[0], f 1 v.[1], f 2 v.[2])
+        create (f 0 v.[0]) (f 1 v.[1]) (f 2 v.[2])
 
     let inline map2 (f: single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        Vector3 (f v1.[0] v2.[0], f v1.[1] v2.[1], f v1.[2] v2.[2])
+        create (f v1.[0] v2.[0]) (f v1.[1] v2.[1]) (f v1.[2] v2.[2])
         
     let inline mapi2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        Vector3 (f 0 v1.[0] v2.[0], f 1 v1.[1] v2.[1], f 2 v1.[2] v2.[2])
+        create (f 0 v1.[0] v2.[0]) (f 1 v1.[1] v2.[1]) (f 2 v1.[2] v2.[2])
 
     let inline snap (v: Vector3) =
-        Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
+        create (truncate v.X) (truncate v.Y) (truncate v.Z)
 
     let inline dotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
     let inline crossProduct (v1: Vector3) (v2: Vector3) =
-        Vector3 ((v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X))
+        create ((v1.Y * v2.Z) - (v1.Z * v2.Y)) ((v1.Z * v2.X) - (v1.X * v2.Z)) ((v1.X * v2.Y) - (v1.Y * v2.X))
 
     let inline length (v: Vector3) =
         sqrt <| dotProduct v v
@@ -164,6 +138,29 @@ module Vector3 =
 
         let uvNormal = normalize uv
         crossProduct v uvNormal
+
+type Vector3 with
+    static member inline (*) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z)
+
+    static member inline (*) (v: Vector3, s: single) =
+        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
+
+    static member inline (*) (s: single, v: Vector3) =
+        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
+
+    static member inline (+) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z)
+
+    static member inline (-) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z)
+
+    static member inline (=) (v1: Vector3, v2: Vector3) =
+        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
+
+    static member inline ( *+ ) ((s: single, v1: Vector3), v2: Vector3) =
+        Vector3.create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z)
+
 
 /// <summary>
 /// Vector4
@@ -305,21 +302,11 @@ module NativeMatrix16 =
 
 type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
-#if NOT_NATIVE
-        let dotProduct row column =
-            (m1.[row, 0] * m2.[0, column]) +
-            (m1.[row, 1] * m2.[1, column]) +
-            (m1.[row, 2] * m2.[2, column]) +
-            (m1.[row, 3] * m2.[3, column])
-        
-        Matrix16.Init dotProduct
-#else
         let mutable m = Matrix16 ()
         let mutable cm1 = m1
         let mutable cm2 = m2
         NativeMatrix16.qmath_matrix16_multiply (&&cm1, &&cm2, &&m)
         m
-#endif
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix16 =
@@ -359,16 +346,3 @@ module Matrix16 =
             f 3 0 m1.[3, 0], f 3 1 m1.[3, 1], f 3 2 m1.[3, 2], f 3 3 m1.[3, 3]
         )
 
-
-(*
-=======================================================================================================================
-Interop Types
-=======================================================================================================================
-*)
-
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type vec3_t =
-    val mutable value : single
-    val mutable value1 : single
-    val mutable value2 : single

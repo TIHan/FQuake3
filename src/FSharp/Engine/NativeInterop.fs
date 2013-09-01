@@ -37,33 +37,36 @@ let DefaultCallingConvention = CallingConvention.Cdecl
 /// NativePtr
 /// </summary>
 module NativePtr =
-    let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (native: nativeptr<'U>) =
-        System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt native, typeof<'T>) :?> 'T
+    let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
+        System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
 
-    let inline ofStructure<'T,'U when 'T : struct and 'U : unmanaged> (structure: 'T) (native: nativeptr<'U>) =
-        System.Runtime.InteropServices.Marshal.StructureToPtr (structure, NativePtr.toNativeInt native, true)
+    let inline ofStructure<'T,'U when 'T : struct and 'U : unmanaged> (structure: 'T) (x: nativeptr<'U>) =
+        System.Runtime.InteropServices.Marshal.StructureToPtr (structure, NativePtr.toNativeInt x, true)
 
-    let inline toString (native: nativeptr<'T>) =
-        System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt native)
+    let inline toString (x: nativeptr<'T>) =
+        System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt x)
 
-    let inline toArray (size: int) (native: nativeptr<'T>) =
+    let inline toArray (size: int) (x: nativeptr<'T>) =
         let arr = Array.zeroCreate<'T> size
         let arrPtr = &&arr.[0]
         for i = 0 to size - 1 do
-            NativePtr.set arrPtr i <| NativePtr.get native i
+            NativePtr.set arrPtr i <| NativePtr.get x i
         arr
+
+    let inline toNativePtr x =
+        NativePtr.toNativeInt x |> NativePtr.ofNativeInt
 
 /// <summary>
 /// List
 /// </summary>
 module List =
-    let inline ofNativePtrArray<'T when 'T : unmanaged> size (native: nativeptr<'T>) =
+    let inline ofNativePtrArray<'T when 'T : unmanaged> size (x: nativeptr<'T>) =
         List.init size (fun i ->
-            NativePtr.get native i
+            NativePtr.get x i
         )
 
-    let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: 'T -> 'U) (native: nativeptr<'T>) =
+    let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: 'T -> 'U) (x: nativeptr<'T>) =
         List.init size (fun i ->
-            f <| NativePtr.get native i
+            f <| NativePtr.get x i
         )
 

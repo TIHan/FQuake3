@@ -54,7 +54,7 @@ module Main =
         [<Pure>]
         let transformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
             Transform.init (fun i ->
-                let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
+                let v = Vector3.create (bounds.[i &&& 1].X) (bounds.[(i >>> 1) &&& 1].Y) (bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
                 |> ( *+ ) (v.X, orientation.Axis.[0])
@@ -149,11 +149,10 @@ module Main =
     /// </summary>
     [<Pure>]
     let localPointToWorld (local: Vector3) (orientation: OrientationR) =
-        Vector3 (
-            (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X,
-            (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y,
-            (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z
-        )
+        Vector3.create
+            ((local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X)
+            ((local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y)
+            ((local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z)
 
     /// <summary>
     /// Based on Q3: R_LocalNormalToWorld
@@ -161,11 +160,10 @@ module Main =
     /// </summary>
     [<Pure>]
     let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
-        Vector3 (
-            (local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X),
-            (local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y),
-            (local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z)
-        )
+        Vector3.create
+            ((local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X))
+            ((local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y))
+            ((local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z))
 
     /// <summary>
     /// Based on Q3: R_WorldToLocal
@@ -173,11 +171,10 @@ module Main =
     /// </summary>
     [<Pure>]
     let worldToLocal (world: Vector3) (orientation: OrientationR) =
-        Vector3 (
-            Vector3.dotProduct world orientation.Axis.[0],
-            Vector3.dotProduct world orientation.Axis.[1],
-            Vector3.dotProduct world orientation.Axis.[2]
-        )
+        Vector3.create
+            (Vector3.dotProduct world orientation.Axis.[0])
+            (Vector3.dotProduct world orientation.Axis.[1])
+            (Vector3.dotProduct world orientation.Axis.[2])
 
     /// <summary>
     /// Based on Q3: R_CullLocalPointAndRadius
@@ -320,11 +317,10 @@ module Main =
         OrientationR (
             orientation.Origin,
             orientation.Axis,
-            Vector3 (
-                (Vector3.dotProduct delta orientation.Axis.X) * axisLength,
-                (Vector3.dotProduct delta orientation.Axis.Y) * axisLength,
-                (Vector3.dotProduct delta orientation.Axis.Z) * axisLength
-            ),
+            Vector3.create
+                ((Vector3.dotProduct delta orientation.Axis.X) * axisLength)
+                ((Vector3.dotProduct delta orientation.Axis.Y) * axisLength)
+                ((Vector3.dotProduct delta orientation.Axis.Z) * axisLength),
             orientation.ModelMatrix
         )
 
@@ -340,9 +336,9 @@ module Main =
         let axis =
             Axis (
                 // Looks like it is a identity matrix
-                Vector3 (1.f, 0.f, 0.f),
-                Vector3 (0.f, 1.f, 0.f),
-                Vector3 (0.f, 0.f, 1.f)
+                Vector3.create 1.f 0.f 0.f,
+                Vector3.create 0.f 1.f 0.f,
+                Vector3.create 0.f 0.f 1.f
             )
 
         let viewOrigin = viewParms.Orientation.Origin
@@ -401,7 +397,7 @@ module Main =
             let y = match (acc &&& 2) <> 0 with | true -> visibilityBounds.[0].[1] | _ -> visibilityBounds.[1].[1]
             let z = match (acc &&& 4) <> 0 with | true -> visibilityBounds.[0].[2] | _ -> visibilityBounds.[1].[2]
 
-            let v = Vector3 (x, y, z)
+            let v = Vector3.create x y z
 
             let vecTo = v - orientation.Origin
             let possibleDistance = Vector3.dotProduct vecTo vecTo
@@ -543,7 +539,7 @@ module Main =
 
             Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
         | _ ->
-            Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
+            Plane (Vector3.create 1.f 0.f 0.f, 0.f, PlaneType.X, 0uy)
 
     // This is for GetPortalOrientation
     //// create plane axis for the portal we are seeing
