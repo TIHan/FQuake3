@@ -21,17 +21,11 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Renderer
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 open System
 open System.IO
-open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
-open Microsoft.FSharp.NativeInterop
 open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
@@ -40,12 +34,11 @@ module Main =
     let flipMatrix =
         // convert from our coordinate system (looking down X)
         // to OpenGL's coordinate system (looking down -Z)
-        Matrix16 (
-            0.f, 0.f, -1.f, 0.f,
-            -1.f, 0.f, 0.f, 0.f,
-            0.f, 1.f, 0.f, 0.f,
-            0.f, 0.f, 0.f, 1.f
-        )
+        Matrix16.create
+            0.f 0.f -1.f 0.f
+            -1.f 0.f 0.f 0.f
+            0.f 1.f 0.f 0.f
+            0.f 0.f 0.f 1.f
 
     module private LocalBox =
         /// <summary>
@@ -198,12 +191,11 @@ module Main =
             (1.f * modelMatrix.[3, i])
           
         let eye =
-            Vector4 (
-                calculateEye 0,
-                calculateEye 1,
-                calculateEye 2,
-                calculateEye 3
-            )
+            Vector4.create
+                (calculateEye 0)
+                (calculateEye 1)
+                (calculateEye 2)
+                (calculateEye 3)
 
         let calculateDestination i =
             (eye.X * projectionMatrix.[0, i]) +
@@ -212,12 +204,11 @@ module Main =
             (eye.W * projectionMatrix.[3, i])
 
         let destination =
-            Vector4 (
-                calculateDestination 0,
-                calculateDestination 1,
-                calculateDestination 2,
-                calculateDestination 3
-            )
+            Vector4.create
+                (calculateDestination 0)
+                (calculateDestination 1)
+                (calculateDestination 2)
+                (calculateDestination 3)
 
         (eye, destination)
     
@@ -228,20 +219,18 @@ module Main =
     [<Pure>]
     let transformClipToWindow (clip: Vector4) (view: ViewParms) =
         let normalized =
-            Vector4 (
-                clip.X / clip.W,
-                clip.Y / clip.W,
-                (clip.Z + clip.W) / (2.f * clip.W),
+            Vector4.create
+                (clip.X / clip.W)
+                (clip.Y / clip.W)
+                ((clip.Z + clip.W) / (2.f * clip.W))
                 0.f
-            )
 
         let window =
-            Vector4 (
-                truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f),
-                truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f),
-                normalized.Z,
+            Vector4.create
+                (truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f))
+                (truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f))
+                normalized.Z
                 0.f
-            )
 
         (normalized, window)
 
@@ -272,24 +261,23 @@ module Main =
             )
 
         let glMatrix =
-            Matrix16 (
-                orientation.Axis.[0].[0],
-                orientation.Axis.[0].[1],
-                orientation.Axis.[0].[2],
-                0.f,
-                orientation.Axis.[1].[0],
-                orientation.Axis.[1].[1],
-                orientation.Axis.[1].[2],
-                0.f,
-                orientation.Axis.[2].[0],
-                orientation.Axis.[2].[1],
-                orientation.Axis.[2].[2],
-                0.f,
-                orientation.Origin.X,
-                orientation.Origin.Y,
-                orientation.Origin.Z,
+            Matrix16.create
+                orientation.Axis.[0].[0]
+                orientation.Axis.[0].[1]
+                orientation.Axis.[0].[2]
+                0.f
+                orientation.Axis.[1].[0]
+                orientation.Axis.[1].[1]
+                orientation.Axis.[1].[2]
+                0.f
+                orientation.Axis.[2].[0]
+                orientation.Axis.[2].[1]
+                orientation.Axis.[2].[2]
+                0.f
+                orientation.Origin.X
+                orientation.Origin.Y
+                orientation.Origin.Z
                 1.f
-            )
 
         let orientation =
             OrientationR (
@@ -347,24 +335,23 @@ module Main =
         let origin = viewParms.Orientation.Origin
 
         let viewerMatrix =
-            Matrix16 (
-                viewParms.Orientation.Axis.[0].[0],
-                viewParms.Orientation.Axis.[1].[0],
-                viewParms.Orientation.Axis.[2].[0],
-                0.f,
-                viewParms.Orientation.Axis.[0].[1],
-                viewParms.Orientation.Axis.[1].[1],
-                viewParms.Orientation.Axis.[2].[1],
-                0.f,
-                viewParms.Orientation.Axis.[0].[2],
-                viewParms.Orientation.Axis.[1].[2],
-                viewParms.Orientation.Axis.[2].[2],
-                0.f,
-                -origin.[0] * viewParms.Orientation.Axis.[0].[0] + -origin.[1] * viewParms.Orientation.Axis.[0].[1] + -origin.[2] * viewParms.Orientation.Axis.[0].[2],
-                -origin.[0] * viewParms.Orientation.Axis.[1].[0] + -origin.[1] * viewParms.Orientation.Axis.[1].[1] + -origin.[2] * viewParms.Orientation.Axis.[1].[2],
-                -origin.[0] * viewParms.Orientation.Axis.[2].[0] + -origin.[1] * viewParms.Orientation.Axis.[2].[1] + -origin.[2] * viewParms.Orientation.Axis.[2].[2],
+            Matrix16.create
+                viewParms.Orientation.Axis.[0].[0]
+                viewParms.Orientation.Axis.[1].[0]
+                viewParms.Orientation.Axis.[2].[0]
+                0.f
+                viewParms.Orientation.Axis.[0].[1]
+                viewParms.Orientation.Axis.[1].[1]
+                viewParms.Orientation.Axis.[2].[1]
+                0.f
+                viewParms.Orientation.Axis.[0].[2]
+                viewParms.Orientation.Axis.[1].[2]
+                viewParms.Orientation.Axis.[2].[2]
+                0.f
+                (-origin.[0] * viewParms.Orientation.Axis.[0].[0] + -origin.[1] * viewParms.Orientation.Axis.[0].[1] + -origin.[2] * viewParms.Orientation.Axis.[0].[2])
+                (-origin.[0] * viewParms.Orientation.Axis.[1].[0] + -origin.[1] * viewParms.Orientation.Axis.[1].[1] + -origin.[2] * viewParms.Orientation.Axis.[1].[2])
+                (-origin.[0] * viewParms.Orientation.Axis.[2].[0] + -origin.[1] * viewParms.Orientation.Axis.[2].[1] + -origin.[2] * viewParms.Orientation.Axis.[2].[2])
                 1.f
-            )
         
         OrientationR (
             Vector3.zero,
@@ -426,12 +413,11 @@ module Main =
         let depth = zFar - zNear
 
         (
-            Matrix16 (
-                2.f * zNear / width, 0.f, 0.f, 0.f,
-                0.f, 2.f * zNear / height, 0.f, 0.f,
-                (xMax + xMin) / width, (yMax + yMin) / height, -(zFar + zNear) / depth, -1.f,
-                0.f, 0.f, -2.f * zFar * zNear / depth, 0.f
-            ),
+            Matrix16.create
+                (2.f * zNear / width) 0.f 0.f 0.f
+                0.f (2.f * zNear / height) 0.f 0.f
+                ((xMax + xMin) / width) ((yMax + yMin) / height) (-(zFar + zNear) / depth) -1.f
+                0.f 0.f (-2.f * zFar * zNear / depth) 0.f,
             zFar
         )
 

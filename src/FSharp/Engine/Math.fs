@@ -31,6 +31,9 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
+[<Literal>]
+let LibEngine = "Engine.Native.dll"
+
 [<RequireQualifiedAccess>]
 module Math =
     [<Literal>]
@@ -49,6 +52,24 @@ module Math =
 type Vector2 =
     val X : single
     val Y : single
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | _ -> raise <| IndexOutOfRangeException ()
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vector2 =
+    let zero = Vector2 ()
+
+    let inline create x y z =
+        let mutable v = zero
+        let ptr = NativePtr.toNativePtr &&v
+        NativePtr.set ptr 0 x
+        NativePtr.set ptr 1 y
+        v
 
 /// <summary>
 /// Vector3
@@ -200,40 +221,37 @@ type Vector4 =
             | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (vector: Vector4) =
-        {
-            X = vector.X;
-            Y = vector.Y;
-            Z = vector.Z;
-            W = vector.W;
-        }
-    
-    new (x, y, z, w) =
-        {
-            X = x;
-            Y = y;
-            Z = z;
-            W = w;
-        }
-
-    static member inline (*) (v1: Vector4, v2: Vector4) =
-        Vector4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
-        
-    static member inline (+) (v1: Vector4, v2: Vector4) =
-        Vector4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
-
-    static member inline (-) (v1: Vector4, v2: Vector4) =
-        Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
-
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector4 =
+    let zero = Vector4 ()
+
+    let inline create x y z w =
+        let mutable v = zero
+        let ptr = NativePtr.toNativePtr &&v
+        NativePtr.set ptr 0 x
+        NativePtr.set ptr 1 y
+        NativePtr.set ptr 2 z
+        NativePtr.set ptr 3 w
+        v
+
     let inline dotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
+
+type Vector4 with
+    static member inline (*) (v1: Vector4, v2: Vector4) =
+        Vector4.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z) (v1.W * v2.W)
+        
+    static member inline (+) (v1: Vector4, v2: Vector4) =
+        Vector4.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z) (v1.W + v2.W)
+
+    static member inline (-) (v1: Vector4, v2: Vector4) =
+        Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)
 
 
 /// <summary>
 /// Matrix4
 /// </summary>
+[<Struct>]
 type Matrix4 =
     val M00 : single
     val M01 : single
@@ -249,14 +267,18 @@ type Matrix4 =
                     | (1, 1) -> this.M11
                     | _ -> raise <| IndexOutOfRangeException ()
 
-    new (
-            m00, m01,
-            m10, m11
-        ) =
-        {
-            M00 = m00; M01 = m01;
-            M10 = m10; M11 = m11;
-        }
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Matrix4 =
+    let zero = Matrix4 ()
+
+    let inline create m00 m01 m10 m11 =
+        let mutable m = zero
+        let ptr = NativePtr.toNativePtr &&m
+        NativePtr.set ptr 0 m00
+        NativePtr.set ptr 1 m01
+        NativePtr.set ptr 2 m10
+        NativePtr.set ptr 3 m11
+        m      
 
 /// <summary>
 /// Matrix16
@@ -300,44 +322,48 @@ type Matrix16 =
                     | (3, 1) -> this.M31
                     | (3, 2) -> this.M32
                     | (3, 3) -> this.M33
-                    | _ -> raise <| IndexOutOfRangeException ()
-    
-    new (
-            m00, m01, m02, m03,
-            m10, m11, m12, m13,
-            m20, m21, m22, m23,
-            m30, m31, m32, m33
-        ) =
-        {
-            M00 = m00; M01 = m01; M02 = m02; M03 = m03;
-            M10 = m10; M11 = m11; M12 = m12; M13 = m13;
-            M20 = m20; M21 = m21; M22 = m22; M23 = m23;
-            M30 = m30; M31 = m31; M32 = m32; M33 = m33;
-        }    
-
-module NativeMatrix16 =
-    [<DllImport ("Engine.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
-    extern void math_matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
-
-type Matrix16 with
-    static member inline (*) (m1: Matrix16, m2: Matrix16) =
-        let mutable m = Matrix16 ()
-        let mutable cm1 = m1
-        let mutable cm2 = m2
-        NativeMatrix16.math_matrix16_multiply (&&cm1, &&cm2, &&m)
-        m
+                    | _ -> raise <| IndexOutOfRangeException ()  
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix16 =
     let zero = Matrix16 ()
 
+    module Native =
+        [<DllImport (LibEngine, CallingConvention = CallingConvention.Cdecl)>]
+        extern void math_matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
+
+    let inline create 
+            m00 m01 m02 m03
+            m10 m11 m12 m13
+            m20 m21 m22 m23
+            m30 m31 m32 m33 =
+        let mutable m = zero
+        let ptr = NativePtr.toNativePtr &&m
+        NativePtr.set ptr 0 m00
+        NativePtr.set ptr 1 m01
+        NativePtr.set ptr 2 m02
+        NativePtr.set ptr 3 m03
+        NativePtr.set ptr 4 m10
+        NativePtr.set ptr 5 m11
+        NativePtr.set ptr 6 m12
+        NativePtr.set ptr 7 m13
+        NativePtr.set ptr 8 m20
+        NativePtr.set ptr 9 m21
+        NativePtr.set ptr 10 m22
+        NativePtr.set ptr 11 m23
+        NativePtr.set ptr 12 m30
+        NativePtr.set ptr 13 m31
+        NativePtr.set ptr 14 m32
+        NativePtr.set ptr 15 m33
+        m
+
     let inline init (f: int -> int -> single) =
-        Matrix16 (
-            f 0 0, f 0 1, f 0 2, f 0 3,
-            f 1 0, f 1 1, f 1 2, f 1 3,
-            f 2 0, f 2 1, f 2 2, f 2 3,
-            f 3 0, f 3 1, f 3 2, f 3 3
-        )
+        create
+            (f 0 0) (f 0 1) (f 0 2) (f 0 3)
+            (f 1 0) (f 1 1) (f 1 2) (f 1 3)
+            (f 2 0) (f 2 1) (f 2 2) (f 2 3)
+            (f 3 0) (f 3 1) (f 3 2) (f 3 3)
+
 
     let inline iter (f: single -> unit) (m: Matrix16) =
         for i = 0 to 3 do
@@ -350,18 +376,23 @@ module Matrix16 =
                 f i j m.[i, j]
 
     let inline map (f: single -> single) (m: Matrix16) =
-        Matrix16 (
-            f m.[0, 0], f m.[0, 1], f m.[0, 2], f m.[0, 3],
-            f m.[1, 0], f m.[1, 1], f m.[1, 2], f m.[1, 3],
-            f m.[2, 0], f m.[2, 1], f m.[2, 2], f m.[2, 3],
-            f m.[3, 0], f m.[3, 1], f m.[3, 2], f m.[3, 3]
-        )        
+        create
+            (f m.[0, 0]) (f m.[0, 1]) (f m.[0, 2]) (f m.[0, 3])
+            (f m.[1, 0]) (f m.[1, 1]) (f m.[1, 2]) (f m.[1, 3])
+            (f m.[2, 0]) (f m.[2, 1]) (f m.[2, 2]) (f m.[2, 3])
+            (f m.[3, 0]) (f m.[3, 1]) (f m.[3, 2]) (f m.[3, 3])       
                 
     let inline mapi (f: int -> int -> single -> single) (m: Matrix16) =
-        Matrix16 (
-            f 0 0 m.[0, 0], f 0 1 m.[0, 1], f 0 2 m.[0, 2], f 0 3 m.[0, 3],
-            f 1 0 m.[1, 0], f 1 1 m.[1, 1], f 1 2 m.[1, 2], f 1 3 m.[1, 3],
-            f 2 0 m.[2, 0], f 2 1 m.[2, 1], f 2 2 m.[2, 2], f 2 3 m.[2, 3],
-            f 3 0 m.[3, 0], f 3 1 m.[3, 1], f 3 2 m.[3, 2], f 3 3 m.[3, 3]
-        )
+        create
+            (f 0 0 m.[0, 0]) (f 0 1 m.[0, 1]) (f 0 2 m.[0, 2]) (f 0 3 m.[0, 3])
+            (f 1 0 m.[1, 0]) (f 1 1 m.[1, 1]) (f 1 2 m.[1, 2]) (f 1 3 m.[1, 3])
+            (f 2 0 m.[2, 0]) (f 2 1 m.[2, 1]) (f 2 2 m.[2, 2]) (f 2 3 m.[2, 3])
+            (f 3 0 m.[3, 0]) (f 3 1 m.[3, 1]) (f 3 2 m.[3, 2]) (f 3 3 m.[3, 3])
 
+type Matrix16 with
+    static member inline (*) (m1: Matrix16, m2: Matrix16) =
+        let mutable m = Matrix16.zero
+        let mutable cm1 = m1
+        let mutable cm2 = m2
+        Matrix16.Native.math_matrix16_multiply (&&cm1, &&cm2, &&m)
+        m
