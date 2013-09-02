@@ -342,29 +342,29 @@ module Matrix16 =
             f 3 0, f 3 1, f 3 2, f 3 3
         )
 
-    let inline iter (f: single -> unit) (m1: Matrix16) =
+    let inline iter (f: single -> unit) (m: Matrix16) =
         for i = 0 to 3 do
             for j = 0 to 3 do
-                f m1.[i, j]
+                f m.[i, j]
         
-    let inline iteri (f: int -> int -> single -> unit) (m1: Matrix16) =
+    let inline iteri (f: int -> int -> single -> unit) (m: Matrix16) =
         for i = 0 to 3 do
             for j = 0 to 3 do
-                f i j m1.[i, j]
+                f i j m.[i, j]
 
-    let inline map (f: single -> single) (m1: Matrix16) =
+    let inline map (f: single -> single) (m: Matrix16) =
         Matrix16 (
-            f m1.[0, 0], f m1.[0, 1], f m1.[0, 2], f m1.[0, 3],
-            f m1.[1, 0], f m1.[1, 1], f m1.[1, 2], f m1.[1, 3],
-            f m1.[2, 0], f m1.[2, 1], f m1.[2, 2], f m1.[2, 3],
-            f m1.[3, 0], f m1.[3, 1], f m1.[3, 2], f m1.[3, 3]
+            f m.[0, 0], f m.[0, 1], f m.[0, 2], f m.[0, 3],
+            f m.[1, 0], f m.[1, 1], f m.[1, 2], f m.[1, 3],
+            f m.[2, 0], f m.[2, 1], f m.[2, 2], f m.[2, 3],
+            f m.[3, 0], f m.[3, 1], f m.[3, 2], f m.[3, 3]
         )        
                 
-    let inline mapi (f: int -> int -> single -> single) (m1: Matrix16) =
+    let inline mapi (f: int -> int -> single -> single) (m: Matrix16) =
         Matrix16 (
-            f 0 0 m1.[0, 0], f 0 1 m1.[0, 1], f 0 2 m1.[0, 2], f 0 3 m1.[0, 3],
-            f 1 0 m1.[1, 0], f 1 1 m1.[1, 1], f 1 2 m1.[1, 2], f 1 3 m1.[1, 3],
-            f 2 0 m1.[2, 0], f 2 1 m1.[2, 1], f 2 2 m1.[2, 2], f 2 3 m1.[2, 3],
-            f 3 0 m1.[3, 0], f 3 1 m1.[3, 1], f 3 2 m1.[3, 2], f 3 3 m1.[3, 3]
+            f 0 0 m.[0, 0], f 0 1 m.[0, 1], f 0 2 m.[0, 2], f 0 3 m.[0, 3],
+            f 1 0 m.[1, 0], f 1 1 m.[1, 1], f 1 2 m.[1, 2], f 1 3 m.[1, 3],
+            f 2 0 m.[2, 0], f 2 1 m.[2, 1], f 2 2 m.[2, 2], f 2 3 m.[2, 3],
+            f 3 0 m.[3, 0], f 3 1 m.[3, 1], f 3 2 m.[3, 2], f 3 3 m.[3, 3]
         )
 
