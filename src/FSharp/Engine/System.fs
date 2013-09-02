@@ -41,9 +41,6 @@ open Engine.Command
 open Engine.NativeInterop
 
 module private Native =
-    [<DllImport (LibEngine, CallingConvention = DefaultCallingConvention)>]
-    extern int system_cpu_get_physical_core_count ()
-
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_CreateConsole ()
 
@@ -96,9 +93,6 @@ module System =
 
     let StartStreamThread () =
         Native.Sys_InitStreamThread ()
-
-    let GetPhysicalCoreCount () =
-        Native.system_cpu_get_physical_core_count ()
 
     let Start () =
         SetupUnhandledExceptions ()

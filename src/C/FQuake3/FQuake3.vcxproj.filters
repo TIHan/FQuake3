@@ -4,6 +4,6 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="fq3.cfg" />
+    <None Include="fq3.cfg" />
   </ItemGroup>
 </Project>

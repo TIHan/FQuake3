@@ -72,7 +72,7 @@ module Vector3 =
     let zero = Vector3 ()
 
     let inline create x y z =
-        let mutable v = Vector3 ()
+        let mutable v = zero
         let ptr = NativePtr.toNativePtr &&v
         NativePtr.set ptr 0 x
         NativePtr.set ptr 1 y
@@ -316,14 +316,14 @@ type Matrix16 =
 
 module NativeMatrix16 =
     [<DllImport ("Engine.Native.dll", CallingConvention = CallingConvention.Cdecl)>]
-    extern void qmath_matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
+    extern void math_matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
 
 type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
         let mutable m = Matrix16 ()
         let mutable cm1 = m1
         let mutable cm2 = m2
-        NativeMatrix16.qmath_matrix16_multiply (&&cm1, &&cm2, &&m)
+        NativeMatrix16.math_matrix16_multiply (&&cm1, &&cm2, &&m)
         m
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]

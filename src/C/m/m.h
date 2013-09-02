@@ -39,15 +39,18 @@ THE SOFTWARE.
 
 typedef struct _MDomain MDomain;
 
-typedef struct {
+typedef struct
+{
 	gpointer __priv;
 } MObject;
 
-typedef struct {
+typedef struct
+{
 	gpointer __priv;
 } MArray;
 
-typedef struct {
+typedef struct
+{
 	gpointer __priv;
 } MString;
 

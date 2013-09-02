@@ -22,27 +22,50 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#if defined(_WIN32)
-#	define ENGINE_IMPORT __declspec(dllimport)
-#	define ENGINE_EXPORT	__declspec(dllexport)
-#	define ENGINE_DECL __cdecl
-#elif defined(__GNUC__)
-#	define ENGINE_EXPORT __attribute__((visibility("default")))
-#	define ENGINE_IMPORT
-#	define ENGINE_DECL __attribute__((cdecl))
-#else
-#	error Compiler not supported.
+#include <m.h>
+
+#ifdef _WIN32
+#include <intrin.h>
 #endif
 
-typedef struct {
+typedef struct
+{
 	float x;
 	float y;
 	float z;
 	float w;
 } vector4_t;
 
-typedef struct {
-	float values[4][4];
+typedef union
+{
+	struct
+	{
+		__m128 m0, m1, m2, m3;
+	};
+
+	struct
+	{
+		gfloat seq[16];
+	};
+
+	struct
+	{
+		gfloat m[4][4];
+	};
+
+	struct
+	{
+		gfloat m00, m01, m02, m03;
+		gfloat m10, m11, m12, m13;
+		gfloat m20, m21, m22, m23;
+		gfloat m30, m31, m32, m33;
+	};
+
+	struct
+	{
+		vector4_t v[4];
+	};
 } matrix16_t;
+    
 
 #endif /* __ENGINE_H__ */

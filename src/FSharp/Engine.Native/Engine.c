@@ -21,30 +21,11 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 #include "Engine.h"
 
-#ifdef _WIN32
-#include <intrin.h>
-#endif
+#define __SIMD__ 0
 
-#include <stdio.h>
-#include <string.h>
-
-// http://stackoverflow.com/questions/2901694/programatically-detect-number-of-physical-processors-cores-or-if-hyper-threading/3082553#3082553
-static void
-cpu_id (unsigned i, unsigned regs[4])
-{
-#ifdef _WIN32
-  __cpuid ((int *)regs, (int)i);
-#else
-	asm volatile
-	("cpuid" : "=a" (regs[0]), "=b" (regs[1]), "=c" (regs[2]), "=d" (regs[3])
-		: "a" (i), "c" (0));
-	// ECX is set to zero for CPUID function 4
-#endif
-}
-
-ENGINE_EXPORT
+M_EXPORT
 void
-ENGINE_DECL qmath_matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m2, matrix16_t* m)
+M_DECL math_matrix16_multiply (const matrix16_t const* m1, const matrix16_t const* m2, matrix16_t* m)
 {
 	int i, j;
 
@@ -52,49 +33,19 @@ ENGINE_DECL qmath_matrix16_multiply (const matrix16_t const* m1, const matrix16_
 	{
 		for (j = 0; j < 4; ++j)
 		{
-			m->values [i][j] =
-				(m1->values [i][0] * m2->values [0][j]) +
-				(m1->values [i][1] * m2->values [1][j]) +
-				(m1->values [i][2] * m2->values [2][j]) +
-				(m1->values [i][3] * m2->values [3][j]);
+#if __SIMD__
+			__m128 row = _mm_set_ps (m1->m [i][0], m1->m [i][1], m1->m [i][2], m1->m [i][3]);
+			__m128 col = _mm_set_ps (m2->m [0][j], m2->m [1][j], m2->m [2][j], m2->m [3][j]);
+			__m128 result = _mm_dp_ps (row, col, 0xFF);
+			m->m [i][j] = *(gfloat *)&result;
+#else
+			m->m [i][j] =
+				(m1->m [i][0] * m2->m [0][j]) +
+				(m1->m [i][1] * m2->m [1][j]) +
+				(m1->m [i][2] * m2->m [2][j]) +
+				(m1->m [i][3] * m2->m [3][j]);
+#endif
 		}
 	}
 }
 
-ENGINE_EXPORT
-void
-ENGINE_DECL system_cpu_get_vendor_name (char vendor[12])
-{
-	unsigned regs[4];
-
-	cpu_id (0, regs);
-	((unsigned *)vendor) [0] = regs [1]; // EBX
-	((unsigned *)vendor) [1] = regs [3]; // EDX
-	((unsigned *)vendor) [2] = regs [2]; // ECX
-}
-
-ENGINE_EXPORT
-int
-ENGINE_DECL system_cpu_get_physical_core_count (void)
-{
-	int cores = 0;
-
-	unsigned regs[4];
-	char vendor[12];
-
-	system_cpu_get_vendor_name (&vendor [0]);
-
-	if (strncmp (vendor, "GenuineIntel", 12) == 0)
-	{
-		// Get DCP cache info
-		cpu_id (4, regs);
-		cores = ((regs[0] >> 26) & 0x3f) + 1; // EAX[31:26] + 1
-	} else if (strncmp (vendor, "AuthenticAMD", 12) == 0)
-	{
-		// Get NC: Number of CPU cores - 1
-		cpu_id (0x80000008, regs);
-		cores = ((unsigned)(regs [2] & 0xff)) + 1; // ECX[7:0] + 1
-	}
-
-	return cores;
-}
