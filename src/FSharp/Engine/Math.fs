@@ -93,7 +93,7 @@ type Vector3 =
         NativePtr.set ptr 1 y
         NativePtr.set ptr 2 z
         v       
-        
+
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
@@ -110,10 +110,7 @@ type Vector3 =
         Vector3.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
     static member inline (=) (v1: Vector3, v2: Vector3) =
-        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
-
-    static member inline ( *+ ) ((s: single, v1: Vector3), v2: Vector3) =
-        Vector3.Create (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z)      
+        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z    
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
@@ -158,6 +155,9 @@ module Vector3 =
 
     let inline snap (v: Vector3) =
         create (truncate v.X) (truncate v.Y) (truncate v.Z)
+        
+    let inline multiplyAdd (s: single) (v1: Vector3) (v2: Vector3) =
+        create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
 
     let inline dotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)

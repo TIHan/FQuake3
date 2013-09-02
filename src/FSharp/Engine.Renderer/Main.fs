@@ -57,9 +57,9 @@ module Main =
                 let v = Vector3.create (bounds.[i &&& 1].X) (bounds.[(i >>> 1) &&& 1].Y) (bounds.[(i >>> 2) &&& 1].Z)
 
                 orientation.Origin
-                |> ( *+ ) (v.X, orientation.Axis.[0])
-                |> ( *+ ) (v.Y, orientation.Axis.[1])
-                |> ( *+ ) (v.Z, orientation.Axis.[2])
+                |> Vector3.multiplyAdd v.X orientation.Axis.[0]
+                |> Vector3.multiplyAdd v.Y orientation.Axis.[1]
+                |> Vector3.multiplyAdd v.Z orientation.Axis.[2]
             )
 
         /// <summary>
@@ -454,10 +454,10 @@ module Main =
         let xNormal = xs * view.Orientation.Axis.[0]
         let yNormal = ys * view.Orientation.Axis.[0]
 
-        let leftNormal = (xc, view.Orientation.Axis.[1]) *+ xNormal
-        let rightNormal = (-xc, view.Orientation.Axis.[1]) *+ xNormal
-        let bottomNormal = (yc, view.Orientation.Axis.[2]) *+ yNormal
-        let topNormal = (-yc, view.Orientation.Axis.[2]) *+ yNormal
+        let leftNormal = Vector3.multiplyAdd xc view.Orientation.Axis.[1] xNormal
+        let rightNormal = Vector3.multiplyAdd -xc view.Orientation.Axis.[1] xNormal
+        let bottomNormal = Vector3.multiplyAdd yc view.Orientation.Axis.[2] yNormal
+        let topNormal = Vector3.multiplyAdd -yc view.Orientation.Axis.[2] yNormal
 
         {
             Left =
@@ -497,7 +497,9 @@ module Main =
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.dotProduct local surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform
+                (Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[acc]) camera.Axis.[acc] transformed)
+                (acc + 1)
 
         (transform (Vector3.zero) 0) + camera.Origin
 
@@ -511,7 +513,9 @@ module Main =
             match acc with
             | 3 -> transformed
             | _ ->
-            transform ((Vector3.dotProduct v surface.Axis.[acc], camera.Axis.[acc]) *+ transformed) (acc + 1)
+            transform
+                (Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[acc]) camera.Axis.[acc] transformed)
+                (acc + 1)
 
         transform (Vector3.zero) 0
 
