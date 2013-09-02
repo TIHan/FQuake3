@@ -31,7 +31,8 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
-module QMath =
+[<RequireQualifiedAccess>]
+module Math =
     [<Literal>]
     let PI = 3.14159265358979323846f
 

@@ -415,10 +415,10 @@ module Main =
         // dynamically compute far clip plane distance
         let zFar = setFarClip rdFlags view.VisibilityBounds view.Orientation
 
-        let xMax = zNear * (tan <| fovX * QMath.PI / 360.f)
+        let xMax = zNear * (tan <| fovX * Math.PI / 360.f)
         let xMin = -xMax
 
-        let yMax = zNear * (tan <| fovY * QMath.PI / 360.f)
+        let yMax = zNear * (tan <| fovY * Math.PI / 360.f)
         let yMin = -yMax
 
         let width = xMax - xMin
@@ -443,11 +443,11 @@ module Main =
     /// </summary>
     [<Pure>]
     let setupFrustum (view: ViewParms) =
-        let xAngle = view.FovX / 180.f * QMath.PI * 0.5f
+        let xAngle = view.FovX / 180.f * Math.PI * 0.5f
         let xs = sin xAngle
         let xc = cos xAngle
 
-        let yAngle = view.FovY / 180.f * QMath.PI * 0.5f
+        let yAngle = view.FovY / 180.f * Math.PI * 0.5f
         let ys = sin yAngle
         let yc = cos yAngle
 
