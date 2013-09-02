@@ -79,6 +79,25 @@ module Vector3 =
         NativePtr.set ptr 2 z
         v
 
+    let inline setAt i value (v: Vector3) =
+        match i with
+        | _ when i >= 0 && i <= 2 ->
+            let mutable cv = v
+            let ptr = NativePtr.toNativePtr &&cv
+            NativePtr.set ptr i value
+            v
+        | _ -> raise <| IndexOutOfRangeException ()
+
+    let inline set2At i1 value1 i2 value2 (v: Vector3) =
+        match (i1, i2) with
+        | _ when i1 >= 0 && i1 <= 2 && i2 >= 0 && i2 <= 2 ->
+            let mutable cv = v
+            let ptr = NativePtr.toNativePtr &&cv
+            NativePtr.set ptr i1 value1
+            NativePtr.set ptr i2 value2
+            v
+        | _ -> raise <| IndexOutOfRangeException ()
+
     let unitX = create 1.f 0.f 0.f
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f

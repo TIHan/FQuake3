@@ -367,7 +367,7 @@ module Main =
             )
         
         OrientationR (
-            Vector3 (),
+            Vector3.zero,
             axis,
             viewOrigin,
             // convert from our coordinate system (looking down X)
