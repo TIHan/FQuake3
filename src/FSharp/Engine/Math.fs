@@ -67,58 +67,36 @@ type Vector3 =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    member inline this.SetAt (i, value) =
-        match i with
-        | _ when i >= 0 && i <= 2 ->
-            let mutable cv = this
-            let ptr = NativePtr.toNativePtr &&cv
-            NativePtr.set ptr i value
-            cv
-        | _ -> raise <| IndexOutOfRangeException ()
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vector3 =
+    let zero = Vector3 ()
 
-    member inline this.Set2At (i1, value1, i2, value2) =
-        match (i1, i2) with
-        | _ when i1 >= 0 && i1 <= 2 && i2 >= 0 && i2 <= 2 ->
-            let mutable cv = this
-            let ptr = NativePtr.toNativePtr &&cv
-            NativePtr.set ptr i1 value1
-            NativePtr.set ptr i2 value2
-            cv
-        | _ -> raise <| IndexOutOfRangeException ()        
-
-    static member inline Create (x, y, z) =
+    let inline create x y z =
         let mutable v = Vector3 ()
         let ptr = NativePtr.toNativePtr &&v
         NativePtr.set ptr 0 x
         NativePtr.set ptr 1 y
         NativePtr.set ptr 2 z
-        v       
+        v
 
-    static member inline (*) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+    let inline setAt i value (v: Vector3) =
+        match i with
+        | _ when i >= 0 && i <= 2 ->
+            let mutable cv = v
+            let ptr = NativePtr.toNativePtr &&cv
+            NativePtr.set ptr i value
+            cv
+        | _ -> raise <| IndexOutOfRangeException ()
 
-    static member inline (*) (v: Vector3, s: single) =
-        Vector3.Create (v.X * s, v.Y * s, v.Z * s)
-
-    static member inline (*) (s: single, v: Vector3) =
-        Vector3.Create (v.X * s, v.Y * s, v.Z * s)
-
-    static member inline (+) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
-
-    static member inline (-) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
-
-    static member inline (=) (v1: Vector3, v2: Vector3) =
-        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z    
-
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Vector3 =
-    let zero = Vector3 ()
-
-    let inline create x y z = Vector3.Create (x, y, z)
-    let inline setAt i value (v: Vector3) = v.SetAt (i, value)
-    let inline set2At i1 value1 i2 value2 (v: Vector3) = v.Set2At (i1, value1, i2, value2)
+    let inline set2At i1 value1 i2 value2 (v: Vector3) =
+        match (i1, i2) with
+        | _ when i1 >= 0 && i1 <= 2 && i2 >= 0 && i2 <= 2 ->
+            let mutable cv = v
+            let ptr = NativePtr.toNativePtr &&cv
+            NativePtr.set ptr i1 value1
+            NativePtr.set ptr i2 value2
+            cv
+        | _ -> raise <| IndexOutOfRangeException ()
 
     let unitX = create 1.f 0.f 0.f
     let unitY = create 0.f 1.f 0.f
@@ -183,6 +161,24 @@ module Vector3 =
         let uvNormal = normalize uv
         crossProduct v uvNormal
 
+type Vector3 with
+    static member inline (*) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z)
+
+    static member inline (*) (v: Vector3, s: single) =
+        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
+
+    static member inline (*) (s: single, v: Vector3) =
+        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
+
+    static member inline (+) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z)
+
+    static member inline (-) (v1: Vector3, v2: Vector3) =
+        Vector3.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z)
+
+    static member inline (=) (v1: Vector3, v2: Vector3) =
+        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z    
 
 /// <summary>
 /// Vector4
