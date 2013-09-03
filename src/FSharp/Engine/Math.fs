@@ -107,16 +107,6 @@ module Vector3 =
             cv
         | _ -> raise <| IndexOutOfRangeException ()
 
-    let inline set2At i1 value1 i2 value2 (v: Vector3) =
-        match (i1, i2) with
-        | _ when i1 >= 0 && i1 <= 2 && i2 >= 0 && i2 <= 2 ->
-            let mutable cv = v
-            let ptr = NativePtr.toNativePtr &&cv
-            NativePtr.set ptr i1 value1
-            NativePtr.set ptr i2 value2
-            cv
-        | _ -> raise <| IndexOutOfRangeException ()
-
     let unitX = create 1.f 0.f 0.f
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f
@@ -139,16 +129,25 @@ module Vector3 =
             | _ -> 2
 
     let inline map (f: single -> single) (v: Vector3) =
-        create (f v.[0]) (f v.[1]) (f v.[2])
+        create (f v.X) (f v.Y) (f v.Z)
 
     let inline mapi (f: int -> single -> single) (v: Vector3) =
-        create (f 0 v.[0]) (f 1 v.[1]) (f 2 v.[2])
+        create (f 0 v.X) (f 1 v.Y) (f 2 v.Z)
 
     let inline map2 (f: single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        create (f v1.[0] v2.[0]) (f v1.[1] v2.[1]) (f v1.[2] v2.[2])
+        create (f v1.X v2.X) (f v1.Y v2.Y) (f v1.Z v2.Z)
         
     let inline mapi2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        create (f 0 v1.[0] v2.[0]) (f 1 v1.[1] v2.[1]) (f 2 v1.[2] v2.[2])
+        create (f 0 v1.X v2.X) (f 1 v1.Y v2.Y) (f 2 v1.Z v2.Z)
+
+    let inline sum (v: Vector3) =
+        v.X + v.Y + v.Z 
+        
+    let inline sumBy f (v: Vector3) =
+        (f v.X) + (f v.Y) + (f v.Z)
+        
+    let inline reduce f (v: Vector3) =
+        f (f (f 0.f v.X) v.Y) v.Z
 
     let inline snap (v: Vector3) =
         create (truncate v.X) (truncate v.Y) (truncate v.Z)
@@ -163,11 +162,11 @@ module Vector3 =
         create ((v1.Y * v2.Z) - (v1.Z * v2.Y)) ((v1.Z * v2.X) - (v1.X * v2.Z)) ((v1.X * v2.Y) - (v1.Y * v2.X))
 
     let inline length (v: Vector3) =
-        sqrt <| dotProduct v v
+        sqrt <| (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
 
     let inline normalize (v: Vector3) =
         let length = 1.f / length v
-        mapi (fun i x -> x * length) v
+        create (v.X * length) (v.Y * length) (v.Z * length)
 
     let inline perpendicular (v: Vector3) =
         let uv =
