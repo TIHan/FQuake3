@@ -28,9 +28,6 @@ open Microsoft.FSharp.NativeInterop
 let LibQuake3 = "quake3.dll"
 
 [<Literal>]
-let LibEngine = "Engine.Native.dll"
-
-[<Literal>]
 let DefaultCallingConvention = CallingConvention.Cdecl
 
 /// <summary>

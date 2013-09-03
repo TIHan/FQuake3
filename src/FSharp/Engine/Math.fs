@@ -31,9 +31,6 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
-[<Literal>]
-let LibEngine = "Engine.Native.dll"
-
 [<RequireQualifiedAccess>]
 module Math =
     [<Literal>]
@@ -322,15 +319,11 @@ type Matrix16 =
                     | (3, 1) -> this.M31
                     | (3, 2) -> this.M32
                     | (3, 3) -> this.M33
-                    | _ -> raise <| IndexOutOfRangeException ()  
+                    | _ -> raise <| IndexOutOfRangeException () 
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix16 =
     let zero = Matrix16 ()
-
-    module Native =
-        [<DllImport (LibEngine, CallingConvention = CallingConvention.Cdecl)>]
-        extern void math_matrix16_multiply ([<In>] Matrix16* m1, [<In>] Matrix16* m2, [<Out>] Matrix16* m)
 
     let inline create 
             m00 m01 m02 m03
@@ -356,6 +349,7 @@ module Matrix16 =
         NativePtr.set ptr 14 m32
         NativePtr.set ptr 15 m33
         m
+
 
     let inline init (f: int -> int -> single) =
         create
@@ -391,33 +385,7 @@ module Matrix16 =
 
 type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
-(*
         Matrix16.init (fun row col ->
             (m1.[row, 0] * m2.[0, col]) + (m1.[row, 1] * m2.[1, col]) + (m1.[row, 2] * m2.[2, col]) + (m1.[row, 3] * m2.[3, col])
         )
-*)
-(*
-        Matrix16.create
-            ((m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]))
-            ((m1.[0, 0] * m2.[0, 1]) + (m1.[0, 1] * m2.[1, 1]) + (m1.[0, 2] * m2.[2, 1]) + (m1.[0, 3] * m2.[3, 1]))
-            ((m1.[0, 0] * m2.[0, 2]) + (m1.[0, 1] * m2.[1, 2]) + (m1.[0, 2] * m2.[2, 2]) + (m1.[0, 3] * m2.[3, 2]))
-            ((m1.[0, 0] * m2.[0, 3]) + (m1.[0, 1] * m2.[1, 3]) + (m1.[0, 2] * m2.[2, 3]) + (m1.[0, 3] * m2.[3, 3]))
-            ((m1.[1, 0] * m2.[0, 0]) + (m1.[1, 1] * m2.[1, 0]) + (m1.[1, 2] * m2.[2, 0]) + (m1.[1, 3] * m2.[3, 0]))
-            ((m1.[1, 0] * m2.[0, 1]) + (m1.[1, 1] * m2.[1, 1]) + (m1.[1, 2] * m2.[2, 1]) + (m1.[1, 3] * m2.[3, 1]))
-            ((m1.[1, 0] * m2.[0, 2]) + (m1.[1, 1] * m2.[1, 2]) + (m1.[1, 2] * m2.[2, 2]) + (m1.[1, 3] * m2.[3, 2]))
-            ((m1.[1, 0] * m2.[0, 3]) + (m1.[1, 1] * m2.[1, 3]) + (m1.[1, 2] * m2.[2, 3]) + (m1.[1, 3] * m2.[3, 3]))
-            ((m1.[2, 0] * m2.[0, 0]) + (m1.[2, 1] * m2.[1, 0]) + (m1.[2, 2] * m2.[2, 0]) + (m1.[2, 3] * m2.[3, 0]))
-            ((m1.[2, 0] * m2.[0, 1]) + (m1.[2, 1] * m2.[1, 1]) + (m1.[2, 2] * m2.[2, 1]) + (m1.[2, 3] * m2.[3, 1]))
-            ((m1.[2, 0] * m2.[0, 2]) + (m1.[2, 1] * m2.[1, 2]) + (m1.[2, 2] * m2.[2, 2]) + (m1.[2, 3] * m2.[3, 2]))
-            ((m1.[2, 0] * m2.[0, 3]) + (m1.[2, 1] * m2.[1, 3]) + (m1.[2, 2] * m2.[2, 3]) + (m1.[2, 3] * m2.[3, 3]))
-            ((m1.[3, 0] * m2.[0, 0]) + (m1.[3, 1] * m2.[1, 0]) + (m1.[3, 2] * m2.[2, 0]) + (m1.[3, 3] * m2.[3, 0]))
-            ((m1.[3, 0] * m2.[0, 1]) + (m1.[3, 1] * m2.[1, 1]) + (m1.[3, 2] * m2.[2, 1]) + (m1.[3, 3] * m2.[3, 1]))
-            ((m1.[3, 0] * m2.[0, 2]) + (m1.[3, 1] * m2.[1, 2]) + (m1.[3, 2] * m2.[2, 2]) + (m1.[3, 3] * m2.[3, 2]))
-            ((m1.[3, 0] * m2.[0, 3]) + (m1.[3, 1] * m2.[1, 3]) + (m1.[3, 2] * m2.[2, 3]) + (m1.[3, 3] * m2.[3, 3]))
-*)
-        let mutable m = Matrix16.zero
-        let mutable cm1 = m1
-        let mutable cm2 = m2
-        Matrix16.Native.math_matrix16_multiply (&&cm1, &&cm2, &&m)
-        m
 
