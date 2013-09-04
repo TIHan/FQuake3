@@ -40,40 +40,10 @@ module Main =
             0.f 1.f 0.f 0.f
             0.f 0.f 0.f 1.f
 
-    module private LocalBox =
-        /// <summary>
-        /// Check against frustum planes.
-        /// </summary>
-        [<Pure>]
-        let checkFrustumPlanes (transformed: Transform) (frustum: Frustum) =
-            let rec checkFrustumPlane (frust: Plane) front back isFront acc =
-                match acc = 8 || isFront with
-                | true -> (front, back)
-                | _ ->
-                    let distance = Vector3.dotProduct transformed.[acc] frust.Normal
-
-                    match distance > frust.Distance with
-                    | true -> checkFrustumPlane frust 1 back (back = 1) (acc + 1)
-                    | _ -> checkFrustumPlane frust front 1 false (acc + 1)
-
-            let rec checkFrustumPlanes anyBack isFront acc =
-                match acc = 4 || isFront = false with
-                | true -> (anyBack, isFront)
-                | _ ->
-                    let frust = frustum.[acc]
-
-                    match checkFrustumPlane frust 0 0 false 0 with
-                    | (front, back) ->
-                        checkFrustumPlanes (anyBack ||| back) (front = 1) (acc + 1)
-
-            match checkFrustumPlanes 0 true 0 with
-            | (_, false) -> ClipType.Out // all points were behind one of the planes
-            | (0, _) -> ClipType.In // completely inside frustum
-            | _ -> ClipType.Clip // partially clipped
-
     module private PointAndRadius =
         /// <summary>
         /// CheckFrustumPlanes
+        /// TODO: Move this into cullPointAndRadius.
         /// </summary>
         [<Pure>]
         let checkFrustumPlanes (point: Vector3) (radius: single) (frustum: Frustum) =
@@ -104,6 +74,7 @@ module Main =
         | true -> ClipType.Clip
         | _ ->
 
+        // transform into world space
         let inline transform i =
             let v = Vector3.create (bounds.[i &&& 1].X) (bounds.[(i >>> 1) &&& 1].Y) (bounds.[(i >>> 2) &&& 1].Z)
 
@@ -112,20 +83,37 @@ module Main =
             |> Vector3.multiplyAdd v.Y orientation.Axis.[1]
             |> Vector3.multiplyAdd v.Z orientation.Axis.[2]
 
-        // transform into world space
-        let transformed =
-            Transform.create
-                (transform 0)
-                (transform 1)
-                (transform 2)
-                (transform 3)
-                (transform 4)
-                (transform 5)
-                (transform 6)
-                (transform 7)
+        let rec checkFrustumPlane (frust: Plane) front back isFront n =
+            match n with
+            | 8 -> (front, back)
+            | _ ->
+            match isFront with
+            | true -> (front, back)
+            | _ ->
+                let distance = Vector3.dotProduct (transform n) frust.Normal
+
+                match distance > frust.Distance with
+                | true -> checkFrustumPlane frust 1 back (back = 1) (n + 1)
+                | _ -> checkFrustumPlane frust front 1 false (n + 1)
+
+        let rec checkFrustumPlanes anyBack isFront n =
+            match n with
+            | 4 -> (anyBack, isFront)
+            | _ ->
+            match isFront with
+            | false -> (anyBack, isFront)
+            | _ ->
+                let frust = frustum.[n]
+
+                match checkFrustumPlane frust 0 0 false 0 with
+                | (front, back) ->
+                    checkFrustumPlanes (anyBack ||| back) (front = 1) (n + 1)
 
         // check against frustum planes
-        LocalBox.checkFrustumPlanes transformed frustum
+        match checkFrustumPlanes 0 true 0 with
+        | (_, false) -> ClipType.Out // all points were behind one of the planes
+        | (0, _) -> ClipType.In // completely inside frustum
+        | _ -> ClipType.Clip // partially clipped
 
     /// <summary>
     /// Based on Q3: R_CullPointAndRadius

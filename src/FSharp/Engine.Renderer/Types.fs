@@ -277,52 +277,6 @@ type Frustum =
             | _ -> raise <| IndexOutOfRangeException ()
 
 /// <summary>
-/// Transform
-///
-/// Note: Too big to be a struct?
-/// </summary>
-[<Struct>]
-type Transform =
-    val T0 : Vector3
-    val T1 : Vector3
-    val T2 : Vector3
-    val T3 : Vector3
-    val T4 : Vector3
-    val T5 : Vector3
-    val T6 : Vector3
-    val T7 : Vector3
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.T0
-            | 1 -> this.T1
-            | 2 -> this.T2
-            | 3 -> this.T3
-            | 4 -> this.T4
-            | 5 -> this.T5
-            | 6 -> this.T6
-            | 7 -> this.T7
-            | _ -> raise <| IndexOutOfRangeException ()
-
-    new (t0, t1, t2, t3, t4, t5, t6, t7) =
-        {
-            T0 = t0;
-            T1 = t1;
-            T2 = t2;
-            T3 = t3;
-            T4 = t4;
-            T5 = t5;
-            T6 = t6;
-            T7 = t7;
-        }
-
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Transform = 
-    let zero = Transform ()
-    let inline create t0 t1 t2 t3 t4 t5 t6 t7 = Transform (t0, t1, t2, t3, t4, t5, t6, t7)
-
-/// <summary>
 /// Based on Q3: viewParms_t
 /// ViewParms
 /// </summary>
