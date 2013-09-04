@@ -40,30 +40,6 @@ module Main =
             0.f 1.f 0.f 0.f
             0.f 0.f 0.f 1.f
 
-    module private PointAndRadius =
-        /// <summary>
-        /// CheckFrustumPlanes
-        /// TODO: Move this into cullPointAndRadius.
-        /// </summary>
-        [<Pure>]
-        let checkFrustumPlanes (point: Vector3) (radius: single) (frustum: Frustum) =
-            let rec checkFrustumPlanes mightBeClipped canCullOut acc =
-                match acc = 4 || canCullOut with
-                | true -> (mightBeClipped, canCullOut)
-                | _ ->
-                    let frust = frustum.[acc]
-                    let distance = (Vector3.dotProduct point frust.Normal) - frust.Distance
-
-                    match distance < -radius with
-                    | true -> checkFrustumPlanes mightBeClipped true (acc + 1)
-                    | _ when distance <= radius -> checkFrustumPlanes true false (acc + 1)
-                    | _ -> checkFrustumPlanes mightBeClipped false (acc + 1)
-
-            match checkFrustumPlanes false false 0 with
-            | (_, true) -> ClipType.Out // all points were behind one of the planes
-            | (true, _) -> ClipType.Clip // partially clipped
-            | _ -> ClipType.In // completely inside frustum
-
     /// <summary>
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
@@ -125,7 +101,25 @@ module Main =
         | true -> ClipType.Clip
         | _ ->
 
-        PointAndRadius.checkFrustumPlanes point radius frustum
+        let rec checkFrustumPlanes mightBeClipped canCullOut n =
+            match n with
+            | 4 -> (mightBeClipped, canCullOut)
+            | _ ->
+            match canCullOut with
+            | true -> (mightBeClipped, canCullOut)
+            | _ ->
+            let frust = frustum.[n]
+            let distance = (Vector3.dotProduct point frust.Normal) - frust.Distance
+
+            match distance < -radius with
+            | true -> checkFrustumPlanes mightBeClipped true (n + 1)
+            | _ when distance <= radius -> checkFrustumPlanes true false (n + 1)
+            | _ -> checkFrustumPlanes mightBeClipped false (n + 1)
+
+        match checkFrustumPlanes false false 0 with
+        | (_, true) -> ClipType.Out // all points were behind one of the planes
+        | (true, _) -> ClipType.Clip // partially clipped
+        | _ -> ClipType.In // completely inside frustum
 
     /// <summary>
     /// Based on Q3: R_LocalPointToWorld
