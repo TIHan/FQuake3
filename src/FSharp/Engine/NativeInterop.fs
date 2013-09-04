@@ -45,9 +45,9 @@ module NativePtr =
 
     let inline toArray (size: int) (x: nativeptr<'T>) =
         let arr = Array.zeroCreate<'T> size
-        let arrPtr = &&arr.[0]
+        let ptr = &&arr.[0]
         for i = 0 to size - 1 do
-            NativePtr.set arrPtr i <| NativePtr.get x i
+            NativePtr.set ptr i <| NativePtr.get x i
         arr
 
     let inline toNativePtr x =

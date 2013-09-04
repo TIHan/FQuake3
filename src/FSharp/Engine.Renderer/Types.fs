@@ -88,6 +88,10 @@ type Axis =
             Z = z;
         }
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Axis =
+    let zero = Axis ()
+    let inline create x y z = Axis (x, y, z)
 
 /// <summary>
 /// Rgba
@@ -315,9 +319,8 @@ type Transform =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Transform = 
-    let inline init (f: int -> Vector3) =
-        Transform (f 0, f 1, f 2, f 3, f 4, f 5, f 6, f 7)
-
+    let zero = Transform ()
+    let inline create t0 t1 t2 t3 t4 t5 t6 t7 = Transform (t0, t1, t2, t3, t4, t5, t6, t7)
 
 /// <summary>
 /// Based on Q3: viewParms_t

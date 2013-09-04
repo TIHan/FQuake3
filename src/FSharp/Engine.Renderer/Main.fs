@@ -42,20 +42,6 @@ module Main =
 
     module private LocalBox =
         /// <summary>
-        /// Transform into world space.
-        /// </summary>
-        [<Pure>]
-        let transformWorldSpace (bounds: Bounds) (orientation: OrientationR) =        
-            Transform.init (fun i ->
-                let v = Vector3.create (bounds.[i &&& 1].X) (bounds.[(i >>> 1) &&& 1].Y) (bounds.[(i >>> 2) &&& 1].Z)
-
-                orientation.Origin
-                |> Vector3.multiplyAdd v.X orientation.Axis.[0]
-                |> Vector3.multiplyAdd v.Y orientation.Axis.[1]
-                |> Vector3.multiplyAdd v.Z orientation.Axis.[2]
-            )
-
-        /// <summary>
         /// Check against frustum planes.
         /// </summary>
         [<Pure>]
@@ -111,15 +97,32 @@ module Main =
     /// <summary>
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
-    // </summary>
+    /// </summary>
     [<Pure>]
     let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
         match noCull.Integer = 1 with
         | true -> ClipType.Clip
         | _ ->
 
+        let inline transform i =
+            let v = Vector3.create (bounds.[i &&& 1].X) (bounds.[(i >>> 1) &&& 1].Y) (bounds.[(i >>> 2) &&& 1].Z)
+
+            orientation.Origin
+            |> Vector3.multiplyAdd v.X orientation.Axis.[0]
+            |> Vector3.multiplyAdd v.Y orientation.Axis.[1]
+            |> Vector3.multiplyAdd v.Z orientation.Axis.[2]
+
         // transform into world space
-        let transformed = LocalBox.transformWorldSpace bounds orientation
+        let transformed =
+            Transform.create
+                (transform 0)
+                (transform 1)
+                (transform 2)
+                (transform 3)
+                (transform 4)
+                (transform 5)
+                (transform 6)
+                (transform 7)
 
         // check against frustum planes
         LocalBox.checkFrustumPlanes transformed frustum
@@ -184,7 +187,7 @@ module Main =
     /// </summary>
     [<Pure>]
     let transformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
-        let calculateEye i =
+        let inline calculateEye i =
             (source.X * modelMatrix.[0, i]) +
             (source.Y * modelMatrix.[1, i]) +
             (source.Z * modelMatrix.[2, i]) +
@@ -197,7 +200,7 @@ module Main =
                 (calculateEye 2)
                 (calculateEye 3)
 
-        let calculateDestination i =
+        let inline calculateDestination i =
             (eye.X * projectionMatrix.[0, i]) +
             (eye.Y * projectionMatrix.[1, i]) +
             (eye.Z * projectionMatrix.[2, i]) +
@@ -385,9 +388,7 @@ module Main =
             let z = match (acc &&& 4) <> 0 with | true -> visibilityBounds.[0].[2] | _ -> visibilityBounds.[1].[2]
 
             let v = Vector3.create x y z
-
-            let vecTo = v - orientation.Origin
-            let possibleDistance = Vector3.dotProduct vecTo vecTo
+            let possibleDistance = Vector3.lengthSquared <| v - orientation.Origin
 
             calculateFarthestCornerDistance (match possibleDistance > distance with | true -> possibleDistance | _ -> distance) (acc + 1)
 

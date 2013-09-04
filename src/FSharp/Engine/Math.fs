@@ -23,8 +23,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 #nowarn "9"
 #nowarn "51"
 
-namespace Engine
-module Math =
+namespace Engine.Math
 
 open System
 open System.Runtime.InteropServices
@@ -57,6 +56,12 @@ type Vector2 =
             | 1 -> this.Y
             | _ -> raise <| IndexOutOfRangeException ()
 
+    new (x, y) =
+        {
+            X = x;
+            Y = y;
+        }
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector2 =
     let zero = Vector2 ()
@@ -86,6 +91,13 @@ type Vector3 =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
+    new (x, y, z) =
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
     let zero = Vector3 ()
@@ -111,9 +123,6 @@ module Vector3 =
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f
 
-    let inline init (f: int -> single) =
-        create (f 0) (f 1) (f 2)
-
     let inline abs (v: Vector3) =
         create (abs v.X) (abs v.Y) (abs v.Z)
 
@@ -128,27 +137,6 @@ module Vector3 =
             | true -> 1
             | _ -> 2
 
-    let inline map (f: single -> single) (v: Vector3) =
-        create (f v.X) (f v.Y) (f v.Z)
-
-    let inline mapi (f: int -> single -> single) (v: Vector3) =
-        create (f 0 v.X) (f 1 v.Y) (f 2 v.Z)
-
-    let inline map2 (f: single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        create (f v1.X v2.X) (f v1.Y v2.Y) (f v1.Z v2.Z)
-        
-    let inline mapi2 (f: int -> single -> single -> single) (v1: Vector3) (v2: Vector3) =
-        create (f 0 v1.X v2.X) (f 1 v1.Y v2.Y) (f 2 v1.Z v2.Z)
-
-    let inline sum (v: Vector3) =
-        v.X + v.Y + v.Z 
-        
-    let inline sumBy f (v: Vector3) =
-        (f v.X) + (f v.Y) + (f v.Z)
-        
-    let inline reduce f (v: Vector3) =
-        f (f (f 0.f v.X) v.Y) v.Z
-
     let inline snap (v: Vector3) =
         create (truncate v.X) (truncate v.Y) (truncate v.Z)
         
@@ -161,8 +149,11 @@ module Vector3 =
     let inline crossProduct (v1: Vector3) (v2: Vector3) =
         create ((v1.Y * v2.Z) - (v1.Z * v2.Y)) ((v1.Z * v2.X) - (v1.X * v2.Z)) ((v1.X * v2.Y) - (v1.Y * v2.X))
 
+    let inline lengthSquared (v: Vector3) =
+        (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
+
     let inline length (v: Vector3) =
-        sqrt <| (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
+        sqrt <| lengthSquared v
 
     let inline normalize (v: Vector3) =
         let length = 1.f / length v
@@ -217,6 +208,14 @@ type Vector4 =
             | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
+    new (x, y, z, w) =
+        {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
+        }
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector4 =
     let zero = Vector4 ()
@@ -243,7 +242,6 @@ type Vector4 with
     static member inline (-) (v1: Vector4, v2: Vector4) =
         Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)
 
-
 /// <summary>
 /// Matrix4
 /// </summary>
@@ -262,6 +260,14 @@ type Matrix4 =
                     | (1, 0) -> this.M10
                     | (1, 1) -> this.M11
                     | _ -> raise <| IndexOutOfRangeException ()
+
+    new (m00, m01, m10, m11) =
+        {
+            M00 = m00;
+            M01 = m01;
+            M10 = m10;
+            M11 = m11;
+        }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix4 =
@@ -318,7 +324,20 @@ type Matrix16 =
                     | (3, 1) -> this.M31
                     | (3, 2) -> this.M32
                     | (3, 3) -> this.M33
-                    | _ -> raise <| IndexOutOfRangeException () 
+                    | _ -> raise <| IndexOutOfRangeException ()
+
+    new (
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        ) =
+        {
+            M00 = m00; M01 = m01; M02 = m02; M03 = m03;
+            M10 = m10; M11 = m11; M12 = m12; M13 = m13;
+            M20 = m20; M21 = m21; M22 = m22; M23 = m23;
+            M30 = m30; M31 = m31; M32 = m32; M33 = m33;
+        }   
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix16 =
@@ -349,42 +368,23 @@ module Matrix16 =
         NativePtr.set ptr 15 m33
         m
 
-
-    let inline init (f: int -> int -> single) =
-        create
-            (f 0 0) (f 0 1) (f 0 2) (f 0 3)
-            (f 1 0) (f 1 1) (f 1 2) (f 1 3)
-            (f 2 0) (f 2 1) (f 2 2) (f 2 3)
-            (f 3 0) (f 3 1) (f 3 2) (f 3 3)
-
-
-    let inline iter (f: single -> unit) (m: Matrix16) =
-        for i = 0 to 3 do
-            for j = 0 to 3 do
-                f m.[i, j]
-        
-    let inline iteri (f: int -> int -> single -> unit) (m: Matrix16) =
-        for i = 0 to 3 do
-            for j = 0 to 3 do
-                f i j m.[i, j]
-
-    let inline map (f: single -> single) (m: Matrix16) =
-        create
-            (f m.[0, 0]) (f m.[0, 1]) (f m.[0, 2]) (f m.[0, 3])
-            (f m.[1, 0]) (f m.[1, 1]) (f m.[1, 2]) (f m.[1, 3])
-            (f m.[2, 0]) (f m.[2, 1]) (f m.[2, 2]) (f m.[2, 3])
-            (f m.[3, 0]) (f m.[3, 1]) (f m.[3, 2]) (f m.[3, 3])       
-                
-    let inline mapi (f: int -> int -> single -> single) (m: Matrix16) =
-        create
-            (f 0 0 m.[0, 0]) (f 0 1 m.[0, 1]) (f 0 2 m.[0, 2]) (f 0 3 m.[0, 3])
-            (f 1 0 m.[1, 0]) (f 1 1 m.[1, 1]) (f 1 2 m.[1, 2]) (f 1 3 m.[1, 3])
-            (f 2 0 m.[2, 0]) (f 2 1 m.[2, 1]) (f 2 2 m.[2, 2]) (f 2 3 m.[2, 3])
-            (f 3 0 m.[3, 0]) (f 3 1 m.[3, 1]) (f 3 2 m.[3, 2]) (f 3 3 m.[3, 3])
-
 type Matrix16 with
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
-        Matrix16.init (fun row col ->
-            (m1.[row, 0] * m2.[0, col]) + (m1.[row, 1] * m2.[1, col]) + (m1.[row, 2] * m2.[2, col]) + (m1.[row, 3] * m2.[3, col])
-        )
+        Matrix16.create
+            ((m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]))
+            ((m1.[0, 0] * m2.[0, 1]) + (m1.[0, 1] * m2.[1, 1]) + (m1.[0, 2] * m2.[2, 1]) + (m1.[0, 3] * m2.[3, 1]))
+            ((m1.[0, 0] * m2.[0, 2]) + (m1.[0, 1] * m2.[1, 2]) + (m1.[0, 2] * m2.[2, 2]) + (m1.[0, 3] * m2.[3, 2]))
+            ((m1.[0, 0] * m2.[0, 3]) + (m1.[0, 1] * m2.[1, 3]) + (m1.[0, 2] * m2.[2, 3]) + (m1.[0, 3] * m2.[3, 3]))
+            ((m1.[1, 0] * m2.[0, 0]) + (m1.[1, 1] * m2.[1, 0]) + (m1.[1, 2] * m2.[2, 0]) + (m1.[1, 3] * m2.[3, 0]))
+            ((m1.[1, 0] * m2.[0, 1]) + (m1.[1, 1] * m2.[1, 1]) + (m1.[1, 2] * m2.[2, 1]) + (m1.[1, 3] * m2.[3, 1]))
+            ((m1.[1, 0] * m2.[0, 2]) + (m1.[1, 1] * m2.[1, 2]) + (m1.[1, 2] * m2.[2, 2]) + (m1.[1, 3] * m2.[3, 2]))
+            ((m1.[1, 0] * m2.[0, 3]) + (m1.[1, 1] * m2.[1, 3]) + (m1.[1, 2] * m2.[2, 3]) + (m1.[1, 3] * m2.[3, 3]))
+            ((m1.[2, 0] * m2.[0, 0]) + (m1.[2, 1] * m2.[1, 0]) + (m1.[2, 2] * m2.[2, 0]) + (m1.[2, 3] * m2.[3, 0]))
+            ((m1.[2, 0] * m2.[0, 1]) + (m1.[2, 1] * m2.[1, 1]) + (m1.[2, 2] * m2.[2, 1]) + (m1.[2, 3] * m2.[3, 1]))
+            ((m1.[2, 0] * m2.[0, 2]) + (m1.[2, 1] * m2.[1, 2]) + (m1.[2, 2] * m2.[2, 2]) + (m1.[2, 3] * m2.[3, 2]))
+            ((m1.[2, 0] * m2.[0, 3]) + (m1.[2, 1] * m2.[1, 3]) + (m1.[2, 2] * m2.[2, 3]) + (m1.[2, 3] * m2.[3, 3]))
+            ((m1.[3, 0] * m2.[0, 0]) + (m1.[3, 1] * m2.[1, 0]) + (m1.[3, 2] * m2.[2, 0]) + (m1.[3, 3] * m2.[3, 0]))
+            ((m1.[3, 0] * m2.[0, 1]) + (m1.[3, 1] * m2.[1, 1]) + (m1.[3, 2] * m2.[2, 1]) + (m1.[3, 3] * m2.[3, 1]))
+            ((m1.[3, 0] * m2.[0, 2]) + (m1.[3, 1] * m2.[1, 2]) + (m1.[3, 2] * m2.[2, 2]) + (m1.[3, 3] * m2.[3, 2]))
+            ((m1.[3, 0] * m2.[0, 3]) + (m1.[3, 1] * m2.[1, 3]) + (m1.[3, 2] * m2.[2, 3]) + (m1.[3, 3] * m2.[3, 3]))
 
