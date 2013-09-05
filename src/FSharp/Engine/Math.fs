@@ -100,6 +100,9 @@ type Vector3 =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
+    [<Literal>]
+    let size = 3
+
     let zero = Vector3 ()
 
     let inline create x y z =
@@ -122,6 +125,7 @@ module Vector3 =
     let unitX = create 1.f 0.f 0.f
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f
+    let one = create 1.f 1.f 1.f
 
     let inline abs (v: Vector3) =
         create (abs v.X) (abs v.Y) (abs v.Z)

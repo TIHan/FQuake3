@@ -40,6 +40,9 @@ module Main =
             0.f 1.f 0.f 0.f
             0.f 0.f 0.f 1.f
 
+    [<Literal>]
+    let private TransformSize = 8
+
     /// <summary>
     /// Based on Q3: R_CullLocalBox
     /// CullLocalBox
@@ -61,7 +64,7 @@ module Main =
 
         let rec checkFrustumPlane (frust: Plane) front back isFront n =
             match n with
-            | 8 -> (front, back)
+            | TransformSize -> (front, back)
             | _ ->
             match isFront with
             | true -> (front, back)
@@ -74,7 +77,7 @@ module Main =
 
         let rec checkFrustumPlanes anyBack isFront n =
             match n with
-            | 4 -> (anyBack, isFront)
+            | Frustum.size -> (anyBack, isFront)
             | _ ->
             match isFront with
             | false -> (anyBack, isFront)
@@ -103,7 +106,7 @@ module Main =
 
         let rec checkFrustumPlanes mightBeClipped canCullOut n =
             match n with
-            | 4 -> (mightBeClipped, canCullOut)
+            | Frustum.size -> (mightBeClipped, canCullOut)
             | _ ->
             match canCullOut with
             | true -> (mightBeClipped, canCullOut)
@@ -462,13 +465,13 @@ module Main =
     [<Pure>]
     let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let local = v - surface.Origin
-        let rec transform transformed acc =
-            match acc with
-            | 3 -> transformed
+        let rec transform transformed n =
+            match n with
+            | Vector3.size -> transformed
             | _ ->
             transform
-                (Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[acc]) camera.Axis.[acc] transformed)
-                (acc + 1)
+                (Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[n]) camera.Axis.[n] transformed)
+                (n + 1)
 
         (transform (Vector3.zero) 0) + camera.Origin
 
@@ -478,13 +481,13 @@ module Main =
     /// </summary>
     [<Pure>]
     let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
-        let rec transform transformed acc =
-            match acc with
-            | 3 -> transformed
+        let rec transform transformed n =
+            match n with
+            | Vector3.size -> transformed
             | _ ->
             transform
-                (Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[acc]) camera.Axis.[acc] transformed)
-                (acc + 1)
+                (Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[n]) camera.Axis.[n] transformed)
+                (n + 1)
 
         transform (Vector3.zero) 0
 

@@ -276,6 +276,11 @@ type Frustum =
             | 3 -> this.Top
             | _ -> raise <| IndexOutOfRangeException ()
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Frustum =
+    [<Literal>]
+    let size = 4
+
 /// <summary>
 /// Based on Q3: viewParms_t
 /// ViewParms
