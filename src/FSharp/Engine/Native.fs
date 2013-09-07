@@ -91,7 +91,7 @@ type netadr_t =
     val private ipx7 : byte
     val private ipx8 : byte
     val private ipx9 : byte
-    val port : uint16
+    val mutable port : uint16
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -139,4 +139,12 @@ module Message =
             MaxSize = native.maxsize;
             ReadCount = native.readcount;
             Bit = native.bit;
+        }
+
+module IPAddress =
+    let inline ofNative (native: netadr_t) =
+        {
+            Type = enum<AddressType> (int native.type');
+            IP = NativePtr.toStructure &&native.ip;
+            Port = native.port;
         }

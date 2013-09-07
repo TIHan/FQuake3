@@ -142,4 +142,9 @@ module Net =
             socket.Close ()
             0
 
-
+    /// <summary>
+    /// Based on Q3: Sys_GetPacket
+    /// GetPacket
+    /// </summary
+    let getPacket (address: Address) (msg: Message) (socket: int) =
+        ()
