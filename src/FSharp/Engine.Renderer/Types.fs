@@ -38,6 +38,7 @@ open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
+open FSharpx.Collections
 open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
@@ -692,29 +693,16 @@ type TrRefDef =
         RdFlags: RdFlags;
 
         // 1 bits will prevent the associated area from rendering at all
-        AreaMask: byte[]; // TODO: Remove array.
+        AreaMask: ByteString;
         HasAreaMaskModified: bool;  // qtrue if areamask changed since last scene
 
         FloatTime: single;          // tr.refdef.time / 1000.0
-        Text: string seq;
-        Entities: TrRefEntity seq;
+        Text: string list;
+        Entities: TrRefEntity list;
         Dlights: Dlight seq;
-        Polys:  SurfacePoly seq;
-        DrawSurfaces: DrawSurface seq;
+        Polys:  SurfacePoly list;
+        DrawSurfaces: DrawSurface list;
     }
-
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module TrRefDef =
-    let inline findEntityById (entityId: int) (trRefDef: TrRefDef) =
-        let length = Seq.length trRefDef.Entities
-
-        // The entityId is based on the index of the sequence.
-        match entityId >= length with
-        | true -> raise <| IndexOutOfRangeException ()
-        | _ ->  
-        trRefDef.Entities
-        |> Seq.nth entityId
-
 
 /// <summary>
 /// Based on Q3: image_t
@@ -1347,7 +1335,7 @@ type TrGlobals =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module TrGlobals =
-    let inline updateCurrentEntityById entityId (tr: TrGlobals) =
-        let entity = TrRefDef.findEntityById entityId tr.RefDef
+    let updateCurrentEntityById entityId (tr: TrGlobals) =
+        let entity = tr.RefDef.Entities.[entityId]
         { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
         

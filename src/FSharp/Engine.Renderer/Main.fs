@@ -517,33 +517,25 @@ module Main =
         | _ ->
             Plane (Vector3.create 1.f 0.f 0.f, 0.f, PlaneType.X, 0uy)
 
-    // This is for GetPortalOrientation
-    //// create plane axis for the portal we are seeing
+    /// <summary>
+    /// create plane axis for the portal we are seeing
+    /// </summary>
     [<Pure>]
     let createPlaneAxis (drawSurface: DrawSurface) =
         planeForSurface drawSurface.Surface Plane.zero
 
     /// <summary>
-    /// Based on Q3: R_GetPortalOrientation
-    /// GetPortalOrientation
-    ///
-    /// entityId is the entity that the portal surface is a part of, which may
-    /// be moving and rotating.
-    ///
-    /// Returns true if it should be mirrored
+    /// rotate the plane if necessary
     /// </summary>
-    let getPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
-        // create plane axis for the portal we are seeing
-        let originalPlane = createPlaneAxis drawSurface
-
-        // rotate the plane if necessary
+    [<Pure>]
+    let tryRotatePlane (originalPlane: Plane) (entityId: int) (tr: TrGlobals) =
         match entityId <> Constants.EntityIdWorld with
         | false -> (originalPlane, originalPlane, tr)
         | _ ->
 
         let tr = TrGlobals.updateCurrentEntityById entityId tr
         match tr.CurrentEntity with
-        | None -> raise <| Exception "Current entity does not exist."
+        | None -> raise <| Exception "Current entity does not exist"
         | Some (entity) ->
 
         // get the orientation of the entity
@@ -564,9 +556,33 @@ module Main =
         )
 
     /// <summary>
+    /// Based on Q3: R_GetPortalOrientation
+    /// GetPortalOrientation
+    ///
+    /// entityId is the entity that the portal surface is a part of, which may
+    /// be moving and rotating.
+    ///
+    /// Returns true if it should be mirrored
+    /// </summary>
+    let getPortalOrientation (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
+        // create plane axis for the portal we are seeing
+        let originalPlane = createPlaneAxis drawSurface
+
+        // rotate the plane if necessary
+        match tryRotatePlane originalPlane entityId tr with
+        | (originalPlane, plane, tr) ->
+        ()
+
+    /// <summary>
     /// Based on Q3: IsMirror
     /// IsMirror
     /// </summary>
     // Note: this is internal
-    let isMirror (drawSurface: DrawSurface) (entity: TrRefEntity) =
+    let isMirror (drawSurface: DrawSurface) (entityId: int) (tr: TrGlobals) =
+        // create plane axis for the portal we are seeing
+        let originalPlane = createPlaneAxis drawSurface
+
+        // rotate the plane if necessary
+        match tryRotatePlane originalPlane entityId tr with
+        | (originalPlane, plane, tr) ->
         ()
