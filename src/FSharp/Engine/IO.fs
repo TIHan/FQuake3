@@ -61,7 +61,7 @@ type StandardIO () =
             sw.Dispose ()
             ms.Dispose ()
 
-module QFile =
+module IO =
     let GetCurrentDirectory () =
         Directory.GetCurrentDirectory ()
 

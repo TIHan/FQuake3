@@ -118,7 +118,7 @@ module System =
         | (false, false) -> ShowConsole 0 false
         | _ -> ()
 
-        printfn "Working directory: %s" (QFile.GetCurrentDirectory ())
+        printfn "Working directory: %s" (IO.GetCurrentDirectory ())
 
         // main game loop
         while true do
