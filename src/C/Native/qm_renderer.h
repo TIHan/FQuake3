@@ -42,7 +42,7 @@ MObject
 qm_map_view_parms (viewParms_t* view_parms);
 
 MObject
-qm_map_ref_entity (refEntity_t* ref_entity);
+qm_map_ref_entity (const refEntity_t* ref_entity);
 
 MObject
 qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity);

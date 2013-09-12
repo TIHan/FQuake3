@@ -444,10 +444,9 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 #else
 	MObject m_or;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", 3, {
-		__args [0] = m_object_as_arg (qm_map_tr_ref_entity (ent));
-		__args [1] = m_object_as_arg (qm_map_view_parms (viewParms));
-		__args [2] = m_object_as_arg (qm_map_orientationr (or));
+	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", 2, {
+		__args [0] = m_object_as_arg (qm_map_view_parms (viewParms));
+		__args [1] = m_object_as_arg (qm_map_ref_entity (&ent->e));
 	}, m_or);
 
 	*or = *(orientationr_t *)m_object_unbox_struct (m_or);

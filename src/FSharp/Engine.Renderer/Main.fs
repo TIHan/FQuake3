@@ -235,69 +235,53 @@ module Main =
     /// Called by both the front end and the back end
     /// </summary>
     [<Pure>]
-    let rotateForEntity (entity: TrRefEntity) (viewParms: ViewParms) (orientation: OrientationR) =
-        match entity.Entity.Type <> RefEntityType.Model with
+    let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
+        match entity.Type <> RefEntityType.Model with
         | true -> viewParms.World
         | _ ->
 
-        let orientation =
-            OrientationR (
-                entity.Entity.Origin,
-                entity.Entity.Axis,
-                orientation.ViewOrigin,
-                orientation.ModelMatrix
-            )
-
         let glMatrix =
             Matrix16.create
-                orientation.Axis.[0].[0]
-                orientation.Axis.[0].[1]
-                orientation.Axis.[0].[2]
+                entity.Axis.[0].[0]
+                entity.Axis.[0].[1]
+                entity.Axis.[0].[2]
                 0.f
-                orientation.Axis.[1].[0]
-                orientation.Axis.[1].[1]
-                orientation.Axis.[1].[2]
+                entity.Axis.[1].[0]
+                entity.Axis.[1].[1]
+                entity.Axis.[1].[2]
                 0.f
-                orientation.Axis.[2].[0]
-                orientation.Axis.[2].[1]
-                orientation.Axis.[2].[2]
+                entity.Axis.[2].[0]
+                entity.Axis.[2].[1]
+                entity.Axis.[2].[2]
                 0.f
-                orientation.Origin.X
-                orientation.Origin.Y
-                orientation.Origin.Z
+                entity.Origin.X
+                entity.Origin.Y
+                entity.Origin.Z
                 1.f
-
-        let orientation =
-            OrientationR (
-                orientation.Origin,
-                orientation.Axis,
-                orientation.ViewOrigin,
-                glMatrix * viewParms.World.ModelMatrix
-            )
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
-        let delta = viewParms.Orientation.Origin - orientation.Origin
+        let delta = viewParms.Orientation.Origin - entity.Origin
 
         // compensate for scale in the axes if necessary
         let axisLength =
-            match entity.Entity.HasNonNormalizedAxes with
+            match entity.HasNonNormalizedAxes with
             | true ->
-                // Is it ok to compare the single like this?
-                match Vector3.length entity.Entity.Axis.X with
+                // TODO: Is it ok to compare the single like this?
+                match Vector3.length entity.Axis.X with
                 | 0.f -> 0.f
                 | axisLength ->
                     1.0f / axisLength
             | _ -> 1.0f
 
         OrientationR (
-            orientation.Origin,
-            orientation.Axis,
+            entity.Origin,
+            entity.Axis,
             Vector3.create
-                ((Vector3.dotProduct delta orientation.Axis.X) * axisLength)
-                ((Vector3.dotProduct delta orientation.Axis.Y) * axisLength)
-                ((Vector3.dotProduct delta orientation.Axis.Z) * axisLength),
-            orientation.ModelMatrix
+                ((Vector3.dotProduct delta entity.Axis.X) * axisLength)
+                ((Vector3.dotProduct delta entity.Axis.Y) * axisLength)
+                ((Vector3.dotProduct delta entity.Axis.Z) * axisLength),
+            glMatrix * viewParms.World.ModelMatrix
         )
 
     /// <summary>
@@ -536,10 +520,10 @@ module Main =
         let tr = TrGlobals.updateCurrentEntityById entityId tr
         match tr.CurrentEntity with
         | None -> raise <| Exception "Current entity does not exist"
-        | Some (entity) ->
+        | Some (trEntity) ->
 
         // get the orientation of the entity
-        let orientation = rotateForEntity entity tr.ViewParms tr.Orientation
+        let orientation = rotateForEntity tr.ViewParms trEntity.Entity
 
         // rotate the plane, but keep the non-rotated version for matching
         // against the portalSurface entities

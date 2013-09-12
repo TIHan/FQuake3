@@ -51,7 +51,7 @@ qm_map_view_parms (viewParms_t* view_parms)
 }
 
 MObject
-qm_map_ref_entity (refEntity_t* ref_entity)
+qm_map_ref_entity (const refEntity_t* ref_entity)
 {
 	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "RefEntity", "ofNative", &ref_entity);
 }
