@@ -435,6 +435,38 @@ type trGlobals_t =
     val mutable flareImage : nativeptr<image_t>
     val mutable whiteImage : nativeptr<image_t>
     val mutable identityLightImage : nativeptr<image_t>
+    val mutable defaultShader : nativeptr<shader_t>
+    val mutable shadowShader : nativeptr<shader_t>
+    val mutable projectionShadowShader : nativeptr<shader_t>
+    val mutable flareShader : nativeptr<shader_t>
+    val mutable sunShader : nativeptr<shader_t>
+    val mutable numLightmaps : int
+    //val mutable lightmaps : nativeptr<image_t>
+    val mutable currentEntity : nativeptr<trRefEntity_t>
+    val mutable worldEntity : trRefEntity_t
+    val mutable currentEntityNum : int
+    val mutable shiftedEntityNum : int
+    //val mutable currentModel : nativeptr<model_t>
+    val mutable viewParms : viewParms_t
+    val mutable identityLight : single
+    val mutable identityLightByte : int
+    val mutable overbrightBits : int
+    val mutable or' : orientationr_t
+    //val mutable refdef : trRefdef_t
+    val mutable viewCluster : int
+    val mutable sunLight : vec3_t
+    val mutable sunDirection : vec3_t
+    //val mutable pc : frontEndCounters_t
+    val mutable frontEndMsec : int
+    //val mutable models : nativeptr<model_t>
+    val mutable numModels : int
+    val mutable numImages : int
+    //val mutable images : nativeptr<image_t>
+    val mutable numShaders : int
+    //val mutable shaders : nativeptr<shader_t>
+    //val mutable sortedShaders : nativeptr<shader_t>
+    val mutable numSkins : int
+    //val mutable skins : nativeptr<skin_t>
     // TODO:
 
 (*
