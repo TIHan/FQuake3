@@ -386,11 +386,26 @@ type refdef_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type dlight_t =
+    val mutable origin : vec3_t
+    val mutable color : vec3_t
+    val mutable radius : single
+    val mutable transformed : vec3_t
+    val mutable additive : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type model_t =
     val mutable name : sbyte
     // TODO:
 
-type trRefDef =
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 256)>]
+type trRefdef_t_text =
+    [<FieldOffset (0)>]
+    val mutable text : sbyte
+
+type trRefdef_t =
     val mutable x : int
     val mutable y : int
     val mutable width : int
@@ -439,7 +454,65 @@ type trRefDef =
 
     val mutable areamaskModified : bool
     val mutable floatTime : single
-    // TODO:
+    val mutable text : trRefdef_t_text
+    val mutable num_entities : int
+    val mutable enities : nativeptr<trRefEntity_t>
+    val mutable num_delights : int
+    val mutable dlights : nativeptr<dlight_t>
+    val mutable numPolys : int
+    val mutable polys : nativeptr<srfPoly_t>
+    val mutable numDrawSurfs : int
+    val mutable drawSurfs : nativeptr<drawSurf_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type frontEndCounters_t =
+    val mutable c_sphere_cull_patch_in : int
+    val mutable c_sphere_cull_patch_clip : int
+    val mutable c_sphere_cull_patch_out : int
+    val mutable c_box_cull_patch_in : int
+    val mutable c_box_cull_patch_clip : int
+    val mutable c_box_cull_patch_out : int
+    val mutable c_sphere_cull_md3_int : int
+    val mutable c_sphere_cull_md3_clip : int
+    val mutable c_sphere_cull_md3_out : int
+    val mutable c_box_cull_md3_int : int
+    val mutable c_box_cull_md3_clip : int
+    val mutable c_box_cull_md3_out : int
+    val mutable c_leafs : int
+    val mutable c_dlightSurfaces : int
+    val mutable c_dlightSurfacesCulled : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
+type skinSurface_t_name =
+    [<FieldOffset (0)>]
+    val mutable name : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type skinSurface_t =
+    val mutable name : skinSurface_t_name
+    val mutable shader : nativeptr<shader_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
+type skin_t_name =
+    [<FieldOffset (0)>]
+    val mutable name : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 128)>]
+type skin_t_surfaces =
+    [<FieldOffset (0)>]
+    val mutable surfaces : nativeptr<skinSurface_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type skin_t = 
+    val mutable name : skin_t_name
+    val mutable numSurfaces : int
+    val mutable surfaces : skin_t_surfaces
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 128)>]
@@ -452,6 +525,42 @@ type trGlobals_t_scratchImage =
 type trGlobals_t_lightmaps =
     [<FieldOffset (0)>]
     val mutable lightmaps : nativeptr<image_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4096)>]
+type trGlobals_t_models =
+    [<FieldOffset (0)>]
+    val mutable models : nativeptr<model_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 8192)>]
+type trGlobals_t_images =
+    [<FieldOffset (0)>]
+    val mutable images : nativeptr<image_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 65536)>]
+type trGlobals_t_shaders =
+    [<FieldOffset (0)>]
+    val mutable shaders : nativeptr<shader_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4096)>]
+type trGlobals_t_skins =
+    [<FieldOffset (0)>]
+    val mutable skins : nativeptr<skin_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4096)>]
+type trGlobals_t_FUNCTABLE_SIZE =
+    [<FieldOffset (0)>]
+    val mutable table : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 1024)>]
+type trGlobals_t_FOG_TABLE_SIZE =
+    [<FieldOffset (0)>]
+    val mutable table : single
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -490,22 +599,27 @@ type trGlobals_t =
     val mutable identityLightByte : int
     val mutable overbrightBits : int
     val mutable or' : orientationr_t
-    //val mutable refdef : trRefdef_t
+    val mutable refdef : trRefdef_t
     val mutable viewCluster : int
     val mutable sunLight : vec3_t
     val mutable sunDirection : vec3_t
-    //val mutable pc : frontEndCounters_t
+    val mutable pc : frontEndCounters_t
     val mutable frontEndMsec : int
-    //val mutable models : nativeptr<model_t>
+    val mutable models : trGlobals_t_models
     val mutable numModels : int
     val mutable numImages : int
-    //val mutable images : nativeptr<image_t>
+    val mutable images : trGlobals_t_images
     val mutable numShaders : int
-    //val mutable shaders : nativeptr<shader_t>
-    //val mutable sortedShaders : nativeptr<shader_t>
+    val mutable shaders : trGlobals_t_shaders
+    val mutable sortedShaders : trGlobals_t_shaders
     val mutable numSkins : int
-    //val mutable skins : nativeptr<skin_t>
-    // TODO:
+    val mutable skins : trGlobals_t_skins
+    val mutable sinTable : trGlobals_t_FUNCTABLE_SIZE
+    val mutable squareTable : trGlobals_t_FUNCTABLE_SIZE
+    val mutable triangleTable : trGlobals_t_FUNCTABLE_SIZE
+    val mutable sawToothTable : trGlobals_t_FUNCTABLE_SIZE
+    val mutable inverseSawToothTable : trGlobals_t_FUNCTABLE_SIZE
+    val mutable fogTable : trGlobals_t_FOG_TABLE_SIZE
 
 (*
 =======================================================================================================================
