@@ -386,6 +386,75 @@ type refdef_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type model_t =
+    val mutable name : sbyte
+    // TODO:
+
+type trRefDef =
+    val mutable x : int
+    val mutable y : int
+    val mutable width : int
+    val mutable height : int
+    val mutable fov_x : single
+    val mutable fov_y : single
+    val mutable vieworg : vec3_t
+    val mutable viewaxis : vec3_t
+    val private viewaxis1 : vec3_t
+    val private viewaxis2 : vec3_t
+    val mutable time : int
+    val mutable rdflags : int
+
+    val mutable areamask : byte
+    val private areamask1 : byte
+    val private areamask2 : byte
+    val private areamask3 : byte
+    val private areamask4 : byte
+    val private areamask5 : byte
+    val private areamask6 : byte
+    val private areamask7 : byte
+    val private areamask8 : byte
+    val private areamask9 : byte
+    val private areamask10 : byte
+    val private areamask11 : byte
+    val private areamask12 : byte
+    val private areamask13 : byte
+    val private areamask14 : byte
+    val private areamask15 : byte
+    val private areamask16 : byte
+    val private areamask17 : byte
+    val private areamask18 : byte
+    val private areamask19 : byte
+    val private areamask20 : byte
+    val private areamask21 : byte
+    val private areamask22 : byte
+    val private areamask23 : byte
+    val private areamask24 : byte
+    val private areamask25 : byte
+    val private areamask26 : byte
+    val private areamask27 : byte
+    val private areamask28 : byte
+    val private areamask29 : byte
+    val private areamask30 : byte
+    val private areamask31 : byte
+
+    val mutable areamaskModified : bool
+    val mutable floatTime : single
+    // TODO:
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 128)>]
+type trGlobals_t_scratchImage =
+    [<FieldOffset (0)>]
+    val mutable scratchImage : nativeptr<image_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 1024)>]
+type trGlobals_t_lightmaps =
+    [<FieldOffset (0)>]
+    val mutable lightmaps : nativeptr<image_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type trGlobals_t =
     val mutable registered : qboolean
     val mutable visCount : int
@@ -398,38 +467,7 @@ type trGlobals_t =
     val mutable world : nativeptr<world_t>
     val mutable externalVisData : nativeptr<byte>
     val mutable defaultImage : nativeptr<image_t>
-    val mutable scratchImage : nativeptr<image_t>
-    val private scratchImage1 : nativeptr<image_t>
-    val private scratchImage2 : nativeptr<image_t>
-    val private scratchImage3 : nativeptr<image_t>
-    val private scratchImage4 : nativeptr<image_t>
-    val private scratchImage5 : nativeptr<image_t>
-    val private scratchImage6 : nativeptr<image_t>
-    val private scratchImage7 : nativeptr<image_t>
-    val private scratchImage8 : nativeptr<image_t>
-    val private scratchImage9 : nativeptr<image_t>
-    val private scratchImage10 : nativeptr<image_t>
-    val private scratchImage11 : nativeptr<image_t>
-    val private scratchImage12 : nativeptr<image_t>
-    val private scratchImage13 : nativeptr<image_t>
-    val private scratchImage14 : nativeptr<image_t>
-    val private scratchImage15 : nativeptr<image_t>
-    val private scratchImage16 : nativeptr<image_t>
-    val private scratchImage17 : nativeptr<image_t>
-    val private scratchImage18 : nativeptr<image_t>
-    val private scratchImage19 : nativeptr<image_t>
-    val private scratchImage20 : nativeptr<image_t>
-    val private scratchImage21 : nativeptr<image_t>
-    val private scratchImage22 : nativeptr<image_t>
-    val private scratchImage23 : nativeptr<image_t>
-    val private scratchImage24 : nativeptr<image_t>
-    val private scratchImage25 : nativeptr<image_t>
-    val private scratchImage26 : nativeptr<image_t>
-    val private scratchImage27 : nativeptr<image_t>
-    val private scratchImage28 : nativeptr<image_t>
-    val private scratchImage29 : nativeptr<image_t>
-    val private scratchImage30 : nativeptr<image_t>
-    val private scratchImage31 : nativeptr<image_t>
+    val mutable scratchImage : trGlobals_t_scratchImage
     val mutable fogImage : nativeptr<image_t>
     val mutable dlightImage : nativeptr<image_t>
     val mutable flareImage : nativeptr<image_t>
@@ -441,12 +479,12 @@ type trGlobals_t =
     val mutable flareShader : nativeptr<shader_t>
     val mutable sunShader : nativeptr<shader_t>
     val mutable numLightmaps : int
-    //val mutable lightmaps : nativeptr<image_t>
+    val mutable lightmaps : trGlobals_t_lightmaps
     val mutable currentEntity : nativeptr<trRefEntity_t>
     val mutable worldEntity : trRefEntity_t
     val mutable currentEntityNum : int
     val mutable shiftedEntityNum : int
-    //val mutable currentModel : nativeptr<model_t>
+    val mutable currentModel : nativeptr<model_t>
     val mutable viewParms : viewParms_t
     val mutable identityLight : single
     val mutable identityLightByte : int
