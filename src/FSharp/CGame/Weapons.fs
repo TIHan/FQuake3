@@ -54,8 +54,8 @@ type CGame =
         LandChange: single;     // for landing hard
         LandTime: int;
 
-        RefDef: RefDef;
-        RefDefViewAngles: Vector3;
+        Refdef: Refdef;
+        RefdefViewAngles: Vector3;
 
         // temp working variables for player view
         BobCycle: int;
@@ -73,8 +73,8 @@ module Weapons =
     /// </summary>
     [<Pure>]
     let calculateWeaponPosition (cg: CGame) =
-        let origin = cg.RefDef.ViewOrigin
-        let angles = cg.RefDefViewAngles
+        let origin = cg.Refdef.ViewOrigin
+        let angles = cg.RefdefViewAngles
 
         // on odd legs, invert some angles
         let scale =

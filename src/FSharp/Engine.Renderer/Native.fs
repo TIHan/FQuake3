@@ -868,7 +868,11 @@ module TrRefEntity =
             DirectedLight = NativePtr.toStructure &&native.directedLight;
         }
 
-module RefDef =
+    module Option =
+        let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =
+            Some << ofNative <| NativePtr.read ptr
+
+module Refdef =
     let inline ofNative (native: refdef_t) =
         {
             X = native.x;
@@ -879,4 +883,47 @@ module RefDef =
             ViewAxis = NativePtr.toStructure &&native.viewaxis;
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags)
+        }
+
+module Dlight =
+    let inline ofNative (native: dlight_t) =
+        Dlight (
+            NativePtr.toStructure &&native.origin,
+            NativePtr.toStructure &&native.color,
+            native.radius,
+            NativePtr.toStructure &&native.transformed,
+            native.additive
+        )
+
+module TrRefdef =
+    let inline ofNative (native: trRefdef_t) =
+        {
+            X = native.x;
+            Y = native.y;
+            Width = native.width;
+            Height = native.height;
+            ViewOrigin = NativePtr.toStructure &&native.vieworg;
+            ViewAxis = NativePtr.toStructure &&native.viewaxis;
+            Time = native.time;
+            RdFlags = enum<RdFlags> (native.rdflags);
+
+            AreaMask = ByteString.ofNativePtr 32 &&native.areamask;
+            HasAreaMaskModified = native.areamaskModified;
+
+            FloatTime = native.floatTime;
+            Text = List.ofNativePtrArrayString 8 32 &&native.text.text;
+            Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNative x) native.enities;
+            Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNative x) native.dlights;
+            Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePoly x) native.polys;
+            DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNative x) native.drawSurfs;
+        }
+
+module TrGlobals =
+    let inline ofNative (native: trGlobals_t) =
+        {
+            CurrentEntity = TrRefEntity.Option.ofNativePtr native.currentEntity;
+            CurrentEntityId = native.currentEntityNum;
+            ViewParms = ViewParms.ofNative native.viewParms;
+            Refdef = TrRefdef.ofNative native.refdef
+            Orientation = OrientationR.ofNative native.or';
         }

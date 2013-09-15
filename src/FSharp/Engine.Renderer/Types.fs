@@ -676,12 +676,12 @@ type RdFlags =
 
 /// <summary>
 /// Based on Q3: trRefdef_t
-/// TrRefDef
+/// TrRefdef
 ///
 /// trRefdef_t holds everything that comes in refdef_t,
 /// as well as the locally generated scene information
 /// </summary>
-type TrRefDef =
+type TrRefdef =
     {
         X: int;
         Y: int;
@@ -699,8 +699,8 @@ type TrRefDef =
         FloatTime: single;          // tr.refdef.time / 1000.0
         Text: string list;
         Entities: TrRefEntity list;
-        Dlights: Dlight seq;
-        Polys:  SurfacePoly list;
+        Dlights: Dlight list;
+        Polys: Surface list;
         DrawSurfaces: DrawSurface list;
     }
 
@@ -1261,9 +1261,9 @@ type Model =
 
 /// <summary>
 /// Based on Q3: refdef_t
-/// RefDef
+/// Refdef
 /// </summary>
-type RefDef =
+type Refdef =
     {
         X: int;
         Y: int;
@@ -1286,56 +1286,23 @@ type RefDef =
 /// backend functions should never modify any of these fields,
 /// but may read fields that aren't dynamically modified
 /// by the frontend.
+/// !!
 /// TODO: Not finished.
+/// !!
 /// </summary>
 type TrGlobals =
     {
-        IsRegistered : bool;            // cleared at shutdown, set at beginRegistration
-        VisCount : int;                 // incremented every time a new vis cluster is entered
-        FrameCount : int;               // incremented every frame
-        SceneCount : int;               // incremented every scene
-        ViewCount : int;                // incremented every view (twice a scene if portaled) and every R_MarkFragments call
-        SmpFrame : int;                 // toggles from 0 to 1 every endFrame
-        FrameSceneId : int;             // zeroed at RE_BeginFrame
-        HasWorldMapLoaded : bool;
-        World: World;
-
-        // FIXME: This is data. We need a immutable array type structure. A list may be ok, not sure.
-        ExternalVisData: byte option;   // from RE_SetWorldVisData, shared with CM_Load
-        
-        DefaultImage: Image option;
-        ScratchImages: Image seq;
-        FogImage: Image option;
-        DlightImage: Image option;              // inverse-quare highlight for projective adding
-        FlareImage: Image option;
-        WhiteImage: Image option;               // full of 0xff
-        IentityLightImage: Image option;        // full of tr.identityLightByte
-
-        DefaultShader: Shader option;
-        ShadowShader: Shader option;
-        ProjectionShadowShader: Shader option;
-        FlareShader: Shader option;
-        SunShader: Shader option;
-
-        Lightmaps: Image seq;
-
         CurrentEntity: TrRefEntity option;
-        WorldEntity: TrRefEntity;               // point currentEntity at this when rendering world
         CurrentEntityId: int;
-        ShiftedEntityId: int;                   // currentEntityNum << QSORT_ENTITYNUM_SHIFT
-        CurrentModel: Model option;
-        // TODO:
 
-
-        // May not be in order.
-        RefDef: TrRefDef;
         ViewParms: ViewParms;
+        Refdef: TrRefdef;
         Orientation: OrientationR;
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module TrGlobals =
     let updateCurrentEntityById entityId (tr: TrGlobals) =
-        let entity = tr.RefDef.Entities.[entityId]
+        let entity = tr.Refdef.Entities.[entityId]
         { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
         
