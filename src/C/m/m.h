@@ -54,6 +54,11 @@ typedef struct
 	gpointer __priv;
 } MString;
 
+typedef struct
+{
+	gpointer __priv;
+} MMethod;
+
 #if 0
 void
 m_setup_debugger (MDomain* domain);
@@ -70,6 +75,12 @@ m_domain_free (MDomain *const domain);
 
 void
 m_load_assembly (const gchar *name);
+
+MMethod
+m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name);
+
+MObject
+m_method_invoke (MMethod method, void **params);
 
 MObject
 m_object (const gchar *assembly_name, const gchar *name_space, const gchar *struct_name, gint argc, gpointer *args);
@@ -167,6 +178,15 @@ m_string_as_arg (MString str);
 		arg_assignment \
 \
 		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
+} \
+
+#define m_method_invoke_easy(method,argc,arg_assignment,o) \
+{ \
+		gpointer __args [argc]; \
+\
+		arg_assignment \
+\
+		*(MObject *)&o = m_method_invoke (method, __args); \
 } \
 
 #endif /* __M_H__ */
