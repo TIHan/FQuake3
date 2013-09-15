@@ -67,7 +67,3 @@ module List =
             f <| NativePtr.get x i
         )
 
-    let inline ofNativePtrArrayString<'T when 'T : unmanaged> size length (x: nativeptr<'T>) : string list =
-        // TODO: Implement.
-        List.empty
-

@@ -111,5 +111,7 @@ qm_map_draw_surf (drawSurf_t* draw_surf)
 MObject
 qm_map_tr_globals (trGlobals_t* tr_globals)
 {
-	//TODO:
+	MObject m_result;
+	m_invoke_method_cache ("Engine.Renderer", "Engine.Renderer.Native", "TrGlobals", "ofNative", &tr_globals, m_result);
+	return m_result;
 }

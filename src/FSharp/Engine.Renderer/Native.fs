@@ -32,6 +32,8 @@ open System.Threading
 open System.Diagnostics
 open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
+open FSharpx.Core
+open FSharpx.Collections
 open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
@@ -405,6 +407,8 @@ type trRefdef_t_text =
     [<FieldOffset (0)>]
     val mutable text : sbyte
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type trRefdef_t =
     val mutable x : int
     val mutable y : int
@@ -609,6 +613,8 @@ type trGlobals_t =
     val mutable numModels : int
     val mutable numImages : int
     val mutable images : trGlobals_t_images
+// Note: This makes the struct too big.
+(*
     val mutable numShaders : int
     val mutable shaders : trGlobals_t_shaders
     val mutable sortedShaders : trGlobals_t_shaders
@@ -620,6 +626,7 @@ type trGlobals_t =
     val mutable sawToothTable : trGlobals_t_FUNCTABLE_SIZE
     val mutable inverseSawToothTable : trGlobals_t_FUNCTABLE_SIZE
     val mutable fogTable : trGlobals_t_FOG_TABLE_SIZE
+*)
 
 (*
 =======================================================================================================================
@@ -911,7 +918,7 @@ module TrRefdef =
             HasAreaMaskModified = native.areamaskModified;
 
             FloatTime = native.floatTime;
-            Text = List.ofNativePtrArrayString 8 32 &&native.text.text;
+            Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text;
             Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNative x) native.enities;
             Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNative x) native.dlights;
             Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePoly x) native.polys;
@@ -924,6 +931,7 @@ module TrGlobals =
             CurrentEntity = TrRefEntity.Option.ofNativePtr native.currentEntity;
             CurrentEntityId = native.currentEntityNum;
             ViewParms = ViewParms.ofNative native.viewParms;
-            Refdef = TrRefdef.ofNative native.refdef
+            Refdef = TrRefdef.ofNative native.refdef;
             Orientation = OrientationR.ofNative native.or';
         }
+

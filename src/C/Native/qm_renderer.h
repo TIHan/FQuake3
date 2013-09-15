@@ -59,4 +59,7 @@ qm_frustum_map (MObject obj, cplane_t* frustum);
 MObject
 qm_map_draw_surf (drawSurf_t* draw_surf);
 
+MObject
+qm_map_tr_globals (trGlobals_t* tr_globals);
+
 #endif /* __QM_RENDERER_H__ */
