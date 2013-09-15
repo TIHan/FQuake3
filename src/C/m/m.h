@@ -173,20 +173,26 @@ m_string_as_arg (MString str);
 
 #define m_invoke_method_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
-		gpointer __args [argc]; \
+	gpointer __args [argc]; \
 \
-		arg_assignment \
+	arg_assignment \
 \
-		*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
+	*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
 #define m_method_invoke_easy(method,argc,arg_assignment,o) \
 { \
-		gpointer __args [argc]; \
+	gpointer __args [argc]; \
 \
-		arg_assignment \
+	arg_assignment \
 \
-		*(MObject *)&o = m_method_invoke (method, __args); \
+	*(MObject *)&o = m_method_invoke (method, __args); \
+} \
+
+#define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
+{ \
+	if (!o.__priv) \
+		o = m_method (assembly_name, name_space, static_class_name, method_name); \
 } \
 
 #endif /* __M_H__ */

@@ -442,9 +442,12 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	or->viewOrigin[1] = DotProduct( delta, or->axis[1] ) * axisLength;
 	or->viewOrigin[2] = DotProduct( delta, or->axis[2] ) * axisLength;
 #else
+	static MMethod m_rotate_for_entity;
 	MObject m_or;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", 2, {
+	m_method_cache ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", m_rotate_for_entity);
+
+	m_method_invoke_easy (m_rotate_for_entity, 2, {
 		__args [0] = m_object_as_arg (qm_map_view_parms (viewParms));
 		__args [1] = m_object_as_arg (qm_map_ref_entity (&ent->e));
 	}, m_or);

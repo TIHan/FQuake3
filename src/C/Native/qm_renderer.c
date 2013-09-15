@@ -47,13 +47,21 @@ qm_map_plane (cplane_t* plane)
 MObject
 qm_map_view_parms (viewParms_t* view_parms)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "ViewParms", "ofNative", &view_parms);
+	static MMethod m_of_native;
+
+	m_method_cache ("Engine.Renderer", "Engine.Renderer.Native", "ViewParms", "ofNative", m_of_native);
+
+	return m_method_invoke (m_of_native, &view_parms);
 }
 
 MObject
 qm_map_ref_entity (const refEntity_t* ref_entity)
 {
-	return m_invoke_method ("Engine.Renderer", "Engine.Renderer.Native", "RefEntity", "ofNative", &ref_entity);
+	static MMethod m_of_native;
+
+	m_method_cache ("Engine.Renderer", "Engine.Renderer.Native", "RefEntity", "ofNative", m_of_native);
+
+	return m_method_invoke (m_of_native, &ref_entity);
 }
 
 MObject
