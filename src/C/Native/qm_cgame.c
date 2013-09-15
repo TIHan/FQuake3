@@ -29,5 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 MObject
 qm_map_cg (cg_t* cg)
 {
-	return m_invoke_method ("CGame", "CGame.Native", "CGame", "ofNative", &cg);
+	MObject m_result;
+	m_invoke_method_cache ("CGame", "CGame.Native", "CGame", "ofNative", &cg, m_result);
+	m_result;
 }

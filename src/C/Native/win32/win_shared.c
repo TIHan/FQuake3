@@ -56,7 +56,9 @@ int Sys_Milliseconds (void)
 #else
 M_EXPORT int M_DECL Sys_Milliseconds (void)
 {
-	return *(int *)m_object_unbox_struct (m_invoke_method ("Engine", "Engine.System", "System", "Milliseconds", NULL));
+	MObject m_milliseconds;
+	m_invoke_method_cache ("Engine", "Engine.System", "System", "Milliseconds", NULL, m_milliseconds);
+	return *(gint *)m_object_unbox_struct (m_milliseconds);
 }
 #endif
 

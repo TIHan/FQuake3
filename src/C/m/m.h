@@ -195,4 +195,19 @@ m_string_as_arg (MString str);
 		o = m_method (assembly_name, name_space, static_class_name, method_name); \
 } \
 
+#define m_invoke_method_cache(assembly_name,name_space,static_class_name,method_name,params,o) \
+{ \
+	static MMethod m_cache; \
+	m_method_cache (assembly_name, name_space, static_class_name, method_name, m_cache); \
+	o = m_method_invoke (m_cache, params); \
+} \
+
+#define m_invoke_method_cache_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+{ \
+	static MMethod m_cache; \
+	m_method_cache (assembly_name, name_space, static_class_name, method_name, m_cache); \
+\
+	m_method_invoke_easy (m_cache, argc, arg_assignment, o); \
+} \
+
 #endif /* __M_H__ */

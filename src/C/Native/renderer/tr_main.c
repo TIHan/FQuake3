@@ -110,7 +110,7 @@ int R_CullLocalBox (vec3_t bounds[2])
 #else
 	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalBox", 4, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalBox", 4, {
 		__args [0] = bounds;
 		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 		__args [2] = m_object_as_arg (qm_map_frustum (&tr.viewParms.frustum));
@@ -135,7 +135,7 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 #else
 	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalPointAndRadius", 5, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalPointAndRadius", 5, {
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_object_as_arg (qm_map_orientationr (&tr.or));
@@ -187,7 +187,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 #else
 	MObject m_clip_type;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullPointAndRadius", 4, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullPointAndRadius", 4, {
 		__args [0] = pt;
 		__args [1] = &radius;
 		__args [2] = m_object_as_arg (qm_map_frustum (&tr.viewParms.frustum));
@@ -213,7 +213,7 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 #else
 	MObject m_world;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localNormalToWorld", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localNormalToWorld", 2, {
 		__args [0] = local;
 		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_world);
@@ -237,7 +237,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world)
 #else
 	MObject m_world;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localPointToWorld", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localPointToWorld", 2, {
 		__args [0] = local;
 		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_world);
@@ -261,7 +261,7 @@ void R_WorldToLocal (vec3_t world, vec3_t local)
 #else
 	MObject m_local;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "worldToLocal", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "worldToLocal", 2, {
 		__args [0] = local;
 		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
 	}, m_local);
@@ -299,7 +299,7 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
 #else
 	MObject m_tuple_source_and_destination;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformModelToClip", 3, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformModelToClip", 3, {
 		__args [0] = src;
 		__args [1] = modelMatrix;
 		__args [2] = projectionMatrix;
@@ -331,7 +331,7 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 #else
 	MObject m_tuple_normalized_and_window;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformClipToWindow", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformClipToWindow", 2, {
 		__args [0] = clip;
 		__args [1] = m_object_as_arg (qm_map_view_parms (view));
 	}, m_tuple_normalized_and_window);
@@ -364,7 +364,7 @@ void myGlMultMatrix( const gfloat *a, const gfloat *b, gfloat *out ) {
 #else
 	MObject m_out;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "myGLMultMatrix", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "myGLMultMatrix", 2, {
 		__args [0] = a;
 		__args [1] = b;
 	}, m_out);
@@ -442,12 +442,9 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	or->viewOrigin[1] = DotProduct( delta, or->axis[1] ) * axisLength;
 	or->viewOrigin[2] = DotProduct( delta, or->axis[2] ) * axisLength;
 #else
-	static MMethod m_rotate_for_entity;
 	MObject m_or;
 
-	m_method_cache ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", m_rotate_for_entity);
-
-	m_method_invoke_easy (m_rotate_for_entity, 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", 2, {
 		__args [0] = m_object_as_arg (qm_map_view_parms (viewParms));
 		__args [1] = m_object_as_arg (qm_map_ref_entity (&ent->e));
 	}, m_or);
@@ -505,7 +502,7 @@ void R_RotateForViewer (void) {
 #else
 	MObject m_or;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForViewer", 1, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForViewer", 1, {
 		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_or);
 
@@ -630,7 +627,7 @@ void R_SetupProjection( void ) {
 #else
 	MObject m_tuple_projection_matrix_and_zFar;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupProjection", 5, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupProjection", 5, {
 		__args [0] = &r_znear->value;
 		__args [1] = &tr.refdef.rdflags;
 		__args [2] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
@@ -684,7 +681,7 @@ void R_SetupFrustum( void ) {
 #else
 	MObject m_frustum;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupFrustum", 1, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupFrustum", 1, {
 		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
 	}, m_frustum);
 
@@ -717,7 +714,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
 #else
 	MObject m_out;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorPoint", 3, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorPoint", 3, {
 		__args [0] = in;
 		__args [1] = m_object_as_arg (qm_map_orientation (surface));
 		__args [2] = m_object_as_arg (qm_map_orientation (camera));
@@ -740,7 +737,7 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
 #else
 	MObject m_out;
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorVector", 3, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorVector", 3, {
 		__args [0] = in;
 		__args [1] = m_object_as_arg (qm_map_orientation (surface));
 		__args [2] = m_object_as_arg (qm_map_orientation (camera));
@@ -800,7 +797,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 		return;
 	}
 
-	m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "planeForSurface", 2, {
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "planeForSurface", 2, {
 		__args [0] = m_object_as_arg (qm_map_surface (surfType));
 		__args [1] = m_object_as_arg (qm_map_plane (plane));
 	}, m_out);
@@ -952,7 +949,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	{
 		MObject m_original_plane;
 
-		m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
+		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
 			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
 		}, m_original_plane)
 
@@ -1138,7 +1135,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	{
 		MObject m_original_plane;
 
-		m_invoke_method_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
+		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
 			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
 		}, m_original_plane)
 

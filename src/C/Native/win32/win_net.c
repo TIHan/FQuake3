@@ -527,11 +527,11 @@ int NET_IPSocket( char *net_interface, int port ) {
 	MObject m_new_socket;
 	MObject m_str;
 
-	m_invoke_method_easy ("Engine", "Engine.Core", "Option", "ofString", 1, {
+	m_invoke_method_cache_easy ("Engine", "Engine.Core", "Option", "ofString", 1, {
 		__args [0] = m_string_as_arg (m_string (net_interface));
 	}, m_str);
 
-	m_invoke_method_easy ("Engine", "Engine.Net", "Net", "createIPSocket", 2, {
+	m_invoke_method_cache_easy ("Engine", "Engine.Net", "Net", "createIPSocket", 2, {
 		__args [0] = m_object_as_arg (m_str);
 		__args [1] = &port;
 	}, m_new_socket);
