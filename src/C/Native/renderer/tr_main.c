@@ -954,7 +954,6 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 		}, m_original_plane)
 
 		originalPlane = *(cplane_t*)m_object_unbox_struct (m_original_plane);
-
 	}
 
 	// rotate the plane if necessary
