@@ -48,7 +48,6 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
-    <Compile Include="FsiSession.fs" />
     <Compile Include="NativeInterop.fs" />
     <Compile Include="Core.fs" />
     <Compile Include="Math.fs" />
