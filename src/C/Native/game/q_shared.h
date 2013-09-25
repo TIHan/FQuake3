@@ -516,6 +516,12 @@ typedef struct {
 	vec4_t w;
 } matrix16_t;
 
+// FQ3
+typedef struct {
+	vec3_t x;
+	vec3_t y;
+} bounds_t;
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
 #endif

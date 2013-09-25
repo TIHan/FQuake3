@@ -53,13 +53,36 @@ qm_map_surface (surfaceType_t* surfaceType);
 MObject
 qm_map_frustum (cplane_t* frustum);
 
-void
-qm_frustum_map (MObject obj, cplane_t* frustum);
-
 MObject
 qm_map_draw_surf (drawSurf_t* draw_surf);
 
 MObject
 qm_map_tr_globals (trGlobals_t* tr_globals);
+
+/*
+=================
+=================
+*/
+
+void
+qm_qboolean_map (MObject obj, qboolean *b);
+
+void
+qm_vec3_map (MObject obj, vec3_t v);
+
+void
+qm_matrix16_map (MObject obj, matrix16_t* m);
+
+void
+qm_bounds_map (MObject obj, bounds_t* bounds);
+
+void
+qm_frustum_map (MObject obj, cplane_t* frustum);
+
+void
+qm_view_parms_map (MObject obj, viewParms_t* view_parms);
+
+void
+qm_tr_globals_map (MObject obj, trGlobals_t* tr_globals);
 
 #endif /* __QM_RENDERER_H__ */
