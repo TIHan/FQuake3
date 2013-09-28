@@ -127,6 +127,9 @@ module Vector3 =
     let unitZ = create 0.f 0.f 1.f
     let one = create 1.f 1.f 1.f
 
+    let inline init f =
+        create (f 0) (f 1) (f 2)
+
     let inline abs (v: Vector3) =
         create (abs v.X) (abs v.Y) (abs v.Z)
 
@@ -232,6 +235,9 @@ module Vector4 =
         NativePtr.set ptr 2 z
         NativePtr.set ptr 3 w
         v
+
+    let inline init f =
+        create (f 0) (f 1) (f 2) (f 3)
 
     let inline dotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)

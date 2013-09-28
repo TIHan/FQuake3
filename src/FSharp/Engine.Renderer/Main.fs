@@ -178,12 +178,7 @@ module Main =
             (source.Z * modelMatrix.[2, i]) +
             (1.f * modelMatrix.[3, i])
           
-        let eye =
-            Vector4.create
-                (calculateEye 0)
-                (calculateEye 1)
-                (calculateEye 2)
-                (calculateEye 3)
+        let eye = Vector4.init calculateEye
 
         let inline calculateDestination i =
             (eye.X * projectionMatrix.[0, i]) +
@@ -191,14 +186,7 @@ module Main =
             (eye.Z * projectionMatrix.[2, i]) +
             (eye.W * projectionMatrix.[3, i])
 
-        let destination =
-            Vector4.create
-                (calculateDestination 0)
-                (calculateDestination 1)
-                (calculateDestination 2)
-                (calculateDestination 3)
-
-        (eye, destination)
+        (eye, Vector4.init calculateDestination)
     
     /// <summary>
     /// Based on Q3: R_TransformClipToWindow
