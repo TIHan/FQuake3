@@ -130,10 +130,7 @@ module Main =
     /// </summary>
     [<Pure>]
     let localPointToWorld (local: Vector3) (orientation: OrientationR) =
-        Vector3.create
-            ((local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X) + orientation.Origin.X)
-            ((local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y) + orientation.Origin.Y)
-            ((local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z) + orientation.Origin.Z)
+        Vector3.init <| fun i -> Vector3.dotProduct local orientation.Axis.[i] + orientation.Origin.[i]
 
     /// <summary>
     /// Based on Q3: R_LocalNormalToWorld
@@ -141,10 +138,7 @@ module Main =
     /// </summary>
     [<Pure>]
     let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
-        Vector3.create
-            ((local.X * orientation.Axis.[0].X) + (local.Y * orientation.Axis.[1].X) + (local.Z * orientation.Axis.[2].X))
-            ((local.X * orientation.Axis.[0].Y) + (local.Y * orientation.Axis.[1].Y) + (local.Z * orientation.Axis.[2].Y))
-            ((local.X * orientation.Axis.[0].Z) + (local.Y * orientation.Axis.[1].Z) + (local.Z * orientation.Axis.[2].Z))
+        Vector3.init <| fun i -> Vector3.dotProduct local orientation.Axis.[i]
 
     /// <summary>
     /// Based on Q3: R_WorldToLocal
@@ -152,10 +146,7 @@ module Main =
     /// </summary>
     [<Pure>]
     let worldToLocal (world: Vector3) (orientation: OrientationR) =
-        Vector3.create
-            (Vector3.dotProduct world orientation.Axis.[0])
-            (Vector3.dotProduct world orientation.Axis.[1])
-            (Vector3.dotProduct world orientation.Axis.[2])
+        Vector3.init <| fun i -> Vector3.dotProduct world orientation.Axis.[i]
 
     /// <summary>
     /// Based on Q3: R_CullLocalPointAndRadius
@@ -280,7 +271,6 @@ module Main =
     /// </summary>
     [<Pure>]
     let rotateForViewer (viewParms: ViewParms) =
-        
         let axis =
             Axis (
                 // Looks like it is a identity matrix
@@ -288,8 +278,6 @@ module Main =
                 Vector3.create 0.f 1.f 0.f,
                 Vector3.create 0.f 0.f 1.f
             )
-
-        let viewOrigin = viewParms.Orientation.Origin
 
         // transform by the camera placement
         let origin = viewParms.Orientation.Origin
@@ -316,7 +304,7 @@ module Main =
         OrientationR (
             Vector3.zero,
             axis,
-            viewOrigin,
+            viewParms.Orientation.Origin,
             // convert from our coordinate system (looking down X)
             // to OpenGL's coordinate system (looking down -Z)
             viewerMatrix * flipMatrix
