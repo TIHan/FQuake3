@@ -325,12 +325,12 @@ module Main =
         // set far clipping planes dynamically
         let rec calculateFarthestCornerDistance distance acc =
             match acc with
-            | 8 -> distance
+            | TransformSize -> distance
             | _ ->
             
-            let x = match (acc &&& 1) <> 0 with | true -> visibilityBounds.[0].[0] | _ -> visibilityBounds.[1].[0]
-            let y = match (acc &&& 2) <> 0 with | true -> visibilityBounds.[0].[1] | _ -> visibilityBounds.[1].[1]
-            let z = match (acc &&& 4) <> 0 with | true -> visibilityBounds.[0].[2] | _ -> visibilityBounds.[1].[2]
+            let x = if (acc &&& 1) <> 0 then visibilityBounds.[0].[0] else visibilityBounds.[1].[0]
+            let y = if (acc &&& 2) <> 0 then visibilityBounds.[0].[1] else visibilityBounds.[1].[1]
+            let z = if (acc &&& 4) <> 0 then visibilityBounds.[0].[2] else visibilityBounds.[1].[2]
 
             let v = Vector3.create x y z
             let possibleDistance = Vector3.lengthSquared <| v - orientation.Origin

@@ -915,7 +915,7 @@ CG_CalculateWeaponPosition
 ==============
 */
 static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
-#if 0
+#if 1
 	float	scale;
 	int		delta;
 	float	fracsin;
