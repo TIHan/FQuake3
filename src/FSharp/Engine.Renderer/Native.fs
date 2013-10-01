@@ -963,8 +963,17 @@ module TrRefEntity =
 
     let inline toNativeByPtr (ptr: nativeptr<trRefEntity_t>) (refEntity: TrRefEntity) =
         let mutable native = NativePtr.read ptr
-        // TODO:
-        ()
+        
+        RefEntity.toNativeByPtr &&native.e refEntity.Entity
+        native.axisLength <- refEntity.AxisLength
+        native.needDlights <- bool.toNative refEntity.NeedDlights
+        native.lightingCalculated <- bool.toNative refEntity.IsLightingCalculated
+        Vector3.toNativeByPtr &&native.lightDir refEntity.LightDirection
+        Vector3.toNativeByPtr &&native.ambientLight refEntity.AmbientLight
+        native.ambientLightInt <- refEntity.AmbientLightInt
+        Vector3.toNativeByPtr &&native.directedLight refEntity.DirectedLight
+        
+        NativePtr.write ptr native
 
     module Option =
         let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =
@@ -982,6 +991,20 @@ module Refdef =
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags)
         }
+
+    let inline toNativeByPtr (ptr: nativeptr<refdef_t>) (refdef: Refdef) =
+        let mutable native = NativePtr.read ptr
+
+        native.x <- refdef.X
+        native.y <- refdef.Y
+        native.width <- refdef.Width
+        native.height <- refdef.Height
+        Vector3.toNativeByPtr &&native.vieworg refdef.ViewOrigin
+        Axis.toNativeByPtr &&native.viewaxis refdef.ViewAxis
+        native.time <- refdef.Time
+        native.rdflags <- int refdef.RdFlags
+
+        NativePtr.write ptr native
 
 module Dlight =
     let inline ofNative (native: dlight_t) =
@@ -1016,6 +1039,7 @@ module TrRefdef =
             DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNative x) native.drawSurfs;
         }
 
+// TODO: This will need more work over time.
 module TrGlobals =
     let inline ofNative (native: trGlobals_t) =
         {
@@ -1025,4 +1049,16 @@ module TrGlobals =
             Refdef = TrRefdef.ofNative native.refdef;
             Orientation = OrientationR.ofNative native.or';
         }
+
+    let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (tr: TrGlobals) =
+        let mutable native = NativePtr.read ptr
+
+        TrRefEntity.toNativeByPtr native.currentEntity tr.CurrentEntity.Value
+        native.currentEntityNum <- tr.CurrentEntityId
+        ViewParms.toNativeByPtr &&native.viewParms tr.ViewParms
+        // TODO: Map TrRefDef - Property Refdef
+        OrientationR.toNativeByPtr &&native.or' tr.Orientation
+
+        NativePtr.write ptr native
+
 
