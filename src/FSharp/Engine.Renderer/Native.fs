@@ -277,13 +277,9 @@ type refEntity_t =
     val private axis1 : vec3_t
     val private axis2 : vec3_t
     val mutable nonNormalizedAxes : qboolean
-    val mutable origin : single
-    val private origin1 : single
-    val private origin2 : single
+    val mutable origin : vec3_t
     val mutable frame : int
-    val mutable oldorigin : single
-    val private oldorigin1 : single
-    val private oldorigin2 : single
+    val mutable oldorigin : vec3_t
     val mutable oldframe : int
     val mutable backlerp : single
     val mutable skinNum : int
@@ -293,8 +289,7 @@ type refEntity_t =
     val private shaderRGBA1 : byte
     val private shaderRGBA2 : byte
     val private shaderRGBA3 : byte
-    val mutable shaderTexCoord : single
-    val private shaderTexCoord1 : single
+    val mutable shaderTexCoord : vec2_t
     val mutable shaderTime : single
     val mutable radius : single
     val mutable rotation : single
@@ -764,6 +759,13 @@ module ViewParms =
 
         NativePtr.write ptr native
 
+module Rgba =
+    let inline toNativeByPtr (ptr: nativeptr<byte>) (rgba: Rgba) =
+        NativePtr.set ptr 0 rgba.R
+        NativePtr.set ptr 1 rgba.G
+        NativePtr.set ptr 2 rgba.B
+        NativePtr.set ptr 3 rgba.A
+
 module DrawVertex =
     let inline ofNative (native: drawVert_t) =
         DrawVertex (
@@ -920,6 +922,32 @@ module RefEntity =
             Rotation = native.rotation;
         }
 
+    let inline toNativeByPtr (ptr: nativeptr<refEntity_t>) (entity: RefEntity) =
+        let mutable native = NativePtr.read ptr
+
+        native.reType <- enum<refEntityType_t> (int entity.Type)
+        native.renderfx <- entity.RenderFx
+        native.hModel <- entity.ModelHandle
+        Vector3.toNativeByPtr &&native.lightingOrigin entity.LightingOrigin
+        native.shadowPlane <- native.shadowPlane
+        Axis.toNativeByPtr &&native.axis entity.Axis
+        native.nonNormalizedAxes <- bool.toNative entity.HasNonNormalizedAxes
+        Vector3.toNativeByPtr &&native.origin entity.Origin
+        native.frame <- entity.Frame
+        Vector3.toNativeByPtr &&native.oldorigin entity.OldOrigin
+        native.oldframe <- entity.OldFrame
+        native.backlerp <- entity.BackLerp
+        native.skinNum <- entity.SkinId
+        native.customSkin <- entity.CustomSkinHandle
+        native.customShader <- entity.CustomShaderHandle
+        Rgba.toNativeByPtr &&native.shaderRGBA entity.ShaderRgba
+        Vector2.toNativeByPtr &&native.shaderTexCoord entity.ShaderTextureCoordinate
+        native.shaderTime <- entity.ShaderTime
+        native.radius <- entity.Radius
+        native.rotation <- entity.Rotation
+
+        NativePtr.write ptr native 
+
 module TrRefEntity =
     let inline ofNative (native: trRefEntity_t) =
         {
@@ -932,6 +960,11 @@ module TrRefEntity =
             AmbientLightInt = native.ambientLightInt;
             DirectedLight = NativePtr.toStructure &&native.directedLight;
         }
+
+    let inline toNativeByPtr (ptr: nativeptr<trRefEntity_t>) (refEntity: TrRefEntity) =
+        let mutable native = NativePtr.read ptr
+        // TODO:
+        ()
 
     module Option =
         let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =

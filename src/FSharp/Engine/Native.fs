@@ -45,10 +45,24 @@ type qhandle_t = int
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type vec2_t =
+    val mutable value : single
+    val mutable value1 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type vec3_t =
     val mutable value : single
     val mutable value1 : single
     val mutable value2 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type vec4_t =
+    val mutable value : single
+    val mutable value1 : single
+    val mutable value2 : single
+    val mutable value3 : single
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -115,6 +129,15 @@ Mappings
 module bool =
     let inline toNative (value: bool) =
         if value then qboolean.qtrue else qboolean.qfalse
+
+module Vector2 =
+    let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
+        let mutable native = NativePtr.read ptr
+
+        native.value <- v.X
+        native.value1 <- v.Y
+
+        NativePtr.write ptr native       
 
 module Vector3 =
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vector3) =
