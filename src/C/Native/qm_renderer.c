@@ -147,33 +147,20 @@ void
 qm_frustum_map (MObject obj, cplane_t* frustum)
 {
 	MObject m_void;
-	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer.Native", "Frustum", "toNativePtr", 2, {
-		__args [0] = m_object_as_arg (obj);
-		__args [1] = frustum;
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer.Native", "Frustum", "toNativeByPtr", 2, {
+		__args [0] = &frustum;
+		__args [1] = m_object_as_arg (obj);
 	}, m_void);
 }
 
 void
 qm_view_parms_map (MObject obj, viewParms_t* view_parms)
 {
-	view_parms->or = *(orientationr_t*)m_object_unbox_struct (m_object_get_property (obj, "Orientation"));
-	view_parms->world = *(orientationr_t*)m_object_unbox_struct (m_object_get_property (obj, "World"));
-	qm_vec3_map (m_object_get_property (obj, "PvsOrigin"), view_parms->pvsOrigin);
-	qm_qboolean_map (m_object_get_property (obj, "IsPortal"), &view_parms->isPortal);
-	qm_qboolean_map (m_object_get_property (obj, "IsMirror"), &view_parms->isMirror);
-	view_parms->frameSceneNum = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "FrameSceneId"));
-	view_parms->frameCount = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "FrameCount"));
-	view_parms->portalPlane = *(cplane_t*)m_object_unbox_struct (m_object_get_property (obj, "PortalPlane"));
-	view_parms->viewportX = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "ViewportX"));
-	view_parms->viewportY = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "ViewportY"));
-	view_parms->viewportWidth = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "ViewportWidth"));
-	view_parms->viewportHeight = *(gint*)m_object_unbox_struct (m_object_get_property (obj, "ViewportHeight"));
-	view_parms->fovX = *(gfloat*)m_object_unbox_struct (m_object_get_property (obj, "FovX"));
-	view_parms->fovY = *(gfloat*)m_object_unbox_struct (m_object_get_property (obj, "FovY"));
-	qm_matrix16_map (m_object_get_property (obj, "ProjectionMatrix"), (matrix16_t*)view_parms->projectionMatrix);
-	qm_frustum_map (m_object_get_property (obj, "Frustum"), view_parms->frustum);
-	qm_bounds_map (m_object_get_property (obj, "VisibilityBounds"), (bounds_t*)view_parms->visBounds);
-	view_parms->zFar = *(gfloat*)m_object_unbox_struct (m_object_get_property (obj, "ZFar"));
+	MObject m_void;
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer.Native", "ViewParms", "toNativeByPtr", 2, {
+		__args [0] = &view_parms;
+		__args [1] = m_object_as_arg (obj);
+	}, m_void);
 }
 
 void

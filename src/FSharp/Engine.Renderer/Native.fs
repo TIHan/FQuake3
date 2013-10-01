@@ -634,6 +634,31 @@ Mappings
 =======================================================================================================================
 *)
 
+module Axis =
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (axis: Axis) =
+        let mutable nativeX = NativePtr.get ptr 0
+        let mutable nativeY = NativePtr.get ptr 1
+        let mutable nativeZ = NativePtr.get ptr 2
+
+        Vector3.toNativeByPtr &&nativeX axis.X
+        Vector3.toNativeByPtr &&nativeY axis.Y
+        Vector3.toNativeByPtr &&nativeZ axis.Z
+
+        NativePtr.set ptr 0 nativeX
+        NativePtr.set ptr 1 nativeY
+        NativePtr.set ptr 2 nativeZ
+
+module Bounds =
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
+        let mutable nativeX = NativePtr.get ptr 0
+        let mutable nativeY = NativePtr.get ptr 1
+
+        Vector3.toNativeByPtr &&nativeX bounds.Bound0
+        Vector3.toNativeByPtr &&nativeY bounds.Bound1
+
+        NativePtr.set ptr 0 nativeX
+        NativePtr.set ptr 1 nativeY
+
 module Orientation =
     let inline ofNative (native: orientation_t) =
         Orientation (
@@ -650,6 +675,15 @@ module OrientationR =
             NativePtr.toStructure &&native.modelMatrix
         )
 
+    let inline toNativeByPtr (ptr: nativeptr<orientationr_t>) (orientation: OrientationR) =
+        let mutable native = NativePtr.read ptr
+
+        Vector3.toNativeByPtr &&native.origin orientation.Origin
+        Axis.toNativeByPtr &&native.axis orientation.Axis
+        Vector3.toNativeByPtr &&native.viewOrigin orientation.ViewOrigin
+        Matrix16.toNativeByPtr &&native.modelMatrix orientation.ModelMatrix
+
+
 module Plane =
     let inline ofNative (native: cplane_t) =
         Plane (
@@ -661,6 +695,7 @@ module Plane =
 
     let inline toNative (plane: Plane) =
         let mutable native = cplane_t ()
+
         NativePtr.ofStructure plane.Normal &&native.normal
         native.dist <- plane.Distance
         NativePtr.ofStructure plane.Type &&native.type'
@@ -676,12 +711,11 @@ module Frustum =
             Top = Plane.ofNative <| NativePtr.get nativePtr 3;
         }
 
-    let inline toNativePtr (frustum: Frustum) (nativePtr: nativeptr<cplane_t>) =
-        NativePtr.set nativePtr 0 <| Plane.toNative frustum.Left
-        NativePtr.set nativePtr 1 <| Plane.toNative frustum.Right
-        NativePtr.set nativePtr 2 <| Plane.toNative frustum.Bottom
-        NativePtr.set nativePtr 3 <| Plane.toNative frustum.Top
-        nativePtr
+    let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (frustum: Frustum) =
+        NativePtr.set ptr 0 <| Plane.toNative frustum.Left
+        NativePtr.set ptr 1 <| Plane.toNative frustum.Right
+        NativePtr.set ptr 2 <| Plane.toNative frustum.Bottom
+        NativePtr.set ptr 3 <| Plane.toNative frustum.Top
 
 module ViewParms =
     let inline ofNative (native: viewParms_t) =
@@ -705,6 +739,30 @@ module ViewParms =
             VisibilityBounds = NativePtr.toStructure &&native.visBounds;
             ZFar = native.zFar;
         }
+
+    let inline toNativeByPtr (ptr: nativeptr<viewParms_t>) (view: ViewParms) =
+        let mutable native = NativePtr.read ptr
+        
+        OrientationR.toNativeByPtr &&native.or' view.Orientation
+        OrientationR.toNativeByPtr &&native.world view.World
+        Vector3.toNativeByPtr &&native.pvsOrigin view.PvsOrigin
+        native.isPortal <- bool.toNative view.IsPortal
+        native.isMirror <- bool.toNative view.IsMirror
+        native.frameSceneNum <- view.FrameSceneId
+        native.frameCount <- view.FrameCount
+        native.portalPlane <- Plane.toNative view.PortalPlane
+        native.viewportX <- view.ViewportX
+        native.viewportY <- view.ViewportY
+        native.viewportWidth <- view.ViewportWidth
+        native.viewportHeight <- view.ViewportHeight
+        native.fovX <- view.FovX
+        native.fovY <- view.FovY
+        Matrix16.toNativeByPtr &&native.projectionMatrix view.ProjectionMatrix
+        Frustum.toNativeByPtr &&native.frustum view.Frustum
+        Bounds.toNativeByPtr &&native.visBounds view.VisibilityBounds
+        native.zFar <- view.ZFar
+
+        NativePtr.write ptr native
 
 module DrawVertex =
     let inline ofNative (native: drawVert_t) =

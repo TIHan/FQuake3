@@ -34,6 +34,7 @@ open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
 open Engine.Net
+open Engine.Math
 open Engine.NativeInterop
 
 type qboolean =
@@ -110,6 +111,39 @@ type msg_t =
 Mappings
 =======================================================================================================================
 *)
+
+module bool =
+    let inline toNative (value: bool) =
+        if value then qboolean.qtrue else qboolean.qfalse
+
+module Vector3 =
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vector3) =
+        let mutable native = NativePtr.read ptr
+
+        native.value <- v.X
+        native.value1 <- v.Y
+        native.value2 <- v.Z
+
+        NativePtr.write ptr native
+
+module Matrix16 =
+    let inline toNativeByPtr (ptr: nativeptr<single>) (m: Matrix16) =
+        NativePtr.set ptr 0 m.M00
+        NativePtr.set ptr 1 m.M01
+        NativePtr.set ptr 2 m.M02
+        NativePtr.set ptr 3 m.M03
+        NativePtr.set ptr 4 m.M10
+        NativePtr.set ptr 5 m.M11
+        NativePtr.set ptr 6 m.M12
+        NativePtr.set ptr 7 m.M13
+        NativePtr.set ptr 8 m.M20
+        NativePtr.set ptr 9 m.M21
+        NativePtr.set ptr 10 m.M22
+        NativePtr.set ptr 11 m.M23
+        NativePtr.set ptr 12 m.M30
+        NativePtr.set ptr 13 m.M31
+        NativePtr.set ptr 14 m.M32
+        NativePtr.set ptr 16 m.M33
 
 module Cvar =
     let inline ofNative (native: cvar_t) =
