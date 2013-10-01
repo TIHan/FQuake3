@@ -256,10 +256,7 @@ module Main =
         OrientationR (
             entity.Origin,
             entity.Axis,
-            Vector3.create
-                ((Vector3.dotProduct delta entity.Axis.X) * axisLength)
-                ((Vector3.dotProduct delta entity.Axis.Y) * axisLength)
-                ((Vector3.dotProduct delta entity.Axis.Z) * axisLength),
+            (Vector3.init <| fun i -> (Vector3.dotProduct delta entity.Axis.[i]) * axisLength),
             glMatrix * viewParms.World.ModelMatrix
         )
 
