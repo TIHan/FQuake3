@@ -64,14 +64,7 @@ type Vector2 =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector2 =
-    let zero = Vector2 ()
-
-    let inline create x y z =
-        let mutable v = zero
-        let ptr = NativePtr.toNativePtr &&v
-        NativePtr.set ptr 0 x
-        NativePtr.set ptr 1 y
-        v
+    let zero = Vector2 (0.f, 0.f)
 
 /// <summary>
 /// Vector3
@@ -98,40 +91,37 @@ type Vector3 =
             Z = z;
         }
 
+    static member inline (*) (v1: Vector3, v2: Vector3) =
+        Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+
+    static member inline (*) (v: Vector3, s: single) =
+        Vector3 (v.X * s, v.Y * s, v.Z * s)
+
+    static member inline (*) (s: single, v: Vector3) =
+        Vector3 (v.X * s, v.Y * s, v.Z * s)
+
+    static member inline (+) (v1: Vector3, v2: Vector3) =
+        Vector3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
+
+    static member inline (-) (v1: Vector3, v2: Vector3) =
+        Vector3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+
+    static member inline (=) (v1: Vector3, v2: Vector3) =
+        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z   
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
     [<Literal>]
     let size = 3
 
-    let zero = Vector3 ()
-
-    let inline create x y z =
-        let mutable v = zero
-        let ptr = NativePtr.toNativePtr &&v
-        NativePtr.set ptr 0 x
-        NativePtr.set ptr 1 y
-        NativePtr.set ptr 2 z
-        v
-
-    let inline setAt i value (v: Vector3) =
-        match i with
-        | _ when i >= 0 && i <= 2 ->
-            let mutable cv = v
-            let ptr = NativePtr.toNativePtr &&cv
-            NativePtr.set ptr i value
-            cv
-        | _ -> raise <| IndexOutOfRangeException ()
-
-    let unitX = create 1.f 0.f 0.f
-    let unitY = create 0.f 1.f 0.f
-    let unitZ = create 0.f 0.f 1.f
-    let one = create 1.f 1.f 1.f
-
-    let inline init f =
-        create (f 0) (f 1) (f 2)
+    let zero =  Vector3 (0.f, 0.f, 0.f)
+    let one =   Vector3 (1.f, 1.f, 1.f)
+    let unitX = Vector3 (1.f, 0.f, 0.f)
+    let unitY = Vector3 (0.f, 1.f, 0.f)
+    let unitZ = Vector3 (0.f, 0.f, 1.f)
 
     let inline abs (v: Vector3) =
-        create (abs v.X) (abs v.Y) (abs v.Z)
+        Vector3 (abs v.X, abs v.Y, abs v.Z)
 
     let inline minDimension (v: Vector3) =
         match v.X < v.Y with
@@ -145,16 +135,16 @@ module Vector3 =
             | _ -> 2
 
     let inline snap (v: Vector3) =
-        create (truncate v.X) (truncate v.Y) (truncate v.Z)
+        Vector3 (truncate v.X, truncate v.Y, truncate v.Z)
         
     let inline multiplyAdd (s: single) (v1: Vector3) (v2: Vector3) =
-        create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
+        Vector3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z) 
 
     let inline dotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
     let inline crossProduct (v1: Vector3) (v2: Vector3) =
-        create ((v1.Y * v2.Z) - (v1.Z * v2.Y)) ((v1.Z * v2.X) - (v1.X * v2.Z)) ((v1.X * v2.Y) - (v1.Y * v2.X))
+        Vector3 ((v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X))
 
     let inline lengthSquared (v: Vector3) =
         (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
@@ -164,7 +154,7 @@ module Vector3 =
 
     let inline normalize (v: Vector3) =
         let length = 1.f / length v
-        create (v.X * length) (v.Y * length) (v.Z * length)
+        Vector3 (v.X * length, v.Y * length, v.Z * length)
 
     let inline perpendicular (v: Vector3) =
         let uv =
@@ -175,26 +165,7 @@ module Vector3 =
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let uvNormal = normalize uv
-        crossProduct v uvNormal
-
-type Vector3 with
-    static member inline (*) (v1: Vector3, v2: Vector3) =
-        Vector3.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z)
-
-    static member inline (*) (v: Vector3, s: single) =
-        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
-
-    static member inline (*) (s: single, v: Vector3) =
-        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
-
-    static member inline (+) (v1: Vector3, v2: Vector3) =
-        Vector3.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z)
-
-    static member inline (-) (v1: Vector3, v2: Vector3) =
-        Vector3.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z)
-
-    static member inline (=) (v1: Vector3, v2: Vector3) =
-        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z    
+        crossProduct v uvNormal 
 
 /// <summary>
 /// Vector4
@@ -223,34 +194,21 @@ type Vector4 =
             W = w;
         }
 
+    static member inline (*) (v1: Vector4, v2: Vector4) =
+        Vector4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
+        
+    static member inline (+) (v1: Vector4, v2: Vector4) =
+        Vector4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
+
+    static member inline (-) (v1: Vector4, v2: Vector4) =
+        Vector4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)
+
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector4 =
-    let zero = Vector4 ()
-
-    let inline create x y z w =
-        let mutable v = zero
-        let ptr = NativePtr.toNativePtr &&v
-        NativePtr.set ptr 0 x
-        NativePtr.set ptr 1 y
-        NativePtr.set ptr 2 z
-        NativePtr.set ptr 3 w
-        v
-
-    let inline init f =
-        create (f 0) (f 1) (f 2) (f 3)
+    let zero = Vector4 (0.f, 0.f, 0.f, 0.f)
 
     let inline dotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
-
-type Vector4 with
-    static member inline (*) (v1: Vector4, v2: Vector4) =
-        Vector4.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z) (v1.W * v2.W)
-        
-    static member inline (+) (v1: Vector4, v2: Vector4) =
-        Vector4.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z) (v1.W + v2.W)
-
-    static member inline (-) (v1: Vector4, v2: Vector4) =
-        Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)
 
 /// <summary>
 /// Matrix4
@@ -281,16 +239,7 @@ type Matrix4 =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix4 =
-    let zero = Matrix4 ()
-
-    let inline create m00 m01 m10 m11 =
-        let mutable m = zero
-        let ptr = NativePtr.toNativePtr &&m
-        NativePtr.set ptr 0 m00
-        NativePtr.set ptr 1 m01
-        NativePtr.set ptr 2 m10
-        NativePtr.set ptr 3 m11
-        m      
+    let zero = Matrix4 (0.f, 0.f, 0.f, 0.f)  
 
 /// <summary>
 /// Matrix16
@@ -347,58 +296,32 @@ type Matrix16 =
             M10 = m10; M11 = m11; M12 = m12; M13 = m13;
             M20 = m20; M21 = m21; M22 = m22; M23 = m23;
             M30 = m30; M31 = m31; M32 = m32; M33 = m33;
-        }   
+        }
 
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Matrix16 =
-    let zero = Matrix16 ()
-
-    let inline create 
-            m00 m01 m02 m03
-            m10 m11 m12 m13
-            m20 m21 m22 m23
-            m30 m31 m32 m33 =
-        let mutable m = zero
-        let ptr = NativePtr.toNativePtr &&m
-        NativePtr.set ptr 0 m00
-        NativePtr.set ptr 1 m01
-        NativePtr.set ptr 2 m02
-        NativePtr.set ptr 3 m03
-        NativePtr.set ptr 4 m10
-        NativePtr.set ptr 5 m11
-        NativePtr.set ptr 6 m12
-        NativePtr.set ptr 7 m13
-        NativePtr.set ptr 8 m20
-        NativePtr.set ptr 9 m21
-        NativePtr.set ptr 10 m22
-        NativePtr.set ptr 11 m23
-        NativePtr.set ptr 12 m30
-        NativePtr.set ptr 13 m31
-        NativePtr.set ptr 14 m32
-        NativePtr.set ptr 15 m33
-        m
-
-type Matrix16 with
 #if DEBUG
     static member (*) (m1: Matrix16, m2: Matrix16) =
 #else
     static member inline (*) (m1: Matrix16, m2: Matrix16) =
 #endif
-        Matrix16.create
-            ((m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]))
-            ((m1.[0, 0] * m2.[0, 1]) + (m1.[0, 1] * m2.[1, 1]) + (m1.[0, 2] * m2.[2, 1]) + (m1.[0, 3] * m2.[3, 1]))
-            ((m1.[0, 0] * m2.[0, 2]) + (m1.[0, 1] * m2.[1, 2]) + (m1.[0, 2] * m2.[2, 2]) + (m1.[0, 3] * m2.[3, 2]))
-            ((m1.[0, 0] * m2.[0, 3]) + (m1.[0, 1] * m2.[1, 3]) + (m1.[0, 2] * m2.[2, 3]) + (m1.[0, 3] * m2.[3, 3]))
-            ((m1.[1, 0] * m2.[0, 0]) + (m1.[1, 1] * m2.[1, 0]) + (m1.[1, 2] * m2.[2, 0]) + (m1.[1, 3] * m2.[3, 0]))
-            ((m1.[1, 0] * m2.[0, 1]) + (m1.[1, 1] * m2.[1, 1]) + (m1.[1, 2] * m2.[2, 1]) + (m1.[1, 3] * m2.[3, 1]))
-            ((m1.[1, 0] * m2.[0, 2]) + (m1.[1, 1] * m2.[1, 2]) + (m1.[1, 2] * m2.[2, 2]) + (m1.[1, 3] * m2.[3, 2]))
-            ((m1.[1, 0] * m2.[0, 3]) + (m1.[1, 1] * m2.[1, 3]) + (m1.[1, 2] * m2.[2, 3]) + (m1.[1, 3] * m2.[3, 3]))
-            ((m1.[2, 0] * m2.[0, 0]) + (m1.[2, 1] * m2.[1, 0]) + (m1.[2, 2] * m2.[2, 0]) + (m1.[2, 3] * m2.[3, 0]))
-            ((m1.[2, 0] * m2.[0, 1]) + (m1.[2, 1] * m2.[1, 1]) + (m1.[2, 2] * m2.[2, 1]) + (m1.[2, 3] * m2.[3, 1]))
-            ((m1.[2, 0] * m2.[0, 2]) + (m1.[2, 1] * m2.[1, 2]) + (m1.[2, 2] * m2.[2, 2]) + (m1.[2, 3] * m2.[3, 2]))
-            ((m1.[2, 0] * m2.[0, 3]) + (m1.[2, 1] * m2.[1, 3]) + (m1.[2, 2] * m2.[2, 3]) + (m1.[2, 3] * m2.[3, 3]))
-            ((m1.[3, 0] * m2.[0, 0]) + (m1.[3, 1] * m2.[1, 0]) + (m1.[3, 2] * m2.[2, 0]) + (m1.[3, 3] * m2.[3, 0]))
-            ((m1.[3, 0] * m2.[0, 1]) + (m1.[3, 1] * m2.[1, 1]) + (m1.[3, 2] * m2.[2, 1]) + (m1.[3, 3] * m2.[3, 1]))
-            ((m1.[3, 0] * m2.[0, 2]) + (m1.[3, 1] * m2.[1, 2]) + (m1.[3, 2] * m2.[2, 2]) + (m1.[3, 3] * m2.[3, 2]))
-            ((m1.[3, 0] * m2.[0, 3]) + (m1.[3, 1] * m2.[1, 3]) + (m1.[3, 2] * m2.[2, 3]) + (m1.[3, 3] * m2.[3, 3]))
+        Matrix16 (
+            (m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]),
+            (m1.[0, 0] * m2.[0, 1]) + (m1.[0, 1] * m2.[1, 1]) + (m1.[0, 2] * m2.[2, 1]) + (m1.[0, 3] * m2.[3, 1]),
+            (m1.[0, 0] * m2.[0, 2]) + (m1.[0, 1] * m2.[1, 2]) + (m1.[0, 2] * m2.[2, 2]) + (m1.[0, 3] * m2.[3, 2]),
+            (m1.[0, 0] * m2.[0, 3]) + (m1.[0, 1] * m2.[1, 3]) + (m1.[0, 2] * m2.[2, 3]) + (m1.[0, 3] * m2.[3, 3]),
+            (m1.[1, 0] * m2.[0, 0]) + (m1.[1, 1] * m2.[1, 0]) + (m1.[1, 2] * m2.[2, 0]) + (m1.[1, 3] * m2.[3, 0]),
+            (m1.[1, 0] * m2.[0, 1]) + (m1.[1, 1] * m2.[1, 1]) + (m1.[1, 2] * m2.[2, 1]) + (m1.[1, 3] * m2.[3, 1]),
+            (m1.[1, 0] * m2.[0, 2]) + (m1.[1, 1] * m2.[1, 2]) + (m1.[1, 2] * m2.[2, 2]) + (m1.[1, 3] * m2.[3, 2]),
+            (m1.[1, 0] * m2.[0, 3]) + (m1.[1, 1] * m2.[1, 3]) + (m1.[1, 2] * m2.[2, 3]) + (m1.[1, 3] * m2.[3, 3]),
+            (m1.[2, 0] * m2.[0, 0]) + (m1.[2, 1] * m2.[1, 0]) + (m1.[2, 2] * m2.[2, 0]) + (m1.[2, 3] * m2.[3, 0]),
+            (m1.[2, 0] * m2.[0, 1]) + (m1.[2, 1] * m2.[1, 1]) + (m1.[2, 2] * m2.[2, 1]) + (m1.[2, 3] * m2.[3, 1]),
+            (m1.[2, 0] * m2.[0, 2]) + (m1.[2, 1] * m2.[1, 2]) + (m1.[2, 2] * m2.[2, 2]) + (m1.[2, 3] * m2.[3, 2]),
+            (m1.[2, 0] * m2.[0, 3]) + (m1.[2, 1] * m2.[1, 3]) + (m1.[2, 2] * m2.[2, 3]) + (m1.[2, 3] * m2.[3, 3]),
+            (m1.[3, 0] * m2.[0, 0]) + (m1.[3, 1] * m2.[1, 0]) + (m1.[3, 2] * m2.[2, 0]) + (m1.[3, 3] * m2.[3, 0]),
+            (m1.[3, 0] * m2.[0, 1]) + (m1.[3, 1] * m2.[1, 1]) + (m1.[3, 2] * m2.[2, 1]) + (m1.[3, 3] * m2.[3, 1]),
+            (m1.[3, 0] * m2.[0, 2]) + (m1.[3, 1] * m2.[1, 2]) + (m1.[3, 2] * m2.[2, 2]) + (m1.[3, 3] * m2.[3, 2]),
+            (m1.[3, 0] * m2.[0, 3]) + (m1.[3, 1] * m2.[1, 3]) + (m1.[3, 2] * m2.[2, 3]) + (m1.[3, 3] * m2.[3, 3])
+        )
 
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Matrix16 =
+    let zero = Matrix16 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
