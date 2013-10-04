@@ -290,41 +290,34 @@ module Main =
     /// </summary>
     [<Pure>]
     let rotateForViewer (viewParms: ViewParms) =
-        let axis =
-            Axis (
-                // Looks like it is a identity matrix
-                Vector3 (1.f, 0.f, 0.f),
-                Vector3 (0.f, 1.f, 0.f),
-                Vector3 (0.f, 0.f, 1.f)
-            )
-
         // transform by the camera placement
         let origin = viewParms.Orientation.Origin
+        let axis = viewParms.Orientation.Axis
 
         let viewerMatrix =
             Matrix16 (
-                viewParms.Orientation.Axis.[0].[0],
-                viewParms.Orientation.Axis.[1].[0],
-                viewParms.Orientation.Axis.[2].[0],
+                axis.[0].[0],
+                axis.[1].[0],
+                axis.[2].[0],
                 0.f,
-                viewParms.Orientation.Axis.[0].[1],
-                viewParms.Orientation.Axis.[1].[1],
-                viewParms.Orientation.Axis.[2].[1],
+                axis.[0].[1],
+                axis.[1].[1],
+                axis.[2].[1],
                 0.f,
-                viewParms.Orientation.Axis.[0].[2],
-                viewParms.Orientation.Axis.[1].[2],
-                viewParms.Orientation.Axis.[2].[2],
+                axis.[0].[2],
+                axis.[1].[2],
+                axis.[2].[2],
                 0.f,
-                (-origin.[0] * viewParms.Orientation.Axis.[0].[0] + -origin.[1] * viewParms.Orientation.Axis.[0].[1] + -origin.[2] * viewParms.Orientation.Axis.[0].[2]),
-                (-origin.[0] * viewParms.Orientation.Axis.[1].[0] + -origin.[1] * viewParms.Orientation.Axis.[1].[1] + -origin.[2] * viewParms.Orientation.Axis.[1].[2]),
-                (-origin.[0] * viewParms.Orientation.Axis.[2].[0] + -origin.[1] * viewParms.Orientation.Axis.[2].[1] + -origin.[2] * viewParms.Orientation.Axis.[2].[2]),
+                (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2]),
+                (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2]),
+                (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2]),
                 1.f
             )
         
         OrientationR (
             Vector3.zero,
-            axis,
-            viewParms.Orientation.Origin,
+            Axis (Vector3.unitX, Vector3.unitY, Vector3.unitZ),
+            origin,
             // convert from our coordinate system (looking down X)
             // to OpenGL's coordinate system (looking down -Z)
             viewerMatrix * flipMatrix

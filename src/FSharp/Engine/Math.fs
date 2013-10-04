@@ -91,6 +91,13 @@ type Vector3 =
             Z = z;
         }
 
+    member inline this.Set (?X: single, ?Y: single, ?Z: single) =
+        Vector3 (
+            (match X with | Some x -> x | None -> this.X),
+            (match Y with | Some y -> y | None -> this.Y),
+            (match Z with | Some z -> z | None -> this.Z)
+        )
+
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
@@ -165,7 +172,10 @@ module Vector3 =
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let uvNormal = normalize uv
-        crossProduct v uvNormal 
+        crossProduct v uvNormal
+        
+    let (|XYZ|) (v: Vector3) =
+        (v.X, v.Y, v.Z)
 
 /// <summary>
 /// Vector4
