@@ -439,15 +439,8 @@ module Main =
     [<Pure>]
     let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
         let local = v - surface.Origin
-        let rec transform transformed n =
-            match n with
-            | Vector3.size -> transformed
-            | _ ->
-            transform
-                (Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[n]) camera.Axis.[n] transformed)
-                (n + 1)
-
-        (transform (Vector3.zero) 0) + camera.Origin
+        let inline transform i transformed = Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[i]) camera.Axis.[i] transformed
+        transform 0 Vector3.zero |> transform 1 |> transform 2 |> (+) camera.Origin
 
     /// <summary>
     /// Based on Q3: R_MirrorVector
@@ -455,15 +448,8 @@ module Main =
     /// </summary>
     [<Pure>]
     let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
-        let rec transform transformed n =
-            match n with
-            | Vector3.size -> transformed
-            | _ ->
-            transform
-                (Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[n]) camera.Axis.[n] transformed)
-                (n + 1)
-
-        transform (Vector3.zero) 0
+        let inline transform i transformed = Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[i]) camera.Axis.[i] transformed
+        transform 0 Vector3.zero |> transform 1 |> transform 2
 
     /// <summary>
     /// Based on Q3: R_PlaneForSurface
