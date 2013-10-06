@@ -29,6 +29,49 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "game/q_shared.h"
 
+#define map_obj_invoke(static_class_name,method_name,arg) \
+{ \
+	MObject m_result; \
+	m_invoke_method_cache ("Engine", "Engine.Native", static_class_name, method_name, arg, m_result); \
+	return m_result; \
+} \
+
+#define obj_map_invoke_easy(static_class_name,method_name,argc,args) \
+{ \
+	MObject m_void; \
+	m_invoke_method_cache_easy ("Engine", "Engine.Native", static_class_name, method_name, argc, args, m_void); \
+	return m_void; \
+} \
+
+#define define_function_map_obj(name,type,managed_name) \
+MObject \
+qm_map_##name## (type ptr) \
+{ \
+	map_obj_invoke (managed_name, "ofNative", ptr); \
+} \
+
+#define define_function_obj_map(name,type,managed_name) \
+void \
+	qm_##name##_map (MObject obj, type ptr) \
+{ \
+	obj_map_invoke_easy (managed_name, "toNativeByPtr", 2, { \
+		__args [0] = m_object_as_arg (obj); \
+		__args [1] = ptr; \
+	}); \
+} \
+
+#define define_mapping_functions(name,type,managed_name) \
+	define_function_map_obj(name,type,managed_name) \
+	define_function_obj_map(name,type,managed_name) \
+
+/*
+=================
+vec3
+=================
+*/
+
+// TODO:
+
 MObject
 qm_map_cvar (cvar_t* cvar);
 

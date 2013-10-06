@@ -30,12 +30,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "renderer\tr_local.h"
 
 MObject
-qm_map_vec3 (vec3_t v);
-
-void
-qm_vec3_map (MObject obj, vec3_t v);
-
-MObject
 qm_map_orientation (orientation_t* orientation);
 
 MObject

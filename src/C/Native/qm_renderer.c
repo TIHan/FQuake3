@@ -40,26 +40,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	return m_void; \
 } \
 
-/*
-=================
-vec3
-=================
-*/
-
-MObject
-qm_map_vec3 (vec3_t v)
-{
-	map_obj_invoke ("Vec3", "ofNative", v);
-}
-
-void
-qm_vec3_map (MObject obj, vec3_t v)
-{
-	obj_map_invoke_easy ("Vec3", "toNativeByPtr", 1, {
-		__args [0] = v;
-	});
-}
-
 MObject
 qm_map_orientation (orientation_t* orientation)
 {
