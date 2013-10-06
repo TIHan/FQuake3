@@ -45,7 +45,7 @@ Download and install the following:
 
 * Visual Studio 2012 ( _[Trial](http://www.microsoft.com/visualstudio/eng/products/visual-studio-premium-2012)_ ) ( _[Express Edition](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-windows-desktop#product-express-desktop) not tested_ )
 * [F# compiler](http://go.microsoft.com/fwlink/?LinkID=261287) (if not installed)
-* [Mono 3.0.10](http://origin-download.mono-project.com/archive/3.0.10/windows-installer/mono-3.0.10-gtksharp-2.12.11-win32-0.exe)
+* [Mono 3.2.3](http://download.mono-project.com/archive/3.2.3/windows-installer/mono-3.2.3-gtksharp-2.12.11-win32-0.exe)
 
 #####Setting Up Mono
 1. Browse to where you installed Mono.
@@ -53,8 +53,8 @@ Download and install the following:
 3. Finally, rename your copied Mono folder to just "Mono". e.g. _FQuake3\lib\Mono_ - Note: git will not pick Mono up in commits.
 
 #####Using Quake Content
-1. In your repository's root folder, create a new folder called "build". e.g. _FQuake3/build/_
-2. If you have a copy of Quake III Arena, go inside its root folder. You should see "baseq3" and "missionpack" (If you have Team Arena). Copy both of them, if you have both, to your newly created _/build/_ folder in your repository.
+1. In your repository's root folder, create a new folder called "build". e.g. _FQuake3\build\_
+2. If you have a copy of Quake III Arena, go inside its root folder. You should see "baseq3" and "missionpack" (If you have Team Arena). Copy both of them, if you have both, to your newly created _\build\_ folder in your repository.
 
 #####Solution Configuration and Running
 
