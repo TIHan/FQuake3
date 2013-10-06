@@ -88,17 +88,10 @@ MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename)
 {
 	MDomain *const domain = (MDomain *)g_malloc0 (sizeof (MDomain));
-	const gchar* options[] =
-	{
-		 "-O=gshared,sse2,precomp,aot,leaf,fcmov,loop,tailc,intrins,sched,shared,cmov,linears,deadce,copyprop,consprop,cfold,inline,branch,peephole"
-	};
 
 	mono_set_dirs (assembly_dir, config_dir);
 	domain->domain = mono_jit_init (filename);
 
-#if NDEBUG
-	mono_jit_parse_options(1, (gchar**)options);
-#endif
 	return domain;
 }
 
