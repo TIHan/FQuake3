@@ -26,6 +26,40 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qm_renderer.h"
 
+#define map_obj_invoke(static_class_name,method_name,arg) \
+{ \
+	MObject m_result; \
+	m_invoke_method_cache ("Engine.Renderer", "Engine.Renderer.Native", static_class_name, method_name, arg, m_result); \
+	return m_result; \
+} \
+
+#define obj_map_invoke_easy(static_class_name,method_name,argc,args) \
+{ \
+	MObject m_void; \
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer.Native", static_class_name, method_name, argc, args, m_void); \
+	return m_void; \
+} \
+
+/*
+=================
+vec3
+=================
+*/
+
+MObject
+qm_map_vec3 (vec3_t v)
+{
+	map_obj_invoke ("Vec3", "ofNative", v);
+}
+
+void
+qm_vec3_map (MObject obj, vec3_t v)
+{
+	obj_map_invoke_easy ("Vec3", "toNativeByPtr", 1, {
+		__args [0] = v;
+	});
+}
+
 MObject
 qm_map_orientation (orientation_t* orientation)
 {
@@ -121,14 +155,6 @@ qm_qboolean_map (MObject obj, qboolean *b)
 	} else {
 		*b = qfalse;
 	}
-}
-
-void
-qm_vec3_map (MObject obj, vec3_t v)
-{
-	v [0] = ((gfloat*)m_object_unbox_struct (obj))[0];
-	v [1] = ((gfloat*)m_object_unbox_struct (obj))[1];
-	v [2] = ((gfloat*)m_object_unbox_struct (obj))[2];
 }
 
 void

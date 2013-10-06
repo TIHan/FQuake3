@@ -130,6 +130,19 @@ module bool =
     let inline toNative (value: bool) =
         if value then qboolean.qtrue else qboolean.qfalse
 
+module Vec3 =
+    let inline ofNative (native: vec3_t) =
+        { X = native.value; Y = native.value1; Z = native.value2 }
+
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vec3) =
+        let mutable native = NativePtr.read ptr
+
+        native.value <- v.X
+        native.value1 <- v.Y
+        native.value2 <- v.Z
+
+        NativePtr.write ptr native
+
 module Vector2 =
     let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
         let mutable native = NativePtr.read ptr

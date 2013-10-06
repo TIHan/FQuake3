@@ -177,6 +177,122 @@ module Vector3 =
     let (|XYZ|) (v: Vector3) =
         (v.X, v.Y, v.Z)
 
+type Vec3 =
+    { X: single; Y: single; Z: single }
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vec3 =
+    let inline create x y z =
+        { X = x; Y = y; Z = z }
+
+    let zero =  create 0.f 0.f 0.f
+    let one =   create 1.f 1.f 1.f
+    let unitX = create 1.f 0.f 0.f
+    let unitY = create 0.f 1.f 0.f
+    let unitZ = create 0.f 0.f 1.f
+
+    let inline abs (v: Vec3) =
+        create (abs v.X) (abs v.Y) (abs v.Z)
+
+    let inline minDimension (v: Vec3) =
+        match v.X < v.Y with
+        | true ->
+            match v.X < v.Z with
+            | true -> 0
+            | _ -> 2
+        | _ ->
+            match v.Y < v.Z with
+            | true -> 1
+            | _ -> 2
+
+    let inline snap (v: Vec3) =
+        create (truncate v.X) (truncate v.Y) (truncate v.Z)
+        
+    let inline multiplyAdd (s: single) (v1: Vec3) (v2: Vec3) =
+        create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
+
+    let inline dotProduct (v1: Vec3) (v2: Vec3) =
+        (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
+
+    let inline crossProduct (v1: Vec3) (v2: Vec3) =
+        create
+            ((v1.Y * v2.Z) - (v1.Z * v2.Y))
+            ((v1.Z * v2.X) - (v1.X * v2.Z))
+            ((v1.X * v2.Y) - (v1.Y * v2.X))
+
+    let inline lengthSquared (v: Vec3) =
+        (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
+
+    let inline length (v: Vec3) =
+        sqrt <| lengthSquared v
+
+    let inline normalize (v: Vec3) =
+        let length = 1.f / length v
+        create (v.X * length) (v.Y * length) (v.Z * length)
+
+    let inline perpendicular (v: Vec3) =
+        let uv =
+            match abs v |> minDimension with
+            | 0 -> unitX
+            | 1 -> unitY
+            | 2 -> unitZ
+            | _ -> raise <| System.ArgumentOutOfRangeException ()
+
+        let uvNormal = normalize uv
+        crossProduct v uvNormal
+        
+    let (|XYZ|) (v: Vec3) =
+        (v.X, v.Y, v.Z)
+
+type Vec3 with
+    static member inline (*) (v1: Vec3, v2: Vec3) =
+        Vec3.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z)
+
+    static member inline (/) (v1: Vec3, v2: Vec3) =
+        Vec3.create (v1.X / v2.X) (v1.Y / v2.Y) (v1.Z / v2.Z)
+
+    static member inline (+) (v1: Vec3, v2: Vec3) =
+        Vec3.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z)
+
+    static member inline (-) (v1: Vec3, v2: Vec3) =
+        Vec3.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z)
+
+    // RHS
+
+    static member inline (*) (v: Vec3, s: single) =
+        Vec3.create (v.X * s) (v.Y * s) (v.Z * s)
+
+    static member inline (/) (v: Vec3, s: single) =
+        Vec3.create (v.X / s) (v.Y / s) (v.Z / s)
+
+    static member inline (+) (v: Vec3, s: single) =
+        Vec3.create (v.X + s) (v.Y + s) (v.Z + s)
+
+    static member inline (-) (v: Vec3, s: single) =
+        Vec3.create (v.X - s) (v.Y - s) (v.Z - s)
+
+    // LHS
+
+    static member inline (*) (s: single, v: Vec3) =
+        Vec3.create (s * v.X) (s * v.Y) (s * v.Z)
+
+    static member inline (/) (s: single, v: Vec3) =
+        Vec3.create (s / v.X) (s / v.Y) (s / v.Z)
+
+    static member inline (+) (s: single, v: Vec3) =
+        Vec3.create (s + v.X) (s + v.Y) (s + v.Z)
+
+    static member inline (-) (s: single, v: Vec3) =
+        Vec3.create (s - v.X) (s - v.Y) (s - v.Z)
+
 /// <summary>
 /// Vector4
 /// </summary>        
