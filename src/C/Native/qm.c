@@ -26,10 +26,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qm.h"
 
-MObject
-qm_map_cvar (cvar_t* cvar)
-{
-	MObject m_result;
-	m_invoke_method_cache ("Engine", "Engine.Native", "Cvar", "ofNative", &cvar, m_result);
-	return m_result;
-}
+define_mapping (vec3, vec3_t, "Vec3");
+define_mapping (cvar, cvar_t*, "Cvar");
