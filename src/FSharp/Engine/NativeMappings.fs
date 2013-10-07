@@ -38,6 +38,18 @@ open Engine.Math
 open Engine.NativeInterop
 
 module bool =
+    let inline ofNative (native: qboolean) =
+        match native with
+        | qboolean.qtrue -> true
+        | _ -> false
+
+    let inline toNativeByPtr (ptr: nativeptr<qboolean>) (value: bool) =
+        let mutable native = NativePtr.read ptr
+
+        native <- if value then qboolean.qtrue else qboolean.qfalse
+
+        NativePtr.write ptr native
+
     let inline toNative (value: bool) =
         if value then qboolean.qtrue else qboolean.qfalse
 

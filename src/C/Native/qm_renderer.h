@@ -65,15 +65,6 @@ qm_map_tr_globals (trGlobals_t* tr_globals);
 */
 
 void
-qm_qboolean_map (MObject obj, qboolean *b);
-
-void
-qm_matrix16_map (MObject obj, matrix16_t* m);
-
-void
-qm_bounds_map (MObject obj, bounds_t* bounds);
-
-void
 qm_frustum_map (MObject obj, cplane_t* frustum);
 
 void

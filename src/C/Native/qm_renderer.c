@@ -26,20 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qm_renderer.h"
 
-#define map_obj_invoke(static_class_name,method_name,arg) \
-{ \
-	MObject m_result; \
-	m_invoke_method_cache ("Engine.Renderer", "Engine.Renderer.Native", static_class_name, method_name, arg, m_result); \
-	return m_result; \
-} \
-
-#define obj_map_invoke_easy(static_class_name,method_name,argc,args) \
-{ \
-	MObject m_void; \
-	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer.Native", static_class_name, method_name, argc, args, m_void); \
-	return m_void; \
-} \
-
 MObject
 qm_map_orientation (orientation_t* orientation)
 {
@@ -124,30 +110,6 @@ qm_map_tr_globals (trGlobals_t* tr_globals)
 =================
 =================
 */
-
-void
-qm_qboolean_map (MObject obj, qboolean *b)
-{
-	gint value = *(gchar*)m_object_unbox_struct (obj);
-
-	if (value == 1) {
-		*b = qtrue;
-	} else {
-		*b = qfalse;
-	}
-}
-
-void
-qm_matrix16_map (MObject obj, matrix16_t* m)
-{
-	*m = *(matrix16_t*)m_object_unbox_struct (obj);
-}
-
-void
-qm_bounds_map (MObject obj, bounds_t* bounds)
-{
-	*bounds = *(bounds_t*)m_object_unbox_struct (obj);
-}
 
 void
 qm_frustum_map (MObject obj, cplane_t* frustum)

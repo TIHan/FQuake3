@@ -32,14 +32,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define of_invoke(static_class_name,method_name,arg) \
 { \
 	MObject m_result; \
-	m_invoke_method_cache ("Engine", "Engine.Native", static_class_name, method_name, &arg, m_result); \
+	m_invoke_method_cache (Assembly, Namespace, static_class_name, method_name, &arg, m_result); \
 	return m_result; \
 } \
 
 #define to_invoke_easy(static_class_name,method_name,argc,args) \
 { \
 	MObject m_void; \
-	m_invoke_method_cache_easy ("Engine", "Engine.Native", static_class_name, method_name, argc, args, m_void); \
+	m_invoke_method_cache_easy (Assembly, Namespace, static_class_name, method_name, argc, args, m_void); \
 	return m_void; \
 } \
 
@@ -76,6 +76,7 @@ qm_to_##name## (MObject obj, type ptr) \
 	define_of(name,type,managed_name) \
 	define_to(name,type,managed_name) \
 
+define_mapping_prototype (qboolean, qboolean*);
 define_mapping_prototype (vec3, vec3_t);
 define_mapping_prototype (cvar, cvar_t*);
 
