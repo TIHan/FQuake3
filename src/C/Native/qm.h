@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define define_mapping_assembly(name) \
 static const gchar* Assembly = name \
 
-#define define_mapping_namesapce(name) \
+#define define_mapping_namespace(name) \
 static const gchar* Namespace = name \
 
 #define of_invoke(static_class_name,method_name,arg) \
@@ -84,6 +84,8 @@ qm_to_##name## (MObject obj, type ptr) \
 
 define_mapping_prototype (qboolean, qboolean*);
 define_mapping_prototype (vec3, vec3_t);
+define_mapping_prototype (vec4, gfloat*);
+define_mapping_prototype (mat4x4, gfloat*);
 define_mapping_prototype (cvar, cvar_t*);
 
 #endif /* __QM_H__ */

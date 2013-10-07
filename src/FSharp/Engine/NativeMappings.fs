@@ -53,6 +53,18 @@ module bool =
     let inline toNative (value: bool) =
         if value then qboolean.qtrue else qboolean.qfalse
 
+module Vector2 =
+    let inline ofNative (native: vec2_t) =
+        { Vector2.X = native.value; Y = native.value1 }
+
+    let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
+        let mutable native = NativePtr.read ptr
+
+        native.value <- v.X
+        native.value1 <- v.Y
+
+        NativePtr.write ptr native  
+
 module Vector3 =
     let inline ofNative (native: vec3_t) =
         { Vector3.X = native.value; Y = native.value1; Z = native.value2 }
@@ -64,19 +76,21 @@ module Vector3 =
         native.value1 <- v.Y
         native.value2 <- v.Z
 
-        NativePtr.write ptr native
+        NativePtr.write ptr native   
+        
+module Vector4 =
+    let inline ofNative (native: vec4_t) =
+        { Vector4.X = native.value; Y = native.value1; Z = native.value2; W = native.value3 }
 
-module Vector2 =
-    let inline ofNative (native: vec2_t) =
-        { Vector2.X = native.value; Y = native.value1 }
-
-    let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
+    let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: Vector4) =
         let mutable native = NativePtr.read ptr
 
         native.value <- v.X
         native.value1 <- v.Y
+        native.value2 <- v.Z
+        native.value3 <- v.W
 
-        NativePtr.write ptr native       
+        NativePtr.write ptr native  
 
 module Matrix4x4 =
     let inline ofNative (ptr: nativeptr<single>) =
@@ -114,7 +128,7 @@ module Matrix4x4 =
         NativePtr.set ptr 12 m.[3, 0]
         NativePtr.set ptr 13 m.[3, 1]
         NativePtr.set ptr 14 m.[3, 2]
-        NativePtr.set ptr 16 m.[3, 3]
+        NativePtr.set ptr 15 m.[3, 3]
 
 module Cvar =
     let inline ofNative (native: cvar_t) =

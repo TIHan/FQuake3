@@ -206,7 +206,7 @@ R_LocalNormalToWorld
 =================
 */
 void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
-#if 1
+#if 0
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
@@ -214,11 +214,11 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 	MObject m_world;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localNormalToWorld", 2, {
-		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
+		__args [0] = m_object_as_arg (qm_of_vec3 (local));
+		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
 	}, m_world);
 
-	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
+	qm_to_vec3 (m_world, world);
 #endif
 }
 
@@ -230,7 +230,7 @@ R_LocalPointToWorld
 */
 void R_LocalPointToWorld (vec3_t local, vec3_t world)
 {
-#if 1
+#if 0
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
@@ -238,11 +238,11 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world)
 	MObject m_world;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "localPointToWorld", 2, {
-		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
+		__args [0] = m_object_as_arg (qm_of_vec3 (local));
+		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
 	}, m_world);
 
-	*(vector3_t *)world = *(vector3_t *)m_object_unbox_struct (m_world);
+	qm_to_vec3 (m_world, world);
 #endif
 }
 
@@ -254,7 +254,7 @@ R_WorldToLocal
 */
 void R_WorldToLocal (vec3_t world, vec3_t local)
 {
-#if 1
+#if 0
 	local[0] = DotProduct(world, tr.or.axis[0]);
 	local[1] = DotProduct(world, tr.or.axis[1]);
 	local[2] = DotProduct(world, tr.or.axis[2]);
@@ -262,11 +262,11 @@ void R_WorldToLocal (vec3_t world, vec3_t local)
 	MObject m_local;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "worldToLocal", 2, {
-		__args [0] = local;
-		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
+		__args [0] = m_object_as_arg (qm_of_vec3 (local));
+		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
 	}, m_local);
 
-	*(vector3_t *)local = *(vector3_t *)m_object_unbox_struct (m_local);
+	qm_to_vec3 (m_local, local);
 #endif
 }
 
@@ -300,13 +300,13 @@ void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
 	MObject m_tuple_source_and_destination;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformModelToClip", 3, {
-		__args [0] = src;
-		__args [1] = modelMatrix;
-		__args [2] = projectionMatrix;
+		__args [0] = m_object_as_arg (qm_of_vec3 (src));
+		__args [1] = m_object_as_arg (qm_of_mat4x4 (modelMatrix));
+		__args [2] = m_object_as_arg (qm_of_mat4x4 (projectionMatrix));
 	}, m_tuple_source_and_destination);
 
-	*(vector4_t *)eye = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_source_and_destination, "Item1"));
-	*(vector4_t *)dst = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_source_and_destination, "Item2"));
+	qm_to_vec4 (m_object_get_property (m_tuple_source_and_destination, "Item1"), eye);
+	qm_to_vec4 (m_object_get_property (m_tuple_source_and_destination, "Item2"), dst);
 #endif
 }
 
