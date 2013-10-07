@@ -84,11 +84,10 @@ module Weapons =
 
         // gun angles from bobbing
         let angles =
-            Vector3 (
-                angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f), // PITCH
-                angles.Y + (scale * cg.BobFractionSin * 0.01f), // YAW
-                angles.Z + (scale * cg.BobFractionSin * 0.005f) // ROLL
-            )
+            Vector3.create
+                (angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f)) // PITCH
+                (angles.Y + (scale * cg.BobFractionSin * 0.01f)) // YAW
+                (angles.Z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
 
         let deltaTime = cg.Time - cg.LandTime
         
@@ -105,17 +104,10 @@ module Weapons =
         let scale = cg.XYSpeed + 40.f
         let fractionSin = sin <| single cg.Time * 0.001f
         let angles =
-            Vector3 (
-                angles.X + (scale * fractionSin * 0.01f), // PITCH
-                angles.Y + (scale * fractionSin * 0.01f), // YAW
-                angles.Z + (scale * fractionSin * 0.01f) // ROLL
-            )
+            Vector3.create
+                (angles.X + (scale * fractionSin * 0.01f)), // PITCH
+                (angles.Y + (scale * fractionSin * 0.01f)), // YAW
+                (angles.Z + (scale * fractionSin * 0.01f)) // ROLL
 
-        let origin =
-            Vector3 (
-                origin.X,
-                origin.Y,
-                originZ
-            )
-        (origin, angles)
+        ({ origin with Z = originZ }, angles)
 

@@ -34,12 +34,11 @@ module Main =
     let flipMatrix =
         // convert from our coordinate system (looking down X)
         // to OpenGL's coordinate system (looking down -Z)
-        Matrix16 (
-            0.f, 0.f, -1.f, 0.f,
-            -1.f, 0.f, 0.f, 0.f,
-            0.f, 1.f, 0.f, 0.f,
-            0.f, 0.f, 0.f, 1.f
-        )
+        Matrix4x4.create
+            0.f 0.f -1.f 0.f
+           -1.f 0.f  0.f 0.f
+            0.f 1.f  0.f 0.f
+            0.f 0.f  0.f 1.f
 
     [<Literal>]
     let private TransformSize = 8
@@ -56,7 +55,7 @@ module Main =
 
         // transform into world space
         let inline transform i =
-            let v = Vector3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
+            let v = Vector3.create bounds.[i &&& 1].X bounds.[(i >>> 1) &&& 1].Y bounds.[(i >>> 2) &&& 1].Z
 
             orientation.Origin
             |> Vector3.multiplyAdd v.X orientation.Axis.[0]
@@ -132,7 +131,7 @@ module Main =
     [<Pure>]
     let localPointToWorld (local: Vector3) (orientation: OrientationR) =
         let inline f i = Vector3.dotProduct local orientation.Axis.[i] + orientation.Origin.[i]
-        Vector3 (f 0, f 1, f 2)
+        Vector3.create (f 0) (f 1) (f 2)
 
     /// <summary>
     /// Based on Q3: R_LocalNormalToWorld
@@ -141,7 +140,7 @@ module Main =
     [<Pure>]
     let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
         let inline f i = Vector3.dotProduct local orientation.Axis.[i]
-        Vector3 (f 0, f 1, f 2)
+        Vector3.create (f 0) (f 1) (f 2)
 
     /// <summary>
     /// Based on Q3: R_WorldToLocal
@@ -150,7 +149,7 @@ module Main =
     [<Pure>]
     let worldToLocal (world: Vector3) (orientation: OrientationR) =
         let inline f i = Vector3.dotProduct world orientation.Axis.[i]
-        Vector3 (f 0, f 1, f 2)
+        Vector3.create (f 0) (f 1) (f 2)
 
     /// <summary>
     /// Based on Q3: R_CullLocalPointAndRadius
@@ -166,7 +165,7 @@ module Main =
     /// TransformModelToClip
     /// </summary>
     [<Pure>]
-    let transformModelToClip (source: Vector3) (modelMatrix: Matrix16) (projectionMatrix: Matrix16) =
+    let transformModelToClip (source: Vector3) (modelMatrix: Matrix4x4) (projectionMatrix: Matrix4x4) =
         let inline calculateEye i =
             (source.X * modelMatrix.[0, i]) +
             (source.Y * modelMatrix.[1, i]) +
@@ -174,12 +173,11 @@ module Main =
             (1.f * modelMatrix.[3, i])
           
         let eye =
-            Vector4 (
-                calculateEye 0,
-                calculateEye 1,
-                calculateEye 2,
-                calculateEye 3
-            )
+            Vector4.create
+                (calculateEye 0)
+                (calculateEye 1)
+                (calculateEye 2)
+                (calculateEye 3)
 
         let inline calculateDestination i =
             (eye.X * projectionMatrix.[0, i]) +
@@ -188,12 +186,11 @@ module Main =
             (eye.W * projectionMatrix.[3, i])
 
         (eye,
-            Vector4 (
-                calculateDestination 0,
-                calculateDestination 1,
-                calculateDestination 2,
-                calculateDestination 3
-            )
+            Vector4.create
+                (calculateDestination 0)
+                (calculateDestination 1)
+                (calculateDestination 2)
+                (calculateDestination 3)
         )
     
     /// <summary>
@@ -203,25 +200,23 @@ module Main =
     [<Pure>]
     let transformClipToWindow (clip: Vector4) (view: ViewParms) =
         let normalized =
-            Vector4 (
-                clip.X / clip.W,
-                clip.Y / clip.W,
-                (clip.Z + clip.W) / (2.f * clip.W),
+            Vector4.create
+                (clip.X / clip.W)
+                (clip.Y / clip.W)
+                ((clip.Z + clip.W) / (2.f * clip.W))
                 0.f
-            )
 
         let window =
-            Vector4 (
-                truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f),
-                truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f),
-                normalized.Z,
+            Vector4.create
+                (truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f))
+                (truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f))
+                normalized.Z
                 0.f
-            )
 
         (normalized, window)
 
     // TODO: This will need to go away eventually.
-    let myGLMultMatrix (a: Matrix16) (b: Matrix16) =
+    let myGLMultMatrix (a: Matrix4x4) (b: Matrix4x4) =
         a * b
 
     /// <summary>
@@ -239,24 +234,23 @@ module Main =
         | _ ->
 
         let glMatrix =
-            Matrix16 (
-                entity.Axis.[0].[0],
-                entity.Axis.[0].[1],
-                entity.Axis.[0].[2],
-                0.f,
-                entity.Axis.[1].[0],
-                entity.Axis.[1].[1],
-                entity.Axis.[1].[2],
-                0.f,
-                entity.Axis.[2].[0],
-                entity.Axis.[2].[1],
-                entity.Axis.[2].[2],
-                0.f,
-                entity.Origin.X,
-                entity.Origin.Y,
-                entity.Origin.Z,
+            Matrix4x4.create
+                entity.Axis.[0].[0]
+                entity.Axis.[0].[1]
+                entity.Axis.[0].[2]
+                0.f
+                entity.Axis.[1].[0]
+                entity.Axis.[1].[1]
+                entity.Axis.[1].[2]
+                0.f
+                entity.Axis.[2].[0]
+                entity.Axis.[2].[1]
+                entity.Axis.[2].[2]
+                0.f
+                entity.Origin.X
+                entity.Origin.Y
+                entity.Origin.Z
                 1.f
-            )
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
@@ -275,12 +269,12 @@ module Main =
 
         let inline calculateOrigin i = (Vector3.dotProduct delta entity.Axis.[i]) * axisLength
 
-        OrientationR (
-            entity.Origin,
-            entity.Axis,
-            Vector3 (calculateOrigin 0, calculateOrigin 1, calculateOrigin 2),
-            glMatrix * viewParms.World.ModelMatrix
-        )
+        {
+            Origin = entity.Origin;
+            Axis = entity.Axis;
+            ViewOrigin = Vector3.create (calculateOrigin 0) (calculateOrigin 1) (calculateOrigin 2);
+            ModelMatrix = glMatrix * viewParms.World.ModelMatrix;
+        }
 
     /// <summary>
     /// Based on Q3: R_RotateForViewer
@@ -295,33 +289,32 @@ module Main =
         let axis = viewParms.Orientation.Axis
 
         let viewerMatrix =
-            Matrix16 (
-                axis.[0].[0],
-                axis.[1].[0],
-                axis.[2].[0],
-                0.f,
-                axis.[0].[1],
-                axis.[1].[1],
-                axis.[2].[1],
-                0.f,
-                axis.[0].[2],
-                axis.[1].[2],
-                axis.[2].[2],
-                0.f,
-                (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2]),
-                (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2]),
-                (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2]),
+            Matrix4x4.create
+                axis.[0].[0]
+                axis.[1].[0]
+                axis.[2].[0]
+                0.f
+                axis.[0].[1]
+                axis.[1].[1]
+                axis.[2].[1]
+                0.f
+                axis.[0].[2]
+                axis.[1].[2]
+                axis.[2].[2]
+                0.f
+                (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2])
+                (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2])
+                (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2])
                 1.f
-            )
         
-        OrientationR (
-            Vector3.zero,
-            Axis (Vector3.unitX, Vector3.unitY, Vector3.unitZ),
-            origin,
+        {
+            Origin = Vector3.zero;
+            Axis = Axis.identity;
+            ViewOrigin = origin;
             // convert from our coordinate system (looking down X)
             // to OpenGL's coordinate system (looking down -Z)
-            viewerMatrix * flipMatrix
-        )
+            ModelMatrix = viewerMatrix * flipMatrix;
+        }
 
     /// <summary>
     /// Based on Q3: SetFarClip
@@ -345,7 +338,7 @@ module Main =
             let y = if (acc &&& 2) <> 0 then visibilityBounds.[0].[1] else visibilityBounds.[1].[1]
             let z = if (acc &&& 4) <> 0 then visibilityBounds.[0].[2] else visibilityBounds.[1].[2]
 
-            let v = Vector3 (x, y, z)
+            let v = Vector3.create x y z
             let possibleDistance = Vector3.lengthSquared <| v - orientation.Origin
 
             calculateFarthestCornerDistance (if possibleDistance > distance then possibleDistance else distance) (acc + 1)
@@ -372,12 +365,11 @@ module Main =
         let depth = zFar - zNear
 
         (
-            Matrix16 (
-                2.f * zNear / width, 0.f, 0.f, 0.f,
-                0.f, 2.f * zNear / height, 0.f, 0.f,
-                (xMax + xMin) / width, (yMax + yMin) / height, -(zFar + zNear) / depth, -1.f,
-                0.f, 0.f, -2.f * zFar * zNear / depth, 0.f
-            ),
+            Matrix4x4.create
+                (2.f * zNear / width) 0.f 0.f 0.f
+                0.f (2.f * zNear / height) 0.f 0.f
+                ((xMax + xMin) / width) ((yMax + yMin) / height) (-(zFar + zNear) / depth) -1.f
+                0.f 0.f (-2.f * zFar * zNear / depth) 0.f,
             zFar
         )
 
@@ -407,29 +399,33 @@ module Main =
 
         {
             Left =
-                Plane (
-                    leftNormal,
-                    Vector3.dotProduct view.Orientation.Origin leftNormal,
-                    PlaneType.NonAxial
-                );
+                {
+                    Normal = leftNormal;
+                    Distance = Vector3.dotProduct view.Orientation.Origin leftNormal;
+                    Type = PlaneType.NonAxial;
+                    SignBits = Plane.CalculateSignBits leftNormal;
+                };
             Right = 
-                Plane (
-                    rightNormal,
-                    Vector3.dotProduct view.Orientation.Origin rightNormal,
-                    PlaneType.NonAxial
-                );
+                {
+                    Normal = rightNormal;
+                    Distance = Vector3.dotProduct view.Orientation.Origin rightNormal;
+                    Type = PlaneType.NonAxial;
+                    SignBits = Plane.CalculateSignBits rightNormal;
+                };
             Bottom =
-                Plane (
-                    bottomNormal,
-                    Vector3.dotProduct view.Orientation.Origin bottomNormal,
-                    PlaneType.NonAxial
-                );
+                {
+                    Normal = bottomNormal;
+                    Distance = Vector3.dotProduct view.Orientation.Origin bottomNormal;
+                    Type = PlaneType.NonAxial;
+                    SignBits = Plane.CalculateSignBits bottomNormal;
+                };
             Top =
-                Plane (
-                    topNormal,
-                    Vector3.dotProduct view.Orientation.Origin topNormal,
-                    PlaneType.NonAxial
-                );
+                {
+                    Normal = topNormal;
+                    Distance = Vector3.dotProduct view.Orientation.Origin topNormal;
+                    Type = PlaneType.NonAxial;
+                    SignBits = Plane.CalculateSignBits topNormal;
+                }
         }
 
     /// <summary>
@@ -468,21 +464,21 @@ module Main =
             let v3 = vertices.[indices.[2]]
             let plane4 = Plane.ofPoints v1.Vertex v2.Vertex v3.Vertex
 
-            Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
+            { plane4 with Type = plane.Type; SignBits = plane.SignBits }
         | Poly (value) ->
             let vertices = value.Vertices
             let plane4 = Plane.ofPoints vertices.[0].Vertex vertices.[1].Vertex vertices.[2].Vertex
 
-            Plane (plane4.Normal, plane4.Distance, plane.Type, plane.SignBits)
+            { plane4 with Type = plane.Type; SignBits = plane.SignBits }
         | _ ->
-            Plane (Vector3 (1.f, 0.f, 0.f), 0.f, PlaneType.X, 0uy)
+            { Normal = Vector3.create 1.f 0.f 0.f; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
 
     /// <summary>
     /// create plane axis for the portal we are seeing
     /// </summary>
     [<Pure>]
     let createPlaneAxis (drawSurface: DrawSurface) =
-        planeForSurface drawSurface.Surface Plane.zero
+        planeForSurface drawSurface.Surface Unchecked.defaultof<Plane>
 
     /// <summary>
     /// rotate the plane if necessary
@@ -510,8 +506,8 @@ module Main =
         let originalDistance = originalPlane.Distance + Vector3.dotProduct originalPlane.Normal orientation.Origin
 
         (
-            Plane.updateDistance originalDistance originalPlane,
-            Plane (normal, distance, PlaneType.X, 0uy),
+            { originalPlane with Distance = originalDistance },
+            { Normal = normal; Distance = distance; Type = PlaneType.X; SignBits = 0uy },
             { tr with Orientation = orientation }
         )
 

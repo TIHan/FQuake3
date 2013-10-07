@@ -29,48 +29,4 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "renderer\tr_local.h"
 
-MObject
-qm_map_orientation (orientation_t* orientation);
-
-MObject
-qm_map_orientationr (orientationr_t* orientation);
-
-MObject
-qm_map_plane (cplane_t* plane);
-
-MObject
-qm_map_view_parms (viewParms_t* view_parms);
-
-MObject
-qm_map_ref_entity (const refEntity_t* ref_entity);
-
-MObject
-qm_map_tr_ref_entity (trRefEntity_t* tr_ref_entity);
-
-MObject
-qm_map_surface (surfaceType_t* surfaceType);
-
-MObject
-qm_map_frustum (cplane_t* frustum);
-
-MObject
-qm_map_draw_surf (drawSurf_t* draw_surf);
-
-MObject
-qm_map_tr_globals (trGlobals_t* tr_globals);
-
-/*
-=================
-=================
-*/
-
-void
-qm_frustum_map (MObject obj, cplane_t* frustum);
-
-void
-qm_view_parms_map (MObject obj, viewParms_t* view_parms);
-
-void
-qm_tr_globals_map (MObject obj, trGlobals_t* tr_globals);
-
 #endif /* __QM_RENDERER_H__ */

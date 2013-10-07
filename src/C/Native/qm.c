@@ -30,5 +30,5 @@ static const gchar* Assembly = "Engine";
 static const gchar* Namespace = "Engine.Native";
 
 define_mapping (qboolean, qboolean*, "bool");
-define_mapping (vec3, vec3_t, "Vec3");
+define_mapping (vec3, vec3_t, "Vector3");
 define_mapping (cvar, cvar_t*, "Cvar");

@@ -68,11 +68,8 @@ type PlaneType =
 /// <summary>
 /// Axis
 /// </summary>
-[<Struct>]
 type Axis =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
+    { X: Vector3; Y: Vector3; Z: Vector3 }
 
     member inline this.Item
         with get (i) =
@@ -82,28 +79,16 @@ type Axis =
             | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (x, y, z) =
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Axis =
-    let zero = Axis ()
-    let inline create x y z = Axis (x, y, z)
+    let zero = { X = Vector3.zero; Y = Vector3.zero; Z = Vector3.zero }
+    let identity = { X = Vector3.unitX; Y = Vector3.unitY; Z = Vector3.unitZ }
 
 /// <summary>
 /// Rgba
 /// </summary>
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
-    val R : byte
-    val G : byte
-    val B : byte
-    val A : byte
+    { R: byte; G: byte; B: byte; A: byte }
 
     member inline this.Item
         with get (i) =
@@ -114,28 +99,12 @@ type Rgba =
             | 3 -> this.A
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (r, g, b, a) =
-        {
-            R = r;
-            G = g;
-            B = b;
-            A = a;
-        }
-
 /// <summary>
 /// Based on Q3: orientation_t
 /// Orientation
 /// </summary>
-[<Struct>]
 type Orientation =
-    val Origin : Vector3
-    val Axis : Axis
-
-    new (origin, axis) =
-        {
-            Origin = origin;
-            Axis = axis;
-        }
+    { Origin: Vector3; Axis: Axis }
 
 /// <summary>
 /// Based on Q3: orientationr_t
@@ -143,40 +112,45 @@ type Orientation =
 ///
 /// Note: Should this be a record type? It is over 64 bytes, don't know for sure.
 /// </summary>
-[<Struct>]
 type OrientationR =
-    val Origin : Vector3        // in world coordinates
-    val Axis : Axis             // orientation in world
-    val ViewOrigin : Vector3    // viewParms->or.origin in local coordinates // FIXME: This directly points to viewParms orientation origin? Yuck.
-    val ModelMatrix : Matrix16
+    {
+        /// <summary>
+        /// in world coordinates
+        /// </summary>
+        Origin: Vector3;
 
-    new (origin, axis, viewOrigin, modelMatrix) =
-        {
-            Origin = origin;
-            Axis = axis;
-            ViewOrigin = viewOrigin;
-            ModelMatrix = modelMatrix;
-        }
+        /// <summary>
+        /// orientation in world
+        /// </summary>
+        Axis : Axis;
+
+        /// <summary>
+        /// viewParms->or.origin in local coordinates
+        /// FIXME: This directly points to viewParms orientation origin? Yuck.
+        /// </summary>
+        ViewOrigin: Vector3;
+        ModelMatrix: Matrix4x4;
+    }
 
 /// <summary>
 /// Based on Q3: cplane_t
 /// Plane
 /// </summary>
-[<Struct>]
-[<StructLayout (LayoutKind.Explicit, Size = 20)>]
 type Plane =
-    [<FieldOffset (0)>]
-    val Normal : Vector3
+    {
+        Normal: Vector3;
+        Distance: single;
 
-    [<FieldOffset (12)>]
-    val Distance : single
+        /// <summary>
+        /// for fast side tests: 0,1,2 = axial, 3 = nonaxial
+        /// </summary>
+        Type: PlaneType;
 
-    [<FieldOffset (16)>]
-    [<MarshalAs (UnmanagedType.I8)>]
-    val Type : PlaneType    // for fast side tests: 0,1,2 = axial, 3 = nonaxial
-
-    [<FieldOffset (17)>]
-    val SignBits : byte     // signx + (signy<<1) + (signz<<2), used as lookup during collision
+        /// <summary>
+        /// signx + (signy<<1) + (signz<<2), used as lookup during collision
+        /// </summary>
+        SignBits: byte;
+    }
 
     /// <summary>
     /// Based on Q3: SetPlaneSignBits
@@ -191,26 +165,8 @@ type Plane =
 
         calculatePlaneSignBits 0uy 0
 
-    new (normal, distance, type', signBits) =
-        {
-            Normal = normal;
-            Distance = distance;
-            Type = type';
-            SignBits = signBits;
-        }
-
-    new (normal, distance, type') =
-        {
-            Normal = normal;
-            Distance = distance;
-            Type = type';
-            SignBits = Plane.CalculateSignBits normal;
-        }
-
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plane =
-    let zero = Plane ()
-
     let calculateSignBits (plane: Plane) =
         Plane.CalculateSignBits plane.Normal
 
@@ -227,33 +183,21 @@ module Plane =
         let normal = Vector3.normalize cross
         
         match Vector3.length cross with
-        | 0.f -> Plane (normal, 0.f, PlaneType.X, 0uy)
-        | _ -> Plane (normal, Vector3.dotProduct a normal, PlaneType.X, 0uy)
-
-    let inline updateDistance distance (plane: Plane) =
-        Plane (plane.Normal, distance, plane.Type, plane.SignBits);
+        | 0.f -> { Normal = normal; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
+        | _ -> { Normal = normal; Distance = Vector3.dotProduct a normal; Type = PlaneType.X; SignBits = 0uy }
 
 /// <summary>
 /// Bounds
 /// </summary>
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Bounds =
-    val Bound0 : Vector3
-    val Bound1 : Vector3     
+    { Bounds0: Vector3; Bounds1: Vector3 }   
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Bound0
-            | 1 -> this.Bound1
+            | 0 -> this.Bounds0
+            | 1 -> this.Bounds1
             | _ -> raise <| IndexOutOfRangeException ()
-
-    new (bound0, bound1) =
-        {
-            Bound0 = bound0;
-            Bound1 = bound1;
-        }
 
 /// <summary>
 /// Frustum
@@ -302,7 +246,7 @@ type ViewParms =
         ViewportHeight: int;
         FovX: single;
         FovY: single;
-        ProjectionMatrix: Matrix16;
+        ProjectionMatrix: Matrix4x4;
         Frustum: Frustum;
         VisibilityBounds: Bounds;
         ZFar: single;
@@ -374,72 +318,56 @@ type TrRefEntity =
 /// Based on Q3: dlight_t
 /// Dlight
 /// </summary>
-[<Struct>]
 type Dlight =
-    val Origin : Vector3
-    val Color : Vector3         // range from 0.0 to 1.0, should be color normalized
-    val Radius : single
-    val Transformed : Vector3   // origin in local coordinate system
-    val Additive : int          // texture detail is lost tho when the lightmap is dark
+    {
+        Origin: Vector3;
 
-    new (origin, color, radius, transformed, additive) =
-        {
-            Origin = origin;
-            Color = color;
-            Radius = radius;
-            Transformed = transformed;
-            Additive = additive;
-        }
+        /// <summary>
+        /// range from 0.0 to 1.0, should be color normalized
+        /// </summary>
+        Color: Vector3;
+        Radius: single;
+
+        /// <summary>
+        /// origin in local coordinate system
+        /// </summary>
+        Transformed: Vector3;
+
+        /// <summary>
+        /// texture detail is lost tho when the lightmap is dark
+        /// </summary>
+        Additive: int;
+    }
 
 /// <summary>
 /// Based on Q3: drawVert_t
 /// DrawVertex
 /// </summary>
-[<Struct>]
 type DrawVertex =
-    val Vertex : Vector3
-    val St1 : single
-    val St2 : single
-    val LightMap1 : single
-    val LightMap2 : single
-    val Normal : Vector3
-    val Color : Rgba
-
-    new (vertex, st1, st2, lightMap1, lightMap2, normal, color) =
-        {
-            Vertex = vertex;
-            St1 = st1;
-            St2 = st2;
-            LightMap1 = lightMap1;
-            LightMap2 = lightMap2;
-            Normal = normal;
-            Color = color;
-        }
+    {
+        Vertex: Vector3;
+        St0: single;
+        St1: single;
+        Lightmap0: single;
+        Lightmap1: single;
+        Normal: Vector3;
+        Color: Rgba;
+    }
 
 /// <summary>
 /// Based on Q3: polyVert_t
 /// PolyVertex
 /// </summary>
-[<Struct>]
 type PolyVertex =
-    val Vertex : Vector3
-    val St1 : single;
-    val St2 : single;
-    val Modulate1 : byte;
-    val Modulate2 : byte;
-    val Modulate3 : byte;
-    val Modulate4 : byte;
-
-    new (vertex, st1, st2, modulate1, modulate2, modulate3, modulate4) =
-        {
-            Vertex = vertex;
-            St1 = st1;
-            St2 = st2;
-            Modulate1 = modulate1;
-            Modulate2 = modulate2;
-            Modulate3 = modulate3;
-            Modulate4 = modulate4;
-        }
+    {
+        Vertex: Vector3;
+        St0: single;
+        St1: single;
+        Modulate0: byte;
+        Modulate1: byte;
+        Modulate2: byte;
+        Modulate3: byte;
+    }
 
 /// <summary>
 /// Based on Q3: srfPoly_t
@@ -448,110 +376,74 @@ type PolyVertex =
 /// when cgame directly specifies a polygon, it becomes a srfPoly_t
 /// as soon as it is called
 /// </summary>
-[<Struct>]
 type SurfacePoly =
-    val ShaderHandle : int
-    val FogIndex : int
-    val Vertices : PolyVertex list
-
-    new (shaderHandle, fogIndex, vertices) =
-        {
-            ShaderHandle = shaderHandle;
-            FogIndex = fogIndex;
-            Vertices = vertices;
-        }
+    {
+        ShaderHandle: int;
+        FogIndex: int;
+        Vertices: PolyVertex list;
+    }
 
 /// <summary>
 /// Based on Q3: srfDisplayList_t
 /// SurfaceDisplayList
 /// </summary>
-[<Struct>]
 type SurfaceDisplayList =
-    val ListId : int
-
-    new (listId) =
-        {
-            ListId = listId;
-        }
+    { ListId: int }
 
 /// <summary>
 /// Based on Q3: srfFlare_t
 /// SurfaceFlare
 /// </summary>
-[<Struct>]
 type SurfaceFlare =
-    val Origin : Vector3
-    val Normal : Vector3
-    val Color : Vector3
-
-    new (origin, normal, color) =
-        {
-            Origin = origin;
-            Normal = normal;
-            Color = color;
-        }
+    { Origin: Vector3; Normal: Vector3; Color: Vector3 }
 
 /// <summary>
 /// Based on Q3: srfGridMesh_t
 /// SurfaceGridMesh
 /// </summary>
-[<Struct>]
 type SurfaceGridMesh =
-    val DlightBit1 : int
-    val DlightBit2 : int
+    {
+        DlightBit0: int;
+        DlightBit1: int;
 
-    // culling information
-    val MeshBounds : Bounds
-    val LocalOrigin : Vector3
-    val MeshRadius : single
+        // culling information
+        MeshBounds: Bounds;
+        LocalOrigin: Vector3;
+        MeshRadius: single;
 
-    // lod information, which may be different
-    // than the culling information to allow for
-    // groups of curves that LOD as a unit
-    val LodOrigin : Vector3
-    val LodRadius : single
-    val LodFixed : int
-    val LodStitched : int
+        // lod information, which may be different
+        // than the culling information to allow for
+        // groups of curves that LOD as a unit
+        LodOrigin: Vector3;
+        LodRadius: single;
+        LodFixed: int;
+        LodStitched: int;
 
-    val Width : int
-    val Height : int
-    val WidthLodError : single list
-    val HeightLodError : single list
-    val Vertex : DrawVertex         // variable sized
+        Width: int;
+        Height: int;
+        WidthLodError: single list;
+        HeightLodError: single list;
 
-    new (dlightBit1, dlightBit2, meshBounds, localOrigin, meshRadius, lodOrigin, lodRadius, lodFixed, lodStitched, width, height, widthLodError, heightLodError, vertex) =
-        {
-            DlightBit1 = dlightBit1;
-            DlightBit2 = dlightBit2;
-            MeshBounds = meshBounds;
-            LocalOrigin = localOrigin;
-            MeshRadius = meshRadius;
-            LodOrigin = lodOrigin;
-            LodRadius = lodRadius;
-            LodFixed = lodFixed;
-            LodStitched = lodStitched;
-            Width = width;
-            Height = height;
-            WidthLodError = widthLodError;
-            HeightLodError = heightLodError;
-            Vertex = vertex;
-        }
+        /// <summary>
+        /// variable sized
+        /// </summary>
+        Vertex: DrawVertex;
+    }
 
 /// <summary>
 /// FaceVertexPoints
-///
-/// Note: Should this be a struct?
 /// </summary>
-[<Struct>]
 type FaceVertexPoints =
-    val Vertex0 : single
-    val Vertex1 : single
-    val Vertex2 : single
-    val Vertex3 : single
-    val Vertex4 : single
-    val Vertex5 : single
-    val Vertex6 : single
-    val Vertex7 : single
+    {
+        Vertex0: single;
+        Vertex1: single;
+        Vertex2: single;
+        Vertex3: single;
+        Vertex4: single;
+        Vertex5: single;
+        Vertex6: single;
+        Vertex7: single;
+    }
 
     member inline this.Item
         with get (i) =
@@ -566,44 +458,26 @@ type FaceVertexPoints =
             | 7 -> this.Vertex7
             | _ -> raise <| IndexOutOfRangeException ()
 
-    new (vertex0, vertex1, vertex2, vertex3, vertex4, vertex5, vertex6, vertex7) =
-        {
-            Vertex0 = vertex0;
-            Vertex1 = vertex1;
-            Vertex2 = vertex2;
-            Vertex3 = vertex3;
-            Vertex4 = vertex4;
-            Vertex5 = vertex5;
-            Vertex6 = vertex6;
-            Vertex7 = vertex7;
-        }
-
 /// <summary>
 /// Based on Q3: srfSurfaceFace_t
 /// SurfaceFace
 /// </summary>
-[<Struct>]
 type SurfaceFace =
-    val Plane : Plane
-    val DlightBit1 : int
-    val DlightBit2 : int
+    {
+        Plane: Plane;
+        DlightBit0: int;
+        DlightBit1: int;
 
-    // triangle definitions (no normals at points)
-    val PointCount : int
-    val IndexCount : int
-    val OfsIndices : int
-    val Points : FaceVertexPoints   // variable sized; // there is a variable length list of indices here also
+        // triangle definitions (no normals at points)
+        PointCount: int;
+        IndexCount: int;
+        OffsetIndices: int;
 
-    new (plane, dlightBit1, dlightBit2, pointCount, indexCount, ofsIndices, points) =
-        {
-            Plane = plane;
-            DlightBit1 = dlightBit1;
-            DlightBit2 = dlightBit2;
-            PointCount = pointCount;
-            IndexCount = indexCount;
-            OfsIndices = ofsIndices;
-            Points = points;
-        }
+        /// <summary>
+        /// // variable sized; // there is a variable length list of indices here also
+        /// </summary>
+        Points: FaceVertexPoints;
+    }
 
 /// <summary>
 /// Based on Q3: srfTriangles_t
@@ -611,30 +485,20 @@ type SurfaceFace =
 ///
 /// // misc_models in maps are turned into direct geometry by q3map
 /// </summary>
-[<Struct>]
 type SurfaceTriangles =
-    val DlightBit1 : int
-    val DlightBit2 : int
+    {
+        DlightBit0: int;
+        DlightBit1: int;
 
-    // culling information (FIXME: use this!)
-    val Bounds : Bounds
-    val LocalOrigin : Vector3
-    val Radius : single
+        // culling information (FIXME: use this!)
+        Bounds: Bounds;
+        LocalOrigin: Vector3;
+        Radius: single;
 
-    // triangle definitions
-    val Indices : int list
-    val Vertices : DrawVertex list
-
-    new (dlightBit1, dlightBit2, bounds, localOrigin, radius, indices, vertices) =
-        {
-            DlightBit1 = dlightBit1;
-            DlightBit2 = dlightBit2;
-            Bounds = bounds;
-            LocalOrigin = localOrigin;
-            Radius = radius;
-            Indices = indices;
-            Vertices = vertices;
-        }
+        // triangle definitions
+        Indices: int list;
+        Vertices: DrawVertex list;
+    }
 
 /// <summary>
 /// Based on Q3: surfaceType_t
@@ -881,10 +745,8 @@ type TextureCoordinateType =
 /// <summary>
 /// TextureCoordinateVectors
 /// </summary>
-[<Struct>]
 type TextureCoordinateVectors =
-    val X : Vector3
-    val Y : Vector3
+    { X: Vector3; Y: Vector3 }
 
     member inline this.Item
         with get (i) =
@@ -892,12 +754,6 @@ type TextureCoordinateVectors =
             | 0 -> this.X
             | 1 -> this.Y
             | _ -> raise <| IndexOutOfRangeException ()
-
-    new (x, y) =
-        {
-            X = x;
-            Y = y;
-        }
 
 /// <summary>
 /// Based on Q3: texMod_t
@@ -925,7 +781,7 @@ type TextureModification =
         Wave: WaveForm;
 
         // used for TMOD_TRANSFORM
-        Matrix: Matrix4;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
+        Matrix: Matrix2x2;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
         Translate: Vector2;     // t' = s * m[0][1] + t * m[0][1] + trans[1]
 
         // used for TMOD_SCALE
@@ -1141,26 +997,16 @@ type Fog =
         Surface: Vector4;
     }
 
-[<Struct>]
 type LightGridBounds =
-    val Bound0 : int
-    val Bound1 : int
-    val Bound2 : int
+    { Bounds0: int; Bounds1: int; Bounds2: int }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Bound0
-            | 1 -> this.Bound1
-            | 2 -> this.Bound2
+            | 0 -> this.Bounds0
+            | 1 -> this.Bounds1
+            | 2 -> this.Bounds2
             | _ -> raise <| IndexOutOfRangeException ()
-
-    new (bound0, bound1, bound2) =
-        {
-            Bound0 = bound0;
-            Bound1 = bound1;
-            Bound2 = bound2;
-        }
 
 /// <summary>
 /// Based on Q3: world_t
@@ -1198,41 +1044,67 @@ type World =
 /// Based on Q3: md3Header_t
 /// Md3Header
 /// </summary>
-[<Struct>]
 type Md3Header =
-    val Id : int
-    val Version : int
-    val Name : string       // model name
-    val Flags : int
-    val FrameCount : int
-    val TagCount : int
-    val SurfaceCount : int
-    val SkinCount : int
-    val FrameOffset : int   // first surface
-    val TagOffset : int     // numFrames * numTags
-    val SurfaceOffset : int // first surface, others follow
-    val EndOffset : int     // end of file
+    {
+        Id: int;
+        Version: int;
+
+        /// <summary>
+        /// model name
+        /// </summary>
+        Name: string;
+        Flags: int;
+        FrameCount: int;
+        TagCount: int;
+        SurfaceCount: int;
+        SkinCount: int;
+
+        /// <summary>
+        /// first surface
+        /// </summary>
+        FrameOffset: int;
+
+        /// <summary>
+        /// numFrames * numTags
+        /// </summary>
+        TagOffset: int;
+
+        /// <summary>
+        /// first surface, others follow
+        /// </summary>
+        SurfaceOffset: int;
+
+        /// <summary>
+        /// end of file
+        /// </summary>
+        EndOffset: int;
+    }
 
 /// <summary>
 /// Based on Q3: md4Header_t
 /// M43Header
 /// </summary>
-[<Struct>]
 type Md4Header =
-    val Id : int
-    val Version : int
-    val Name : string           // model name
+    {
+        Id: int;
+        Version: int;
 
-    // frames and bones are shared by all levels of detail
-    val FrameCount : int
-    val BoneCount : int
-    val BoneNameOffset : int    // char name[ MAX_QPATH ]   
-    val FrameOffset : int       // md4Frame_t[numFrames]
+        /// <summary>
+        /// model name
+        /// </summary>
+        Name: string;
 
-    // each level of detail has completely separate sets of surfaces
-    val LodCount : int
-    val LodOffset : int
-    val EndOffset : int         // end of file
+        // frames and bones are shared by all levels of detail
+        Framecount: int;
+        BoneCount: int;
+        BoneNameOffset: int;    // char name[ MAX_QPATH ] 
+        FrameOffset: int;       // md4Frame_t[numFrames]
+
+        // each level of detail has completely separate sets of surfaces
+        LodCount: int;
+        LodOffset: int;
+        EndOffset: int;         // end of file
+    }
 
 /// <summary>
 /// Based on Q3: modtype_t

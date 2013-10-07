@@ -53,7 +53,7 @@ Returns CULL_IN, CULL_CLIP, or CULL_OUT
 */
 int R_CullLocalBox (vec3_t bounds[2])
 {
-#if 0
+#if 1
 	int		i, j;
 	vec3_t	transformed[8];
 	float	dists[8];
@@ -126,7 +126,7 @@ int R_CullLocalBox (vec3_t bounds[2])
 */
 int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 {
-#if 0
+#if 1
 	vec3_t transformed;
 
 	R_LocalPointToWorld( pt, transformed );
@@ -152,7 +152,7 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 */
 int R_CullPointAndRadius( vec3_t pt, float radius )
 {
-#if 0
+#if 1
 	int		i;
 	float	dist;
 	cplane_t	*frust;
@@ -206,7 +206,7 @@ R_LocalNormalToWorld
 =================
 */
 void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
-#if 0
+#if 1
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
@@ -230,7 +230,7 @@ R_LocalPointToWorld
 */
 void R_LocalPointToWorld (vec3_t local, vec3_t world)
 {
-#if 0
+#if 1
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
@@ -254,7 +254,7 @@ R_WorldToLocal
 */
 void R_WorldToLocal (vec3_t world, vec3_t local)
 {
-#if 0
+#if 1
 	local[0] = DotProduct(world, tr.or.axis[0]);
 	local[1] = DotProduct(world, tr.or.axis[1]);
 	local[2] = DotProduct(world, tr.or.axis[2]);
@@ -278,7 +278,7 @@ R_TransformModelToClip
 */
 void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
 							vec4_t eye, vec4_t dst ) {
-#if 0
+#if 1
 	int i;
 
 	for ( i = 0 ; i < 4 ; i++ ) {
@@ -317,7 +317,7 @@ R_TransformClipToWindow
 ==========================
 */
 void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window ) {
-#if 0
+#if 1
 	normalized[0] = clip[0] / clip[3];
 	normalized[1] = clip[1] / clip[3];
 	normalized[2] = ( clip[2] + clip[3] ) / ( 2 * clip[3] );
@@ -349,7 +349,7 @@ myGlMultMatrix
 ==========================
 */
 void myGlMultMatrix( const gfloat *a, const gfloat *b, gfloat *out ) {
-#if 0
+#if 1
 	int		i, j;
 
 	for ( i = 0 ; i < 4 ; i++ ) {
@@ -384,7 +384,7 @@ Called by both the front end and the back end
 */
 void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 					   orientationr_t *or ) {
-#if 0
+#if 1
 	float	glMatrix[16];
 	vec3_t	delta;
 	float	axisLength;
@@ -461,7 +461,7 @@ Sets up the modelview matrix for a given viewParm
 =================
 */
 void R_RotateForViewer (void) {
-#if 0
+#if 1
 	float	viewerMatrix[16];
 	vec3_t	origin;
 
@@ -509,7 +509,7 @@ void R_RotateForViewer (void) {
 	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox_struct (m_or);
 #endif
 }
-#if 0
+#if 1
 /*
 ** SetFarClip
 */
@@ -581,7 +581,7 @@ R_SetupProjection
 ===============
 */
 void R_SetupProjection( void ) {
-#if 0
+#if 1
 	float	xmin, xmax, ymin, ymax;
 	float	width, height, depth;
 	float	zNear, zFar;
@@ -648,7 +648,7 @@ Setup that culling frustum planes for the current view
 =================
 */
 void R_SetupFrustum( void ) {
-#if 0
+#if 1
 	int		i;
 	float	xs, xc;
 	float	ang;
@@ -696,7 +696,7 @@ R_MirrorPoint
 =================
 */
 void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
-#if 0
+#if 1
 	int		i;
 	vec3_t	local;
 	vec3_t	transformed;
@@ -725,7 +725,7 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
 }
 
 void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
-#if 0
+#if 1
 	int		i;
 	float	d;
 
@@ -754,7 +754,7 @@ R_PlaneForSurface
 =============
 */
 void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
-#if 0
+#if 1
 	srfTriangles_t	*tri;
 	srfPoly_t		*poly;
 	drawVert_t		*v1, *v2, *v3;
@@ -816,7 +816,7 @@ be moving and rotating.
 Returns qtrue if it should be mirrored
 =================
 */
-#if 0
+#if 1
 qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
 							 orientation_t *surface, orientation_t *camera,
 							 vec3_t pvsOrigin, qboolean *mirror ) {
@@ -1063,7 +1063,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	return qfalse;
 }
 #endif
-#if 0
+#if 1
 static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
 	int			i;
