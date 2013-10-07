@@ -27,6 +27,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __QM_RENDERER_H__
 #define __QM_RENDERER_H__
 
+#include "qm.h"
 #include "renderer\tr_local.h"
+
+define_mapping_prototype (orientationr, orientationr_t*);
+define_mapping_prototype (frustum, cplane_t*);
+define_mapping_prototype (bounds, vec3_t*);
 
 #endif /* __QM_RENDERER_H__ */

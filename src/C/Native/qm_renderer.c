@@ -25,3 +25,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //	gets converted to F#. It is only intended as interop helpers.
 
 #include "qm_renderer.h"
+
+define_mapping_assembly ("Engine.Renderer");
+define_mapping_namesapce ("Engine.Renderer.Native");
+
+define_mapping (orientationr, orientationr_t*, "OrientationR");
+define_mapping (frustum, cplane_t*, "Frustum");
+define_mapping (bounds, vec3_t*, "Bounds");

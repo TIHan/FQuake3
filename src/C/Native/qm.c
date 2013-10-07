@@ -26,8 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qm.h"
 
-static const gchar* Assembly = "Engine";
-static const gchar* Namespace = "Engine.Native";
+define_mapping_assembly ("Engine");
+define_mapping_namesapce ("Engine.Native");
 
 define_mapping (qboolean, qboolean*, "bool");
 define_mapping (vec3, vec3_t, "Vector3");

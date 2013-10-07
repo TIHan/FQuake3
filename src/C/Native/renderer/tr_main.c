@@ -53,7 +53,7 @@ Returns CULL_IN, CULL_CLIP, or CULL_OUT
 */
 int R_CullLocalBox (vec3_t bounds[2])
 {
-#if 1
+#if 0
 	int		i, j;
 	vec3_t	transformed[8];
 	float	dists[8];
@@ -111,9 +111,9 @@ int R_CullLocalBox (vec3_t bounds[2])
 	MObject m_clip_type;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalBox", 4, {
-		__args [0] = bounds;
-		__args [1] = m_object_as_arg (qm_map_orientationr (&tr.or));
-		__args [2] = m_object_as_arg (qm_map_frustum (&tr.viewParms.frustum));
+		__args [0] = m_object_as_arg (qm_of_bounds (bounds));
+		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
+		__args [2] = m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum));
 		__args [3] = m_object_as_arg (qm_of_cvar (r_nocull));
 	}, m_clip_type);
 

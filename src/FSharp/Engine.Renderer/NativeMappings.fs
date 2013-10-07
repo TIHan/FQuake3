@@ -123,12 +123,12 @@ module Plane =
         native
 
 module Frustum =
-    let inline ofNativePtr (nativePtr: nativeptr<cplane_t>) =
+    let inline ofNative (ptr: nativeptr<cplane_t>) =
         {
-            Left = Plane.ofNative <| NativePtr.get nativePtr 0;
-            Right = Plane.ofNative <| NativePtr.get nativePtr 1;
-            Bottom = Plane.ofNative <| NativePtr.get nativePtr 2;
-            Top = Plane.ofNative <| NativePtr.get nativePtr 3;
+            Left = Plane.ofNative <| NativePtr.get ptr 0;
+            Right = Plane.ofNative <| NativePtr.get ptr 1;
+            Bottom = Plane.ofNative <| NativePtr.get ptr 2;
+            Top = Plane.ofNative <| NativePtr.get ptr 3;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (frustum: Frustum) =
@@ -155,7 +155,7 @@ module ViewParms =
             FovX = native.fovX;
             FovY = native.fovY;
             ProjectionMatrix = Matrix4x4.ofNative &&native.projectionMatrix;
-            Frustum = Frustum.ofNativePtr &&native.frustum;
+            Frustum = Frustum.ofNative &&native.frustum;
             VisibilityBounds = Bounds.ofNative &&native.visBounds;
             ZFar = native.zFar;
         }
