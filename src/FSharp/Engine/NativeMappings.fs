@@ -144,13 +144,6 @@ module Cvar =
             Integer = native.integer;
         }
 
-    let inline toNativeByPtr (ptr: nativeptr<cvar_t>) (value: Cvar) =
-        let mutable native = NativePtr.read ptr
-
-        // TODO: Mapping.
-
-        NativePtr.write ptr native
-
 module ByteString =
     let inline ofNativePtr (size: int) (nativePtr: nativeptr<byte>) =
         ByteString.create <| NativePtr.toArray size nativePtr

@@ -384,7 +384,7 @@ Called by both the front end and the back end
 */
 void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 					   orientationr_t *or ) {
-#if 1
+#if 0
 	float	glMatrix[16];
 	vec3_t	delta;
 	float	axisLength;
@@ -445,11 +445,11 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 	MObject m_or;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForEntity", 2, {
-		__args [0] = m_object_as_arg (qm_map_view_parms (viewParms));
-		__args [1] = m_object_as_arg (qm_map_ref_entity (&ent->e));
+		__args [0] = m_object_as_arg (qm_of_view_parms (viewParms));
+		__args [1] = m_object_as_arg (qm_of_ref_entity (&ent->e));
 	}, m_or);
 
-	*or = *(orientationr_t *)m_object_unbox_struct (m_or);
+	qm_to_ptr_orientationr (m_or, or);
 #endif
 }
 
@@ -461,7 +461,7 @@ Sets up the modelview matrix for a given viewParm
 =================
 */
 void R_RotateForViewer (void) {
-#if 1
+#if 0
 	float	viewerMatrix[16];
 	vec3_t	origin;
 
@@ -503,13 +503,14 @@ void R_RotateForViewer (void) {
 	MObject m_or;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForViewer", 1, {
-		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
+		__args [0] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, m_or);
 
-	tr.viewParms.world = tr.or = *(orientationr_t *)m_object_unbox_struct (m_or);
+	qm_to_ptr_orientationr (m_or, &tr.or);
+	qm_to_ptr_orientationr (m_or, &tr.viewParms.world);
 #endif
 }
-#if 1
+#if 0
 /*
 ** SetFarClip
 */
@@ -581,7 +582,7 @@ R_SetupProjection
 ===============
 */
 void R_SetupProjection( void ) {
-#if 1
+#if 0
 	float	xmin, xmax, ymin, ymax;
 	float	width, height, depth;
 	float	zNear, zFar;
@@ -630,12 +631,12 @@ void R_SetupProjection( void ) {
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupProjection", 5, {
 		__args [0] = &r_znear->value;
 		__args [1] = &tr.refdef.rdflags;
-		__args [2] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
+		__args [2] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 		__args [3] = &tr.refdef.fov_x;
 		__args [4] = &tr.refdef.fov_y;
 	}, m_tuple_projection_matrix_and_zFar);
 
-	*(matrix16_t *)tr.viewParms.projectionMatrix = *(matrix16_t *)m_object_unbox_struct (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item1"));
+	qm_to_mat4x4 (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item1"), tr.viewParms.projectionMatrix);
 	tr.viewParms.zFar = *(gfloat *)m_object_unbox_struct (m_object_get_property (m_tuple_projection_matrix_and_zFar, "Item2"));
 #endif
 }

@@ -19,12 +19,6 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-(*
-    Rules of Thumb:
-    1. Types that are 64 bytes or less can be structs.
-    2. Types that don't singularly try to represent a value should be records.
-*)
-
 // Disable native interop warnings
 #nowarn "9"
 #nowarn "51"
