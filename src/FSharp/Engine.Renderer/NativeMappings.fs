@@ -113,14 +113,15 @@ module Plane =
             SignBits = native.signbits;
         }
 
-    let inline toNative (plane: Plane) =
-        let mutable native = cplane_t ()
+    let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (plane: Plane) =
+        let mutable native = NativePtr.read ptr
 
         Vector3.toNativeByPtr &&native.normal plane.Normal
         native.dist <- plane.Distance
         NativePtr.ofStructure plane.Type &&native.type'
         native.signbits <- plane.SignBits
-        native
+        
+        NativePtr.write ptr native
 
 module Frustum =
     let inline ofNative (ptr: nativeptr<cplane_t>) =
@@ -132,10 +133,10 @@ module Frustum =
         }
 
     let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (frustum: Frustum) =
-        NativePtr.set ptr 0 <| Plane.toNative frustum.Left
-        NativePtr.set ptr 1 <| Plane.toNative frustum.Right
-        NativePtr.set ptr 2 <| Plane.toNative frustum.Bottom
-        NativePtr.set ptr 3 <| Plane.toNative frustum.Top
+        Plane.toNativeByPtr (NativePtr.add ptr 0) frustum.Left
+        Plane.toNativeByPtr (NativePtr.add ptr 1) frustum.Right
+        Plane.toNativeByPtr (NativePtr.add ptr 2) frustum.Bottom
+        Plane.toNativeByPtr (NativePtr.add ptr 3) frustum.Top
 
 module ViewParms =
     let inline ofNative (native: viewParms_t) =
@@ -170,7 +171,7 @@ module ViewParms =
         native.isMirror <- bool.toNative view.IsMirror
         native.frameSceneNum <- view.FrameSceneId
         native.frameCount <- view.FrameCount
-        native.portalPlane <- Plane.toNative view.PortalPlane
+        Plane.toNativeByPtr &&native.portalPlane view.PortalPlane
         native.viewportX <- view.ViewportX
         native.viewportY <- view.ViewportY
         native.viewportWidth <- view.ViewportWidth
@@ -302,7 +303,7 @@ module Surface =
         }
         |> Flare
 
-    let inline ofNativePtr (nativePtr: nativeptr<surfaceType_t>) =
+    let inline ofNative (nativePtr: nativeptr<surfaceType_t>) =
         let type' = NativePtr.read nativePtr
         match type' with
         | surfaceType_t.SF_BAD -> Bad
@@ -340,7 +341,7 @@ module DrawSurface =
     let inline ofNative (native: drawSurf_t) =
         {
             Sort = native.sort;
-            Surface = Surface.ofNativePtr native.surface;
+            Surface = Surface.ofNative native.surface;
         }
 
 module RefEntity =

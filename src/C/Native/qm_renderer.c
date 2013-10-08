@@ -34,3 +34,7 @@ define_mapping (frustum, cplane_t*, "Frustum");
 define_mapping (bounds, vec3_t*, "Bounds");
 define_mapping (view_parms, viewParms_t*, "ViewParms");
 define_mapping (ref_entity, refEntity_t*, "RefEntity");
+define_mapping (orientation, orientation_t*, "Orientation");
+define_mapping (plane, cplane_t*, "Plane");
+define_mapping (surface, surfaceType_t*, "Surface");
+define_mapping (draw_surf, drawSurf_t*, "DrawSurface");

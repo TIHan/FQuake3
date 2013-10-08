@@ -35,5 +35,9 @@ define_mapping_prototype (frustum, cplane_t*);
 define_mapping_prototype (bounds, vec3_t*);
 define_mapping_prototype (view_parms, viewParms_t*);
 define_mapping_prototype (ref_entity, refEntity_t*);
+define_mapping_prototype (orientation, orientation_t*);
+define_mapping_prototype (plane, cplane_t*);
+define_mapping_prototype (surface, surfaceType_t*);
+define_mapping_prototype (draw_surf, drawSurf_t*);
 
 #endif /* __QM_RENDERER_H__ */

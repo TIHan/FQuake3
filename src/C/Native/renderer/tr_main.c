@@ -649,7 +649,7 @@ Setup that culling frustum planes for the current view
 =================
 */
 void R_SetupFrustum( void ) {
-#if 1
+#if 0
 	int		i;
 	float	xs, xc;
 	float	ang;
@@ -683,10 +683,10 @@ void R_SetupFrustum( void ) {
 	MObject m_frustum;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "setupFrustum", 1, {
-		__args [0] = m_object_as_arg (qm_map_view_parms (&tr.viewParms));
+		__args [0] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, m_frustum);
 
-	qm_frustum_map (m_frustum, &tr.viewParms.frustum);
+	qm_to_ptr_frustum (m_frustum, &tr.viewParms.frustum);
 #endif
 }
 
@@ -697,7 +697,7 @@ R_MirrorPoint
 =================
 */
 void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
-#if 1
+#if 0
 	int		i;
 	vec3_t	local;
 	vec3_t	transformed;
@@ -716,17 +716,17 @@ void R_MirrorPoint (vec3_t in, orientation_t *surface, orientation_t *camera, ve
 	MObject m_out;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorPoint", 3, {
-		__args [0] = in;
-		__args [1] = m_object_as_arg (qm_map_orientation (surface));
-		__args [2] = m_object_as_arg (qm_map_orientation (camera));
+		__args [0] = m_object_as_arg (qm_of_vec3 (in));
+		__args [1] = m_object_as_arg (qm_of_orientation (surface));
+		__args [2] = m_object_as_arg (qm_of_orientation (camera));
 	}, m_out);
 
-	*(vector3_t *)out = *(vector3_t *)m_object_unbox_struct (m_out);
+	qm_to_vec3 (m_out, out);
 #endif
 }
 
 void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, vec3_t out) {
-#if 1
+#if 0
 	int		i;
 	float	d;
 
@@ -739,12 +739,12 @@ void R_MirrorVector (vec3_t in, orientation_t *surface, orientation_t *camera, v
 	MObject m_out;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "mirrorVector", 3, {
-		__args [0] = in;
-		__args [1] = m_object_as_arg (qm_map_orientation (surface));
-		__args [2] = m_object_as_arg (qm_map_orientation (camera));
+		__args [0] = m_object_as_arg (qm_of_vec3 (in));
+		__args [1] = m_object_as_arg (qm_of_orientation (surface));
+		__args [2] = m_object_as_arg (qm_of_orientation (camera));
 	}, m_out);
 
-	*(vector3_t *)out = *(vector3_t *)m_object_unbox_struct (m_out);
+	qm_to_vec3 (m_out, out);
 #endif
 }
 
@@ -755,7 +755,7 @@ R_PlaneForSurface
 =============
 */
 void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
-#if 1
+#if 0
 	srfTriangles_t	*tri;
 	srfPoly_t		*poly;
 	drawVert_t		*v1, *v2, *v3;
@@ -799,11 +799,11 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 	}
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "planeForSurface", 2, {
-		__args [0] = m_object_as_arg (qm_map_surface (surfType));
-		__args [1] = m_object_as_arg (qm_map_plane (plane));
+		__args [0] = m_object_as_arg (qm_of_surface (surfType));
+		__args [1] = m_object_as_arg (qm_of_plane (plane));
 	}, m_out);
 
-	*plane = *(cplane_t*)m_object_unbox_struct (m_out);
+	qm_to_ptr_plane (m_out, plane);
 #endif
 }
 
@@ -817,7 +817,7 @@ be moving and rotating.
 Returns qtrue if it should be mirrored
 =================
 */
-#if 1
+#if 0
 qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
 							 orientation_t *surface, orientation_t *camera,
 							 vec3_t pvsOrigin, qboolean *mirror ) {
@@ -951,10 +951,10 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 		MObject m_original_plane;
 
 		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
-			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
+			__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
 		}, m_original_plane)
 
-		originalPlane = *(cplane_t*)m_object_unbox_struct (m_original_plane);
+		qm_to_ptr_plane (m_original_plane, &originalPlane);
 	}
 
 	// rotate the plane if necessary
@@ -1064,7 +1064,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	return qfalse;
 }
 #endif
-#if 1
+#if 0
 static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
 	int			i;
@@ -1137,10 +1137,10 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 		MObject m_original_plane;
 
 		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
-			__args [0] = m_object_as_arg (qm_map_draw_surf (drawSurf));
+			__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
 		}, m_original_plane)
 
-		originalPlane = *(cplane_t*)m_object_unbox_struct (m_original_plane);
+		qm_to_ptr_plane (m_original_plane, &originalPlane);
 	}
 
 	// rotate the plane if necessary

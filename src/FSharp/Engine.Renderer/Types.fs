@@ -161,6 +161,7 @@ type Plane =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plane =
+    let zero = { Normal = Vector3.zero; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
     let calculateSignBits (plane: Plane) =
         Plane.CalculateSignBits plane.Normal
 

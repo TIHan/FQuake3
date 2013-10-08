@@ -478,7 +478,7 @@ module Main =
     /// </summary>
     [<Pure>]
     let createPlaneAxis (drawSurface: DrawSurface) =
-        planeForSurface drawSurface.Surface Unchecked.defaultof<Plane>
+        planeForSurface drawSurface.Surface Plane.zero
 
     /// <summary>
     /// rotate the plane if necessary
