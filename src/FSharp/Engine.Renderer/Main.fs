@@ -233,45 +233,48 @@ module Main =
         | true -> viewParms.World
         | _ ->
 
+        let axis = entity.Axis
+        let origin = entity.Origin
+
         let glMatrix =
             Matrix4x4.create
-                entity.Axis.[0].[0]
-                entity.Axis.[0].[1]
-                entity.Axis.[0].[2]
+                axis.[0].[0]
+                axis.[0].[1]
+                axis.[0].[2]
                 0.f
-                entity.Axis.[1].[0]
-                entity.Axis.[1].[1]
-                entity.Axis.[1].[2]
+                axis.[1].[0]
+                axis.[1].[1]
+                axis.[1].[2]
                 0.f
-                entity.Axis.[2].[0]
-                entity.Axis.[2].[1]
-                entity.Axis.[2].[2]
+                axis.[2].[0]
+                axis.[2].[1]
+                axis.[2].[2]
                 0.f
-                entity.Origin.X
-                entity.Origin.Y
-                entity.Origin.Z
+                origin.X
+                origin.Y
+                origin.Z
                 1.f
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
-        let delta = viewParms.Orientation.Origin - entity.Origin
+        let delta = viewParms.Orientation.Origin - origin
 
         // compensate for scale in the axes if necessary
         let axisLength =
             match entity.HasNonNormalizedAxes with
             | true ->
                 // TODO: Is it ok to compare the single like this?
-                match Vector3.length entity.Axis.X with
+                match Vector3.length axis.X with
                 | 0.f -> 0.f
                 | axisLength ->
                     1.0f / axisLength
             | _ -> 1.0f
 
-        let inline calculateOrigin i = (Vector3.dotProduct delta entity.Axis.[i]) * axisLength
+        let inline calculateOrigin i = (Vector3.dotProduct delta axis.[i]) * axisLength
 
         {
-            Origin = entity.Origin;
-            Axis = entity.Axis;
+            Origin = origin;
+            Axis = axis;
             ViewOrigin = Vector3.create (calculateOrigin 0) (calculateOrigin 1) (calculateOrigin 2);
             ModelMatrix = glMatrix * viewParms.World.ModelMatrix;
         }
