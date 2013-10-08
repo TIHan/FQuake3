@@ -278,7 +278,7 @@ R_TransformModelToClip
 */
 void R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const float *projectionMatrix,
 							vec4_t eye, vec4_t dst ) {
-#if 1
+#if 0
 	int i;
 
 	for ( i = 0 ; i < 4 ; i++ ) {
@@ -317,7 +317,7 @@ R_TransformClipToWindow
 ==========================
 */
 void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window ) {
-#if 1
+#if 0
 	normalized[0] = clip[0] / clip[3];
 	normalized[1] = clip[1] / clip[3];
 	normalized[2] = ( clip[2] + clip[3] ) / ( 2 * clip[3] );
@@ -332,12 +332,12 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 	MObject m_tuple_normalized_and_window;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformClipToWindow", 2, {
-		__args [0] = clip;
-		__args [1] = m_object_as_arg (qm_map_view_parms (view));
+		__args [0] = m_object_as_arg (qm_of_vec4 (clip));
+		__args [1] = m_object_as_arg (qm_of_view_parms (view));
 	}, m_tuple_normalized_and_window);
 
-	*(vector4_t *)normalized = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_normalized_and_window, "Item1"));
-	*(vector4_t *)window = *(vector4_t *)m_object_unbox_struct (m_object_get_property (m_tuple_normalized_and_window, "Item2"));
+	qm_to_vec4 (m_object_get_property (m_tuple_normalized_and_window, "Item1"), normalized);
+	qm_to_vec4 (m_object_get_property (m_tuple_normalized_and_window, "Item2"), window);
 #endif
 }
 
@@ -349,7 +349,7 @@ myGlMultMatrix
 ==========================
 */
 void myGlMultMatrix( const gfloat *a, const gfloat *b, gfloat *out ) {
-#if 1
+#if 0
 	int		i, j;
 
 	for ( i = 0 ; i < 4 ; i++ ) {
@@ -365,11 +365,11 @@ void myGlMultMatrix( const gfloat *a, const gfloat *b, gfloat *out ) {
 	MObject m_out;
 
 	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "myGLMultMatrix", 2, {
-		__args [0] = a;
-		__args [1] = b;
+		__args [0] = m_object_as_arg (qm_of_mat4x4 (a));
+		__args [1] = m_object_as_arg (qm_of_mat4x4 (b));
 	}, m_out);
 
-	*(matrix16_t *)out = *(matrix16_t *)m_object_unbox_struct (m_out);
+	qm_to_mat4x4 (m_out, out);
 #endif
 }
 

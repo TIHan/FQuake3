@@ -69,8 +69,8 @@ void \
 qm_to_##name## (MObject obj, type ptr) \
 { \
 	to_invoke_easy (managed_name, "toNativeByPtr", 2, { \
-		__args [0] = m_object_as_arg (obj); \
-		__args [1] = ptr; \
+		__args [0] = ptr; \
+		__args [1] = m_object_as_arg (obj); \
 	}); \
 } \
 
@@ -84,7 +84,7 @@ qm_to_##name## (MObject obj, type ptr) \
 
 define_mapping_prototype (qboolean, qboolean*);
 define_mapping_prototype (vec3, vec3_t);
-define_mapping_prototype (vec4, gfloat*);
+define_mapping_prototype (vec4, vec4_t);
 define_mapping_prototype (mat4x4, gfloat*);
 define_mapping_prototype (cvar, cvar_t*);
 

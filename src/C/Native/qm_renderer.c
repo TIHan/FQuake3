@@ -32,3 +32,4 @@ define_mapping_namespace ("Engine.Renderer.Native");
 define_mapping (orientationr, orientationr_t*, "OrientationR");
 define_mapping (frustum, cplane_t*, "Frustum");
 define_mapping (bounds, vec3_t*, "Bounds");
+define_mapping (view_parms, viewParms_t*, "ViewParms");
