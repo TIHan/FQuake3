@@ -289,7 +289,7 @@ type Matrix4x4 =
 #if DEBUG
     static member (*) (m1: Matrix4x4, m2: Matrix4x4) =
 #else
-    static member inline (*) (m1: Matrix16, m2: Matrix16) =
+    static member inline (*) (m1: Matrix4x4, m2: Matrix4x4) =
 #endif
         {
             M0_0 = (m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]);
