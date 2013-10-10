@@ -958,22 +958,18 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	}
 
 	// rotate the plane if necessary
-	if ( entityNum != ENTITYNUM_WORLD ) {
-		tr.currentEntityNum = entityNum;
-		tr.currentEntity = &tr.refdef.entities[entityNum];
+	{
+		MObject m_tuple;
 
-		// get the orientation of the entity
-		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
+		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "tryRotatePlane", 3, {
+			__args [0] = m_object_as_arg (qm_of_plane (&originalPlane));
+			__args [1] = &entityNum;
+			__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
+		}, m_tuple);
 
-		// rotate the plane, but keep the non-rotated version for matching
-		// against the portalSurface entities
-		R_LocalNormalToWorld( originalPlane.normal, plane.normal );
-		plane.dist = originalPlane.dist + DotProduct( plane.normal, tr.or.origin );
-
-		// translate the original plane
-		originalPlane.dist = originalPlane.dist + DotProduct( originalPlane.normal, tr.or.origin );
-	} else {
-		plane = originalPlane;
+		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item1"), &originalPlane);
+		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item2"), &plane);
+		qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item3"), &tr);
 	}
 
 	VectorCopy( plane.normal, surface->axis[0] );
@@ -1144,25 +1140,18 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	}
 
 	// rotate the plane if necessary
-	if ( entityNum != ENTITYNUM_WORLD ) 
 	{
-		tr.currentEntityNum = entityNum;
-		tr.currentEntity = &tr.refdef.entities[entityNum];
+		MObject m_tuple;
 
-		// get the orientation of the entity
-		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
+		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "tryRotatePlane", 3, {
+			__args [0] = m_object_as_arg (qm_of_plane (&originalPlane));
+			__args [1] = &entityNum;
+			__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
+		}, m_tuple);
 
-		// rotate the plane, but keep the non-rotated version for matching
-		// against the portalSurface entities
-		R_LocalNormalToWorld( originalPlane.normal, plane.normal );
-		plane.dist = originalPlane.dist + DotProduct( plane.normal, tr.or.origin );
-
-		// translate the original plane
-		originalPlane.dist = originalPlane.dist + DotProduct( originalPlane.normal, tr.or.origin );
-	} 
-	else 
-	{
-		plane = originalPlane;
+		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item1"), &originalPlane);
+		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item2"), &plane);
+		qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item3"), &tr);
 	}
 
 	// locate the portal entity closest to this plane.

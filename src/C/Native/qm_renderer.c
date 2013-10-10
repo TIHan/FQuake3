@@ -38,3 +38,4 @@ define_mapping (orientation, orientation_t*, "Orientation");
 define_mapping (plane, cplane_t*, "Plane");
 define_mapping (surface, surfaceType_t*, "Surface");
 define_mapping (draw_surf, drawSurf_t*, "DrawSurface");
+define_mapping (tr_globals, trGlobals_t*, "TrGlobals");
