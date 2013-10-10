@@ -40,5 +40,6 @@ define_mapping_prototype (plane, cplane_t*);
 define_mapping_prototype (surface, surfaceType_t*);
 define_mapping_prototype (draw_surf, drawSurf_t*);
 define_mapping_prototype (tr_globals, trGlobals_t*);
+define_mapping_prototype (axis, vec3_t*);
 
 #endif /* __QM_RENDERER_H__ */

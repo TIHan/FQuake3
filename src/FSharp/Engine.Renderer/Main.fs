@@ -514,6 +514,12 @@ module Main =
             { tr with Orientation = orientation }
         )
 
+    /// Transforms existing axis based on a normal.
+    [<Pure>]
+    let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
+        let y = Vector3.perpendicular normal
+        { Axis.X = normal; Y = y; Z = Vector3.crossProduct normal y }
+
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
     /// GetPortalOrientation

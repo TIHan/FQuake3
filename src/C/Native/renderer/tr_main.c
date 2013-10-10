@@ -972,9 +972,16 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 		qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item3"), &tr);
 	}
 
-	VectorCopy( plane.normal, surface->axis[0] );
-	PerpendicularVector( surface->axis[1], surface->axis[0] );
-	CrossProduct( surface->axis[0], surface->axis[1], surface->axis[2] );
+	{
+		MObject m_axis;
+
+		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformAxisOfNormal", 2, {
+			__args [0] = m_object_as_arg (qm_of_vec3 (plane.normal));
+			__args [1] = m_object_as_arg (qm_of_axis (surface->axis));
+		}, m_axis);
+
+		qm_to_ptr_axis (m_axis, surface->axis);
+	}
 
 	// locate the portal entity closest to this plane.
 	// origin will be the origin of the portal, origin2 will be
