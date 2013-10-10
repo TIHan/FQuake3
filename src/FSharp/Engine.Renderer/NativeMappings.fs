@@ -479,7 +479,7 @@ module TrRefdef =
             HasAreaMaskModified = native.areamaskModified;
 
             FloatTime = native.floatTime;
-            Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text;
+            Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text; // FIXME: This isn't right.
             Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNative x) native.enities;
             Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNative x) native.dlights;
             Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePoly x) native.polys;

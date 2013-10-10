@@ -520,6 +520,18 @@ module Main =
         let y = Vector3.perpendicular normal
         { Axis.X = normal; Y = y; Z = Vector3.crossProduct normal y }
 
+    /// Tries to find the closest portal entity based on a plane.
+    [<Pure>]
+    let tryFindClosestPortalEntityByPlane (plane: Plane) (tr: TrGlobals) =
+        tr.Refdef.Entities |>
+        List.tryFind (fun x ->
+            let isPortalSurface = not (x.Entity.Type <> RefEntityType.PortalSurface)
+            let distance = (Vector3.dotProduct x.Entity.Origin plane.Normal) - plane.Distance
+            let isWithinDistance = not (distance > 64.f || distance < -64.f)
+
+            isPortalSurface && not isWithinDistance
+        )
+
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
     /// GetPortalOrientation
