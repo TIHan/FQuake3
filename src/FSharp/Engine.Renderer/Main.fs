@@ -529,8 +529,43 @@ module Main =
             let distance = (Vector3.dotProduct x.Entity.Origin plane.Normal) - plane.Distance
             let isWithinDistance = not (distance > 64.f || distance < -64.f)
 
-            isPortalSurface && not isWithinDistance
+            isPortalSurface && isWithinDistance
         )
+
+    /// Calculates the portal orientation.
+    /// Note: Not finished.
+    [<Pure>]
+    let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orientation) (camera: Orientation) (refdef: Refdef) =
+        // if the entity is just a mirror, don't use as a camera point
+        match entity.OldOrigin = entity.Origin with
+        | true ->
+            let origin = plane.Normal * plane.Distance
+            let axis = { surface.Axis with X = Vector3.zero - surface.Axis.X }
+
+            (
+                { surface with Origin = origin },
+                { camera with Origin = origin; Axis = axis }
+            )
+        | _ ->
+
+        // project the origin onto the surface plane to get
+        // an origin point we can rotate around
+        let distance = (Vector3.dotProduct entity.Origin plane.Normal) - plane.Distance
+        let surfaceOrigin = Vector3.multiplyAdd -distance surface.Axis.X entity.Origin
+
+        // now get the camera origin and orientation
+        let cameraOrigin = entity.OldOrigin
+        let cameraAxis = { entity.Axis with X = Vector3.zero - camera.Axis.X; Y = Vector3.zero - camera.Axis.Y }
+        (surface, camera)
+        (*
+        TODO: Finish implementation.
+        if entity.OldFrame > 0 then
+            if entity.Frame > 0 then
+                let distance = single refdef.Time / 1000.f * entity.Frame
+
+            else
+        *)
+            
 
     /// <summary>
     /// Based on Q3: R_GetPortalOrientation
