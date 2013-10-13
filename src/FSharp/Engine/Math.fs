@@ -415,16 +415,26 @@ module Quaternion =
             (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
             (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
 
+    let ofAxisAngle (axis: Vector3) (angle: single) =
+        let angle = angle * 0.5f
+        let sinAngle = sin angle
+        let cosAngle = cos angle
+
+        create
+            (axis.X * sinAngle)
+            (axis.Y * sinAngle)
+            (axis.Z * sinAngle)
+            cosAngle
 
 type Quaternion with
-    static member inline (*) (q1: Quaternion, q2: Quaternion) =
+    static member inline (*) (q1, q2) =
         Quaternion.create
             (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z)
             (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y)
             (q1.W * q2.Y + q1.Y * q2.W + q1.Z * q2.X - q1.X * q2.Z)
             (q1.W * q2.Z + q1.Z * q2.W + q1.X * q2.Y - q1.Y * q2.X)
 
-    static member inline (*) (q: Quaternion, v: Vector3) =
+    static member inline (*) (q, v) =
         let vn = Vector3.normalize v
         let vq = Quaternion.create 0.f vn.X vn.Y vn.Z
         let result = q * (vq * Quaternion.conjugate q)
