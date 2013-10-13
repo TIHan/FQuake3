@@ -430,7 +430,3 @@ type Quaternion with
         let result = q * (vq * Quaternion.conjugate q)
 
         Vector3.create result.X result.Y result.Z
-
-module TestMath =
-    let rotatePointAroundVector (point: Vector3) (degrees: single) =
-        let q = Quaternion.ofEuler 0.f degrees 0.f
