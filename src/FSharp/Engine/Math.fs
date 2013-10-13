@@ -394,9 +394,9 @@ module Quaternion =
         create q.W -q.X -q.Y -q.Z
 
     let ofEuler (v: Vector3) =
-        let pitch = Math.PI / 360.f * single v.[0]
-        let yaw = Math.PI / 360.f * single v.[1]
-        let roll = Math.PI / 360.f * single v.[2]
+        let pitch = Math.PI / 360.f * v.[0]
+        let yaw = Math.PI / 360.f * v.[1]
+        let roll = Math.PI / 360.f * v.[2]
 
         let sinRoll = sin roll
         let sinPitch = sin pitch
@@ -430,3 +430,7 @@ type Quaternion with
         let result = q * (vq * Quaternion.conjugate q)
 
         Vector3.create result.X result.Y result.Z
+
+module TestMath =
+    let rotatePointAroundVector (point: Vector3) (degrees: single) =
+        let q = Quaternion.ofEuler 0.f degrees 0.f
