@@ -393,6 +393,14 @@ module Quaternion =
     let inline conjugate (q: Quaternion) =
         create q.W -q.X -q.Y -q.Z
 
+    let inline dotProduct q1 q2 =
+        (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 
+
+    let inline normalize (q: Quaternion) =
+        // magnitude
+        let mag = sqrt <| dotProduct q q
+        create (q.W / mag) (q.X / mag) (q.Y / mag) (q.Z / mag)
+
     let ofEuler (v: Vector3) =
         let pitch = Math.PI / 360.f * v.[0]
         let yaw = Math.PI / 360.f * v.[1]
@@ -421,10 +429,10 @@ module Quaternion =
         let cosAngle = cos angle
 
         create
+            cosAngle
             (axis.X * sinAngle)
             (axis.Y * sinAngle)
             (axis.Z * sinAngle)
-            cosAngle
 
 type Quaternion with
     static member inline (*) (q1, q2) =
