@@ -390,6 +390,9 @@ module Quaternion =
     let inline create w x y z =
         { Quaternion.W = w; X = x; Y = y; Z = z }
 
+    let inline conjugate (q: Quaternion) =
+        create q.W -q.X -q.Y -q.Z
+
     let ofEuler (v: Vector3) =
         let pitch = Math.PI / 360.f * single v.[0]
         let yaw = Math.PI / 360.f * single v.[1]
@@ -411,3 +414,19 @@ module Quaternion =
             (sinRoll * cosPitchYaw - cosRoll * sinPitchYaw)
             (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
             (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
+
+
+type Quaternion with
+    static member inline (*) (q1: Quaternion, q2: Quaternion) =
+        Quaternion.create
+            (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z)
+            (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y)
+            (q1.W * q2.Y + q1.Y * q2.W + q1.Z * q2.X - q1.X * q2.Z)
+            (q1.W * q2.Z + q1.Z * q2.W + q1.X * q2.Y - q1.Y * q2.X)
+
+    static member inline (*) (q: Quaternion, v: Vector3) =
+        let vn = Vector3.normalize v
+        let vq = Quaternion.create 0.f vn.X vn.Y vn.Z
+        let result = q * (vq * Quaternion.conjugate q)
+
+        Vector3.create result.X result.Y result.Z
