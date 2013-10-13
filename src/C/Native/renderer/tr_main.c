@@ -1039,7 +1039,19 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 				d = sin( tr.refdef.time * 0.003f );
 				d = e->e.skinNum + d * 4;
 				VectorCopy( camera->axis[1], transformed );
-				RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
+
+				{
+					MObject m_axis;
+
+					m_invoke_method_cache_easy ("Engine", "Engine.Math", "Rotation", "rotatePointAroundVector", 3, {
+						__args [0] = m_object_as_arg (qm_of_vec3 (camera->axis [1]));
+						__args [1] = m_object_as_arg (qm_of_vec3 (camera->axis [0]));
+						__args [2] = &d;
+					}, m_axis);
+
+					qm_to_vec3 (m_axis, camera->axis [1]);
+				}
+
 				CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
 			}
 		}

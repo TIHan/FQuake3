@@ -39,7 +39,7 @@ module Math =
     let E = 2.7182818284590452354f
         
     let inline lerp (x: single) (y: single) (t: single) =
-        x + (t * (y - x))
+        x + (t * (y - x))   
 
 /// Vector2
 type Vector2 =
@@ -448,3 +448,9 @@ type Quaternion with
         let result = q * (vq * Quaternion.conjugate q)
 
         Vector3.create result.X result.Y result.Z
+
+// Note: Don't know if we will this need this in the future.
+module Rotation =
+    let rotatePointAroundVector (point: Vector3) (axis: Vector3) (angle: single) =
+        let q = Quaternion.ofAxisAngle axis (angle * (Math.PI / 180.f))
+        q * point
