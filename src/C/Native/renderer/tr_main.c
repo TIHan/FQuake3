@@ -1043,7 +1043,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 				{
 					MObject m_axis;
 
-					m_invoke_method_cache_easy ("Engine", "Engine.Math", "Rotation", "rotatePointAroundVector", 3, {
+					m_invoke_method_cache_easy ("Engine", "Engine.Math", "QuaternionModule", "rotatePointAroundVector", 3, {
 						__args [0] = m_object_as_arg (qm_of_vec3 (camera->axis [1]));
 						__args [1] = m_object_as_arg (qm_of_vec3 (camera->axis [0]));
 						__args [2] = &d;

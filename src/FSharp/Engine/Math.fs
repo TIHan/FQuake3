@@ -30,6 +30,7 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
+/// Math Module
 [<RequireQualifiedAccess>]
 module Math =
     [<Literal>]
@@ -37,9 +38,18 @@ module Math =
 
     [<Literal>]
     let E = 2.7182818284590452354f
+
+    [<Literal>]
+    let ``PI / 180`` = 0.0174532925199433f
+
+    [<Literal>]
+    let ``PI / 360`` = 0.00872664625997165f
+
+    [<Literal>]
+    let ``180 / PI`` = 57.2957795130823f
         
     let inline lerp (x: single) (y: single) (t: single) =
-        x + (t * (y - x))   
+        x + (t * (y - x))
 
 /// Vector2
 type Vector2 =
@@ -48,16 +58,23 @@ type Vector2 =
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X
-            | 1 -> this.Y
+            | 0 -> this.X | 1 -> this.Y
             | _ -> raise <| IndexOutOfRangeException ()
 
+    static member inline Create (x, y) =
+        { X = x; Y = y; }
+
+/// Vector2 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector2 =
-    let inline create x y =
-        { X = x; Y = y }
-
-    let zero = { X = 0.f; Y = 0.f }
+    let inline create x y = 
+        Vector2.Create (x, y)
+    
+    let zero =  create 0.f 0.f
+    let one =   create 1.f 1.f
+    let unitX = create 1.f 0.f
+    let unitY = create 0.f 1.f
 
 /// Vector3
 type Vector3 =
@@ -66,24 +83,66 @@ type Vector3 =
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X
-            | 1 -> this.Y
-            | 2 -> this.Z
+            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
+    static member inline Create (x, y, z) =
+        { X = x; Y = y; Z = z }
+
+    static member inline Abs v =
+        Vector3.Create (abs v.X, abs v.Y, abs v.Z)
+
+    static member inline Truncate v =
+        Vector3.Create (truncate v.X, truncate v.Y, truncate v.Z)
+
+    static member inline (*) (v1, v2) =
+        Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+
+    static member inline (/) (v1, v2) =
+        Vector3.Create (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
+
+    static member inline (+) (v1, v2) =
+        Vector3.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
+
+    static member inline (-) (v1, v2) =
+        Vector3.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+
+    static member inline (*) (v, s) =
+        Vector3.Create (v.X * s, v.Y * s, v.Z * s)
+
+    static member inline (/) (v, s) =
+        Vector3.Create (v.X / s, v.Y / s, v.Z / s)
+
+    static member inline (+) (v, s) =
+        Vector3.Create (v.X + s, v.Y + s, v.Z + s)
+
+    static member inline (-) (v, s) =
+        Vector3.Create (v.X - s, v.Y - s, v.Z - s)
+
+    static member inline (*) (s, v) =
+        v * s
+
+    static member inline (/) (s, v) =
+        v / s
+
+    static member inline (+) (s, v) =
+        v / s
+
+    static member inline (-) (s, v) =
+        v / s
+
+/// Vector3 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector3 =
     let inline create x y z =
-        { X = x; Y = y; Z = z }
+        Vector3.Create (x, y, z)
 
     let zero =  create 0.f 0.f 0.f
     let one =   create 1.f 1.f 1.f
     let unitX = create 1.f 0.f 0.f
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f
-
-    let inline abs v =
-        create (abs v.X) (abs v.Y) (abs v.Z)
 
     let inline minDimension v =
         match v.X < v.Y with
@@ -95,9 +154,6 @@ module Vector3 =
             match v.Y < v.Z with
             | true -> 1
             | _ -> 2
-
-    let inline snap v =
-        create (truncate v.X) (truncate v.Y) (truncate v.Z)
         
     let inline multiplyAdd s v1 v2 =
         create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
@@ -124,57 +180,11 @@ module Vector3 =
     let inline perpendicular v =
         let uv =
             match abs v |> minDimension with
-            | 0 -> unitX
-            | 1 -> unitY
-            | 2 -> unitZ
+            | 0 -> unitX | 1 -> unitY | 2 -> unitZ
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
-        let uvNormal = normalize uv
-        crossProduct v uvNormal
-        
-    let (|XYZ|) v =
-        (v.X, v.Y, v.Z)
-
-type Vector3 with
-    static member inline (*) (v1, v2) =
-        Vector3.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z)
-
-    static member inline (/) (v1, v2) =
-        Vector3.create (v1.X / v2.X) (v1.Y / v2.Y) (v1.Z / v2.Z)
-
-    static member inline (+) (v1, v2) =
-        Vector3.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z)
-
-    static member inline (-) (v1, v2) =
-        Vector3.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z)
-
-    // RHS
-
-    static member inline (*) (v, s) =
-        Vector3.create (v.X * s) (v.Y * s) (v.Z * s)
-
-    static member inline (/) (v, s) =
-        Vector3.create (v.X / s) (v.Y / s) (v.Z / s)
-
-    static member inline (+) (v, s) =
-        Vector3.create (v.X + s) (v.Y + s) (v.Z + s)
-
-    static member inline (-) (v, s) =
-        Vector3.create (v.X - s) (v.Y - s) (v.Z - s)
-
-    // LHS
-
-    static member inline (*) (s, v) =
-        Vector3.create (s * v.X) (s * v.Y) (s * v.Z)
-
-    static member inline (/) (s, v) =
-        Vector3.create (s / v.X) (s / v.Y) (s / v.Z)
-
-    static member inline (+) (s, v) =
-        Vector3.create (s + v.X) (s + v.Y) (s + v.Z)
-
-    static member inline (-) (s, v) =
-        Vector3.create (s - v.X) (s - v.Y) (s - v.Z)
+        let vn = normalize uv
+        crossProduct v vn
 
 /// Vector4      
 type Vector4 =
@@ -183,215 +193,175 @@ type Vector4 =
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X
-            | 1 -> this.Y
-            | 2 -> this.Z
-            | 3 -> this.W
+            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
+    static member inline Create (x, y, z, w) =
+        { X = x; Y = y; Z = z; W = w }
+
+    static member inline (*) (v1, v2) =
+        Vector4.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
+        
+    static member inline (+) (v1, v2) =
+        Vector4.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
+
+    static member inline (-) (v1, v2) =
+        Vector4.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)  
+
+// Vector4 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vector4 =
     let inline create x y z w =
-        { X = x; Y = y; Z = z; W = w }
+        Vector4.Create (x, y, z, w)
 
     let zero = create 0.f 0.f 0.f 0.f
 
     let inline dotProduct v1 v2 =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
-type Vector4 with
-    static member inline (*) (v1, v2) =
-        Vector4.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z) (v1.W * v2.W)
-        
-    static member inline (+) (v1, v2) =
-        Vector4.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z) (v1.W + v2.W)
-
-    static member inline (-) (v1, v2) =
-        Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)    
-
 /// Matrix2x2
 type Matrix2x2 =
     {
-        M0_0: single;
-        M0_1: single;
-        M1_0: single;
-        M1_1: single;
+        M11: single; M12: single;
+        M21: single; M22: single;
     }
 
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M0_0
-                | (0, 1) -> this.M0_1
-                | (1, 0) -> this.M1_0
-                | (1, 1) -> this.M1_1
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22
                 | _ -> raise <| IndexOutOfRangeException ()
 
+    static member inline Create (m11, m12, m21, m22) =
+        { 
+            M11 = m11; M12 = m12;
+            M21 = m21; M22 = m22;
+        }
+
+/// Matrix2x2 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix2x2 =
-    let zero =
-        {
-            M0_0 = 0.f;
-            M0_1 = 0.f;
-            M1_0 = 0.f;
-            M1_1 = 0.f;
-        }
+    let inline create m11 m12 m21 m22 =
+        Matrix2x2.Create (m11, m12, m21, m22)
+
+    let zero = create 0.f 0.f 0.f 0.f
 
 /// Matrix3x3        
 type Matrix3x3 =     
     {
-        M0_0: single;
-        M0_1: single;
-        M0_2: single;
-        M1_0: single;
-        M1_1: single;
-        M1_2: single;
-        M2_0: single;
-        M2_1: single;
-        M2_2: single;
+        M11: single; M12: single; M13: single;
+        M21: single; M22: single; M23: single;
+        M31: single; M32: single; M33: single;
     }
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M0_0
-                | (0, 1) -> this.M0_1
-                | (0, 2) -> this.M0_2
-                | (1, 0) -> this.M1_0
-                | (1, 1) -> this.M1_1
-                | (1, 2) -> this.M1_2
-                | (2, 0) -> this.M2_0
-                | (2, 1) -> this.M2_1
-                | (2, 2) -> this.M2_2
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23
+                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33
                 | _ -> raise <| IndexOutOfRangeException ()
 
+    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+        {
+            M11 = m11; M12 = m12; M13 = m13;
+            M21 = m21; M22 = m22; M23 = m23;
+            M31 = m31; M32 = m32; M33 = m33;
+        }
+
+/// Matrix3x3 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix3x3 =
-    let inline create m1 m2 m3 m4 m5 m6 m7 m8 m9 =
-        {
-            M0_0 = m1;
-            M0_1 = m2;
-            M0_2 = m3;
-            M1_0 = m4;
-            M1_1 = m5;
-            M1_2 = m6;
-            M2_0 = m7;
-            M2_1 = m8;
-            M2_2 = m9;
-        }
+    let inline create m11 m12 m13 m21 m22 m23 m31 m32 m33 =
+        Matrix3x3.Create (m11, m12, m13, m21, m22, m23, m31, m32, m33)
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Matrix4x4       
 type Matrix4x4 =     
     {
-        M0_0: single;
-        M0_1: single;
-        M0_2: single;
-        M0_3: single;
-        M1_0: single;
-        M1_1: single;
-        M1_2: single;
-        M1_3: single;
-        M2_0: single;
-        M2_1: single;
-        M2_2: single;
-        M2_3: single;
-        M3_0: single;
-        M3_1: single;
-        M3_2: single;
-        M3_3: single;
+        M11: single; M12: single; M13: single; M14: single;
+        M21: single; M22: single; M23: single; M24: single;
+        M31: single; M32: single; M33: single; M34: single;
+        M41: single; M42: single; M43: single; M44: single;
     }
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M0_0
-                | (0, 1) -> this.M0_1
-                | (0, 2) -> this.M0_2
-                | (0, 3) -> this.M0_3
-                | (1, 0) -> this.M1_0
-                | (1, 1) -> this.M1_1
-                | (1, 2) -> this.M1_2
-                | (1, 3) -> this.M1_3
-                | (2, 0) -> this.M2_0
-                | (2, 1) -> this.M2_1
-                | (2, 2) -> this.M2_2
-                | (2, 3) -> this.M2_3
-                | (3, 0) -> this.M3_0
-                | (3, 1) -> this.M3_1
-                | (3, 2) -> this.M3_2
-                | (3, 3) -> this.M3_3
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13 | (0, 3) -> this.M14
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23 | (1, 3) -> this.M24
+                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33 | (2, 3) -> this.M34
+                | (3, 0) -> this.M41 | (3, 1) -> this.M42 | (3, 2) -> this.M43 | (3, 3) -> this.M44
                 | _ -> raise <| IndexOutOfRangeException ()
+
+    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+        {
+            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
+            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
+            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
+            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
+        }
 
 #if DEBUG
     static member (*) (m1: Matrix4x4, m2: Matrix4x4) =
 #else
     static member inline (*) (m1: Matrix4x4, m2: Matrix4x4) =
 #endif
-        {
-            M0_0 = (m1.[0, 0] * m2.[0, 0]) + (m1.[0, 1] * m2.[1, 0]) + (m1.[0, 2] * m2.[2, 0]) + (m1.[0, 3] * m2.[3, 0]);
-            M0_1 = (m1.[0, 0] * m2.[0, 1]) + (m1.[0, 1] * m2.[1, 1]) + (m1.[0, 2] * m2.[2, 1]) + (m1.[0, 3] * m2.[3, 1]);
-            M0_2 = (m1.[0, 0] * m2.[0, 2]) + (m1.[0, 1] * m2.[1, 2]) + (m1.[0, 2] * m2.[2, 2]) + (m1.[0, 3] * m2.[3, 2]);
-            M0_3 = (m1.[0, 0] * m2.[0, 3]) + (m1.[0, 1] * m2.[1, 3]) + (m1.[0, 2] * m2.[2, 3]) + (m1.[0, 3] * m2.[3, 3]);
-            M1_0 = (m1.[1, 0] * m2.[0, 0]) + (m1.[1, 1] * m2.[1, 0]) + (m1.[1, 2] * m2.[2, 0]) + (m1.[1, 3] * m2.[3, 0]);
-            M1_1 = (m1.[1, 0] * m2.[0, 1]) + (m1.[1, 1] * m2.[1, 1]) + (m1.[1, 2] * m2.[2, 1]) + (m1.[1, 3] * m2.[3, 1]);
-            M1_2 = (m1.[1, 0] * m2.[0, 2]) + (m1.[1, 1] * m2.[1, 2]) + (m1.[1, 2] * m2.[2, 2]) + (m1.[1, 3] * m2.[3, 2]);
-            M1_3 = (m1.[1, 0] * m2.[0, 3]) + (m1.[1, 1] * m2.[1, 3]) + (m1.[1, 2] * m2.[2, 3]) + (m1.[1, 3] * m2.[3, 3]);
-            M2_0 = (m1.[2, 0] * m2.[0, 0]) + (m1.[2, 1] * m2.[1, 0]) + (m1.[2, 2] * m2.[2, 0]) + (m1.[2, 3] * m2.[3, 0]);
-            M2_1 = (m1.[2, 0] * m2.[0, 1]) + (m1.[2, 1] * m2.[1, 1]) + (m1.[2, 2] * m2.[2, 1]) + (m1.[2, 3] * m2.[3, 1]);
-            M2_2 = (m1.[2, 0] * m2.[0, 2]) + (m1.[2, 1] * m2.[1, 2]) + (m1.[2, 2] * m2.[2, 2]) + (m1.[2, 3] * m2.[3, 2]);
-            M2_3 = (m1.[2, 0] * m2.[0, 3]) + (m1.[2, 1] * m2.[1, 3]) + (m1.[2, 2] * m2.[2, 3]) + (m1.[2, 3] * m2.[3, 3]);
-            M3_0 = (m1.[3, 0] * m2.[0, 0]) + (m1.[3, 1] * m2.[1, 0]) + (m1.[3, 2] * m2.[2, 0]) + (m1.[3, 3] * m2.[3, 0]);
-            M3_1 = (m1.[3, 0] * m2.[0, 1]) + (m1.[3, 1] * m2.[1, 1]) + (m1.[3, 2] * m2.[2, 1]) + (m1.[3, 3] * m2.[3, 1]);
-            M3_2 = (m1.[3, 0] * m2.[0, 2]) + (m1.[3, 1] * m2.[1, 2]) + (m1.[3, 2] * m2.[2, 2]) + (m1.[3, 3] * m2.[3, 2]);
-            M3_3 = (m1.[3, 0] * m2.[0, 3]) + (m1.[3, 1] * m2.[1, 3]) + (m1.[3, 2] * m2.[2, 3]) + (m1.[3, 3] * m2.[3, 3]);
-        }
+        let inline f i j = (m1.[i, 0] * m2.[0, j]) + (m1.[i, 1] * m2.[1, j]) + (m1.[i, 2] * m2.[2, j]) + (m1.[i, 3] * m2.[3, j])
+        Matrix4x4.Create (
+            f 0 0, f 0 1, f 0 2, f 0 3,
+            f 1 0, f 1 1, f 1 2, f 1 3,
+            f 2 0, f 2 1, f 2 2, f 2 3,
+            f 3 0, f 3 1, f 3 2, f 3 3
+        )
 
+/// Matrix4x4 Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Matrix4x4 =
-    let inline create m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 m12 m13 m14 m15 m16 =
-        {
-            M0_0 = m1;
-            M0_1 = m2;
-            M0_2 = m3;
-            M0_3 = m4;
-            M1_0 = m5;
-            M1_1 = m6;
-            M1_2 = m7;
-            M1_3 = m8;
-            M2_0 = m9;
-            M2_1 = m10;
-            M2_2 = m11;
-            M2_3 = m12;
-            M3_0 = m13;
-            M3_1 = m14;
-            M3_2 = m15;
-            M3_3 = m16;
-        }
+    let inline create m11 m12 m13 m14 m21 m22 m23 m24 m31 m32 m33 m34 m41 m42 m43 m44 =
+        Matrix4x4.Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44)
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Quaternion
 type Quaternion =
-    { X: single; Y: single; Z: single; W: single }
+    { W: single; X: single; Y: single; Z: single; }
 
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.W
-            | 1 -> this.X
-            | 2 -> this.Y
-            | 3 -> this.Z
-            | _ -> raise <| IndexOutOfRangeException ()
+    static member inline Create (w, x, y, z) =
+        { W = w; X = x; Y = y; Z = z }
 
+    member inline q.Conjugate with get () =
+        Quaternion.Create (q.W, -q.X, -q.Y, -q.Z) 
+
+    static member inline (*) (q1, q2) =
+        Quaternion.Create (
+            (q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z),
+            (q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y),
+            (q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z),
+            (q1.W * q2.Z) + (q1.Z * q2.W) + (q1.X * q2.Y) - (q1.Y * q2.X)
+        )
+
+    static member inline (*) (q: Quaternion, v) =
+        let vn = Vector3.normalize v
+        let vq = Quaternion.Create (0.f, vn.X, vn.Y, vn.Z)
+        let result = q * (vq * q.Conjugate)
+
+        Vector3.create result.X result.Y result.Z
+
+/// Quaternion Module
+[<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Quaternion =
     let inline create w x y z =
-        { Quaternion.W = w; X = x; Y = y; Z = z }
+        Quaternion.Create (w, x, y, z)
 
-    let inline conjugate (q: Quaternion) =
-        create q.W -q.X -q.Y -q.Z
+    let inline conjugate (q: Quaternion) = q.Conjugate 
 
     let inline dotProduct q1 q2 =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 
@@ -401,56 +371,36 @@ module Quaternion =
         let mag = sqrt <| dotProduct q q
         create (q.W / mag) (q.X / mag) (q.Y / mag) (q.Z / mag)
 
-    let ofEuler (v: Vector3) =
-        let pitch = Math.PI / 360.f * v.[0]
-        let yaw = Math.PI / 360.f * v.[1]
-        let roll = Math.PI / 360.f * v.[2]
+    let ofEulerDegrees (v: Vector3) =
+        let pitch = Math.``PI / 360`` * v.[0]
+        let yaw =   Math.``PI / 360`` * v.[1]
+        let roll =  Math.``PI / 360`` * v.[2]
 
-        let sinRoll = sin roll
-        let sinPitch = sin pitch
-        let sinYaw = sin yaw
+        let sinRoll =   sin roll
+        let sinPitch =  sin pitch
+        let sinYaw =    sin yaw
 
-        let cosRoll = cos roll
-        let cosPitch = cos pitch
-        let cosYaw = cos yaw
+        let cosRoll =   cos roll
+        let cosPitch =  cos pitch
+        let cosYaw =    cos yaw
 
         let cosPitchYaw = cosPitch * cosYaw
         let sinPitchYaw = sinPitch * sinYaw
 
         create
-            (cosRoll * cosPitchYaw + sinRoll * sinPitchYaw)
-            (sinRoll * cosPitchYaw - cosRoll * sinPitchYaw)
-            (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
-            (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
+            ((cosRoll * cosPitchYaw) + (sinRoll * sinPitchYaw))
+            ((sinRoll * cosPitchYaw) - (cosRoll * sinPitchYaw))
+            ((cosRoll * sinPitch * cosYaw) + (sinRoll * cosPitch * sinYaw))
+            ((cosRoll * cosPitch * sinYaw) - (sinRoll * sinPitch * cosYaw))
 
     let ofAxisAngle (axis: Vector3) (angle: single) =
         let angle = angle * 0.5f
         let sinAngle = sin angle
         let cosAngle = cos angle
 
-        create
-            cosAngle
-            (axis.X * sinAngle)
-            (axis.Y * sinAngle)
-            (axis.Z * sinAngle)
+        create cosAngle (axis.X * sinAngle) (axis.Y * sinAngle) (axis.Z * sinAngle)
 
-type Quaternion with
-    static member inline (*) (q1, q2) =
-        Quaternion.create
-            (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z)
-            (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y)
-            (q1.W * q2.Y + q1.Y * q2.W + q1.Z * q2.X - q1.X * q2.Z)
-            (q1.W * q2.Z + q1.Z * q2.W + q1.X * q2.Y - q1.Y * q2.X)
-
-    static member inline (*) (q, v) =
-        let vn = Vector3.normalize v
-        let vq = Quaternion.create 0.f vn.X vn.Y vn.Z
-        let result = q * (vq * Quaternion.conjugate q)
-
-        Vector3.create result.X result.Y result.Z
-
-// Note: Don't know if we will this need this in the future.
-module Rotation =
-    let rotatePointAroundVector (point: Vector3) (axis: Vector3) (angle: single) =
-        let q = Quaternion.ofAxisAngle axis (angle * (Math.PI / 180.f))
+    /// Note: Not sure if we will need this in the future.
+    let rotatePointAroundVector (point: Vector3) (axis: Vector3) (degrees: single) =
+        let q = ofAxisAngle axis (Math.``PI / 180`` * degrees)
         q * point
