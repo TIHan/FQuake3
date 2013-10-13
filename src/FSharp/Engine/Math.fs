@@ -41,9 +41,7 @@ module Math =
     let inline lerp (x: single) (y: single) (t: single) =
         x + (t * (y - x))
 
-/// <summary>
 /// Vector2
-/// </summary>
 type Vector2 =
     { X: single; Y: single }
 
@@ -61,6 +59,7 @@ module Vector2 =
 
     let zero = { X = 0.f; Y = 0.f }
 
+/// Vector3
 type Vector3 =
     { X: single; Y: single; Z: single }
 
@@ -177,9 +176,7 @@ type Vector3 with
     static member inline (-) (s, v) =
         Vector3.create (s - v.X) (s - v.Y) (s - v.Z)
 
-/// <summary>
-/// Vector4
-/// </summary>        
+/// Vector4      
 type Vector4 =
     { X: single; Y: single; Z: single; W: single }
     
@@ -203,18 +200,16 @@ module Vector4 =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 type Vector4 with
-    static member inline (*) (v1: Vector4, v2: Vector4) =
+    static member inline (*) (v1, v2) =
         Vector4.create (v1.X * v2.X) (v1.Y * v2.Y) (v1.Z * v2.Z) (v1.W * v2.W)
         
-    static member inline (+) (v1: Vector4, v2: Vector4) =
+    static member inline (+) (v1, v2) =
         Vector4.create (v1.X + v2.X) (v1.Y + v2.Y) (v1.Z + v2.Z) (v1.W + v2.W)
 
-    static member inline (-) (v1: Vector4, v2: Vector4) =
-        Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)
+    static member inline (-) (v1, v2) =
+        Vector4.create (v1.X - v2.X) (v1.Y - v2.Y) (v1.Z - v2.Z) (v1.W - v2.W)    
 
-/// <summary>
 /// Matrix2x2
-/// </summary>
 type Matrix2x2 =
     {
         M0_0: single;
@@ -242,9 +237,52 @@ module Matrix2x2 =
             M1_1 = 0.f;
         }
 
-/// <summary>
-/// Matrix4x4
-/// </summary>        
+/// Matrix3x3        
+type Matrix3x3 =     
+    {
+        M0_0: single;
+        M0_1: single;
+        M0_2: single;
+        M1_0: single;
+        M1_1: single;
+        M1_2: single;
+        M2_0: single;
+        M2_1: single;
+        M2_2: single;
+    }
+    
+    member inline this.Item
+            with get (i, j) =
+                match (i, j) with
+                | (0, 0) -> this.M0_0
+                | (0, 1) -> this.M0_1
+                | (0, 2) -> this.M0_2
+                | (1, 0) -> this.M1_0
+                | (1, 1) -> this.M1_1
+                | (1, 2) -> this.M1_2
+                | (2, 0) -> this.M2_0
+                | (2, 1) -> this.M2_1
+                | (2, 2) -> this.M2_2
+                | _ -> raise <| IndexOutOfRangeException ()
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Matrix3x3 =
+    let inline create m1 m2 m3 m4 m5 m6 m7 m8 m9 =
+        {
+            M0_0 = m1;
+            M0_1 = m2;
+            M0_2 = m3;
+            M1_0 = m4;
+            M1_1 = m5;
+            M1_2 = m6;
+            M2_0 = m7;
+            M2_1 = m8;
+            M2_2 = m9;
+        }
+
+    let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
+
+/// Matrix4x4       
 type Matrix4x4 =     
     {
         M0_0: single;
@@ -334,4 +372,42 @@ module Matrix4x4 =
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
+/// Quaternion
+type Quaternion =
+    { X: single; Y: single; Z: single; W: single }
 
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.W
+            | 1 -> this.X
+            | 2 -> this.Y
+            | 3 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Quaternion =
+    let inline create w x y z =
+        { Quaternion.W = w; X = x; Y = y; Z = z }
+
+    let ofEuler (v: Vector3) =
+        let pitch = Math.PI / 360.f * single v.[0]
+        let yaw = Math.PI / 360.f * single v.[1]
+        let roll = Math.PI / 360.f * single v.[2]
+
+        let sinRoll = sin roll
+        let sinPitch = sin pitch
+        let sinYaw = sin yaw
+
+        let cosRoll = cos roll
+        let cosPitch = cos pitch
+        let cosYaw = cos yaw
+
+        let cosPitchYaw = cosPitch * cosYaw
+        let sinPitchYaw = sinPitch * sinYaw
+
+        create
+            (cosRoll * cosPitchYaw + sinRoll * sinPitchYaw)
+            (sinRoll * cosPitchYaw - cosRoll * sinPitchYaw)
+            (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
+            (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
