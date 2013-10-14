@@ -533,7 +533,6 @@ module Main =
         )
 
     /// Calculates the portal orientation.
-    /// Note: Not finished.
     [<Pure>]
     let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orientation) (camera: Orientation) (refdef: TrRefdef) =
         // if the entity is just a mirror, don't use as a camera point
@@ -552,59 +551,42 @@ module Main =
         // project the origin onto the surface plane to get
         // an origin point we can rotate around
         let distance = (Vector3.dotProduct entity.Origin plane.Normal) - plane.Distance
-        let surfaceOrigin = Vector3.multiplyAdd -distance surface.Axis.X entity.Origin
+        let surface = { surface with Origin = Vector3.multiplyAdd -distance surface.Axis.X entity.Origin }
 
         // now get the camera origin and orientation
-        let cameraOrigin = entity.OldOrigin
-        let cameraAxis = { entity.Axis with X = Vector3.zero - camera.Axis.X; Y = Vector3.zero - camera.Axis.Y }
+        let camera =
+            { camera with
+                Origin = entity.OldOrigin;
+                Axis = { entity.Axis with X = Vector3.zero - entity.Axis.X; Y = Vector3.zero - entity.Axis.Y };
+            }
 
-        // optionally rotate
-        if entity.OldFrame > 0 then
-            // if a speed is specified
-            if entity.Frame > 0 then
-                // continuous rotate
-                let distance = single refdef.Time / 1000.f * single entity.Frame
-                let cameraAxisY = Quaternion.rotatePointAroundVector cameraAxis.Y cameraAxis.X distance
-                let cameraAxisZ = Vector3.crossProduct cameraAxis.X cameraAxisY
+        // optionally rotate and if a speed is specified
+        match entity.OldFrame = 0 && entity.SkinId = 0 with
+        | true -> (false, surface, camera)
+        | _ ->
 
-                (
-                    false,
-                    { surface with Origin = surfaceOrigin },
-                    { camera with Axis = { cameraAxis with Y = cameraAxisY; Z = cameraAxisZ }}
-                )
-            else
-                // bobbing rotate, with skinId being the rotation offset
-                let distance = single entity.SkinId + (sin <| single refdef.Time * 0.003f) * 4.f
+        let degrees =
+            match (entity.OldFrame <> 0, entity.Frame <> 0) with
+            | (true, true) -> single refdef.Time / 1000.f * single entity.Frame // continuous rotate
+            | (true, false) -> single entity.SkinId + (sin <| single refdef.Time * 0.003f) * 4.f // bobbing rotate, with skinId being the rotation offset
+            | _ -> single entity.SkinId
 
-                let cameraAxisY = Quaternion.rotatePointAroundVector cameraAxis.Y cameraAxis.X distance
-                let cameraAxisZ = Vector3.crossProduct cameraAxis.X cameraAxisY
+        let y = Quaternion.rotatePointAroundVector camera.Axis.Y camera.Axis.X degrees
 
-                (
-                    false,
-                    { surface with Origin = surfaceOrigin },
-                    { camera with Axis = { cameraAxis with Y = cameraAxisY; Z = cameraAxisZ }}
-                )       
-        else
-            if entity.SkinId > 0 then
-                let distance = single entity.SkinId
+        (
+            false,
+            surface,
+            { camera with 
+                Axis = 
+                { camera.Axis with 
+                    Y = y;
+                    Z = Vector3.crossProduct camera.Axis.X y
+                }
+            }
+        )
 
-                let cameraAxisY = Quaternion.rotatePointAroundVector cameraAxis.Y cameraAxis.X distance
-                let cameraAxisZ = Vector3.crossProduct cameraAxis.X cameraAxisY
-
-                (
-                    false,
-                    { surface with Origin = surfaceOrigin },
-                    { camera with Axis = { cameraAxis with Y = cameraAxisY; Z = cameraAxisZ }}
-                )
-            else
-                (
-                    false,
-                    { surface with Origin = surfaceOrigin },
-                    { camera with Axis = cameraAxis }
-                ) 
-
-    /// Based on Q3: R_GetPortalOrientation
-    /// GetPortalOrientation
+    /// Based on Q3: R_GetPortalOrientations
+    /// GetPortalOrientations
     ///
     /// entityId is the entity that the portal surface is a part of, which may
     /// be moving and rotating.
@@ -621,6 +603,9 @@ module Main =
 
         let surface = { surface with Axis = transformAxisOfNormal plane.Normal surface.Axis }
 
+        // locate the portal entity closest to this plane.
+        // origin will be the origin of the portal, origin2 will be
+        // the origin of the camera
         match tryFindClosestPortalEntityByPlane originalPlane tr with
         | None ->
             // if we didn't locate a portal entity, don't render anything.

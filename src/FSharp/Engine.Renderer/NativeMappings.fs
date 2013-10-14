@@ -85,6 +85,14 @@ module Orientation =
             Axis = Axis.ofNative &&native.axis;
         }
 
+    let inline toNativeByPtr (ptr: nativeptr<orientation_t>) (orientation: Orientation) =
+        let mutable native = NativePtr.read ptr
+
+        Vector3.toNativeByPtr &&native.origin orientation.Origin
+        Axis.toNativeByPtr &&native.axis orientation.Axis
+
+        NativePtr.write ptr native
+
 module OrientationR =
     let inline ofNative (native: orientationr_t) =
         {

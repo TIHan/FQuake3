@@ -940,143 +940,26 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
 							 orientation_t *surface, orientation_t *camera,
 							 vec3_t pvsOrigin, qboolean *mirror ) {
-	int			i;
-	cplane_t	originalPlane, plane;
-	trRefEntity_t	*e;
-	float		d;
-	vec3_t		transformed;
+	MObject m_tuple;
+	qboolean retval;
 
-	// create plane axis for the portal we are seeing
-	{
-		MObject m_original_plane;
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "getPortalOrientations", 6, {
+		__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
+		__args [1] = &entityNum;
+		__args [2] = m_object_as_arg (qm_of_orientation (surface));
+		__args [3] = m_object_as_arg (qm_of_orientation (camera));
+		__args [4] = m_object_as_arg (qm_of_vec3 (pvsOrigin));
+		__args [5] = m_object_as_arg (qm_of_tr_globals (&tr));
+	}, m_tuple);
 
-		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
-			__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
-		}, m_original_plane)
+	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item1"), &retval);
+	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item2"), mirror);
+	qm_to_ptr_orientation (m_object_get_property (m_tuple, "Item3"), surface);
+	qm_to_ptr_orientation (m_object_get_property (m_tuple, "Item4"), camera);
+	qm_to_vec3 (m_object_get_property (m_tuple, "Item5"), pvsOrigin);
+	qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item6"), &tr);
 
-		qm_to_ptr_plane (m_original_plane, &originalPlane);
-	}
-
-	// rotate the plane if necessary
-	{
-		MObject m_tuple;
-
-		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "tryRotatePlane", 3, {
-			__args [0] = m_object_as_arg (qm_of_plane (&originalPlane));
-			__args [1] = &entityNum;
-			__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
-		}, m_tuple);
-
-		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item1"), &originalPlane);
-		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item2"), &plane);
-		qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item3"), &tr);
-	}
-
-	{
-		MObject m_axis;
-
-		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "transformAxisOfNormal", 2, {
-			__args [0] = m_object_as_arg (qm_of_vec3 (plane.normal));
-			__args [1] = m_object_as_arg (qm_of_axis (surface->axis));
-		}, m_axis);
-
-		qm_to_ptr_axis (m_axis, surface->axis);
-	}
-
-	// locate the portal entity closest to this plane.
-	// origin will be the origin of the portal, origin2 will be
-	// the origin of the camera
-	for ( i = 0 ; i < tr.refdef.num_entities ; i++ ) {
-		e = &tr.refdef.entities[i];
-		if ( e->e.reType != RT_PORTALSURFACE ) {
-			continue;
-		}
-
-		d = DotProduct( e->e.origin, originalPlane.normal ) - originalPlane.dist;
-		if ( d > 64 || d < -64) {
-			continue;
-		}
-
-		// get the pvsOrigin from the entity
-		VectorCopy( e->e.oldorigin, pvsOrigin );
-
-		// if the entity is just a mirror, don't use as a camera point
-		if ( e->e.oldorigin[0] == e->e.origin[0] && 
-			e->e.oldorigin[1] == e->e.origin[1] && 
-			e->e.oldorigin[2] == e->e.origin[2] ) {
-			VectorScale( plane.normal, plane.dist, surface->origin );
-			VectorCopy( surface->origin, camera->origin );
-			VectorSubtract( vec3_origin, surface->axis[0], camera->axis[0] );
-			VectorCopy( surface->axis[1], camera->axis[1] );
-			VectorCopy( surface->axis[2], camera->axis[2] );
-
-			*mirror = qtrue;
-			return qtrue;
-		}
-
-		// project the origin onto the surface plane to get
-		// an origin point we can rotate around
-		d = DotProduct( e->e.origin, plane.normal ) - plane.dist;
-		VectorMA( e->e.origin, -d, surface->axis[0], surface->origin );
-			
-		// now get the camera origin and orientation
-		VectorCopy( e->e.oldorigin, camera->origin );
-		AxisCopy( e->e.axis, camera->axis );
-		VectorSubtract( vec3_origin, camera->axis[0], camera->axis[0] );
-		VectorSubtract( vec3_origin, camera->axis[1], camera->axis[1] );
-
-		// optionally rotate
-		if ( e->e.oldframe ) {
-			// if a speed is specified
-			if ( e->e.frame ) {
-				// continuous rotate
-				d = (tr.refdef.time/1000.0f) * e->e.frame;
-				VectorCopy( camera->axis[1], transformed );
-				RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
-				CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
-			} else {
-				// bobbing rotate, with skinNum being the rotation offset
-				d = sin( tr.refdef.time * 0.003f );
-				d = e->e.skinNum + d * 4;
-				VectorCopy( camera->axis[1], transformed );
-
-				{
-					MObject m_axis;
-
-					m_invoke_method_cache_easy ("Engine", "Engine.Math", "QuaternionModule", "rotatePointAroundVector", 3, {
-						__args [0] = m_object_as_arg (qm_of_vec3 (camera->axis [1]));
-						__args [1] = m_object_as_arg (qm_of_vec3 (camera->axis [0]));
-						__args [2] = &d;
-					}, m_axis);
-
-					qm_to_vec3 (m_axis, camera->axis [1]);
-				}
-
-				CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
-			}
-		}
-		else if ( e->e.skinNum ) {
-			d = e->e.skinNum;
-			VectorCopy( camera->axis[1], transformed );
-			RotatePointAroundVector( camera->axis[1], camera->axis[0], transformed, d );
-			CrossProduct( camera->axis[0], camera->axis[1], camera->axis[2] );
-		}
-		*mirror = qfalse;
-		return qtrue;
-	}
-
-	// if we didn't locate a portal entity, don't render anything.
-	// We don't want to just treat it as a mirror, because without a
-	// portal entity the server won't have communicated a proper entity set
-	// in the snapshot
-
-	// unfortunately, with local movement prediction it is easily possible
-	// to see a surface before the server has communicated the matching
-	// portal surface entity, so we don't want to print anything here...
-
-	//ri.Printf( PRINT_ALL, "Portal surface without a portal entity\n" );
-
-	return qfalse;
+	return retval;
 }
 #endif
 #if 0

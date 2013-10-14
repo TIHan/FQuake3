@@ -61,6 +61,10 @@ qm_to_##name## (MObject obj, type ptr); \
 void \
 qm_to_ptr_##name## (MObject obj, type ptr); \
 
+#define define_to_of_struct_prototype(name,type) \
+void \
+qm_to_of_struct_##name## (MObject obj, type ptr); \
+
 #define define_of(name,type,managed_name) \
 MObject \
 qm_of_##name## (type ptr) \
@@ -88,15 +92,27 @@ qm_to_ptr_##name## (MObject obj, type ptr) \
 	}); \
 } \
 
+#define define_to_of_struct(name,type,managed_name) \
+void \
+qm_to_of_struct_##name## (MObject obj, type ptr) \
+{ \
+	to_invoke_easy (managed_name, "toNativeByPtr", 2, { \
+		__args [0] = ptr; \
+		__args [1] = m_object_unbox_struct (obj); \
+	}); \
+} \
+
 #define define_mapping_prototype(name,type) \
 	define_of_prototype(name,type) \
 	define_to_prototype(name,type) \
 	define_to_ptr_prototype(name,type) \
+	define_to_of_struct_prototype(name,type,managed_name) \
 
 #define define_mapping(name,type,managed_name) \
 	define_of(name,type,managed_name) \
 	define_to(name,type,managed_name) \
 	define_to_ptr(name,type,managed_name) \
+	define_to_of_struct(name,type,managed_name) \
 
 define_mapping_prototype (qboolean, qboolean*);
 define_mapping_prototype (vec3, vec3_t);
