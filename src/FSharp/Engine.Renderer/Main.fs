@@ -599,6 +599,7 @@ module Main =
     /// Based on Q3: IsMirror
     /// IsMirror
     /// Note: this is internal
+    [<Pure>]
     let isMirror (drawSurface: DrawSurface) (entityId: int) (tr: TrGlobals) =
         // create plane axis for the portal we are seeing
         let originalPlane = createPlaneAxis drawSurface
@@ -618,3 +619,8 @@ module Main =
         match e.Entity.OldOrigin = e.Entity.Origin with
         | true -> (true, tr)
         | _ -> (false, tr)
+
+    /// Based on Q3: R_DecomposeSort
+    /// DecomposeSort
+    let decomposeSort (sort: uint64) (sortedShaders: Shader list) =
+        ()

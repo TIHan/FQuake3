@@ -878,51 +878,98 @@ type ShaderStage =
 /// </summary>
 type Shader =
     {
-        Name: string;               // game path, including extension
-        LightmapIndex: int;         // for a shader to match, both name and lightmapIndex must match
-        Index: int;                 // this shader == tr.shaders[index]
-        SortedIndex: int;           // this shader == tr.sortedShaders[sortedIndex]
-        Sort: single;               // lower numbered shaders draw before higher numbered
+        /// game path, including extension
+        Name: string;
 
-        // we want to return index 0 if the shader failed to
-        // load for some reason, but R_FindShader should
-        // still keep a name allocated for it, so if
-        // something calls RE_RegisterShader again with
-        // the same name, we don't try looking for it again
+        /// for a shader to match, both name and lightmapIndex must match
+        LightmapIndex: int;
+
+        /// this shader == tr.shaders[index]
+        Index: int;
+
+        /// this shader == tr.sortedShaders[sortedIndex]
+        SortedIndex: int;
+
+        /// lower numbered shaders draw before higher numbered
+        Sort: single;
+
+        /// we want to return index 0 if the shader failed to
+        /// load for some reason, but R_FindShader should
+        /// still keep a name allocated for it, so if
+        /// something calls RE_RegisterShader again with
+        /// the same name, we don't try looking for it again
         IsDefaultShader: bool;
 
-        IsExplicitlyDefined: bool;  // found in a .shader file
-        SurfaceFlags: int;          // if explicitlyDefined, this will have SURF_* flags
+        /// found in a .shader file
+        IsExplicitlyDefined: bool;
+
+        /// if explicitlyDefined, this will have SURF_* flags
+        SurfaceFlags: int;
         ContentFlags: int;
-        IsEntityMergable: bool;     // merge across entites optimizable (smoke, blood)
+
+        /// merge across entites optimizable (smoke, blood)
+        IsEntityMergable: bool;
         IsSky: bool;
         Sky: SkyParms;
         Fog: FogParms;
-        PortalRange: single;        // distance to fog out at
-        MultitextureEnv: int;       // 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
-        CullType: CullType;         // CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
-        HasPolygonOffset: bool;     // set for decals and other items that must be offset 
-        HasNoMipMaps: bool;         // for console fonts, 2D elements, etc.
-        HasNoPicMip: bool;          // for images that must always be full resolution
-        FogType: FogType;           // draw a blended pass, possibly with depth test equals
-        NeedsNormal: bool;          // not all shaders will need all data to be gathered
+
+        /// distance to fog out at
+        PortalRange: single;
+
+        /// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
+        MultitextureEnv: int;
+
+        /// CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
+        CullType: CullType;
+
+        /// set for decals and other items that must be offset 
+        HasPolygonOffset: bool;
+
+        /// for console fonts, 2D elements, etc.
+        HasNoMipMaps: bool;
+
+        /// for images that must always be full resolution
+        HasNoPicMip: bool;
+
+        /// draw a blended pass, possibly with depth test equals
+        FogType: FogType;
+
+        // not all shaders will need all data to be gathered
+        NeedsNormal: bool;
         NeedsSt1: bool;
         NeedsSt2: bool;
         NeedsColor: bool;
-        Deforms: DeformStage seq;
-        Stages: ShaderStage seq;
+        Deforms: DeformStage list;
+        Stages: ShaderStage list;
         // void (*optimimalStageIteratorFunc)( void ); <-- TODO: Need to figure what to do with this guy.
-        ClampTime: single;              // time this shader is clamped to
-        TimeOffset: single;             // current time offset for this shader
+
+        /// time this shader is clamped to
+        ClampTime: single;
+
+        /// current time offset for this shader
+        TimeOffset: single;
 
         // Is StateId a better name vs. numStates?
-        StateId: int;                   // if non-zero this is a state shader
-        CurrentShader: Shader option;   // current state if this is a state shader
-        ParentShader: Shader option;    // current state if this is a state shader
-        CurrentState: int;              // current state index for cycle purposes
-        ExpireTime: int64;              // time in milliseconds this expires
-        RemappedShader: Shader option;  // current shader this one is remapped too
-        ShaderStates: int seq;          // index to valid shader states
+        /// if non-zero this is a state shader
+        StateId: int;
+
+        /// current state if this is a state shader
+        CurrentShader: Shader option;
+
+        /// current state if this is a state shader
+        ParentShader: Shader option;
+
+        /// current state index for cycle purposes
+        CurrentState: int;
+
+        /// time in milliseconds this expires
+        ExpireTime: int64;
+
+        /// current shader this one is remapped too
+        RemappedShader: Shader option;
+
+        /// index to valid shader states
+        ShaderStates: int list;
         Next: Shader option;
     }
 
