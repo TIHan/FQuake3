@@ -1025,63 +1025,19 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 #else
 static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
-	int			i;
-	cplane_t	originalPlane, plane;
-	trRefEntity_t	*e;
-	float		d;
+	MObject m_tuple;
+	qboolean retval;
 
-	// create plane axis for the portal we are seeing
-	{
-		MObject m_original_plane;
+	m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "isMirror", 3, {
+		__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
+		__args [1] = &entityNum;
+		__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
+	}, m_tuple);
 
-		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "createPlaneAxis", 1, {
-			__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
-		}, m_original_plane)
+	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item1"), &retval);
+	qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item2"), &tr);
 
-		qm_to_ptr_plane (m_original_plane, &originalPlane);
-	}
-
-	// rotate the plane if necessary
-	{
-		MObject m_tuple;
-
-		m_invoke_method_cache_easy ("Engine.Renderer", "Engine.Renderer", "Main", "tryRotatePlane", 3, {
-			__args [0] = m_object_as_arg (qm_of_plane (&originalPlane));
-			__args [1] = &entityNum;
-			__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
-		}, m_tuple);
-
-		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item1"), &originalPlane);
-		qm_to_ptr_plane (m_object_get_property (m_tuple, "Item2"), &plane);
-		qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item3"), &tr);
-	}
-
-	// locate the portal entity closest to this plane.
-	// origin will be the origin of the portal, origin2 will be
-	// the origin of the camera
-	for ( i = 0 ; i < tr.refdef.num_entities ; i++ ) 
-	{
-		e = &tr.refdef.entities[i];
-		if ( e->e.reType != RT_PORTALSURFACE ) {
-			continue;
-		}
-
-		d = DotProduct( e->e.origin, originalPlane.normal ) - originalPlane.dist;
-		if ( d > 64 || d < -64) {
-			continue;
-		}
-
-		// if the entity is just a mirror, don't use as a camera point
-		if ( e->e.oldorigin[0] == e->e.origin[0] && 
-			e->e.oldorigin[1] == e->e.origin[1] && 
-			e->e.oldorigin[2] == e->e.origin[2] ) 
-		{
-			return qtrue;
-		}
-
-		return qfalse;
-	}
-	return qfalse;
+	return retval;
 }
 #endif
 /*

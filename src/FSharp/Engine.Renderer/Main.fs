@@ -167,30 +167,22 @@ module Main =
     [<Pure>]
     let transformModelToClip (source: Vector3) (modelMatrix: Matrix4x4) (projectionMatrix: Matrix4x4) =
         let inline calculateEye i =
-            (source.X * modelMatrix.[0, i]) +
-            (source.Y * modelMatrix.[1, i]) +
-            (source.Z * modelMatrix.[2, i]) +
-            (1.f * modelMatrix.[3, i])
+            (source.X * modelMatrix.[0, i]) + (source.Y * modelMatrix.[1, i]) +
+            (source.Z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
           
         let eye =
             Vector4.create
-                (calculateEye 0)
-                (calculateEye 1)
-                (calculateEye 2)
-                (calculateEye 3)
+                (calculateEye 0) (calculateEye 1)
+                (calculateEye 2) (calculateEye 3)
 
         let inline calculateDestination i =
-            (eye.X * projectionMatrix.[0, i]) +
-            (eye.Y * projectionMatrix.[1, i]) +
-            (eye.Z * projectionMatrix.[2, i]) +
-            (eye.W * projectionMatrix.[3, i])
+            (eye.X * projectionMatrix.[0, i]) + (eye.Y * projectionMatrix.[1, i]) +
+            (eye.Z * projectionMatrix.[2, i]) + (eye.W * projectionMatrix.[3, i])
 
         (eye,
             Vector4.create
-                (calculateDestination 0)
-                (calculateDestination 1)
-                (calculateDestination 2)
-                (calculateDestination 3)
+                (calculateDestination 0) (calculateDestination 1)
+                (calculateDestination 2) (calculateDestination 3)
         )
     
     /// <summary>
@@ -238,22 +230,10 @@ module Main =
 
         let glMatrix =
             Matrix4x4.create
-                axis.[0].[0]
-                axis.[0].[1]
-                axis.[0].[2]
-                0.f
-                axis.[1].[0]
-                axis.[1].[1]
-                axis.[1].[2]
-                0.f
-                axis.[2].[0]
-                axis.[2].[1]
-                axis.[2].[2]
-                0.f
-                origin.X
-                origin.Y
-                origin.Z
-                1.f
+                axis.[0].[0] axis.[0].[1] axis.[0].[2] 0.f
+                axis.[1].[0] axis.[1].[1] axis.[1].[2] 0.f
+                axis.[2].[0] axis.[2].[1] axis.[2].[2] 0.f
+                origin.X origin.Y origin.Z 1.f
 
         // calculate the viewer origin in the model's space
         // needed for fog, specular, and environment mapping
@@ -293,18 +273,9 @@ module Main =
 
         let viewerMatrix =
             Matrix4x4.create
-                axis.[0].[0]
-                axis.[1].[0]
-                axis.[2].[0]
-                0.f
-                axis.[0].[1]
-                axis.[1].[1]
-                axis.[2].[1]
-                0.f
-                axis.[0].[2]
-                axis.[1].[2]
-                axis.[2].[2]
-                0.f
+                axis.[0].[0] axis.[1].[0] axis.[2].[0] 0.f
+                axis.[0].[1] axis.[1].[1] axis.[2].[1] 0.f
+                axis.[0].[2] axis.[1].[2] axis.[2].[2] 0.f
                 (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2])
                 (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2])
                 (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2])
@@ -635,4 +606,15 @@ module Main =
         // rotate the plane if necessary
         match tryRotatePlane originalPlane entityId tr with
         | (originalPlane, plane, tr) ->
-        ()
+
+        // locate the portal entity closest to this plane.
+        // origin will be the origin of the portal, origin2 will be
+        // the origin of the camera
+        match tryFindClosestPortalEntityByPlane originalPlane tr with
+        | None -> (false, tr)
+        | Some e ->
+
+        // if the entity is just a mirror, don't use as a camera point
+        match e.Entity.OldOrigin = e.Entity.Origin with
+        | true -> (true, tr)
+        | _ -> (false, tr)
