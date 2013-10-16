@@ -37,14 +37,15 @@ open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
 
-/// <summary>
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
 /// ClipType
-/// </summary>
 type ClipType =
-    | In = 0    // completely unclipped
-    | Clip = 1  // clipped by one or more planes
-    | Out = 2   // completely outside the clipping planes
+    /// completely unclipped
+    | In = 0
+    /// clipped by one or more planes
+    | Clip = 1
+    /// completely outside the clipping planes
+    | Out = 2
 
 /// <summary>
 /// Based on Q3: PLANE_X, PLANE_Y, PLANE_Z, PLANE_NON_AXIAL
@@ -1082,18 +1083,14 @@ type World =
         EntityParsePoint: string;
     }
 
-/// <summary>
 /// Based on Q3: md3Header_t
 /// Md3Header
-/// </summary>
 type Md3Header =
     {
         Id: int;
         Version: int;
 
-        /// <summary>
         /// model name
-        /// </summary>
         Name: string;
         Flags: int;
         FrameCount: int;
@@ -1101,24 +1098,16 @@ type Md3Header =
         SurfaceCount: int;
         SkinCount: int;
 
-        /// <summary>
         /// first surface
-        /// </summary>
         FrameOffset: int;
 
-        /// <summary>
         /// numFrames * numTags
-        /// </summary>
         TagOffset: int;
 
-        /// <summary>
         /// first surface, others follow
-        /// </summary>
         SurfaceOffset: int;
 
-        /// <summary>
         /// end of file
-        /// </summary>
         EndOffset: int;
     }
 
@@ -1192,6 +1181,28 @@ type Refdef =
         // TODO:
     }
 
+/// ClippingPerformanceCounters
+type ClippingPerformanceCounters =
+    {
+        CullIn: int;
+        CullClip: int;
+        CullOut: int;
+    }
+
+/// Based on Q3: frontEndCounters_t
+/// FrontEndPerformanceCounters
+type FrontEndPerformanceCounters =
+    {
+        SpherePatch: ClippingPerformanceCounters;
+        BoxPatch: ClippingPerformanceCounters;
+        SphereMd3: ClippingPerformanceCounters;
+        BoxMd3: ClippingPerformanceCounters;
+
+        Leafs: int;
+        DynamicLightSurfaces: int
+        DynamicLightSurfacesCulled: int;
+    }
+
 /// <summary>
 /// Based on Q3: trGlobals_t
 /// TrGlobals
@@ -1212,6 +1223,7 @@ type TrGlobals =
         ViewParms: ViewParms;
         Refdef: TrRefdef;
         Orientation: OrientationR;
+        // TODO:
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]

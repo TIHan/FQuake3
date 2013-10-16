@@ -472,10 +472,10 @@ type frontEndCounters_t =
     val mutable c_box_cull_patch_in : int
     val mutable c_box_cull_patch_clip : int
     val mutable c_box_cull_patch_out : int
-    val mutable c_sphere_cull_md3_int : int
+    val mutable c_sphere_cull_md3_in : int
     val mutable c_sphere_cull_md3_clip : int
     val mutable c_sphere_cull_md3_out : int
-    val mutable c_box_cull_md3_int : int
+    val mutable c_box_cull_md3_in : int
     val mutable c_box_cull_md3_clip : int
     val mutable c_box_cull_md3_out : int
     val mutable c_leafs : int

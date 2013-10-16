@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Types.fs" />
     <Compile Include="Main.fs" />
+    <Compile Include="Mesh.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
     <None Include="packages.config" />

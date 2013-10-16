@@ -494,6 +494,39 @@ module TrRefdef =
             DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNative x) native.drawSurfs;
         }
 
+module FrontEndPerformanceCounters =
+    let inline ofNative (native: frontEndCounters_t) =
+        {
+            SpherePatch = { CullIn = native.c_sphere_cull_patch_in; CullClip = native.c_sphere_cull_patch_clip; CullOut = native.c_sphere_cull_patch_out };
+            BoxPatch = { CullIn = native.c_box_cull_patch_in; CullClip = native.c_box_cull_patch_clip; CullOut = native.c_box_cull_patch_out };
+            SphereMd3 = { CullIn = native.c_sphere_cull_md3_in; CullClip = native.c_sphere_cull_md3_clip; CullOut = native.c_sphere_cull_md3_out };
+            BoxMd3 = { CullIn = native.c_box_cull_md3_in; CullClip = native.c_box_cull_md3_clip; CullOut = native.c_box_cull_md3_out };
+            Leafs = native.c_leafs;
+            DynamicLightSurfaces = native.c_dlightSurfaces;
+            DynamicLightSurfacesCulled = native.c_dlightSurfacesCulled
+        }
+
+    let inline toNativeByPtr (ptr: nativeptr<frontEndCounters_t>) (value: FrontEndPerformanceCounters) =
+        let mutable native = NativePtr.read ptr
+
+        native.c_sphere_cull_patch_in <- value.SpherePatch.CullIn
+        native.c_sphere_cull_patch_clip <- value.SpherePatch.CullClip
+        native.c_sphere_cull_patch_out <- value.SpherePatch.CullOut
+        native.c_box_cull_patch_in <- value.BoxPatch.CullIn
+        native.c_box_cull_patch_clip <- value.BoxPatch.CullClip
+        native.c_box_cull_patch_out <- value.BoxPatch.CullOut
+        native.c_sphere_cull_md3_in <- value.SphereMd3.CullIn
+        native.c_sphere_cull_md3_clip <- value.SphereMd3.CullClip
+        native.c_sphere_cull_md3_out <- value.SphereMd3.CullOut
+        native.c_box_cull_md3_in <- value.BoxMd3.CullIn
+        native.c_box_cull_md3_clip <- value.BoxMd3.CullOut
+        native.c_box_cull_md3_out <- value.BoxMd3.CullOut
+        native.c_leafs <- value.Leafs
+        native.c_dlightSurfaces <- value.DynamicLightSurfaces
+        native.c_dlightSurfacesCulled <- value.DynamicLightSurfacesCulled
+
+        NativePtr.write ptr native
+
 // TODO: This will need more work over time.
 module TrGlobals =
     let inline ofNative (native: trGlobals_t) =
