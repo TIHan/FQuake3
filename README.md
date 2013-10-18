@@ -43,8 +43,7 @@ You will need a commercial copy of Quake III Arena, preferably with Team Arena a
 ####Windows 7 / 8
 Download and install the following:
 
-* Visual Studio 2012 ( _[Trial](http://www.microsoft.com/visualstudio/eng/products/visual-studio-premium-2012)_ ) ( _[Express Edition](http://www.microsoft.com/visualstudio/eng/products/visual-studio-express-for-windows-desktop#product-express-desktop) not tested_ )
-* [F# compiler](http://go.microsoft.com/fwlink/?LinkID=261287) (if not installed)
+* Visual Studio 2013 ( _[Trial](http://www.microsoft.com/visualstudio/eng/downloads#d-2013-editions)_ ) ( _[Express for Windows](http://www.microsoft.com/visualstudio/eng/downloads#d-2013-express) not tested_ )
 * [Mono 3.2.3](http://download.mono-project.com/archive/3.2.3/windows-installer/mono-3.2.3-gtksharp-2.12.11-win32-0.exe)
 
 #####Setting Up Mono
