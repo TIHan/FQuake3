@@ -70,6 +70,8 @@
     <Compile Include="IO.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="System.fs" />
+    <Compile Include="Md3.fs" />
+    <Compile Include="Md4.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
     <None Include="packages.config" />

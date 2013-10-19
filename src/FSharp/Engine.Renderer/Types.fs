@@ -34,6 +34,7 @@ open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
+open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
 
@@ -1081,60 +1082,6 @@ type World =
 
         EntityString: string;
         EntityParsePoint: string;
-    }
-
-/// Based on Q3: md3Header_t
-/// Md3Header
-type Md3Header =
-    {
-        Id: int;
-        Version: int;
-
-        /// model name
-        Name: string;
-        Flags: int;
-        FrameCount: int;
-        TagCount: int;
-        SurfaceCount: int;
-        SkinCount: int;
-
-        /// first surface
-        FrameOffset: int;
-
-        /// numFrames * numTags
-        TagOffset: int;
-
-        /// first surface, others follow
-        SurfaceOffset: int;
-
-        /// end of file
-        EndOffset: int;
-    }
-
-/// <summary>
-/// Based on Q3: md4Header_t
-/// M43Header
-/// </summary>
-type Md4Header =
-    {
-        Id: int;
-        Version: int;
-
-        /// <summary>
-        /// model name
-        /// </summary>
-        Name: string;
-
-        // frames and bones are shared by all levels of detail
-        Framecount: int;
-        BoneCount: int;
-        BoneNameOffset: int;    // char name[ MAX_QPATH ] 
-        FrameOffset: int;       // md4Frame_t[numFrames]
-
-        // each level of detail has completely separate sets of surfaces
-        LodCount: int;
-        LodOffset: int;
-        EndOffset: int;         // end of file
     }
 
 /// <summary>

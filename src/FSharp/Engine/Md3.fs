@@ -19,20 +19,33 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine.Renderer
+namespace Engine.Files
 
-open System
-open System.IO
-open System.Threading
-open System.Diagnostics
-open System.Diagnostics.Contracts
-open Engine.Core
-open Engine.Files
-open Engine.Math
-open Engine.NativeInterop
+/// Based on Q3: md3Header_t
+/// Md3Header
+type Md3Header =
+    {
+        Id: int;
+        Version: int;
 
-module Mesh =
-    /// Based on Q3: R_CullModel
-    /// CullModel
-    let cullModel (header: Md3Header) (entity: TrRefEntity) (perfCounters: FrontEndPerformanceCounters) =
-        ()
+        /// model name
+        Name: string;
+        Flags: int;
+        FrameCount: int;
+        TagCount: int;
+        SurfaceCount: int;
+        SkinCount: int;
+
+        /// first surface
+        FrameOffset: int;
+
+        /// numFrames * numTags
+        TagOffset: int;
+
+        /// first surface, others follow
+        SurfaceOffset: int;
+
+        /// end of file
+        EndOffset: int;
+    }
+
