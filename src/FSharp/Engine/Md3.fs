@@ -49,3 +49,44 @@ type Md3Header =
         EndOffset: int;
     }
 
+module Md3 =
+    /// (('3'<<24)+('P'<<16)+('D'<<8)+'I')
+    /// Is this right?
+    [<Literal>]
+    let ident = 16uy
+
+    [<Literal>]
+    let version = 15
+
+    /// 1.0 / 64.0
+    [<Literal>]
+    let xyzScale = 0.015625f
+
+    module Limits = 
+        [<Literal>]
+        let maxLods = 3
+
+        /// per surface
+        [<Literal>]
+        let maxTriangles = 8192
+
+        /// per surface
+        [<Literal>]
+        let maxVertices = 4096
+
+        /// per surface
+        [<Literal>]
+        let maxShaders = 256
+
+        /// per model
+        [<Literal>]
+        let maxFrames = 1024
+
+        /// per model
+        [<Literal>]
+        let maxSurfaces = 32
+
+        /// per frame
+        [<Literal>]
+        let maxTags = 16
+
