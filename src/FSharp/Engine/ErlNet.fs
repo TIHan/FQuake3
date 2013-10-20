@@ -37,10 +37,22 @@ open Engine.NativeInterop
 type ErlCommand =
     | Ping
 
+    member this.Id with get () =
+        let type' = this.GetType ()
+        let property = type'.GetProperty "Tag"
+
+        property.GetValue (this) :?> int
+
 /// ErlEvent
 type ErlEvent =
     | Pong
     | CommandSent of string
+
+    member this.Id with get () =
+        let type' = this.GetType ()
+        let property = type'.GetProperty "Tag"
+
+        property.GetValue (this) :?> int
 
 module ErlNet =
     let mutable private socket_ : Socket option = None
@@ -61,7 +73,7 @@ module ErlNet =
 
         match cmd with
         | Ping ->
-            socket.Send([| 0uy |]) |> ignore
+            socket.Send([| byte cmd.Id |]) |> ignore
         | _ ->
             ()    
 

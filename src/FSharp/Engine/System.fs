@@ -140,9 +140,6 @@ module System =
             // make sure mouse and joystick are only called once a frame
             Input.Frame ()
 
-            // run the game
-            Common.Frame ();
-
             // ErlNet
 
             ErlNet.handleEvents (fun evt ->
@@ -152,6 +149,9 @@ module System =
             )
 
             // End ErlNet
+
+            // run the game
+            Common.Frame ();
 
             // Flush standard out
             io.FlushOut ()
