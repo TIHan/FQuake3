@@ -46,6 +46,20 @@ module private Native =
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Cmd_ArgsBuffer (StringBuilder buffer, int length)
 
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    extern void Cbuf_ExecuteText(int execWhen, string text)
+
+type CommandExecutionType =
+    /// don't return until completed, a VM should NEVER use this,
+    /// because some commands might cause the VM to be unloaded...
+    | Now = 0
+
+    // insert at current position, but don't run yet
+    | Insert = 1
+
+    // add to end of the command buffer (normal case)
+    | Append = 2
+
 module Command =
     let Add (name: string) (f: unit -> unit) =
         let cmd = Native.XCommand (f)
@@ -59,4 +73,7 @@ module Command =
         let sb = StringBuilder (1024)
         Native.Cmd_ArgsBuffer (sb, 1024)
         sb.ToString ()
+
+    let ExecuteText (cmdExec: CommandExecutionType) (text: string) =
+        Native.Cbuf_ExecuteText (int cmdExec, text)
 

@@ -114,7 +114,6 @@ module System =
 
         Command.Add ("erl_ping") (fun () -> 
             ErlNet.send Ping
-            printfn "%s" <| ErlNet.receive ()
         )
 
         // hide the early console since we've reached the point where we
@@ -137,6 +136,13 @@ module System =
 
             // run the game
             Common.Frame ();
+
+            match ErlNet.receive () with
+            | None -> ()
+            | Some msg ->
+                match msg with
+                | "Pong" -> printfn "Pong"
+                | _ -> Command.ExecuteText CommandExecutionType.Insert msg
 
             // Flush standard out
             io.FlushOut ()

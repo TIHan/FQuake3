@@ -343,7 +343,7 @@ void Cbuf_Init (void);
 void Cbuf_AddText( const char *text );
 // Adds command text at the end of the buffer, does NOT add a final \n
 
-void Cbuf_ExecuteText( int exec_when, const char *text );
+M_EXPORT void M_DECL Cbuf_ExecuteText( int exec_when, const char *text );
 // this can be used in place of either Cbuf_AddText or Cbuf_InsertText
 
 void Cbuf_Execute (void);

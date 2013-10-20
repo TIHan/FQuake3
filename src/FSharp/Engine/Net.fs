@@ -121,12 +121,17 @@ module ErlNet =
 
     let receive () =
         match socket_ with
-        | None -> ""
+        | None -> None
         | Some x ->
         let mutable buffer = Array.create 1024 0uy
+        
+        match x.Available with
+        | 0 -> None
+        | _ ->
+
         let size = x.Receive(buffer) - 1
 
-        System.Text.Encoding.UTF8.GetString(buffer.[..size])
+        Some <| System.Text.Encoding.UTF8.GetString(buffer.[..size])
 
 module Net =
     let Init () =
