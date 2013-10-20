@@ -112,9 +112,15 @@ module System =
         Common.Init ""
         Net.Init ()
 
+        // ErlNet
+
+        ErlNet.init ()
+
         Command.Add ("erl_ping") (fun () -> 
-            ErlNet.send Ping
+            ErlNet.dispatch Ping
         )
+
+        // End ErlNet
 
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
@@ -137,12 +143,15 @@ module System =
             // run the game
             Common.Frame ();
 
-            match ErlNet.receive () with
-            | None -> ()
-            | Some msg ->
-                match msg with
-                | "Pong" -> printfn "Pong"
-                | _ -> Command.ExecuteText CommandExecutionType.Insert msg
+            // ErlNet
+
+            ErlNet.handleEvents (fun evt ->
+                match evt with
+                | Pong -> printfn "Pong"
+                | CommandSent x ->  Command.ExecuteText CommandExecutionType.Insert x
+            )
+
+            // End ErlNet
 
             // Flush standard out
             io.FlushOut ()

@@ -90,52 +90,8 @@ type Address =
         Port: uint16;
     }
 
-/// ErlMessage
-type ErlMessage =
-    | Ping
-    | AddBot
-
-module ErlNet =
-    let mutable private socket_ : Socket option = None
-    
-    type ErlMessageType =
-        | Ping = 0
-        | AddBot = 1
-
-    let init () =
-        let socket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
-
-        socket.Connect ("localhost", 37950)
-        socket_ <- Some <| socket
-
-    let send (msg: ErlMessage) =
-        match socket_ with
-        | None -> ()
-        | Some x ->
-
-        match msg with
-        | Ping ->
-            x.Send([| byte ErlMessageType.Ping |]) |> ignore
-        | _ ->
-            ()
-
-    let receive () =
-        match socket_ with
-        | None -> None
-        | Some x ->
-        let mutable buffer = Array.create 1024 0uy
-        
-        match x.Available with
-        | 0 -> None
-        | _ ->
-
-        let size = x.Receive(buffer) - 1
-
-        Some <| System.Text.Encoding.UTF8.GetString(buffer.[..size])
-
 module Net =
     let Init () =
-        ErlNet.init ()
         Native.NET_Init ()
 
     /// Based on Q3: NET_IPSocket
