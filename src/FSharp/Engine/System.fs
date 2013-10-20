@@ -112,6 +112,11 @@ module System =
         Common.Init ""
         Net.Init ()
 
+        Command.Add ("erl_ping") (fun () -> 
+            ErlNet.send Ping
+            printfn "%s" <| ErlNet.receive ()
+        )
+
         // hide the early console since we've reached the point where we
         // have a working graphics subsystems
         match (Common.CheckIsDedicated (), Common.CheckIsViewLogEnabled ()) with

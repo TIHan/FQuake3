@@ -41,10 +41,8 @@ module private Native =
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void NET_Init ()
 
-/// <summary>
 /// Based on Q3: msg_t
 /// Message
-/// </summary>
 type Message =
     {
         IsAllowedOverflow: bool;    // if false, do a Com_Error
@@ -56,10 +54,8 @@ type Message =
         Bit: int;                   // for bitwise reads and writes
     }
 
-/// <summary>
 /// Based on Q3: netadrtype_t
 /// AddressType
-/// </summary>
 type AddressType =
     | Bot = 0
     | Bad = 1           // an address lookup failed
@@ -85,10 +81,8 @@ type IPAddress =
             Octet3 = octet3;
         }
 
-/// <summary>
 /// Based on Q3: netadr_t
 /// Address
-/// </summary>
 type Address =
     {
         Type: AddressType;
@@ -96,14 +90,51 @@ type Address =
         Port: uint16;
     }
 
+/// ErlMessage
+type ErlMessage =
+    | Ping
+    | AddBot
+
+module ErlNet =
+    let mutable private socket_ : Socket option = None
+    
+    type ErlMessageType =
+        | Ping = 0
+        | AddBot = 1
+
+    let init () =
+        let socket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+
+        socket.Connect ("localhost", 37950)
+        socket_ <- Some <| socket
+
+    let send (msg: ErlMessage) =
+        match socket_ with
+        | None -> ()
+        | Some x ->
+
+        match msg with
+        | Ping ->
+            x.Send([| byte ErlMessageType.Ping |]) |> ignore
+        | _ ->
+            ()
+
+    let receive () =
+        match socket_ with
+        | None -> ""
+        | Some x ->
+        let mutable buffer = Array.create 1024 0uy
+        let size = x.Receive(buffer) - 1
+
+        System.Text.Encoding.UTF8.GetString(buffer.[..size])
+
 module Net =
     let Init () =
+        ErlNet.init ()
         Native.NET_Init ()
 
-    /// <summary>
     /// Based on Q3: NET_IPSocket
     /// Socket
-    /// </summary
     let createIPSocket (netInterface: string option) (port: int) =
         match netInterface with
         | Some x -> printfn "Opening IP socket: %s:%i" x port
@@ -142,9 +173,7 @@ module Net =
             socket.Close ()
             0
 
-    /// <summary>
     /// Based on Q3: Sys_GetPacket
     /// GetPacket
-    /// </summary
     let getPacket (address: Address) (msg: Message) (socket: int) =
         ()
