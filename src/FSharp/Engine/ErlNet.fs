@@ -46,7 +46,6 @@ type ErlCommand =
 /// ErlEvent
 type ErlEvent =
     | Pong
-    | CommandSent of string
 
     member this.Id with get () =
         let type' = this.GetType ()
@@ -55,36 +54,30 @@ type ErlEvent =
         property.GetValue (this) :?> int
 
 module ErlNet =
+    [<Literal>]
+    let private Call = 0uy
+    
+    [<Literal>]
+    let private Cast = 1uy
+
     let mutable private socket_ : Socket option = None
     let mutable private buffer_ = Array.zeroCreate<byte> 8192
 
     let init () =
-        let socket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, Blocking = false)
+        let socket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, Blocking = false, NoDelay = true)
 
         socket.Connect ("localhost", 37950)
         socket_ <- Some <| socket
 
-    let checkIsConnected () = socket_.IsSome
-
-    let dispatch (cmd: ErlCommand) =
+    let cast (cmd: ErlCommand) =
         match socket_ with
         | None -> ()
         | Some socket ->
 
         match cmd with
         | Ping ->
-            socket.Send([| byte cmd.Id |]) |> ignore
+            let msg = byte cmd.Id
+            socket.Send([| Cast; msg; |]) |> ignore
         | _ ->
-            ()    
-
-    let handleEvents (f: ErlEvent -> unit) =
-        match socket_ with
-        | None -> ()
-        | Some socket ->
-
-        while socket.Available <> 0 do
-            let size = socket.Receive(buffer_)
-            match System.Text.Encoding.UTF8.GetString(buffer_.[..size - 1]) with
-            | "Pong" -> f Pong
-            | x -> f <| CommandSent x
+            ()
 

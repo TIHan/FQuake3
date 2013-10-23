@@ -117,7 +117,7 @@ module System =
         ErlNet.init ()
 
         Command.Add ("erl_ping") (fun () -> 
-            ErlNet.dispatch Ping
+            ErlNet.cast Ping
         )
 
         // End ErlNet
@@ -139,16 +139,6 @@ module System =
 
             // make sure mouse and joystick are only called once a frame
             Input.Frame ()
-
-            // ErlNet
-
-            ErlNet.handleEvents (fun evt ->
-                match evt with
-                | Pong -> printfn "Pong"
-                | CommandSent x ->  Command.ExecuteText CommandExecutionType.Insert x
-            )
-
-            // End ErlNet
 
             // run the game
             Common.Frame ();

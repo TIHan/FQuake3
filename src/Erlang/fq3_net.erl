@@ -1,4 +1,4 @@
--module(net).
+-module(fq3_net).
 
 -export([create_ip_socket/2]).
 
