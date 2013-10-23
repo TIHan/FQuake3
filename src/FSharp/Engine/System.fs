@@ -117,7 +117,7 @@ module System =
         ErlNet.init ()
 
         Command.Add ("erl_ping") (fun () -> 
-            ErlNet.cast Ping
+            printfn "%s" <| ErlNet.call Ping
         )
 
         // End ErlNet

@@ -2,9 +2,6 @@
 
 -export([start/0]).
 
--define(CALL, 0).
--define(CAST, 1).
-
 start() ->
     spawn(fun () -> listen(37950) end).
 
@@ -12,24 +9,14 @@ start() ->
 %**********************************************************************************************************************
 %**********************************************************************************************************************
 
-handle_call(_ByteStream, _Socket) ->
-    not_implemented.
+send(Res, Socket) ->
+    gen_tcp:send(Socket, Res).
 
-handle_cast(ByteStream, Socket) ->
+handle_byte_stream(ByteStream, Socket) ->
     case ByteStream of
-    <<0, Rest/binary>> ->
-        gen_tcp:send(Socket, <<?CAST, "Pong">>),
-        Rest;
-    _ ->
-        bad_msg
-    end.
-
-handle_receive(ByteStream, Socket) ->
-    case ByteStream of
-    <<?CALL, Rest/binary>> ->
-        handle_receive(handle_call(Rest, Socket), Socket);
-    <<?CAST, Rest/binary>> ->
-        handle_receive(handle_cast(Rest, Socket), Socket);
+    <<0>> ->
+        io:format("Ping request.~n"),
+        send(<<0>>, Socket);
     _ ->
         ok
     end.
@@ -37,7 +24,7 @@ handle_receive(ByteStream, Socket) ->
 receive_loop(Socket) ->
     case gen_tcp:recv(Socket, 0) of
     {ok, ByteStream} ->
-        handle_receive(ByteStream, Socket),
+        handle_byte_stream(ByteStream, Socket),
         receive_loop(Socket);
     {error, closed} ->
         io:format("Disconnected from FQuake3.~n"),

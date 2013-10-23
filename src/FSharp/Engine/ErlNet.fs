@@ -33,8 +33,8 @@ open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.NativeInterop
 
-/// ErlCommand
-type ErlCommand =
+/// ErlRequest
+type ErlRequest =
     | Ping
 
     member this.Id with get () =
@@ -43,8 +43,8 @@ type ErlCommand =
 
         property.GetValue (this) :?> int
 
-/// ErlEvent
-type ErlEvent =
+/// ErlResponse
+type ErlResponse =
     | Pong
 
     member this.Id with get () =
@@ -54,30 +54,31 @@ type ErlEvent =
         property.GetValue (this) :?> int
 
 module ErlNet =
-    [<Literal>]
-    let private Call = 0uy
-    
-    [<Literal>]
-    let private Cast = 1uy
-
-    let mutable private socket_ : Socket option = None
-    let mutable private buffer_ = Array.zeroCreate<byte> 8192
+    let mutable private callSocket_ : Socket option = None
+    let mutable private callBuffer_ = Array.zeroCreate<byte> 8192
 
     let init () =
-        let socket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, Blocking = false, NoDelay = true)
+        let callSocket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
 
-        socket.Connect ("localhost", 37950)
-        socket_ <- Some <| socket
+        callSocket.Connect ("localhost", 37950)
+        callSocket_ <- Some <| callSocket
 
-    let cast (cmd: ErlCommand) =
-        match socket_ with
-        | None -> ()
+    let call (req: ErlRequest) =
+        match callSocket_ with
+        | None -> raise <| Exception "Bad call socket."
         | Some socket ->
 
-        match cmd with
+        match req with
         | Ping ->
-            let msg = byte cmd.Id
-            socket.Send([| Cast; msg; |]) |> ignore
+            let msg = byte req.Id
+            socket.Send([| msg; |]) |> ignore
+
+            let size = socket.Receive(callBuffer_)
+            let res = callBuffer_.[..size - 1]
+            
+            match res with
+            | [| 0uy |] -> "Pong"
+            | _ -> "Bad response."
         | _ ->
-            ()
+            raise <| Exception "Bad request."
 
