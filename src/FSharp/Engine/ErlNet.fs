@@ -37,48 +37,46 @@ open Engine.NativeInterop
 type ErlRequest =
     | Ping
 
-    member this.Id with get () =
-        let type' = this.GetType ()
-        let property = type'.GetProperty "Tag"
-
-        property.GetValue (this) :?> int
-
 /// ErlResponse
 type ErlResponse =
     | Pong
 
-    member this.Id with get () =
-        let type' = this.GetType ()
-        let property = type'.GetProperty "Tag"
-
-        property.GetValue (this) :?> int
-
 module ErlNet =
+    let private callLock_ = obj ()
     let mutable private callSocket_ : Socket option = None
     let mutable private callBuffer_ = Array.zeroCreate<byte> 8192
 
-    let init () =
-        let callSocket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
+    let tryInit () =
+        try
+            let callSocket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
 
-        callSocket.Connect ("localhost", 37950)
-        callSocket_ <- Some <| callSocket
+            callSocket.Connect ("localhost", 37950)
+            callSocket_ <- Some <| callSocket
+            true
+        with
+        _ -> false
 
     let call (req: ErlRequest) =
-        match callSocket_ with
-        | None -> raise <| Exception "Bad call socket."
-        | Some socket ->
+        lock callLock_ (fun () ->
 
-        match req with
-        | Ping ->
-            let msg = byte req.Id
-            socket.Send([| msg; |]) |> ignore
+            match callSocket_ with
+            | None -> None
+            | Some socket ->
 
-            let size = socket.Receive(callBuffer_)
-            let res = callBuffer_.[..size - 1]
-            
-            match res with
-            | [| 0uy |] -> "Pong"
-            | _ -> "Bad response."
-        | _ ->
-            raise <| Exception "Bad request."
+            match req with
+            | Ping ->
+                let msg = [| 0uy |]
+
+                socket.Send msg |> ignore
+
+                let size = socket.Receive(callBuffer_)
+                let res = callBuffer_.[..size - 1]
+
+                match res with
+                | [| 0uy |] -> Some Pong
+                | _ -> None
+            | _ ->
+                raise <| Exception "Bad request."
+
+        )
 
