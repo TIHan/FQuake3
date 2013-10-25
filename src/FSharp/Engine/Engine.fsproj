@@ -66,10 +66,10 @@
     <Compile Include="Math.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Common.fs" />
+    <Compile Include="Command.fs" />
     <Compile Include="ErlNet.fs" />
     <Compile Include="Net.fs" />
     <Compile Include="IO.fs" />
-    <Compile Include="Command.fs" />
     <Compile Include="System.fs" />
     <Compile Include="Md3.fs" />
     <Compile Include="Md4.fs" />
