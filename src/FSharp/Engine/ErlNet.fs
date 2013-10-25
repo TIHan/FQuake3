@@ -30,53 +30,96 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open FSharp.Control
 open FSharpx.Collections
 open Engine.NativeInterop
 
-/// ErlRequest
-type ErlRequest =
-    | Ping
+type ErlNetSocketClient () =
+    let socket_ = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
+    let buffer_ = Array.zeroCreate<byte> 8192
 
-/// ErlResponse
-type ErlResponse =
-    | Pong
+    member this.Connect (host: string) port =
+        socket_.Connect (host, port)
 
-module ErlNet =
-    let private callLock_ = obj ()
-    let mutable private callSocket_ : Socket option = None
-    let mutable private callBuffer_ = Array.zeroCreate<byte> 8192
-
-    let tryInit () =
+    member this.TryConnect host port =
         try
-            let callSocket = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
-
-            callSocket.Connect ("localhost", 37950)
-            callSocket_ <- Some <| callSocket
+            this.Connect host port
             true
         with
         _ -> false
 
-    let call (req: ErlRequest) =
-        lock callLock_ (fun () ->
+    member this.Disconnect () =
+        socket_.Disconnect true
 
-            match callSocket_ with
-            | None -> None
-            | Some socket ->
+    member this.TryDisconnect () =
+        try
+            this.Disconnect ()
+            true
+        with
+        _ -> false
 
-            match req with
-            | Ping ->
-                let msg = [| 0uy |]
+    member this.Send (bytes: byte []) =
+        socket_.Send bytes
 
-                socket.Send msg |> ignore
+    member this.TrySend bytes =
+        try
+            let size = this.Send bytes
+            size = bytes.Length
+        with
+        _ -> false
 
-                let size = socket.Receive(callBuffer_)
-                let res = callBuffer_.[..size - 1]
+    member this.Receive () =
+        try
+            let size = socket_.Receive(buffer_)
+            buffer_.[..size - 1]
+        with
+        _ -> [||]
 
-                match res with
-                | [| 0uy |] -> Some Pong
-                | _ -> None
-            | _ ->
-                raise <| Exception "Bad request."
+module ErlNet =
+    type private ErlNetMessage =
+        | Connect of AsyncReplyChannel<bool>
+        | Disconnect of AsyncReplyChannel<bool>
+        | Call of byte [] * AsyncReplyChannel<byte []>
 
-        )
+    let private callAgent = Agent<ErlNetMessage>.Start(fun agent ->
+        let rec loop (callSocket: ErlNetSocketClient) =
+            async {
+                let! msg = agent.Receive()
+
+                match msg with
+                | Connect channel ->
+                    channel.Reply <| callSocket.TryConnect "localhost" 37950
+                    return! loop callSocket
+                | Disconnect channel ->
+                    channel.Reply <| callSocket.TryDisconnect ()
+                    return! loop callSocket
+                | Call (bytes, channel) ->
+                    match callSocket.TrySend bytes with
+                    | false ->
+                        channel.Reply [||]
+                    | _ ->
+                        channel.Reply <| callSocket.Receive ()
+                    return! loop callSocket
+                | _ ->
+                    return! loop callSocket
+            }
+        loop (ErlNetSocketClient ())
+    )
+
+    let tryConnect () =
+        callAgent.PostAndReply (fun x -> Connect x)
+
+    let tryDisconnect () =
+        callAgent.PostAndReply (fun x -> Disconnect x)
+
+    let tryInit () =
+        tryConnect ()
+
+    let call (bytes: byte []) =
+        callAgent.PostAndReply (fun x -> Call (bytes, x))
+
+    let ping () =
+        match call [| 255uy |] with
+        | [| 255uy |] -> true
+        | _ -> false
 

@@ -117,10 +117,11 @@ module System =
         ErlNet.tryInit () |> ignore
 
         Command.Add ("erl_ping") (fun () -> 
-            match ErlNet.call Ping with
-            | None -> ()
-            | Some _ ->
+            match ErlNet.ping () with
+            | true ->
                 printfn "Pong"
+            | _ ->
+                ()
         )
 
         // End ErlNet
