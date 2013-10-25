@@ -31,6 +31,7 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
 open Microsoft.FSharp.NativeInterop
+open Engine.Math
 open Engine.NativeInterop
 
 module Constants =
@@ -62,6 +63,34 @@ type Cvar =
         Value: single;              // atof( string )
         Integer: int;               // atoi( string )
     }
+
+/// Bounds
+type Bounds =
+    { Bounds1: Vector3; Bounds2: Vector3 }   
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.Bounds1
+            | 1 -> this.Bounds2
+            | _ -> raise <| IndexOutOfRangeException ()
+
+/// Axis
+type Axis =
+    { X: Vector3; Y: Vector3; Z: Vector3 }
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X
+            | 1 -> this.Y
+            | 2 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Axis =
+    let zero = { X = Vector3.zero; Y = Vector3.zero; Z = Vector3.zero }
+    let identity = { X = Vector3.unitX; Y = Vector3.unitY; Z = Vector3.unitZ }
 
 module Option =
     let inline ofString str = match str with null -> None | "" -> None | _ -> Some str

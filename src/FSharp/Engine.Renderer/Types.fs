@@ -62,25 +62,6 @@ type PlaneType =
     | NonAxial = 3
 
 /// <summary>
-/// Axis
-/// </summary>
-type Axis =
-    { X: Vector3; Y: Vector3; Z: Vector3 }
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X
-            | 1 -> this.Y
-            | 2 -> this.Z
-            | _ -> raise <| IndexOutOfRangeException ()
-
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Axis =
-    let zero = { X = Vector3.zero; Y = Vector3.zero; Z = Vector3.zero }
-    let identity = { X = Vector3.unitX; Y = Vector3.unitY; Z = Vector3.unitZ }
-
-/// <summary>
 /// Rgba
 /// </summary>
 type Rgba =
@@ -182,19 +163,6 @@ module Plane =
         match Vector3.length cross with
         | 0.f -> { Normal = normal; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
         | _ -> { Normal = normal; Distance = Vector3.dotProduct a normal; Type = PlaneType.X; SignBits = 0uy }
-
-/// <summary>
-/// Bounds
-/// </summary>
-type Bounds =
-    { Bounds0: Vector3; Bounds1: Vector3 }   
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.Bounds0
-            | 1 -> this.Bounds1
-            | _ -> raise <| IndexOutOfRangeException ()
 
 /// <summary>
 /// Frustum

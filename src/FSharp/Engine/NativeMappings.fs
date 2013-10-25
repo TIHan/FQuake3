@@ -144,6 +144,23 @@ module Cvar =
             Integer = native.integer;
         }
 
+module Bounds =
+    let inline ofNative (ptr: nativeptr<vec3_t>) =
+        {
+            Bounds.Bounds1 = Vector3.ofNative <| NativePtr.get ptr 0;
+            Bounds2 = Vector3.ofNative <| NativePtr.get ptr 1;
+        }
+
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
+        let mutable nativeX = NativePtr.get ptr 0
+        let mutable nativeY = NativePtr.get ptr 1
+
+        Vector3.toNativeByPtr &&nativeX bounds.Bounds1
+        Vector3.toNativeByPtr &&nativeY bounds.Bounds2
+
+        NativePtr.set ptr 0 nativeX
+        NativePtr.set ptr 1 nativeY
+
 module ByteString =
     let inline ofNativePtr (size: int) (nativePtr: nativeptr<byte>) =
         ByteString.create <| NativePtr.toArray size nativePtr

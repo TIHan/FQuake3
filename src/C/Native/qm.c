@@ -34,3 +34,5 @@ define_mapping (vec3, vec3_t, "Vector3");
 define_mapping (vec4, vec4_t, "Vector4");
 define_mapping (mat4x4, gfloat*, "Matrix4x4");
 define_mapping (cvar, cvar_t*, "Cvar");
+define_mapping (bounds, vec3_t*, "Bounds");
+define_mapping (axis, vec3_t*, "Axis");

@@ -62,8 +62,8 @@
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
     <Compile Include="NativeInterop.fs" />
-    <Compile Include="Core.fs" />
     <Compile Include="Math.fs" />
+    <Compile Include="Core.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="Command.fs" />

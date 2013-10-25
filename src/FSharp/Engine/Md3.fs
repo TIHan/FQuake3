@@ -21,6 +21,9 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Files
 
+open Engine.Core
+open Engine.Math
+
 /// Based on Q3: md3Header_t
 /// Md3Header
 type Md3Header =
@@ -49,44 +52,63 @@ type Md3Header =
         EndOffset: int;
     }
 
+/// Based on Q3: md3Frame_t
+/// Md3Frame
+type Md3Frame =
+    {
+        Bounds: Bounds;
+        LocalOrigin: Vector3;
+        Radius: single;
+        Name: string;
+    }
+
+/// Based on Q3: md3Tag_t
+/// Md3Tag
+type Md3Tag =
+    {
+        Name: string;
+        Origin: Vector3;
+        Axis: Axis;
+    }
+
 module Md3 =
     /// (('3'<<24)+('P'<<16)+('D'<<8)+'I')
     /// Is this right?
     [<Literal>]
-    let ident = 16uy
+    let Ident = 16uy
 
     [<Literal>]
-    let version = 15
+    let Version = 15
 
     /// 1.0 / 64.0
     [<Literal>]
-    let xyzScale = 0.015625f
+    let XyzScale = 0.015625f
 
     module Limits = 
         [<Literal>]
-        let maxLods = 3
+        let MaxLods = 3
 
         /// per surface
         [<Literal>]
-        let maxTriangles = 8192
+        let MaxTriangles = 8192
 
         /// per surface
         [<Literal>]
-        let maxVertices = 4096
+        let MaxVertices = 4096
 
         /// per surface
         [<Literal>]
-        let maxShaders = 256
+        let MaxShaders = 256
 
         /// per model
         [<Literal>]
-        let maxFrames = 1024
+        let MaxFrames = 1024
 
         /// per model
         [<Literal>]
-        let maxSurfaces = 32
+        let MaxSurfaces = 32
 
         /// per frame
         [<Literal>]
-        let maxTags = 16
+        let MaxTags = 16
 

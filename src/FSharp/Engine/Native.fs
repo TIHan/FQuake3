@@ -37,6 +37,10 @@ open Engine.Net
 open Engine.Math
 open Engine.NativeInterop
 
+module Constants =
+    [<Literal>]
+    let MaxQpath = 64
+
 type qboolean =
     | qfalse = 0
     | qtrue = 1
@@ -120,3 +124,31 @@ type msg_t =
     val mutable readcount : int
     val mutable bit : int
 
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 16)>]
+type md3Frame_t_name =
+    [<FieldOffset (0)>]
+    val mutable name : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3Frame_t =
+    val mutable bounds : vec3_t
+    val private bounds1 : vec3_t
+    val mutable localOrigin : vec3_t
+    val mutable radius : single
+    val mutable name : md3Frame_t_name
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit)>]
+type md3Tag_t_name =
+    [<FieldOffset (0)>]
+    val mutable name : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3Tag_t =
+    val mutable name : md3Tag_t_name
+    val mutable origin : vec3_t
+    val mutable axis : vec3_t
+    val private axis1 : vec3_t

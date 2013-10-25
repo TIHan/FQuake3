@@ -119,5 +119,7 @@ define_mapping_prototype (vec3, vec3_t);
 define_mapping_prototype (vec4, vec4_t);
 define_mapping_prototype (mat4x4, gfloat*);
 define_mapping_prototype (cvar, cvar_t*);
+define_mapping_prototype (bounds, vec3_t*);
+define_mapping_prototype (axis, vec3_t*);
 
 #endif /* __QM_H__ */

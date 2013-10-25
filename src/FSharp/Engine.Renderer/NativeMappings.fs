@@ -61,23 +61,6 @@ module Axis =
         NativePtr.set ptr 1 nativeY
         NativePtr.set ptr 2 nativeZ
 
-module Bounds =
-    let inline ofNative (ptr: nativeptr<vec3_t>) =
-        {
-            Bounds.Bounds0 = Vector3.ofNative <| NativePtr.get ptr 0;
-            Bounds1 = Vector3.ofNative <| NativePtr.get ptr 1;
-        }
-
-    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
-        let mutable nativeX = NativePtr.get ptr 0
-        let mutable nativeY = NativePtr.get ptr 1
-
-        Vector3.toNativeByPtr &&nativeX bounds.Bounds0
-        Vector3.toNativeByPtr &&nativeY bounds.Bounds1
-
-        NativePtr.set ptr 0 nativeX
-        NativePtr.set ptr 1 nativeY
-
 module Orientation =
     let inline ofNative (native: orientation_t) =
         {

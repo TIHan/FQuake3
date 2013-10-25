@@ -34,5 +34,5 @@ open Engine.NativeInterop
 module Mesh =
     /// Based on Q3: R_CullModel
     /// CullModel
-    let cullModel (header: Md3Header) (entity: TrRefEntity) (perfCounters: FrontEndPerformanceCounters) =
+    let cullModel (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (perfCounters: FrontEndPerformanceCounters) =
         ()
