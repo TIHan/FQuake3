@@ -88,10 +88,17 @@ MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename)
 {
 	MDomain *const domain = (MDomain *)g_malloc0 (sizeof (MDomain));
-
+	const gchar* options[] =
+	{
+		"--llvm",
+		"-O=all"
+	};
 	mono_set_dirs (assembly_dir, config_dir);
 	domain->domain = mono_jit_init (filename);
 
+#if NDEBUG
+	mono_jit_parse_options(2, (gchar**)options);
+#endif
 	return domain;
 }
 
