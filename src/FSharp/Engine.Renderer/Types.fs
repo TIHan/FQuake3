@@ -1096,27 +1096,51 @@ type Refdef =
         // TODO:
     }
 
-/// ClippingPerformanceCounters
-type ClippingPerformanceCounters =
-    {
-        CullIn: int;
-        CullClip: int;
-        CullOut: int;
-    }
+module PerformanceCounters =
+    /// ClippingPerformanceCounters
+    type ClippingPerformanceCounters =
+        {
+            CullIn: int;
+            CullClip: int;
+            CullOut: int;
+        }
 
-/// Based on Q3: frontEndCounters_t
-/// FrontEndPerformanceCounters
-type FrontEndPerformanceCounters =
-    {
-        SpherePatch: ClippingPerformanceCounters;
-        BoxPatch: ClippingPerformanceCounters;
-        SphereMd3: ClippingPerformanceCounters;
-        BoxMd3: ClippingPerformanceCounters;
+    /// Based on Q3: frontEndCounters_t
+    /// FrontEndPerformanceCounters
+    type FrontEndPerformanceCounters =
+        {
+            SpherePatch: ClippingPerformanceCounters;
+            BoxPatch: ClippingPerformanceCounters;
+            SphereMd3: ClippingPerformanceCounters;
+            BoxMd3: ClippingPerformanceCounters;
 
-        Leafs: int;
-        DynamicLightSurfaces: int
-        DynamicLightSurfacesCulled: int;
-    }
+            Leafs: int;
+            DynamicLightSurfaces: int
+            DynamicLightSurfacesCulled: int;
+        }
+
+    let increment (clipType: ClipType) (clipCounters: ClippingPerformanceCounters) =
+        match clipType with
+            | ClipType.In ->
+                { clipCounters with CullIn = clipCounters.CullIn + 1 }
+            | ClipType.Clip ->
+                { clipCounters with CullClip = clipCounters.CullClip + 1 }
+            | _ ->
+                { clipCounters with CullOut = clipCounters.CullOut + 1 }
+
+    let incrementSpherePatch (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with SpherePatch = increment clipType perfCounters.SpherePatch }
+
+    let incrementBoxPatch (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with BoxPatch = increment clipType perfCounters.BoxPatch }
+
+    let incrementSphereMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with SphereMd3 = increment clipType perfCounters.SphereMd3 }
+
+    let incrementBoxMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with BoxMd3 = increment clipType perfCounters.BoxMd3 }
+
+open PerformanceCounters
 
 /// <summary>
 /// Based on Q3: trGlobals_t
@@ -1138,6 +1162,8 @@ type TrGlobals =
         ViewParms: ViewParms;
         Refdef: TrRefdef;
         Orientation: OrientationR;
+
+        PerfCounters: FrontEndPerformanceCounters;
         // TODO:
     }
 

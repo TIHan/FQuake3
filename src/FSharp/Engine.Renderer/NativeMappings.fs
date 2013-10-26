@@ -39,6 +39,7 @@ open Engine.Math
 open Engine.NativeInterop
 open Engine.Native
 open Engine.Renderer
+open Engine.Renderer.PerformanceCounters
 
 module Axis =
     let inline ofNative (ptr: nativeptr<vec3_t>) =
@@ -519,6 +520,7 @@ module TrGlobals =
             ViewParms = ViewParms.ofNative native.viewParms;
             Refdef = TrRefdef.ofNative native.refdef;
             Orientation = OrientationR.ofNative native.or';
+            PerfCounters = FrontEndPerformanceCounters.ofNative native.pc
         }
 
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (tr: TrGlobals) =
@@ -529,6 +531,7 @@ module TrGlobals =
         ViewParms.toNativeByPtr &&native.viewParms tr.ViewParms
         // TODO: Map TrRefDef - Property Refdef
         OrientationR.toNativeByPtr &&native.or' tr.Orientation
+        FrontEndPerformanceCounters.toNativeByPtr &&native.pc tr.PerfCounters
 
         NativePtr.write ptr native
 

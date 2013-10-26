@@ -30,9 +30,11 @@ open Engine.Core
 open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
+open Engine.Renderer.PerformanceCounters
 
 module Mesh =
     /// CalculateCullLocalBox
+    [<Pure>]
     let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cvar) (tr: TrGlobals) =
         let inline calculateBounds i j =
             match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
@@ -56,38 +58,40 @@ module Mesh =
                     }
             }
 
-        match Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull with
+        let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull
+        let perfCounters = incrementBoxMd3 clip tr.PerfCounters
+        let tr = { tr with PerfCounters = perfCounters }
+
+        match clip with
         | ClipType.In ->
-            // TODO: add perf counter
-            ClipType.In
+            (ClipType.In, tr)
         | ClipType.Clip ->
-            // TODO: add perf counter
-            ClipType.Clip
+            (ClipType.Clip, tr)
         | _ ->
-            // TODO: add perf counter
-            ClipType.Out
+            (ClipType.Out, tr)
 
     /// Based on Q3: R_CullModel
     /// CullModel
     /// Note: This is internal.
+    [<Pure>]
     let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (noCull: Cvar) (tr: TrGlobals) =
         // cull bounding sphere ONLY if this is not an upscaled entity
         match not entity.HasNonNormalizedAxes with
         | true ->
             let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+
             match entity.Frame = entity.OldFrame with
             | true ->
+                let perfCounters = incrementSphereMd3 sphereCull tr.PerfCounters
+                let tr = { tr with PerfCounters = perfCounters }
+
                 match sphereCull with
                 | ClipType.Out ->
-                    // TODO: add perf counter
-                    ClipType.Out
+                    (ClipType.Out, tr)
                 | ClipType.In ->
-                    // TODO: add perf counter
-                    ClipType.In
-                | ClipType.Clip ->
-                    // TODO: add perf counter
+                    (ClipType.In, tr)
+                | _ ->
                     calculateCullLocalBox newFrame oldFrame noCull tr
-                | _ -> raise <| Exception "Bad clip type."
             | _ ->
                 let sphereCullB =
                     match newFrame = oldFrame with
@@ -96,17 +100,16 @@ module Mesh =
                 
                 match sphereCull = sphereCullB with
                 | true ->
+                    let perfCounters = incrementSphereMd3 sphereCull tr.PerfCounters
+                    let tr = { tr with PerfCounters = perfCounters }
+
                     match sphereCull with
                     | ClipType.Out ->
-                        // TODO: add perf counter
-                        ClipType.Out
+                        (ClipType.Out, tr)
                     | ClipType.In ->
-                        // TODO: add perf counter
-                        ClipType.In
-                    | ClipType.Clip ->
-                        // TODO: add perf counter
+                        (ClipType.In, tr)
+                    | _ ->
                         calculateCullLocalBox newFrame oldFrame noCull tr
-                    | _ -> raise <| Exception "Bad clip type."
                 | _ ->
                     calculateCullLocalBox newFrame oldFrame noCull tr
         | _ ->
