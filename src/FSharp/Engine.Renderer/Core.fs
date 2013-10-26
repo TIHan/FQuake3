@@ -19,11 +19,11 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
+module Engine.Renderer.Core
+
 // Disable native interop warnings
 #nowarn "9"
 #nowarn "51"
-
-namespace Engine.Renderer
 
 open System
 open System.IO
@@ -1010,14 +1010,14 @@ type Fog =
     }
 
 type LightGridBounds =
-    { Bounds0: int; Bounds1: int; Bounds2: int }
+    { Bounds1: int; Bounds2: int; Bounds3: int }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Bounds0
-            | 1 -> this.Bounds1
-            | 2 -> this.Bounds2
+            | 0 -> this.Bounds1
+            | 1 -> this.Bounds2
+            | 2 -> this.Bounds3
             | _ -> raise <| IndexOutOfRangeException ()
 
 /// <summary>

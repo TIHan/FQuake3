@@ -93,6 +93,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\qm_cgame.c" />
+    <ClCompile Include="..\qm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_public.h">

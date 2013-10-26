@@ -915,7 +915,7 @@ CG_CalculateWeaponPosition
 ==============
 */
 static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
-#if 1
+#if 0
 	float	scale;
 	int		delta;
 	float	fracsin;
@@ -961,14 +961,14 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	angles[YAW] += scale * fracsin * 0.01;
 	angles[PITCH] += scale * fracsin * 0.01;
 #else
-	MObject m_tuple_origin_and_angles;
+	MObject m_tuple;
 
 	m_invoke_method_cache_easy ("CGame", "CGame", "Weapons", "calculateWeaponPosition", 1, {
-		__args [0] = m_object_as_arg (qm_map_cg (&cg));
-	}, m_tuple_origin_and_angles);
+		__args [0] = m_object_as_arg (qm_of_cg (&cg));
+	}, m_tuple);
 
-	*(vector3_t *)origin = *(vector3_t *)m_object_unbox_struct (m_object_get_property (m_tuple_origin_and_angles, "Item1"));
-	*(vector3_t *)angles = *(vector3_t *)m_object_unbox_struct (m_object_get_property (m_tuple_origin_and_angles, "Item2"));
+	qm_to_vec3 (m_object_get_property (m_tuple, "Item1"), origin);
+	qm_to_vec3 (m_object_get_property (m_tuple, "Item2"), angles);
 #endif
 }
 

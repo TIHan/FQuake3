@@ -26,11 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "qm_cgame.h"
 
-MObject
-qm_map_cg (cg_t* cg)
-{
-	// FIXME: This sometimes crashes.
-	MObject m_result;
-	m_invoke_method_cache ("CGame", "CGame.Native", "CGame", "ofNative", &cg, m_result);
-	m_result;
-}
+define_mapping_assembly("CGame");
+define_mapping_namespace("CGame.Native");
+
+define_mapping(cg, cg_t*, "CGame");

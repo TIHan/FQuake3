@@ -30,6 +30,7 @@ open Engine.Core
 open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
+open Engine.Renderer.Core
 
 module Mesh =
     /// CalculateCullLocalBox
@@ -43,7 +44,7 @@ module Mesh =
         // calculate a bounding box in the current coordinate system
         let bounds =
             {
-                Bounds1 =
+                Bounds.Bounds1 =
                     {
                         X = calculateBounds 0 0;
                         Y = calculateBounds 0 1;

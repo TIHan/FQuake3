@@ -38,7 +38,7 @@ open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
 open Engine.Native
-open Engine.Renderer
+open Engine.Renderer.Core
 
 module Axis =
     let inline ofNative (ptr: nativeptr<vec3_t>) =

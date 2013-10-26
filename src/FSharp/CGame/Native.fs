@@ -606,16 +606,3 @@ type cg_t =
     val mutable testModelEntity : refEntity_t
     val mutable testModelName : cg_t_testModelName
     val mutable testGun : qboolean
-
-module CGame =
-    let inline ofNative (native: cg_t) =
-        {
-            Time = native.time;
-            LandChange = native.landChange;
-            LandTime = native.landTime;
-            Refdef = Refdef.ofNative native.refdef;
-            RefdefViewAngles = Vector3.ofNative native.refdefViewAngles
-            BobCycle = native.bobcycle;
-            BobFractionSin = native.bobfracsin;
-            XYSpeed = native.xyspeed;
-        }

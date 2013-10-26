@@ -54,8 +54,10 @@
     </PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core.fs" />
     <Compile Include="Weapons.fs" />
     <Compile Include="Native.fs" />
+    <Compile Include="NativeMappings.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

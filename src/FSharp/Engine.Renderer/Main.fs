@@ -29,6 +29,7 @@ open System.Diagnostics.Contracts
 open Engine.Core
 open Engine.Math
 open Engine.NativeInterop
+open Engine.Renderer.Core
 
 module Main =
     let flipMatrix =

@@ -27,9 +27,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __QM_CGAME_H__
 #define __QM_CGAME_H__
 
+#include "qm.h"
 #include "cgame\cg_local.h"
 
-MObject
-qm_map_cg (cg_t* cg);
+define_mapping_prototype(cg, cg_t*);
 
 #endif /* __QM_CGAME_H__ */
