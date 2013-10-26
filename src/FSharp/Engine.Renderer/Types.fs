@@ -1096,29 +1096,30 @@ type Refdef =
         // TODO:
     }
 
-module PerformanceCounters =
-    /// ClippingPerformanceCounters
-    type ClippingPerformanceCounters =
-        {
-            CullIn: int;
-            CullClip: int;
-            CullOut: int;
-        }
+/// ClippingPerformanceCounters
+type ClippingPerformanceCounters =
+    {
+        CullIn: int;
+        CullClip: int;
+        CullOut: int;
+    }
 
-    /// Based on Q3: frontEndCounters_t
-    /// FrontEndPerformanceCounters
-    type FrontEndPerformanceCounters =
-        {
-            SpherePatch: ClippingPerformanceCounters;
-            BoxPatch: ClippingPerformanceCounters;
-            SphereMd3: ClippingPerformanceCounters;
-            BoxMd3: ClippingPerformanceCounters;
+/// Based on Q3: frontEndCounters_t
+/// FrontEndPerformanceCounters
+type FrontEndPerformanceCounters =
+    {
+        SpherePatch: ClippingPerformanceCounters;
+        BoxPatch: ClippingPerformanceCounters;
+        SphereMd3: ClippingPerformanceCounters;
+        BoxMd3: ClippingPerformanceCounters;
 
-            Leafs: int;
-            DynamicLightSurfaces: int
-            DynamicLightSurfacesCulled: int;
-        }
+        Leafs: int;
+        DynamicLightSurfaces: int
+        DynamicLightSurfacesCulled: int;
+    }
 
+[<RequireQualifiedAccess>]
+module PerfCounter =
     let increment (clipType: ClipType) (clipCounters: ClippingPerformanceCounters) =
         match clipType with
             | ClipType.In ->
@@ -1139,8 +1140,6 @@ module PerformanceCounters =
 
     let incrementBoxMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
         { perfCounters with BoxMd3 = increment clipType perfCounters.BoxMd3 }
-
-open PerformanceCounters
 
 /// <summary>
 /// Based on Q3: trGlobals_t

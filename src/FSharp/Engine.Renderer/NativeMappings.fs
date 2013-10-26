@@ -39,7 +39,6 @@ open Engine.Math
 open Engine.NativeInterop
 open Engine.Native
 open Engine.Renderer
-open Engine.Renderer.PerformanceCounters
 
 module Axis =
     let inline ofNative (ptr: nativeptr<vec3_t>) =

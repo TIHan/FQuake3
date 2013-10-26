@@ -30,7 +30,6 @@ open Engine.Core
 open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
-open Engine.Renderer.PerformanceCounters
 
 module Mesh =
     /// CalculateCullLocalBox
@@ -59,7 +58,7 @@ module Mesh =
             }
 
         let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull
-        let perfCounters = incrementBoxMd3 clip tr.PerfCounters
+        let perfCounters = PerfCounter.incrementBoxMd3 clip tr.PerfCounters
         let tr = { tr with PerfCounters = perfCounters }
 
         match clip with
@@ -82,7 +81,7 @@ module Mesh =
 
             match entity.Frame = entity.OldFrame with
             | true ->
-                let perfCounters = incrementSphereMd3 sphereCull tr.PerfCounters
+                let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
                 let tr = { tr with PerfCounters = perfCounters }
 
                 match sphereCull with
@@ -100,7 +99,7 @@ module Mesh =
                 
                 match sphereCull = sphereCullB with
                 | true ->
-                    let perfCounters = incrementSphereMd3 sphereCull tr.PerfCounters
+                    let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
                     let tr = { tr with PerfCounters = perfCounters }
 
                     match sphereCull with
