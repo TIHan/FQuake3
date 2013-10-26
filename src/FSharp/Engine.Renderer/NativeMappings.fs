@@ -503,7 +503,7 @@ module FrontEndPerformanceCounters =
         native.c_sphere_cull_md3_clip <- value.SphereMd3.CullClip
         native.c_sphere_cull_md3_out <- value.SphereMd3.CullOut
         native.c_box_cull_md3_in <- value.BoxMd3.CullIn
-        native.c_box_cull_md3_clip <- value.BoxMd3.CullOut
+        native.c_box_cull_md3_clip <- value.BoxMd3.CullClip
         native.c_box_cull_md3_out <- value.BoxMd3.CullOut
         native.c_leafs <- value.Leafs
         native.c_dlightSurfaces <- value.DynamicLightSurfaces
