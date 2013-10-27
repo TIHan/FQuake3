@@ -133,7 +133,22 @@ m_array_as_arg (MArray arr);
 gpointer
 m_string_as_arg (MString str);
 
-#define m_invoke_method_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+#define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
+{ \
+if (!o.__priv) \
+	o = m_method(assembly_name, name_space, static_class_name, method_name); \
+} \
+
+#define m_method_invoke_args(method,argc,arg_assignment,o) \
+{ \
+	gpointer __args[argc]; \
+\
+	arg_assignment \
+\
+	*(MObject *)&o = m_method_invoke(method, __args); \
+} \
+
+#define m_invoke_method_args(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
 	gpointer __args [argc]; \
 \
@@ -142,34 +157,12 @@ m_string_as_arg (MString str);
 	*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
-#define m_method_invoke_easy(method,argc,arg_assignment,o) \
-{ \
-	gpointer __args [argc]; \
-\
-	arg_assignment \
-\
-	*(MObject *)&o = m_method_invoke (method, __args); \
-} \
-
-#define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
-{ \
-	if (!o.__priv) \
-		o = m_method (assembly_name, name_space, static_class_name, method_name); \
-} \
-
-#define m_invoke_method_cache(assembly_name,name_space,static_class_name,method_name,params,o) \
-{ \
-	static MMethod m_cache; \
-	m_method_cache (assembly_name, name_space, static_class_name, method_name, m_cache); \
-	o = m_method_invoke (m_cache, params); \
-} \
-
-#define m_invoke_method_cache_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+#define m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
 	static MMethod m_cache; \
 	m_method_cache (assembly_name, name_space, static_class_name, method_name, m_cache); \
 \
-	m_method_invoke_easy (m_cache, argc, arg_assignment, o); \
+	m_method_invoke_args (m_cache, argc, arg_assignment, o); \
 } \
 
 #endif /* __M_H__ */

@@ -963,7 +963,7 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 #else
 	MObject m_tuple;
 
-	m_invoke_method_cache_easy ("CGame", "CGame", "Weapons", "calculateWeaponPosition", 1, {
+	qm_invoke ("CGame", "CGame", "Weapons", "calculateWeaponPosition", 1, {
 		__args [0] = m_object_as_arg (qm_of_ptr_cg (&cg));
 	}, m_tuple);
 

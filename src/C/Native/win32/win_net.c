@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "win_local.h"
+#include "../qm.h" // IMPORTANT: Temporary
 
 static WSADATA	winsockdata;
 static qboolean	winsockInitialized = qfalse;
@@ -527,11 +528,11 @@ int NET_IPSocket( char *net_interface, int port ) {
 	MObject m_new_socket;
 	MObject m_str;
 
-	m_invoke_method_cache_easy ("Engine", "Engine", "Option", "ofString", 1, {
+	qm_invoke ("Engine", "Engine", "Option", "ofString", 1, {
 		__args [0] = m_string_as_arg (m_string (net_interface));
 	}, m_str);
 
-	m_invoke_method_cache_easy ("Engine", "Engine.Net", "Net", "createIPSocket", 2, {
+	qm_invoke ("Engine", "Engine.Net", "Net", "createIPSocket", 2, {
 		__args [0] = m_object_as_arg (m_str);
 		__args [1] = &port;
 	}, m_new_socket);

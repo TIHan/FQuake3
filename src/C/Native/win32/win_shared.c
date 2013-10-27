@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <direct.h>
 #include <io.h>
 #include <conio.h>
+#include "../qm.h" // IMPORTANT: Temporary
 
 /*
 ================
@@ -57,7 +58,7 @@ int Sys_Milliseconds (void)
 M_EXPORT int M_DECL Sys_Milliseconds (void)
 {
 	MObject m_milliseconds;
-	m_invoke_method_cache ("Engine", "Engine.System", "System", "Milliseconds", NULL, m_milliseconds);
+	qm_invoke ("Engine", "Engine.System", "System", "Milliseconds", 1, {}, m_milliseconds);
 	return *(gint *)m_object_unbox_struct (m_milliseconds);
 }
 #endif

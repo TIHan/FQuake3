@@ -390,7 +390,7 @@ m_array_int32 (const gint size)
 gchar*
 m_array_addr_with_size (const MArray object, const gint size, const gint index)
 {
-	mono_array_addr_with_size ((MonoArray *)object.__priv, size, index);
+	return mono_array_addr_with_size ((MonoArray *)object.__priv, size, index);
 }
 
 gint
