@@ -21,20 +21,11 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Net
 
-open System
-open System.IO
 open System.Net
 open System.Net.Sockets
-open System.Text
-open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open Microsoft.FSharp.NativeInterop
 open FSharp.Control
-open FSharpx.Collections
-open Engine.NativeInterop
 
-type ErlNetSocketClient () =
+type ErlNetClient () =
     let socket_ = Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp, NoDelay = true)
     let buffer_ = Array.zeroCreate<byte> 8192
 
@@ -76,34 +67,40 @@ type ErlNetSocketClient () =
         _ -> [||]
 
 module ErlNet =
+    [<Literal>]
+    let private Ping = 255uy
+
+    [<Literal>]
+    let private Pong = 255uy
+
     type private ErlNetMessage =
         | Connect of AsyncReplyChannel<bool>
         | Disconnect of AsyncReplyChannel<bool>
         | Call of byte [] * AsyncReplyChannel<byte []>
 
     let private callAgent = Agent<ErlNetMessage>.Start(fun agent ->
-        let rec loop (callSocket: ErlNetSocketClient) =
+        let rec loop (client: ErlNetClient) =
             async {
                 let! msg = agent.Receive()
 
                 match msg with
                 | Connect channel ->
-                    channel.Reply <| callSocket.TryConnect "localhost" 37950
-                    return! loop callSocket
+                    channel.Reply <| client.TryConnect "localhost" 37950
+                    return! loop client
                 | Disconnect channel ->
-                    channel.Reply <| callSocket.TryDisconnect ()
-                    return! loop callSocket
+                    channel.Reply <| client.TryDisconnect ()
+                    return! loop client
                 | Call (bytes, channel) ->
-                    match callSocket.TrySend bytes with
+                    match client.TrySend bytes with
                     | false ->
                         channel.Reply [||]
                     | _ ->
-                        channel.Reply <| callSocket.Receive ()
-                    return! loop callSocket
+                        channel.Reply <| client.Receive ()
+                    return! loop client
                 | _ ->
-                    return! loop callSocket
+                    return! loop client
             }
-        loop (ErlNetSocketClient ())
+        loop (ErlNetClient ())
     )
 
     let tryConnect () =
@@ -119,7 +116,7 @@ module ErlNet =
         callAgent.PostAndReply (fun x -> Call (bytes, x))
 
     let ping () =
-        match call [| 255uy |] with
-        | [| 255uy |] -> true
+        match call [| Ping |] with
+        | [| Pong |] -> true
         | _ -> false
 

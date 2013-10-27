@@ -19,22 +19,13 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 namespace Engine.IO
 
 open System
 open System.IO
-open System.Text
-open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open Microsoft.FSharp.NativeInterop
-open Engine.NativeInterop
 
-// WIP
+/// Standard IO
+/// Can easily redirect the output based on a function.
 type StandardIO () =
     let ms = new MemoryStream ()
     let sw = new StreamWriter (ms)

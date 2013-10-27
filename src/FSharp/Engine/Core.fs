@@ -19,20 +19,10 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine.Core
-
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
+module Engine.Core
 
 open System
-open System.IO
-open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open Microsoft.FSharp.NativeInterop
 open Engine.Math
-open Engine.NativeInterop
 
 module Constants =
     [<Literal>]
@@ -91,7 +81,4 @@ type Axis =
 module Axis =
     let zero = { X = Vector3.zero; Y = Vector3.zero; Z = Vector3.zero }
     let identity = { X = Vector3.unitX; Y = Vector3.unitY; Z = Vector3.unitZ }
-
-module Option =
-    let inline ofString str = match str with null -> None | "" -> None | _ -> Some str
 

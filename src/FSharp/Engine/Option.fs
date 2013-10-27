@@ -19,21 +19,7 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine.Input
+module Engine.Option
 
-open System.Runtime.InteropServices
-open Engine.NativeInterop
-
-module private Native =
-    [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
-    extern void IN_Frame ()
-
-/// <summary>
-/// Input
-///
-/// Note: Revisit to make purely functional.
-/// </summary
-module Input =
-    let Frame () =
-        Native.IN_Frame ()
+let inline ofString str = match str with null -> None | "" -> None | _ -> Some str
 

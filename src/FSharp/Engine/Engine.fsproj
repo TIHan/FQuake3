@@ -25,7 +25,8 @@
     <OutputPath>..\..\..\build\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <WarningLevel>0</WarningLevel>
-    <DocumentationFile>..\..\..\build\Engine.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
     <OtherFlags>
     </OtherFlags>
     <StartAction>Project</StartAction>
@@ -63,6 +64,7 @@
   <ItemGroup>
     <Compile Include="NativeInterop.fs" />
     <Compile Include="Math.fs" />
+    <Compile Include="Option.fs" />
     <Compile Include="Core.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Common.fs" />

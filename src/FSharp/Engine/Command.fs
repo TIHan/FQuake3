@@ -19,19 +19,10 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 namespace Engine.Command
 
-open System
-open System.IO
 open System.Text
 open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open Microsoft.FSharp.NativeInterop
 open Engine.NativeInterop
 
 module private Native =

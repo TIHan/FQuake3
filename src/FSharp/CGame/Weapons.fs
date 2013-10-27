@@ -21,10 +21,6 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 module CGame.Weapons
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 open System.Diagnostics.Contracts
 open Engine.Math
 open Engine.Renderer

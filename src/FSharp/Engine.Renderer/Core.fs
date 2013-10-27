@@ -21,22 +21,11 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 module Engine.Renderer.Core
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 open System
-open System.IO
-open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open System.Diagnostics.Contracts
-open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
-open Engine.Files
 open Engine.Math
-open Engine.NativeInterop
+open Engine.Files
 
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
 /// ClipType

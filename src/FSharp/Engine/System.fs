@@ -19,20 +19,14 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-// Disable native interop warnings
-#nowarn "9"
-#nowarn "51"
-
 namespace Engine.System
 
 open System
 open System.IO
 open System.Text
-open System.Runtime.InteropServices
 open System.Threading
 open System.Diagnostics
-open System.Reflection
-open Microsoft.FSharp.NativeInterop
+open System.Runtime.InteropServices
 open Engine.Input
 open Engine.Common
 open Engine.Net
@@ -53,14 +47,11 @@ module private Native =
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
-/// <summary>
 /// System
-///
-/// Note: Revisit to make purely functional.
-/// </summary
 module System =
     let private stopwatch = new Stopwatch ()
 
+    /// TODO: Need to revisit this.
     let private SetupUnhandledExceptions () =
         let errorFilename = "error.txt"
         let UnhandledException (sender: obj) (e: UnhandledExceptionEventArgs) =
@@ -109,7 +100,7 @@ module System =
 
         StartStreamThread ()
 
-        Common.Init ""
+        Common.Init "" // TODO: Need to be able to pass arguments.
         Net.Init ()
 
         // hide the early console since we've reached the point where we

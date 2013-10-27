@@ -25,17 +25,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Native
 
-open System
-open System.IO
 open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open Microsoft.FSharp.NativeInterop
-open FSharpx.Collections
-open Engine.Core
-open Engine.Net
-open Engine.Math
-open Engine.NativeInterop
 
 module Constants =
     [<Literal>]

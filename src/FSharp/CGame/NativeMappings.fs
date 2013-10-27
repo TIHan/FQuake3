@@ -19,23 +19,14 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
+namespace CGame.Native
+
 // Disable native interop warnings
 #nowarn "9"
 #nowarn "51"
 
-namespace CGame.Native
-
-open System
-open System.IO
-open System.Runtime.InteropServices
-open System.Threading
-open System.Diagnostics
-open System.Diagnostics.Contracts
 open Microsoft.FSharp.NativeInterop
-open Engine.Core
-open Engine.Math
 open Engine.Native
-open Engine.NativeInterop
 open Engine.Renderer.Native
 open CGame.Core
 

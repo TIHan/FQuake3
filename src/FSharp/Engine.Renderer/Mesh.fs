@@ -19,68 +19,81 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine.Renderer
+module Engine.Renderer.Mesh
 
 open System
-open System.IO
-open System.Threading
-open System.Diagnostics
 open System.Diagnostics.Contracts
 open Engine.Core
 open Engine.Files
 open Engine.Math
-open Engine.NativeInterop
 open Engine.Renderer.Core
 
-module Mesh =
-    /// CalculateCullLocalBox
-    [<Pure>]
-    let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cvar) (tr: TrGlobals) =
-        let inline calculateBounds i j =
-            match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
-            | true -> oldFrame.Bounds.[i].[j]
-            | _ -> newFrame.Bounds.[i].[j]
+/// CalculateCullLocalBox
+[<Pure>]
+let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cvar) (tr: TrGlobals) =
+    let inline calculateBounds i j =
+        match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
+        | true -> oldFrame.Bounds.[i].[j]
+        | _ -> newFrame.Bounds.[i].[j]
 
-        // calculate a bounding box in the current coordinate system
-        let bounds =
-            {
-                Bounds.Bounds1 =
-                    {
-                        X = calculateBounds 0 0;
-                        Y = calculateBounds 0 1;
-                        Z = calculateBounds 0 2;
-                    };
-                Bounds2 =
-                    {
-                        X = calculateBounds 1 0;
-                        Y = calculateBounds 1 1;
-                        Z = calculateBounds 1 2;
-                    }
-            }
+    // calculate a bounding box in the current coordinate system
+    let bounds =
+        {
+            Bounds.Bounds1 =
+                {
+                    X = calculateBounds 0 0;
+                    Y = calculateBounds 0 1;
+                    Z = calculateBounds 0 2;
+                };
+            Bounds2 =
+                {
+                    X = calculateBounds 1 0;
+                    Y = calculateBounds 1 1;
+                    Z = calculateBounds 1 2;
+                }
+        }
 
-        let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull
-        let perfCounters = PerfCounter.incrementBoxMd3 clip tr.PerfCounters
-        let tr = { tr with PerfCounters = perfCounters }
+    let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull
+    let perfCounters = PerfCounter.incrementBoxMd3 clip tr.PerfCounters
+    let tr = { tr with PerfCounters = perfCounters }
 
-        match clip with
-        | ClipType.In ->
-            (ClipType.In, tr)
-        | ClipType.Clip ->
-            (ClipType.Clip, tr)
-        | _ ->
-            (ClipType.Out, tr)
+    match clip with
+    | ClipType.In ->
+        (ClipType.In, tr)
+    | ClipType.Clip ->
+        (ClipType.Clip, tr)
+    | _ ->
+        (ClipType.Out, tr)
 
-    /// Based on Q3: R_CullModel
-    /// CullModel
-    /// Note: This is internal.
-    [<Pure>]
-    let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (noCull: Cvar) (tr: TrGlobals) =
-        // cull bounding sphere ONLY if this is not an upscaled entity
-        match not entity.HasNonNormalizedAxes with
+/// Based on Q3: R_CullModel
+/// CullModel
+/// Note: This is internal.
+[<Pure>]
+let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (noCull: Cvar) (tr: TrGlobals) =
+    // cull bounding sphere ONLY if this is not an upscaled entity
+    match not entity.HasNonNormalizedAxes with
+    | true ->
+        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+
+        match entity.Frame = entity.OldFrame with
         | true ->
-            let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+            let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
+            let tr = { tr with PerfCounters = perfCounters }
 
-            match entity.Frame = entity.OldFrame with
+            match sphereCull with
+            | ClipType.Out ->
+                (ClipType.Out, tr)
+            | ClipType.In ->
+                (ClipType.In, tr)
+            | _ ->
+                calculateCullLocalBox newFrame oldFrame noCull tr
+        | _ ->
+            let sphereCullB =
+                match newFrame = oldFrame with
+                | true -> sphereCull
+                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+                
+            match sphereCull = sphereCullB with
             | true ->
                 let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
                 let tr = { tr with PerfCounters = perfCounters }
@@ -93,24 +106,6 @@ module Mesh =
                 | _ ->
                     calculateCullLocalBox newFrame oldFrame noCull tr
             | _ ->
-                let sphereCullB =
-                    match newFrame = oldFrame with
-                    | true -> sphereCull
-                    | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
-                
-                match sphereCull = sphereCullB with
-                | true ->
-                    let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
-                    let tr = { tr with PerfCounters = perfCounters }
-
-                    match sphereCull with
-                    | ClipType.Out ->
-                        (ClipType.Out, tr)
-                    | ClipType.In ->
-                        (ClipType.In, tr)
-                    | _ ->
-                        calculateCullLocalBox newFrame oldFrame noCull tr
-                | _ ->
-                    calculateCullLocalBox newFrame oldFrame noCull tr
-        | _ ->
-            calculateCullLocalBox newFrame oldFrame noCull tr
+                calculateCullLocalBox newFrame oldFrame noCull tr
+    | _ ->
+        calculateCullLocalBox newFrame oldFrame noCull tr
