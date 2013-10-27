@@ -40,7 +40,8 @@ open Engine.Renderer.Native
 open CGame.Core
 
 module CGame =
-    let inline ofNative (native: cg_t) =
+    let inline ofNativePtr (ptr: nativeptr<cg_t>) =
+        let mutable native = NativePtr.read ptr
         {
             Time = native.time;
             LandChange = native.landChange;
