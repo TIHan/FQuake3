@@ -56,7 +56,7 @@
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
-    <Compile Include="Types.fs" />
+    <Compile Include="Core.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Mesh.fs" />
     <Compile Include="Native.fs" />
