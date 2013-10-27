@@ -35,17 +35,22 @@ static const gchar* Assembly = name \
 #define define_mapping_namespace(name) \
 static const gchar* Namespace = name \
 
+#define qm_invoke(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+m_invoke_method_cache_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+
 #define of_invoke(static_class_name,method_name,arg) \
 { \
 	MObject m_result; \
-	m_invoke_method_cache (Assembly, Namespace, static_class_name, method_name, &arg, m_result); \
+	qm_invoke (Assembly, Namespace, static_class_name, method_name, 1, { \
+		__args [0] = arg; \
+	}, m_result); \
 	return m_result; \
 } \
 
-#define to_invoke_easy(static_class_name,method_name,argc,args) \
+#define to_invoke(static_class_name,method_name,argc,arg_assignment) \
 { \
 	MObject m_void; \
-	m_invoke_method_cache_easy (Assembly, Namespace, static_class_name, method_name, argc, args, m_void); \
+	qm_invoke (Assembly, Namespace, static_class_name, method_name, argc, arg_assignment, m_void); \
 	return m_void; \
 } \
 
@@ -80,7 +85,7 @@ qm_of_##name## (type ptr) \
 	MObject \
 	qm_of_ptr_##name## (type ptr) \
 { \
-	to_invoke_easy(managed_name, "ofNativePtr", 1, { \
+	to_invoke (managed_name, "ofNativePtr", 1, { \
 		__args[0] = ptr; \
 	}); \
 } \
@@ -89,7 +94,7 @@ qm_of_##name## (type ptr) \
 void \
 qm_to_##name## (MObject obj, type ptr) \
 { \
-	to_invoke_easy (managed_name, "toNativeByPtr", 2, { \
+	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = ptr; \
 		__args [1] = m_object_as_arg (obj); \
 	}); \
@@ -99,7 +104,7 @@ qm_to_##name## (MObject obj, type ptr) \
 void \
 qm_to_ptr_##name## (MObject obj, type ptr) \
 { \
-	to_invoke_easy (managed_name, "toNativeByPtr", 2, { \
+	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = &ptr; \
 		__args [1] = m_object_as_arg (obj); \
 	}); \
@@ -109,7 +114,7 @@ qm_to_ptr_##name## (MObject obj, type ptr) \
 void \
 qm_to_of_struct_##name## (MObject obj, type ptr) \
 { \
-	to_invoke_easy (managed_name, "toNativeByPtr", 2, { \
+	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = ptr; \
 		__args [1] = m_object_unbox_struct (obj); \
 	}); \
