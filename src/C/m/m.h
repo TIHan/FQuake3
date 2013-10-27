@@ -133,44 +133,6 @@ m_array_as_arg (MArray arr);
 gpointer
 m_string_as_arg (MString str);
 
-#define m_array_addr(array,type,index) ((type*)(void*) m_array_addr_with_size (array, sizeof (type), index))
-#define m_array_get(array,type,index) ( *(type*)m_array_addr ((array), type, (index)) ) 
-#define m_array_set(array,type,index,value)	\
-	do {	\
-		type *__p = (type *) m_array_addr ((array), type, (index));	\
-		*__p = (value);	\
-	} while (0)
-
-#define m_array_map(arr,argc,type,native_arr) \
-{ \
-	gint __i; \
-\
-	for (__i = 0; __i < argc; ++__i) \
-	{ \
-		m_array_set (arr, type, __i, native_arr [__i]); \
-	} \
-} \
-
-#define m_array_map_objects(arr,argc,type,native_arr,obj_func) \
-{ \
-	gint __i; \
-\
-	for (__i = 0; __i < argc; ++__i) \
-	{ \
-		m_array_set (arr, type, __i, m_object_as_arg (obj_func (&native_arr [__i]))); \
-	} \
-} \
-
-#define m_map_array(native_arr,argc,type,arr) \
-{ \
-	gint __i; \
-\
-	for (__i = 0; __i < argc; ++__i) \
-	{ \
-		native_arr [__i] = m_array_get (arr, type, __i); \
-	} \
-} \
-
 #define m_invoke_method_easy(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
 	gpointer __args [argc]; \
