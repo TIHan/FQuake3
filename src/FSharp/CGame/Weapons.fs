@@ -28,6 +28,7 @@ open CGame.Core
 
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
+let mutable calculateWeaponPositionFsx : CGame -> (Vector3 * Vector3) = fun _ -> (Vector3.zero, Vector3.zero)
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
     let origin = cg.Refdef.ViewOrigin
@@ -67,4 +68,3 @@ let calculateWeaponPosition (cg: CGame) =
             (angles.Z + (scale * fractionSin * 0.01f)) // ROLL
 
     ({ origin with Z = originZ }, angles)
-

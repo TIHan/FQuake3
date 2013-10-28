@@ -27,14 +27,33 @@ namespace CGame.Native
 
 open Microsoft.FSharp.NativeInterop
 open Engine.Native
+open Engine.NativeInterop
 open Engine.Renderer.Native
 open CGame.Core
+
+module PlayerState =
+    let inline ofNativePtr (ptr: nativeptr<playerState_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            ViewAngles = Vector3.ofNativePtr &&native.viewangles
+        }
+
+module Snapshot =
+    let inline ofNativePtr (ptr: nativeptr<snapshot_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            PlayerState = PlayerState.ofNativePtr &&native.ps
+        }
 
 module CGame =
     let inline ofNativePtr (ptr: nativeptr<cg_t>) =
         let mutable native = NativePtr.read ptr
 
         {
+            CurrentSnapshot = Option.ofNativePtr (fun x -> Snapshot.ofNativePtr x) native.snap;
+            FrameInterpolation = native.frameInterpolation;
             Time = native.time;
             LandChange = native.landChange;
             LandTime = native.landTime;

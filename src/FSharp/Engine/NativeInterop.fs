@@ -30,9 +30,7 @@ let LibQuake3 = "quake3.dll"
 [<Literal>]
 let DefaultCallingConvention = CallingConvention.Cdecl
 
-/// <summary>
 /// NativePtr
-/// </summary>
 module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
@@ -53,9 +51,10 @@ module NativePtr =
     let inline toNativePtr x =
         NativePtr.toNativeInt x |> NativePtr.ofNativeInt
 
-/// <summary>
+    let inline isValid x =
+        NativePtr.toNativeInt x = System.IntPtr.Zero
+
 /// List
-/// </summary>
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (x: nativeptr<'T>) =
         List.init size (fun i ->
@@ -66,4 +65,11 @@ module List =
         List.init size (fun i ->
             f <| NativePtr.add x i
         )
+
+/// Option
+module Option =
+    let inline ofNativePtr (f: nativeptr<'a> -> 'b) (ptr: nativeptr<'a>) =
+        match NativePtr.isValid ptr with
+        | false -> None
+        | _ -> Some <| f ptr
 

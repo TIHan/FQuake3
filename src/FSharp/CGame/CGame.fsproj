@@ -68,8 +68,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.fsproj">
       <Name>Engine.Renderer</Name>
       <Project>{b80caf20-14ee-49ad-8943-69862c05be1d}</Project>
