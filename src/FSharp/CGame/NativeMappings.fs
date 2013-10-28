@@ -33,12 +33,13 @@ open CGame.Core
 module CGame =
     let inline ofNativePtr (ptr: nativeptr<cg_t>) =
         let mutable native = NativePtr.read ptr
+
         {
             Time = native.time;
             LandChange = native.landChange;
             LandTime = native.landTime;
-            Refdef = Refdef.ofNative native.refdef;
-            RefdefViewAngles = Vector3.ofNative native.refdefViewAngles
+            Refdef = Refdef.ofNativePtr &&native.refdef;
+            RefdefViewAngles = Vector3.ofNativePtr &&native.refdefViewAngles
             BobCycle = native.bobcycle;
             BobFractionSin = native.bobfracsin;
             XYSpeed = native.xyspeed;

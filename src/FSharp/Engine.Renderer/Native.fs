@@ -596,8 +596,6 @@ type trGlobals_t =
     val mutable numModels : int
     val mutable numImages : int
     val mutable images : trGlobals_t_images
-// Note: This makes the struct too big.
-(*
     val mutable numShaders : int
     val mutable shaders : trGlobals_t_shaders
     val mutable sortedShaders : trGlobals_t_shaders
@@ -609,5 +607,4 @@ type trGlobals_t =
     val mutable sawToothTable : trGlobals_t_FUNCTABLE_SIZE
     val mutable inverseSawToothTable : trGlobals_t_FUNCTABLE_SIZE
     val mutable fogTable : trGlobals_t_FOG_TABLE_SIZE
-*)
 

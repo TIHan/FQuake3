@@ -964,7 +964,7 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	MObject m_tuple;
 
 	qm_invoke ("CGame", "CGame", "Weapons", "calculateWeaponPosition", 1, {
-		__args [0] = m_object_as_arg (qm_of_ptr_cg (&cg));
+		__args [0] = m_object_as_arg (qm_of_cg (&cg));
 	}, m_tuple);
 
 	qm_to_vec3 (m_object_get_property (m_tuple, "Item1"), origin);

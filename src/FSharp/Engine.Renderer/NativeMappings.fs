@@ -34,11 +34,11 @@ open Engine.Native
 open Engine.Renderer.Core
 
 module Axis =
-    let inline ofNative (ptr: nativeptr<vec3_t>) =
+    let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         {
-            Axis.X = Vector3.ofNative <| NativePtr.get ptr 0;
-            Axis.Y = Vector3.ofNative <| NativePtr.get ptr 1;
-            Axis.Z = Vector3.ofNative <| NativePtr.get ptr 2;
+            Axis.X = Vector3.ofNativePtr <| NativePtr.add ptr 0;
+            Axis.Y = Vector3.ofNativePtr <| NativePtr.add ptr 1;
+            Axis.Z = Vector3.ofNativePtr <| NativePtr.add ptr 2;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (axis: Axis) =
@@ -55,10 +55,11 @@ module Axis =
         NativePtr.set ptr 2 nativeZ
 
 module Orientation =
-    let inline ofNative (native: orientation_t) =
+    let inline ofNativePtr (ptr: nativeptr<orientation_t>) =
+        let mutable native = NativePtr.read ptr
         {
-            Orientation.Origin = Vector3.ofNative native.origin;
-            Axis = Axis.ofNative &&native.axis;
+            Orientation.Origin = Vector3.ofNativePtr &&native.origin;
+            Axis = Axis.ofNativePtr &&native.axis;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<orientation_t>) (orientation: Orientation) =
@@ -70,12 +71,14 @@ module Orientation =
         NativePtr.write ptr native
 
 module OrientationR =
-    let inline ofNative (native: orientationr_t) =
+    let inline ofNativePtr (ptr: nativeptr<orientationr_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Origin = Vector3.ofNative native.origin;
-            Axis = Axis.ofNative &&native.axis;
-            ViewOrigin = Vector3.ofNative native.viewOrigin;
-            ModelMatrix = Matrix4x4.ofNative &&native.modelMatrix;
+            Origin = Vector3.ofNativePtr &&native.origin;
+            Axis = Axis.ofNativePtr &&native.axis;
+            ViewOrigin = Vector3.ofNativePtr &&native.viewOrigin;
+            ModelMatrix = Matrix4x4.ofNativePtr &&native.modelMatrix;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<orientationr_t>) (orientation: OrientationR) =
@@ -89,9 +92,11 @@ module OrientationR =
         NativePtr.write ptr native
 
 module Plane =
-    let inline ofNative (native: cplane_t) =
+    let inline ofNativePtr (ptr: nativeptr<cplane_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Normal = Vector3.ofNative native.normal;
+            Normal = Vector3.ofNativePtr &&native.normal;
             Distance = native.dist;
             Type = NativePtr.toStructure &&native.type';
             SignBits = native.signbits;
@@ -108,12 +113,12 @@ module Plane =
         NativePtr.write ptr native
 
 module Frustum =
-    let inline ofNative (ptr: nativeptr<cplane_t>) =
+    let inline ofNativePtr (ptr: nativeptr<cplane_t>) =
         {
-            Left = Plane.ofNative <| NativePtr.get ptr 0;
-            Right = Plane.ofNative <| NativePtr.get ptr 1;
-            Bottom = Plane.ofNative <| NativePtr.get ptr 2;
-            Top = Plane.ofNative <| NativePtr.get ptr 3;
+            Left = Plane.ofNativePtr <| NativePtr.add ptr 0;
+            Right = Plane.ofNativePtr <| NativePtr.add ptr 1;
+            Bottom = Plane.ofNativePtr <| NativePtr.add ptr 2;
+            Top = Plane.ofNativePtr <| NativePtr.add ptr 3;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (frustum: Frustum) =
@@ -123,25 +128,27 @@ module Frustum =
         Plane.toNativeByPtr (NativePtr.add ptr 3) frustum.Top
 
 module ViewParms =
-    let inline ofNative (native: viewParms_t) =
+    let inline ofNativePtr (ptr: nativeptr<viewParms_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Orientation = OrientationR.ofNative native.or';
-            World = OrientationR.ofNative native.world;
-            PvsOrigin = Vector3.ofNative native.pvsOrigin;
+            Orientation = OrientationR.ofNativePtr &&native.or';
+            World = OrientationR.ofNativePtr &&native.world;
+            PvsOrigin = Vector3.ofNativePtr &&native.pvsOrigin;
             IsPortal = Convert.ToBoolean native.isPortal;
             IsMirror = Convert.ToBoolean native.isMirror;
             FrameSceneId = native.frameSceneNum;
             FrameCount = native.frameCount;
-            PortalPlane = Plane.ofNative native.portalPlane;
+            PortalPlane = Plane.ofNativePtr &&native.portalPlane;
             ViewportX = native.viewportX;
             ViewportY = native.viewportY;
             ViewportWidth = native.viewportWidth;
             ViewportHeight = native.viewportHeight;
             FovX = native.fovX;
             FovY = native.fovY;
-            ProjectionMatrix = Matrix4x4.ofNative &&native.projectionMatrix;
-            Frustum = Frustum.ofNative &&native.frustum;
-            VisibilityBounds = Bounds.ofNative &&native.visBounds;
+            ProjectionMatrix = Matrix4x4.ofNativePtr &&native.projectionMatrix;
+            Frustum = Frustum.ofNativePtr &&native.frustum;
+            VisibilityBounds = Bounds.ofNativePtr &&native.visBounds;
             ZFar = native.zFar;
         }
 
@@ -170,7 +177,7 @@ module ViewParms =
         NativePtr.write ptr native
 
 module Rgba =
-    let inline ofNative (ptr: nativeptr<byte>) =
+    let inline ofNativePtr (ptr: nativeptr<byte>) =
         {
             R = NativePtr.get ptr 0;
             G = NativePtr.get ptr 1;
@@ -185,21 +192,25 @@ module Rgba =
         NativePtr.set ptr 3 rgba.A
 
 module DrawVertex =
-    let inline ofNative (native: drawVert_t) =
+    let inline ofNativePtr (ptr: nativeptr<drawVert_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            DrawVertex.Vertex = Vector3.ofNative native.xyz;
+            DrawVertex.Vertex = Vector3.ofNativePtr &&native.xyz;
             St0 = NativePtr.get &&native.st 0;
             St1 = NativePtr.get &&native.st 1;
             Lightmap0 = NativePtr.get &&native.lightmap 0;
             Lightmap1 = NativePtr.get &&native.lightmap 1;
-            Normal = Vector3.ofNative native.normal;
-            Color = Rgba.ofNative &&native.color;
+            Normal = Vector3.ofNativePtr &&native.normal;
+            Color = Rgba.ofNativePtr &&native.color;
         }
 
 module PolyVertex =
-    let inline ofNative (native: polyVert_t) =
+    let inline ofNativePtr (ptr: nativeptr<polyVert_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Vertex = Vector3.ofNative native.xyz;
+            Vertex = Vector3.ofNativePtr &&native.xyz;
             St0 = NativePtr.get &&native.st 0;
             St1 = NativePtr.get &&native.st 1;
             Modulate0 = NativePtr.get &&native.modulate 0;
@@ -209,7 +220,7 @@ module PolyVertex =
         }
 
 module FaceVertexPoints =
-    let inline ofNative (ptr: nativeptr<single>) =
+    let inline ofNativePtr (ptr: nativeptr<single>) =
         {
             Vertex0 = NativePtr.get ptr 0;
             Vertex1 = NativePtr.get ptr 1;
@@ -222,52 +233,62 @@ module FaceVertexPoints =
         }
 
 module Surface =
-    let inline ofNativeFace (native: srfSurfaceFace_t) =
+    let inline ofNativePtrFace (ptr: nativeptr<srfSurfaceFace_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Plane = Plane.ofNative native.plane;
+            Plane = Plane.ofNativePtr &&native.plane;
             DlightBit0 = NativePtr.get &&native.dlightBits 0;
             DlightBit1 = NativePtr.get &&native.dlightBits 1;
             PointCount = native.numPoints;
             IndexCount = native.numIndices;
             OffsetIndices = native.ofsIndices;
-            Points = FaceVertexPoints.ofNative &&native.points;
+            Points = FaceVertexPoints.ofNativePtr &&native.points;
         }
         |> Face
 
-    let inline ofNativeTriangles (native: srfTriangles_t) =
+    let inline ofNativePtrTriangles (ptr: nativeptr<srfTriangles_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             DlightBit0 = NativePtr.get &&native.dlightBits 0;
             DlightBit1 = NativePtr.get &&native.dlightBits 1;
-            Bounds = Bounds.ofNative &&native.bounds;
-            LocalOrigin = Vector3.ofNative native.localOrigin;
+            Bounds = Bounds.ofNativePtr &&native.bounds;
+            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
             Radius = native.radius;
             Indices = List.ofNativePtrArray native.numIndexes native.indexes;
-            Vertices = List.ofNativePtrArrayMap native.numVerts DrawVertex.ofNative native.verts;
+            Vertices = List.ofNativePtrArrayMap native.numVerts DrawVertex.ofNativePtr native.verts;
         }
         |> Triangles
 
-    let inline ofNativePoly (native: srfPoly_t) =
+    let inline ofNativePtrPoly (ptr: nativeptr<srfPoly_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             ShaderHandle = native.hShader;
             FogIndex = native.fogIndex;
-            Vertices = List.ofNativePtrArrayMap native.numVerts PolyVertex.ofNative native.verts;
+            Vertices = List.ofNativePtrArrayMap native.numVerts PolyVertex.ofNativePtr native.verts;
         }
         |> Poly
 
-    let inline ofNativeDisplayList (native: srfDisplayList_t) =
+    let inline ofNativePtrDisplayList (ptr: nativeptr<srfDisplayList_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             ListId = native.listNum;
         }
         |> DisplayList
 
-    let inline ofNativeGridMesh (native: srfGridMesh_t) =
+    let inline ofNativePtrGridMesh (ptr: nativeptr<srfGridMesh_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             DlightBit0 = NativePtr.get &&native.dlightBits 0;
             DlightBit1 = NativePtr.get &&native.dlightBits 1;
-            MeshBounds = Bounds.ofNative &&native.meshBounds;
-            LocalOrigin = Vector3.ofNative native.localOrigin;
+            MeshBounds = Bounds.ofNativePtr &&native.meshBounds;
+            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
             MeshRadius = native.meshRadius;
-            LodOrigin = Vector3.ofNative native.lodOrigin;
+            LodOrigin = Vector3.ofNativePtr &&native.lodOrigin;
             LodRadius = native.lodRadius;
             LodFixed = native.lodFixed;
             LodStitched = native.lodStitched;
@@ -275,79 +296,80 @@ module Surface =
             Height = native.height;
             WidthLodError = List.ofNativePtrArray native.width native.widthLodError;
             HeightLodError = List.ofNativePtrArray native.height native.heightLodError;
-            Vertex = DrawVertex.ofNative native.verts;
+            Vertex = DrawVertex.ofNativePtr &&native.verts;
         }
         |> Grid
 
-    let inline ofNativeFlare (native: srfFlare_t) =
+    let inline ofNativePtrFlare (ptr: nativeptr<srfFlare_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Origin = Vector3.ofNative native.origin;
-            Normal = Vector3.ofNative native.normal;
-            Color = Vector3.ofNative native.color;
+            Origin = Vector3.ofNativePtr &&native.origin;
+            Normal = Vector3.ofNativePtr &&native.normal;
+            Color = Vector3.ofNativePtr &&native.color;
         }
         |> Flare
 
-    let inline ofNative (nativePtr: nativeptr<surfaceType_t>) =
-        let type' = NativePtr.read nativePtr
-        match type' with
+    let inline ofNativePtr (ptr: nativeptr<surfaceType_t>) =
+        let mutable native = NativePtr.read ptr
+
+        match native with
         | surfaceType_t.SF_BAD -> Bad
         | surfaceType_t.SF_SKIP -> Skip
         | surfaceType_t.SF_FACE ->
-            let nativePtr = NativePtr.ofNativeInt<srfSurfaceFace_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativeFace native            
+            let ptr = NativePtr.ofNativeInt<srfSurfaceFace_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrFace ptr
         | surfaceType_t.SF_GRID ->
-            let nativePtr = NativePtr.ofNativeInt<srfGridMesh_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativeGridMesh native
+            let ptr = NativePtr.ofNativeInt<srfGridMesh_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrGridMesh ptr
         | surfaceType_t.SF_TRIANGLES ->
-            let nativePtr = NativePtr.ofNativeInt<srfTriangles_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativeTriangles native
+            let ptr = NativePtr.ofNativeInt<srfTriangles_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrTriangles ptr
         | surfaceType_t.SF_POLY ->
-            let nativePtr = NativePtr.ofNativeInt<srfPoly_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativePoly native
+            let ptr = NativePtr.ofNativeInt<srfPoly_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrPoly ptr
         | surfaceType_t.SF_MD3 -> Md3
         | surfaceType_t.SF_MD4 -> Md4
         | surfaceType_t.SF_FLARE ->
-            let nativePtr = NativePtr.ofNativeInt<srfFlare_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativeFlare native 
+            let ptr = NativePtr.ofNativeInt<srfFlare_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrFlare ptr
         | surfaceType_t.SF_ENTITY -> Entity
         | surfaceType_t.SF_DISPLAY_LIST ->
-            let nativePtr = NativePtr.ofNativeInt<srfDisplayList_t> <| NativePtr.toNativeInt nativePtr
-            let native = NativePtr.read nativePtr
-            ofNativeDisplayList native
+            let ptr = NativePtr.ofNativeInt<srfDisplayList_t> <| NativePtr.toNativeInt ptr
+            ofNativePtrDisplayList ptr
         | _ -> raise <| Exception "Invalid Surface Type"          
 
 module DrawSurface =
-    let inline ofNative (native: drawSurf_t) =
+    let inline ofNativePtr (ptr: nativeptr<drawSurf_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             Sort = native.sort;
-            Surface = Surface.ofNative native.surface;
+            Surface = Surface.ofNativePtr native.surface;
         }
 
 module RefEntity =
-    let inline ofNative (native: refEntity_t) =
+    let inline ofNativePtr (ptr: nativeptr<refEntity_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             RefEntity.Type = enum<RefEntityType> (int native.reType);
             RenderFx = native.renderfx;
             ModelHandle = native.hModel;
-            LightingOrigin = Vector3.ofNative native.lightingOrigin;
+            LightingOrigin = Vector3.ofNativePtr &&native.lightingOrigin;
             ShadowPlane = native.shadowPlane;
-            Axis = Axis.ofNative &&native.axis;
+            Axis = Axis.ofNativePtr &&native.axis;
             HasNonNormalizedAxes = Convert.ToBoolean native.nonNormalizedAxes;
-            Origin = Vector3.ofNative native.origin;
+            Origin = Vector3.ofNativePtr &&native.origin;
             Frame = native.frame;
-            OldOrigin = Vector3.ofNative native.oldorigin;
+            OldOrigin = Vector3.ofNativePtr &&native.oldorigin;
             OldFrame = native.oldframe;
             BackLerp = native.backlerp;
             SkinId = native.skinNum;
             CustomSkinHandle = native.customSkin;
             CustomShaderHandle = native.customShader;
-            ShaderRgba = Rgba.ofNative &&native.shaderRGBA;
-            ShaderTextureCoordinate = Vector2.ofNative native.shaderTexCoord;
+            ShaderRgba = Rgba.ofNativePtr &&native.shaderRGBA;
+            ShaderTextureCoordinate = Vector2.ofNativePtr &&native.shaderTexCoord;
             ShaderTime = native.shaderTime;
             Radius = native.radius;
             Rotation = native.rotation;
@@ -380,16 +402,18 @@ module RefEntity =
         NativePtr.write ptr native 
 
 module TrRefEntity =
-    let inline ofNative (native: trRefEntity_t) =
+    let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Entity = RefEntity.ofNative native.e;
+            Entity = RefEntity.ofNativePtr &&native.e;
             AxisLength = native.axisLength;
             NeedDlights = Convert.ToBoolean native.needDlights;
             IsLightingCalculated = Convert.ToBoolean native.lightingCalculated;
-            LightDirection = Vector3.ofNative native.lightDir;
-            AmbientLight = Vector3.ofNative native.ambientLight;
+            LightDirection = Vector3.ofNativePtr &&native.lightDir;
+            AmbientLight = Vector3.ofNativePtr &&native.ambientLight;
             AmbientLightInt = native.ambientLightInt;
-            DirectedLight = Vector3.ofNative native.directedLight;
+            DirectedLight = Vector3.ofNativePtr &&native.directedLight;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<trRefEntity_t>) (refEntity: TrRefEntity) =
@@ -408,17 +432,19 @@ module TrRefEntity =
 
     module Option =
         let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =
-            Some << ofNative <| NativePtr.read ptr
+            Some <| ofNativePtr ptr
 
 module Refdef =
-    let inline ofNative (native: refdef_t) =
+    let inline ofNativePtr (ptr: nativeptr<refdef_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             X = native.x;
             Y = native.y;
             Width = native.width;
             Height = native.height;
-            ViewOrigin = Vector3.ofNative native.vieworg;
-            ViewAxis = Axis.ofNative &&native.viewaxis;
+            ViewOrigin = Vector3.ofNativePtr &&native.vieworg;
+            ViewAxis = Axis.ofNativePtr &&native.viewaxis;
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags)
         }
@@ -438,24 +464,28 @@ module Refdef =
         NativePtr.write ptr native
 
 module Dlight =
-    let inline ofNative (native: dlight_t) =
+    let inline ofNativePtr (ptr: nativeptr<dlight_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
-            Origin = Vector3.ofNative native.origin;
-            Color = Vector3.ofNative native.color;
+            Origin = Vector3.ofNativePtr &&native.origin;
+            Color = Vector3.ofNativePtr &&native.color;
             Radius = native.radius;
-            Transformed = Vector3.ofNative native.transformed;
+            Transformed = Vector3.ofNativePtr &&native.transformed;
             Additive = native.additive;
         }
 
 module TrRefdef =
-    let inline ofNative (native: trRefdef_t) =
+    let inline ofNativePtr (ptr: nativeptr<trRefdef_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             X = native.x;
             Y = native.y;
             Width = native.width;
             Height = native.height;
-            ViewOrigin = Vector3.ofNative native.vieworg;
-            ViewAxis = Axis.ofNative &&native.viewaxis;
+            ViewOrigin = Vector3.ofNativePtr &&native.vieworg;
+            ViewAxis = Axis.ofNativePtr &&native.viewaxis;
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags);
 
@@ -464,14 +494,16 @@ module TrRefdef =
 
             FloatTime = native.floatTime;
             Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text; // FIXME: This isn't right.
-            Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNative x) native.enities;
-            Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNative x) native.dlights;
-            Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePoly x) native.polys;
-            DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNative x) native.drawSurfs;
+            Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNativePtr x) native.enities;
+            Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNativePtr x) native.dlights;
+            Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePtrPoly x) native.polys;
+            DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNativePtr x) native.drawSurfs;
         }
 
 module FrontEndPerformanceCounters =
-    let inline ofNative (native: frontEndCounters_t) =
+    let inline ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             SpherePatch = { CullIn = native.c_sphere_cull_patch_in; CullClip = native.c_sphere_cull_patch_clip; CullOut = native.c_sphere_cull_patch_out };
             BoxPatch = { CullIn = native.c_box_cull_patch_in; CullClip = native.c_box_cull_patch_clip; CullOut = native.c_box_cull_patch_out };
@@ -505,14 +537,16 @@ module FrontEndPerformanceCounters =
 
 // TODO: This will need more work over time.
 module TrGlobals =
-    let inline ofNative (native: trGlobals_t) =
+    let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             CurrentEntity = TrRefEntity.Option.ofNativePtr native.currentEntity;
             CurrentEntityId = native.currentEntityNum;
-            ViewParms = ViewParms.ofNative native.viewParms;
-            Refdef = TrRefdef.ofNative native.refdef;
-            Orientation = OrientationR.ofNative native.or';
-            PerfCounters = FrontEndPerformanceCounters.ofNative native.pc
+            ViewParms = ViewParms.ofNativePtr &&native.viewParms;
+            Refdef = TrRefdef.ofNativePtr &&native.refdef;
+            Orientation = OrientationR.ofNativePtr &&native.or';
+            PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc
         }
 
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (tr: TrGlobals) =

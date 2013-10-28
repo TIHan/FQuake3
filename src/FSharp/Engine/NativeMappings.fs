@@ -26,6 +26,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 namespace Engine.Native
 
 open System
+open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
@@ -34,7 +35,9 @@ open Engine.Math
 open Engine.NativeInterop
 
 module bool =
-    let inline ofNative (native: qboolean) =
+    let inline ofNativePtr (ptr: nativeptr<qboolean>) =
+        let mutable native = NativePtr.read ptr
+
         match native with
         | qboolean.qtrue -> true
         | _ -> false
@@ -50,7 +53,9 @@ module bool =
         if value then qboolean.qtrue else qboolean.qfalse
 
 module Vector2 =
-    let inline ofNative (native: vec2_t) =
+    let inline ofNativePtr (ptr: nativeptr<vec2_t>) =
+        let mutable native = NativePtr.read ptr
+
         { Vector2.X = native.value; Y = native.value1 }
 
     let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
@@ -62,7 +67,9 @@ module Vector2 =
         NativePtr.write ptr native  
 
 module Vector3 =
-    let inline ofNative (native: vec3_t) =
+    let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
+        let mutable native = NativePtr.read ptr
+
         { Vector3.X = native.value; Y = native.value1; Z = native.value2 }
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vector3) =
@@ -75,7 +82,9 @@ module Vector3 =
         NativePtr.write ptr native   
         
 module Vector4 =
-    let inline ofNative (native: vec4_t) =
+    let inline ofNativePtr (ptr: nativeptr<vec4_t>) =
+        let mutable native = NativePtr.read ptr
+
         { Vector4.X = native.value; Y = native.value1; Z = native.value2; W = native.value3 }
 
     let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: Vector4) =
@@ -89,7 +98,7 @@ module Vector4 =
         NativePtr.write ptr native  
 
 module Matrix4x4 =
-    let inline ofNative (ptr: nativeptr<single>) =
+    let inline ofNativePtr (ptr: nativeptr<single>) =
         Matrix4x4.create
             (NativePtr.get ptr 0)
             (NativePtr.get ptr 1)
@@ -127,7 +136,9 @@ module Matrix4x4 =
         NativePtr.set ptr 15 m.[3, 3]
 
 module Cvar =
-    let inline ofNative (native: cvar_t) =
+    let inline ofNativePtr (ptr: nativeptr<cvar_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             Name = NativePtr.toString native.name;
             String = NativePtr.toString native.string;
@@ -141,10 +152,10 @@ module Cvar =
         }
 
 module Bounds =
-    let inline ofNative (ptr: nativeptr<vec3_t>) =
+    let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         {
-            Bounds.Bounds1 = Vector3.ofNative <| NativePtr.get ptr 0;
-            Bounds2 = Vector3.ofNative <| NativePtr.get ptr 1;
+            Bounds.Bounds1 = Vector3.ofNativePtr <| NativePtr.add ptr 0;
+            Bounds2 = Vector3.ofNativePtr <| NativePtr.add ptr 1;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
@@ -162,7 +173,9 @@ module ByteString =
         ByteString.create <| NativePtr.toArray size nativePtr
 
 module Message =
-    let inline ofNative (native: msg_t) =
+    let inline ofNativePtr (ptr: nativeptr<msg_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             IsAllowedOverflow = Convert.ToBoolean native.allowoverflow;
             IsOverflowed = Convert.ToBoolean native.overflowed;
@@ -174,7 +187,9 @@ module Message =
         }
 
 module IPAddress =
-    let inline ofNative (native: netadr_t) =
+    let inline ofNativePtr (ptr: nativeptr<netadr_t>) =
+        let mutable native = NativePtr.read ptr
+
         {
             Type = enum<AddressType> (int native.type');
             IP = NativePtr.toStructure &&native.ip;

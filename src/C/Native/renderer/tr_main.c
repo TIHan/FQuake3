@@ -449,7 +449,7 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms,
 		__args [1] = m_object_as_arg (qm_of_ref_entity (&ent->e));
 	}, m_result);
 
-	qm_to_ptr_orientationr (m_result, or);
+	qm_to_orientationr (m_result, &or);
 #endif
 }
 
@@ -500,14 +500,15 @@ void R_RotateForViewer (void) {
 
 	tr.viewParms.world = tr.or;
 #else
+	orientation_t *_or = &tr.or;
 	MObject m_result;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "rotateForViewer", 1, {
 		__args [0] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, m_result);
 
-	qm_to_ptr_orientationr (m_result, &tr.or);
-	qm_to_ptr_orientationr (m_result, &tr.viewParms.world);
+	qm_to_orientationr (m_result, &_or);
+	tr.viewParms.world = tr.or;
 #endif
 }
 #if 0
@@ -680,13 +681,14 @@ void R_SetupFrustum( void ) {
 		SetPlaneSignbits( &tr.viewParms.frustum[i] );
 	}
 #else
+	cplane_t** _frustum = &tr.viewParms.frustum;
 	MObject m_result;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "setupFrustum", 1, {
 		__args [0] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, m_result);
 
-	qm_to_ptr_frustum (m_result, &tr.viewParms.frustum);
+	qm_to_frustum (m_result, &_frustum);
 #endif
 }
 
@@ -803,7 +805,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 		__args [1] = m_object_as_arg (qm_of_plane (plane));
 	}, m_result);
 
-	qm_to_ptr_plane (m_result, plane);
+	qm_to_plane (m_result, &plane);
 #endif
 }
 
@@ -940,6 +942,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum, 
 							 orientation_t *surface, orientation_t *camera,
 							 vec3_t pvsOrigin, qboolean *mirror ) {
+	trGlobals_t* _tr = &tr;
 	MObject m_tuple;
 	qboolean retval;
 
@@ -954,10 +957,10 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 
 	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item1"), &retval);
 	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item2"), mirror);
-	qm_to_ptr_orientation (m_object_get_property (m_tuple, "Item3"), surface);
-	qm_to_ptr_orientation (m_object_get_property (m_tuple, "Item4"), camera);
+	qm_to_orientation (m_object_get_property (m_tuple, "Item3"), &surface);
+	qm_to_orientation (m_object_get_property (m_tuple, "Item4"), &camera);
 	qm_to_vec3 (m_object_get_property (m_tuple, "Item5"), pvsOrigin);
-	qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item6"), &tr);
+	qm_to_tr_globals (m_object_get_property (m_tuple, "Item6"), &_tr);
 
 	return retval;
 }
@@ -1025,6 +1028,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 #else
 static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 {
+	trGlobals_t *_tr = &tr;
 	MObject m_tuple;
 	qboolean retval;
 
@@ -1035,7 +1039,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	}, m_tuple);
 
 	qm_to_of_struct_qboolean (m_object_get_property (m_tuple, "Item1"), &retval);
-	qm_to_ptr_tr_globals (m_object_get_property (m_tuple, "Item2"), &tr);
+	qm_to_tr_globals (m_object_get_property (m_tuple, "Item2"), &_tr);
 
 	return retval;
 }

@@ -62,8 +62,8 @@ module List =
             NativePtr.get x i
         )
 
-    let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: 'T -> 'U) (x: nativeptr<'T>) =
+    let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: nativeptr<'T> -> 'U) (x: nativeptr<'T>) =
         List.init size (fun i ->
-            f <| NativePtr.get x i
+            f <| NativePtr.add x i
         )
 
