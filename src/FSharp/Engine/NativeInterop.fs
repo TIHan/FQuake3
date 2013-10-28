@@ -52,7 +52,7 @@ module NativePtr =
         NativePtr.toNativeInt x |> NativePtr.ofNativeInt
 
     let inline isValid x =
-        NativePtr.toNativeInt x = System.IntPtr.Zero
+        NativePtr.toNativeInt x <> System.IntPtr.Zero
 
 /// List
 module List =
