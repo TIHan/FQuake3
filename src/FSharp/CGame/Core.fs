@@ -78,6 +78,9 @@ type CGame =
         /// cg.snap->serverTime <= cg.time
         CurrentSnapshot: Snapshot option;
 
+        /// cg.nextSnap->serverTime > cg.time, or NULL
+        NextSnapshot: Snapshot option;
+
         /// (float)( cg.time - cg.frame->serverTime ) / (cg.nextFrame->serverTime - cg.frame->serverTime)
         FrameInterpolation: single;
 

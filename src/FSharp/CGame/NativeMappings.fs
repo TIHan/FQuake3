@@ -53,6 +53,7 @@ module CGame =
 
         {
             CurrentSnapshot = Option.ofNativePtr (fun x -> Snapshot.ofNativePtr x) native.snap;
+            NextSnapshot = Option.ofNativePtr (fun x -> Snapshot.ofNativePtr x) native.nextSnap;
             FrameInterpolation = native.frameInterpolation;
             Time = native.time;
             LandChange = native.landChange;
