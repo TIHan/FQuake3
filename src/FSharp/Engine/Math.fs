@@ -179,6 +179,9 @@ module Vector3 =
         let vn = normalize uv
         crossProduct v vn
 
+    let inline lerp (v1: Vector3) (v2: Vector3) (t: single) =
+        create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
+
 /// Vector4      
 type Vector4 =
     { X: single; Y: single; Z: single; W: single }
