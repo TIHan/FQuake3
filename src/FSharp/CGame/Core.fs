@@ -88,6 +88,8 @@ type CGame =
         /// is rendering at.
         Time: int;
 
+        PredictedPlayerState: PlayerState;
+
         // for landing hard
         LandChange: single;
         LandTime: int;
