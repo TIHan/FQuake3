@@ -49,6 +49,9 @@ module Constants =
 /// TODO: Not finished.
 type PlayerState =
     {
+        Origin: Vector3;
+        Velocity: Vector3;
+
         /// for fixed views
         ViewAngles: Vector3; 
     }

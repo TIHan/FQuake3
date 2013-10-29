@@ -36,6 +36,8 @@ module PlayerState =
         let mutable native = NativePtr.read ptr
 
         {
+            Origin = Vector3.ofNativePtr &&native.origin;
+            Velocity = Vector3.ofNativePtr &&native.velocity;
             ViewAngles = Vector3.ofNativePtr &&native.viewangles
         }
 
