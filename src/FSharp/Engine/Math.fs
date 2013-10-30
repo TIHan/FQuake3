@@ -325,6 +325,22 @@ module Matrix4x4 =
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
+/// Euler
+/// Uses Vector3
+[<RequireQualifiedAccess>]
+module Euler =
+    let inline lerp (a1: Vector3) (a2: Vector3) t =
+        let inline lerpAngle a b t =
+            let b =
+                match b - a with
+                | x when x > 180.f -> b - 360.f 
+                | x when x < -180.f -> b + 360.f
+                | _ -> b
+
+            Math.lerp a b t
+
+        Vector3.create (lerpAngle a1.X a2.X t) (lerpAngle a1.Y a2.Y t) (lerpAngle a1.Z a2.Z t)
+
 /// Quaternion
 type Quaternion =
     { W: single; X: single; Y: single; Z: single; }
