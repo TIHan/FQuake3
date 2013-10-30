@@ -91,6 +91,9 @@ type CGame =
         /// is rendering at.
         Time: int;
 
+        /// time at last frame, used for missile trails and prediction checking
+        OldTime: int;
+
         PredictedPlayerState: PlayerState;
 
         // for landing hard
@@ -105,3 +108,6 @@ type CGame =
         BobFractionSin: single;
         XYSpeed: single;
     }
+
+    member this.FrameTime with get () = this.Time - this.OldTime
+    member this.DeltaLandTime with get () = this.Time - this.LandTime

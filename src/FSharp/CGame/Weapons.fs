@@ -46,12 +46,10 @@ let calculateWeaponPosition (cg: CGame) =
             (angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f)) // PITCH
             (angles.Y + (scale * cg.BobFractionSin * 0.01f)) // YAW
             (angles.Z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
-
-    let deltaTime = cg.Time - cg.LandTime
         
     let originZ =
         // drop the weapon when landing
-        match deltaTime with
+        match cg.DeltaLandTime with
         | x when x < Constants.LandDeflectTime ->
             origin.Z + (cg.LandChange * 0.25f * (single x / single Constants.LandDeflectTime))
         | x when x < Constants.LandDeflectTime + Constants.LandReturnTime ->

@@ -58,6 +58,7 @@ module CGame =
             NextSnapshot = Option.ofNativePtr (fun x -> Snapshot.ofNativePtr x) native.nextSnap;
             FrameInterpolation = native.frameInterpolation;
             Time = native.time;
+            OldTime = native.oldTime;
             PredictedPlayerState = PlayerState.ofNativePtr &&native.predictedPlayerState;
             LandChange = native.landChange;
             LandTime = native.landTime;
