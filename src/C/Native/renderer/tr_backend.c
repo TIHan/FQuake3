@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "tr_local.h"
+#include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 backEndData_t	*backEndData[SMP_FRAMES];
 backEndState_t	backEnd;
@@ -408,7 +410,7 @@ static void RB_Hyperspace( void ) {
 	backEnd.isHyperspace = qtrue;
 }
 
-
+#if 0
 static void SetViewportAndScissor( void ) {
 	qglMatrixMode(GL_PROJECTION);
 	qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
@@ -420,7 +422,14 @@ static void SetViewportAndScissor( void ) {
 	qglScissor( backEnd.viewParms.viewportX, backEnd.viewParms.viewportY, 
 		backEnd.viewParms.viewportWidth, backEnd.viewParms.viewportHeight );
 }
-
+#else
+static void SetViewportAndScissor(void) {
+	MObject m_void;
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Backend", "setViewportAndScissor", 1, {
+		__args[0] = m_object_as_arg (qm_of_tr_back_end_state (&backEnd));
+	}, m_void);
+}
+#endif
 /*
 =================
 RB_BeginDrawingView

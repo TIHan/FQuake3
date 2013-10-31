@@ -34,19 +34,23 @@ open Engine.Math
 open Engine.Renderer.Core
 open GL
 
+// Hmm, I wonder if this is ok...
+let inline fixedPtr (f: nativeptr<_> -> unit) (a: obj) =
+    let handle = GCHandle.Alloc (a, GCHandleType.Pinned)
+    let addr = handle.AddrOfPinnedObject ()
+
+    f <| NativePtr.ofNativeInt addr
+
+    handle.Free ()
+
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
-let setViewPortAndScissor (backend: Backend) =
+let setViewportAndScissor (backend: Backend) =
     let view = backend.View
 
     glMatrixMode <| GLenum GL_PROJECTION
-
-    let handle = GCHandle.Alloc (view.ProjectionMatrix, GCHandleType.Pinned)
-    let addr = handle.AddrOfPinnedObject ()
-
-    glLoadMatrixf <| NativePtr.ofNativeInt addr
-
-    handle.Free ()
+    fixedPtr (fun ptr -> glLoadMatrixf ptr) view.ProjectionMatrix
+    glMatrixMode <| GLenum GL_MODELVIEW
 
     // set the window clipping
     glViewport (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)

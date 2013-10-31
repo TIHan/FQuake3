@@ -38,3 +38,4 @@ define_mapping (plane, cplane_t*, "Plane");
 define_mapping (surface, surfaceType_t*, "Surface");
 define_mapping (draw_surf, drawSurf_t*, "DrawSurface");
 define_mapping (tr_globals, trGlobals_t*, "TrGlobals");
+define_mapping (tr_back_end_state, backEndState_t*, "Backend");
