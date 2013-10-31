@@ -22,6 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 namespace Engine.Math
 
 open System
+open System.Runtime.InteropServices
 
 /// Math Module
 [<RequireQualifiedAccess>]
@@ -45,6 +46,7 @@ module Math =
         x + (t * (y - x))
 
 /// Vector2
+[<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
     { X: single; Y: single }
 
@@ -70,6 +72,7 @@ module Vector2 =
     let unitY = create 0.f 1.f
 
 /// Vector3
+[<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
     { X: single; Y: single; Z: single }
 
@@ -183,6 +186,7 @@ module Vector3 =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
 
 /// Vector4      
+[<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
     { X: single; Y: single; Z: single; W: single }
     
@@ -217,6 +221,7 @@ module Vector4 =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 /// Matrix2x2
+[<StructLayout (LayoutKind.Sequential)>]
 type Matrix2x2 =
     {
         M11: single; M12: single;
@@ -245,7 +250,8 @@ module Matrix2x2 =
 
     let zero = create 0.f 0.f 0.f 0.f
 
-/// Matrix3x3        
+/// Matrix3x3 
+[<StructLayout (LayoutKind.Sequential)>]       
 type Matrix3x3 =     
     {
         M11: single; M12: single; M13: single;
@@ -277,7 +283,8 @@ module Matrix3x3 =
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
-/// Matrix4x4       
+/// Matrix4x4    
+[<StructLayout (LayoutKind.Sequential)>]   
 type Matrix4x4 =     
     {
         M11: single; M12: single; M13: single; M14: single;
@@ -342,6 +349,7 @@ module Euler =
         Vector3.create (lerpAngle a1.X a2.X t) (lerpAngle a1.Y a2.Y t) (lerpAngle a1.Z a2.Z t)
 
 /// Quaternion
+[<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
     { W: single; X: single; Y: single; Z: single; }
 

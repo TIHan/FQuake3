@@ -1130,6 +1130,36 @@ module PerfCounter =
     let incrementBoxMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
         { perfCounters with BoxMd3 = increment clipType perfCounters.BoxMd3 }
 
+/// Based on Q3: backEndState_t
+/// Backend
+///
+/// all state modified by the back end is seperated
+/// from the front end state
+/// TODO: Not finished.
+type Backend =
+    {
+        Refdef: TrRefdef;
+        View: ViewParms;
+        Orientation: OrientationR;
+        // TODO: backEndCounters_t  pc;
+        IsHyperspace: bool;
+        CurrentEntity: TrRefEntity option;
+
+        /// flag for drawing sun
+        HasSkyRenderedThisView: bool;
+
+        /// if qtrue, drawstretchpic doesn't need to change modes
+        IsProjection2D: bool;
+
+        Color2D: Rgba; // This right?
+
+        /// shader needs to be finished
+        IsVertex2D: bool;
+
+        /// currentEntity will point at this when doing 2D rendering
+        Entity2D: TrRefEntity;
+    }
+
 /// <summary>
 /// Based on Q3: trGlobals_t
 /// TrGlobals
