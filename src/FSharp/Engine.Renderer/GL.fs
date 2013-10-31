@@ -19,35 +19,47 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-module Engine.Renderer.Backend
+module GL
 
 // Disable native interop warnings
 #nowarn "9"
 #nowarn "51"
 
 open System
-open System.Diagnostics.Contracts
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
-open Engine.Core
-open Engine.Math
-open Engine.Renderer.Core
-open GL
 
-/// Based on Q3: SetViewportAndScissor
-/// SetViewportAndScissor
-let setViewPortAndScissor (backend: Backend) =
-    let view = backend.View
+[<Literal>]
+let LibOpenGL = "opengl32.dll"
 
-    glMatrixMode <| GLenum GL_PROJECTION
+[<Literal>]
+let OpenGLCallingConvention = CallingConvention.Cdecl
 
-    let handle = GCHandle.Alloc (view.ProjectionMatrix, GCHandleType.Pinned)
-    let addr = handle.AddrOfPinnedObject ()
+//
 
-    glLoadMatrixf <| NativePtr.ofNativeInt addr
+[<Literal>]
+let GL_MODELVIEW = 0x1700
 
-    handle.Free ()
+[<Literal>]
+let GL_PROJECTION = 0x1701
 
-    // set the window clipping
-    glViewport (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
-    glScissor (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+type GLenum = uint32
+type GLint = int
+type GLsizei = int
+type GLfloat = single
+
+let inline GLenum a = uint32 a
+
+//
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glMatrixMode (GLenum mode)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glLoadMatrixf (GLfloat *m)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glScissor (GLint x, GLint y, GLsizei width, GLsizei height)

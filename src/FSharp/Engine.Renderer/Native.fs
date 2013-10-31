@@ -471,6 +471,40 @@ type frontEndCounters_t =
     val mutable c_dlightSurfacesCulled : int
 
 [<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type backEndCounters_t =
+    val mutable c_surfaces : int
+    val mutable c_shaders : int
+    val mutable c_vertexes : int
+    val mutable c_indexes : int
+    val mutable c_totalIndexes : int
+    val mutable c_dlightVertexes : int
+    val mutable c_dlightIndexes : int
+    val mutable c_flareAdds : int
+    val mutable c_flareTests : int
+    val mutable c_flareRenders : int
+    val mutable msec : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type backEndState_t =
+    val mutable smpFrame : int
+    val mutable refdef : trRefdef_t
+    val mutable viewParms : viewParms_t
+    val mutable or' : orientationr_t
+    val mutable pc : backEndCounters_t
+    val mutable isHyperspace : qboolean
+    val mutable currentEntity : nativeptr<trRefEntity_t>
+    val mutable skyRenderedThisView : qboolean
+    val mutable projection2D : qboolean
+    val mutable color2D : byte
+    val private color2D1 : byte
+    val private color2D2 : byte
+    val private color2D3 : byte
+    val mutable vertexes2D : qboolean
+    val mutable entity2D : trRefEntity_t
+
+[<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 64)>]
 type skinSurface_t_name =
     [<FieldOffset (0)>]

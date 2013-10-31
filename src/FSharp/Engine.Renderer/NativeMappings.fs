@@ -535,6 +535,23 @@ module FrontEndPerformanceCounters =
 
         NativePtr.write ptr native
 
+module Backend =
+    let inline ofNativePtr (ptr: nativeptr<backEndState_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            Refdef = TrRefdef.ofNativePtr &&native.refdef;
+            View = ViewParms.ofNativePtr &&native.viewParms;
+            Orientation = OrientationR.ofNativePtr &&native.or';
+            IsHyperspace = bool.ofNativePtr &&native.isHyperspace;
+            CurrentEntity = Option.ofNativePtr (fun x -> TrRefEntity.ofNativePtr x) native.currentEntity;
+            HasSkyRenderedThisView = bool.ofNativePtr &&native.skyRenderedThisView;
+            IsProjection2D = bool.ofNativePtr &&native.projection2D;
+            Color2D = Rgba.ofNativePtr &&native.color2D;
+            IsVertex2D = bool.ofNativePtr &&native.vertexes2D;
+            Entity2D = TrRefEntity.ofNativePtr &&native.entity2D;
+        }
+
 // TODO: This will need more work over time.
 module TrGlobals =
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
