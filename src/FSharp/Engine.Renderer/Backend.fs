@@ -43,6 +43,17 @@ let inline fixedPtr (f: nativeptr<_> -> unit) (a: obj) =
 
     handle.Free ()
 
+/// Based on Q3: GL_State
+/// SetGLState
+///
+/// This routine is responsible for setting the most commonly changed state
+/// in Q3.
+let setGLState (stateBits: uint64) (state: GLState) =
+    let diff = stateBits ^^^ state.GLStateBits
+    // TODO:
+    ()
+
+
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
 let setViewportAndScissor (backend: Backend) =

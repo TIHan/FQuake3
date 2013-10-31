@@ -63,3 +63,6 @@ extern void glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
 
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glFinish ()

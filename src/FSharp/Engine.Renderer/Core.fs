@@ -27,6 +27,21 @@ open Engine.Core
 open Engine.Math
 open Engine.Files
 
+/// Based on Q3: glstate_t
+/// GLState
+/// the renderer front end should never modify glstate_t
+type GLState =
+    {
+        CurrentTexture1 : int
+        CurrentTexture2 : int
+        CurrentTextureMappingUnit : int
+        HasFinishCalled : bool
+        TextureEnvironment1 : int
+        TextureEnvironment2 : int
+        FaceCulling : int
+        GLStateBits : uint64
+    }
+
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
 /// ClipType
 type ClipType =

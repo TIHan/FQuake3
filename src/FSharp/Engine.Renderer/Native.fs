@@ -30,6 +30,17 @@ open Engine.Native
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type glstate_t =
+    val mutable currenttextures : int
+    val private currenttextures1 : int
+    val mutable finishedCalled : qboolean
+    val mutable texEnv : int
+    val private texEnv2 : int
+    val mutable faceCulling : int
+    val mutable glStateBits : uint64
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type cplane_t =
     val mutable normal : vec3_t
     val mutable dist : single
