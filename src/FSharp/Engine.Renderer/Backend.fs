@@ -43,15 +43,33 @@ let inline fixedPtr (f: nativeptr<_> -> unit) (a: obj) =
 
     handle.Free ()
 
-/// Based on Q3: GL_State
-/// SetGLState
-///
-/// This routine is responsible for setting the most commonly changed state
-/// in Q3.
-let setGLState (stateBits: uint64) (state: GLState) =
-    let diff = stateBits ^^^ state.GLStateBits
-    // TODO:
-    ()
+[<RequireQualifiedAccess>]
+module GL =
+    [<Literal>]
+    let DepthfuncEqual = 0x00020000
+
+    /// Based on Q3: GL_State
+    /// state
+    ///
+    /// This routine is responsible for setting the most commonly changed state
+    /// in Q3.
+    let state (stateBits: uint64) (state: GLState) =
+        let diff = stateBits ^^^ state.GLStateBits
+        
+        match diff with
+        | 0UL -> ()
+        | _ ->
+
+        //
+        // check depthFunc bits
+        //
+        if diff &&& uint64 DepthfuncEqual <> uint64 0 then
+            match stateBits &&& uint64 DepthfuncEqual <> uint64 0 with
+            | true ->
+                glDepthFunc <| GLenum GL_EQUAL
+            | _ ->
+                glDepthFunc <| GLenum GL_LEQUAL
+        ()
 
 
 /// Based on Q3: SetViewportAndScissor

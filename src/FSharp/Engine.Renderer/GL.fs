@@ -38,6 +38,12 @@ let OpenGLCallingConvention = CallingConvention.Cdecl
 //
 
 [<Literal>]
+let GL_EQUAL = 0x0202
+
+[<Literal>]
+let GL_LEQUAL = 0x0202
+
+[<Literal>]
 let GL_MODELVIEW = 0x1700
 
 [<Literal>]
@@ -66,3 +72,6 @@ extern void glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
 
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glFinish ()
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glDepthFunc (GLenum func);
