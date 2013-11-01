@@ -56,7 +56,7 @@ module Vector2 =
     let inline ofNativePtr (ptr: nativeptr<vec2_t>) =
         let mutable native = NativePtr.read ptr
 
-        { Vector2.X = native.value; Y = native.value1 }
+        Vector2.create native.value native.value1
 
     let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: Vector2) =
         let mutable native = NativePtr.read ptr
@@ -70,7 +70,7 @@ module Vector3 =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         let mutable native = NativePtr.read ptr
 
-        { Vector3.X = native.value; Y = native.value1; Z = native.value2 }
+        Vector3.create native.value native.value1 native.value2
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vector3) =
         let mutable native = NativePtr.read ptr
@@ -85,7 +85,7 @@ module Vector4 =
     let inline ofNativePtr (ptr: nativeptr<vec4_t>) =
         let mutable native = NativePtr.read ptr
 
-        { Vector4.X = native.value; Y = native.value1; Z = native.value2; W = native.value3 }
+        Vector4.create native.value native.value1 native.value2 native.value3
 
     let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: Vector4) =
         let mutable native = NativePtr.read ptr
@@ -154,16 +154,16 @@ module Cvar =
 module Bounds =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         {
-            Bounds.Bounds1 = Vector3.ofNativePtr <| NativePtr.add ptr 0;
-            Bounds2 = Vector3.ofNativePtr <| NativePtr.add ptr 1;
+            From = Vector3.ofNativePtr <| NativePtr.add ptr 0;
+            To = Vector3.ofNativePtr <| NativePtr.add ptr 1;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
 
-        Vector3.toNativeByPtr &&nativeX bounds.Bounds1
-        Vector3.toNativeByPtr &&nativeY bounds.Bounds2
+        Vector3.toNativeByPtr &&nativeX bounds.From
+        Vector3.toNativeByPtr &&nativeY bounds.To
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY

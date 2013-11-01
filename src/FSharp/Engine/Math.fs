@@ -46,18 +46,31 @@ module Math =
         x + (t * (y - x))
 
 /// Vector2
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
     { X: single; Y: single }
+
+    static member inline Create (x, y) =
+        { X = x; Y = y; }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector2 =
+    val X : single
+    val Y : single
+
+    new (x, y) = { X = x; Y = y }
+
+    static member inline Create (x, y) =
+        Vector2 (x, y)
+#endif
 
     member inline this.Item
         with get (i) =
             match i with
             | 0 -> this.X | 1 -> this.Y
             | _ -> raise <| IndexOutOfRangeException ()
-
-    static member inline Create (x, y) =
-        { X = x; Y = y; }
 
 /// Vector2 Module
 [<RequireQualifiedAccess>]
@@ -72,9 +85,26 @@ module Vector2 =
     let unitY = create 0.f 1.f
 
 /// Vector3
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
     { X: single; Y: single; Z: single }
+
+    static member inline Create (x, y, z) =
+        { X = x; Y = y; Z = z }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector3 =
+    val X : single
+    val Y : single
+    val Z : single
+
+    new (x, y, z) = { X = x; Y = y; Z = z }
+
+    static member inline Create (x, y, z) =
+        Vector3 (x, y, z)
+#endif
 
     member inline this.Item
         with get (i) =
@@ -82,37 +112,41 @@ type Vector3 =
             | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    static member inline Create (x, y, z) =
-        { X = x; Y = y; Z = z }
+    member inline this.Set (?X: single, ?Y: single, ?Z: single) =
+        Vector3.Create (
+            (match X with | Some x -> x | None -> this.X),
+            (match Y with | Some y -> y | None -> this.Y),
+            (match Z with | Some z -> z | None -> this.Z)
+        )
 
-    static member inline Abs v =
+    static member inline Abs (v: Vector3) =
         Vector3.Create (abs v.X, abs v.Y, abs v.Z)
 
-    static member inline Truncate v =
+    static member inline Truncate (v: Vector3) =
         Vector3.Create (truncate v.X, truncate v.Y, truncate v.Z)
 
-    static member inline (*) (v1, v2) =
+    static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
-    static member inline (/) (v1, v2) =
+    static member inline (/) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
 
-    static member inline (+) (v1, v2) =
+    static member inline (+) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
 
-    static member inline (-) (v1, v2) =
+    static member inline (-) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
-    static member inline (*) (v, s) =
+    static member inline (*) (v: Vector3, s) =
         Vector3.Create (v.X * s, v.Y * s, v.Z * s)
 
-    static member inline (/) (v, s) =
+    static member inline (/) (v: Vector3, s) =
         Vector3.Create (v.X / s, v.Y / s, v.Z / s)
 
-    static member inline (+) (v, s) =
+    static member inline (+) (v: Vector3, s) =
         Vector3.Create (v.X + s, v.Y + s, v.Z + s)
 
-    static member inline (-) (v, s) =
+    static member inline (-) (v: Vector3, s) =
         Vector3.Create (v.X - s, v.Y - s, v.Z - s)
 
     static member inline (*) (s, v) =
@@ -140,7 +174,7 @@ module Vector3 =
     let unitY = create 0.f 1.f 0.f
     let unitZ = create 0.f 0.f 1.f
 
-    let inline minDimension v =
+    let inline minDimension (v: Vector3) =
         match v.X < v.Y with
         | true ->
             match v.X < v.Z with
@@ -151,19 +185,19 @@ module Vector3 =
             | true -> 1
             | _ -> 2
         
-    let inline multiplyAdd s v1 v2 =
+    let inline multiplyAdd s (v1: Vector3) (v2: Vector3) =
         create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
 
-    let inline dotProduct v1 v2 =
+    let inline dotProduct (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
-    let inline crossProduct v1 v2 =
+    let inline crossProduct (v1: Vector3) (v2: Vector3) =
         create
             ((v1.Y * v2.Z) - (v1.Z * v2.Y))
             ((v1.Z * v2.X) - (v1.X * v2.Z))
             ((v1.X * v2.Y) - (v1.Y * v2.X))
 
-    let inline lengthSquared v =
+    let inline lengthSquared (v: Vector3) =
         (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
 
     let inline length v =
@@ -186,9 +220,27 @@ module Vector3 =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
 
 /// Vector4      
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
     { X: single; Y: single; Z: single; W: single }
+
+    static member inline Create (x, y, z, w) =
+        { X = x; Y = y; Z = z; W = w }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Vector4 =
+    val X : single
+    val Y : single
+    val Z : single
+    val W : single
+
+    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w; }
+
+    static member inline Create (x, y, z, w) =
+        Vector4 (x, y, z, w)
+#endif
     
     member inline this.Item
         with get (i) =
@@ -196,16 +248,13 @@ type Vector4 =
             | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
-    static member inline Create (x, y, z, w) =
-        { X = x; Y = y; Z = z; W = w }
-
-    static member inline (*) (v1, v2) =
+    static member inline (*) (v1: Vector4, v2: Vector4) =
         Vector4.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
         
-    static member inline (+) (v1, v2) =
+    static member inline (+) (v1: Vector4, v2: Vector4) =
         Vector4.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
 
-    static member inline (-) (v1, v2) =
+    static member inline (-) (v1: Vector4, v2: Vector4) =
         Vector4.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)  
 
 // Vector4 Module
@@ -217,10 +266,11 @@ module Vector4 =
 
     let zero = create 0.f 0.f 0.f 0.f
 
-    let inline dotProduct v1 v2 =
+    let inline dotProduct (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 /// Matrix2x2
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix2x2 =
     {
@@ -228,18 +278,37 @@ type Matrix2x2 =
         M21: single; M22: single;
     }
 
+    static member inline Create (m11, m12, m21, m22) =
+        { 
+            M11 = m11; M12 = m12;
+            M21 = m21; M22 = m22;
+        }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Matrix2x2 =
+    val M11 : single val M12 : single
+    val M21 : single val M22 : single
+
+    new (m11, m12, m21, m22) =
+        { 
+            M11 = m11; M12 = m12;
+            M21 = m21; M22 = m22;
+        }
+
+    static member inline Create (m11, m12, m21, m22) =
+        Matrix2x2 (
+            m11, m12,
+            m21, m22
+        )
+#endif
+
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
                 | (0, 0) -> this.M11 | (0, 1) -> this.M12
                 | (1, 0) -> this.M21 | (1, 1) -> this.M22
                 | _ -> raise <| IndexOutOfRangeException ()
-
-    static member inline Create (m11, m12, m21, m22) =
-        { 
-            M11 = m11; M12 = m12;
-            M21 = m21; M22 = m22;
-        }
 
 /// Matrix2x2 Module
 [<RequireQualifiedAccess>]
@@ -251,6 +320,7 @@ module Matrix2x2 =
     let zero = create 0.f 0.f 0.f 0.f
 
 /// Matrix3x3 
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]       
 type Matrix3x3 =     
     {
@@ -258,6 +328,35 @@ type Matrix3x3 =
         M21: single; M22: single; M23: single;
         M31: single; M32: single; M33: single;
     }
+
+    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+        {
+            M11 = m11; M12 = m12; M13 = m13;
+            M21 = m21; M22 = m22; M23 = m23;
+            M31 = m31; M32 = m32; M33 = m33;
+        }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Matrix3x3 =
+    val M11 : single val M12 : single val M13 : single
+    val M21 : single val M22 : single val M23 : single
+    val M31 : single val M32 : single val M33 : single
+
+    new (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+        {
+            M11 = m11; M12 = m12; M13 = m13;
+            M21 = m21; M22 = m22; M23 = m23;
+            M31 = m31; M32 = m32; M33 = m33;
+        }
+
+    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+        Matrix3x3 (
+            m11, m12, m13,
+            m21, m22, m23,
+            m31, m32, m33
+        )
+#endif
     
     member inline this.Item
             with get (i, j) =
@@ -266,13 +365,6 @@ type Matrix3x3 =
                 | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23
                 | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33
                 | _ -> raise <| IndexOutOfRangeException ()
-
-    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
-        {
-            M11 = m11; M12 = m12; M13 = m13;
-            M21 = m21; M22 = m22; M23 = m23;
-            M31 = m31; M32 = m32; M33 = m33;
-        }
 
 /// Matrix3x3 Module
 [<RequireQualifiedAccess>]
@@ -283,7 +375,8 @@ module Matrix3x3 =
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
-/// Matrix4x4    
+/// Matrix4x4
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]   
 type Matrix4x4 =     
     {
@@ -292,6 +385,39 @@ type Matrix4x4 =
         M31: single; M32: single; M33: single; M34: single;
         M41: single; M42: single; M43: single; M44: single;
     }
+
+    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+        {
+            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
+            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
+            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
+            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
+        }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Matrix4x4 =
+    val M11 : single val M12 : single val M13 : single val M14 : single
+    val M21 : single val M22 : single val M23 : single val M24 : single
+    val M31 : single val M32 : single val M33 : single val M34 : single
+    val M41 : single val M42 : single val M43 : single val M44 : single
+
+    new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+        {
+            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
+            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
+            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
+            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
+        }
+
+    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+        Matrix4x4 (
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44
+        )
+#endif
     
     member inline this.Item
             with get (i, j) =
@@ -301,14 +427,6 @@ type Matrix4x4 =
                 | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33 | (2, 3) -> this.M34
                 | (3, 0) -> this.M41 | (3, 1) -> this.M42 | (3, 2) -> this.M43 | (3, 3) -> this.M44
                 | _ -> raise <| IndexOutOfRangeException ()
-
-    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
-        {
-            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
-            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
-            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
-            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
-        }
 
 #if DEBUG
     static member (*) (m1: Matrix4x4, m2: Matrix4x4) =
@@ -349,17 +467,32 @@ module Euler =
         Vector3.create (lerpAngle a1.X a2.X t) (lerpAngle a1.Y a2.Y t) (lerpAngle a1.Z a2.Z t)
 
 /// Quaternion
+#if MATH_RECORD_TYPES
 [<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
     { W: single; X: single; Y: single; Z: single; }
 
     static member inline Create (w, x, y, z) =
         { W = w; X = x; Y = y; Z = z }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Quaternion =
+    val W : single
+    val X : single
+    val Y : single
+    val Z : single
+
+    new (w, x, y, z) = { W = w; X = x; Y = y; Z = z }
+
+    static member inline Create (w, x, y, z) =
+        Quaternion (w, x, y, z)
+#endif
 
     member inline q.Conjugate with get () =
         Quaternion.Create (q.W, -q.X, -q.Y, -q.Z) 
 
-    static member inline (*) (q1, q2) =
+    static member inline (*) (q1: Quaternion, q2: Quaternion) =
         Quaternion.Create (
             (q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z),
             (q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y),
@@ -383,7 +516,7 @@ module Quaternion =
 
     let inline conjugate (q: Quaternion) = q.Conjugate 
 
-    let inline dotProduct q1 q2 =
+    let inline dotProduct (q1: Quaternion) (q2: Quaternion) =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 
 
     let inline normalize (q: Quaternion) =

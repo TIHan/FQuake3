@@ -485,7 +485,7 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (tr: TrGlobals) =
 [<Pure>]
 let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
     let y = Vector3.perpendicular normal
-    { Axis.X = normal; Y = y; Z = Vector3.crossProduct normal y }
+    Axis.create normal y (Vector3.crossProduct normal y)
 
 /// Tries to find the closest portal entity based on a plane.
 [<Pure>]
@@ -506,7 +506,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     match entity.OldOrigin = entity.Origin with
     | true ->
         let origin = plane.Normal * plane.Distance
-        let axis = { surface.Axis with X = Vector3.zero - surface.Axis.X }
+        let axis = surface.Axis.Set (X = Vector3.zero - surface.Axis.X)
 
         (
             true,
@@ -524,7 +524,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     let camera =
         { camera with
             Origin = entity.OldOrigin;
-            Axis = { entity.Axis with X = Vector3.zero - entity.Axis.X; Y = Vector3.zero - entity.Axis.Y };
+            Axis = entity.Axis.Set (X = Vector3.zero - entity.Axis.X, Y = Vector3.zero - entity.Axis.Y);
         }
 
     // optionally rotate and if a speed is specified
@@ -544,11 +544,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
         false,
         surface,
         { camera with 
-            Axis = 
-            { camera.Axis with 
-                Y = y;
-                Z = Vector3.crossProduct camera.Axis.X y
-            }
+            Axis = camera.Axis.Set (Y = y, Z = Vector3.crossProduct camera.Axis.X y)
         }
     )
 

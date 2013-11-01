@@ -39,18 +39,16 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cva
     // calculate a bounding box in the current coordinate system
     let bounds =
         {
-            Bounds.Bounds1 =
-                {
-                    X = calculateBounds 0 0;
-                    Y = calculateBounds 0 1;
-                    Z = calculateBounds 0 2;
-                };
-            Bounds2 =
-                {
-                    X = calculateBounds 1 0;
-                    Y = calculateBounds 1 1;
-                    Z = calculateBounds 1 2;
-                }
+            From =
+                Vector3.create
+                    (calculateBounds 0 0)
+                    (calculateBounds 0 1)
+                    (calculateBounds 0 2);
+            To =
+                Vector3.create
+                    (calculateBounds 1 0)
+                    (calculateBounds 1 1)
+                    (calculateBounds 1 2)
         }
 
     let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull

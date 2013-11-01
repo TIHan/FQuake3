@@ -22,6 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module Engine.Core
 
 open System
+open System.Runtime.InteropServices
 open Engine.Math
 
 module Constants =
@@ -36,6 +37,51 @@ module Constants =
     let EntityIdNone = MaxGEntities - 1
     let EntityIdWorld = MaxGEntities - 2
     let EntityIdMaxNormal = MaxGEntities - 2
+
+/// Axis
+#if MATH_RECORD_TYPES
+[<StructLayout (LayoutKind.Sequential)>]
+type Axis =
+    { X: Vector3; Y: Vector3; Z: Vector3 }
+
+    static member inline Create (x, y, z) =
+        { X = x; Y = y; Z = z }
+#else
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Axis =
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+
+    new (x, y, z) = { X = x; Y = y; Z = z }
+
+    static member inline Create (x, y, z) =
+        Axis (x, y, z)
+#endif
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
+            | _ -> raise <| IndexOutOfRangeException ()
+
+    member inline this.Set (?X: Vector3, ?Y: Vector3, ?Z: Vector3) =
+        Axis.Create (
+            (match X with | Some x -> x | None -> this.X),
+            (match Y with | Some y -> y | None -> this.Y),
+            (match Z with | Some z -> z | None -> this.Z)
+        )
+
+/// Axis Module
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Axis =
+    let inline create x y z =
+        Axis.Create (x, y, z)
+
+    let zero =      create Vector3.zero Vector3.zero Vector3.zero
+    let identity =  create Vector3.unitX Vector3.unitY Vector3.unitZ
 
 /// <summary>
 /// Based on Q3: cvar_t
@@ -56,29 +102,11 @@ type Cvar =
 
 /// Bounds
 type Bounds =
-    { Bounds1: Vector3; Bounds2: Vector3 }   
+    { From: Vector3; To: Vector3 }   
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Bounds1
-            | 1 -> this.Bounds2
+            | 0 -> this.From | 1 -> this.To
             | _ -> raise <| IndexOutOfRangeException ()
-
-/// Axis
-type Axis =
-    { X: Vector3; Y: Vector3; Z: Vector3 }
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X
-            | 1 -> this.Y
-            | 2 -> this.Z
-            | _ -> raise <| IndexOutOfRangeException ()
-
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Axis =
-    let zero = { X = Vector3.zero; Y = Vector3.zero; Z = Vector3.zero }
-    let identity = { X = Vector3.unitX; Y = Vector3.unitY; Z = Vector3.unitZ }
 

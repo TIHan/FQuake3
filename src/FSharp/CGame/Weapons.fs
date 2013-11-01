@@ -65,4 +65,4 @@ let calculateWeaponPosition (cg: CGame) =
             (angles.Y + (scale * fractionSin * 0.01f)) // YAW
             (angles.Z + (scale * fractionSin * 0.01f)) // ROLL
 
-    ({ origin with Z = originZ }, angles)
+    (origin.Set (Z = originZ), angles)

@@ -22,10 +22,41 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module Engine.Renderer.Core
 
 open System
+open System.Runtime.InteropServices
 open FSharpx.Collections
 open Engine.Core
 open Engine.Math
 open Engine.Files
+
+/// Rgba
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type Rgba =
+    val R : byte
+    val G : byte
+    val B : byte
+    val A : byte
+
+    new (r, g, b, a) = { R = r; G = g; B = b; A = a }
+
+    static member inline Create (r, g, b, a) =
+        Rgba (r, g, b, a)
+
+    member inline this.Item
+        with get (i) =
+            match i with
+            | 0 -> this.R
+            | 1 -> this.G
+            | 2 -> this.B
+            | 3 -> this.A
+            | _ -> raise <| IndexOutOfRangeException ()
+
+/// Rgba Module
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Rgba =
+    let inline create r g b a =
+        Rgba.Create (r, g, b, a)
 
 /// Based on Q3: glstate_t
 /// GLState
@@ -64,21 +95,6 @@ type PlaneType =
     | Y = 1
     | Z = 2
     | NonAxial = 3
-
-/// <summary>
-/// Rgba
-/// </summary>
-type Rgba =
-    { R: byte; G: byte; B: byte; A: byte }
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.R
-            | 1 -> this.G
-            | 2 -> this.B
-            | 3 -> this.A
-            | _ -> raise <| IndexOutOfRangeException ()
 
 /// <summary>
 /// Based on Q3: orientation_t

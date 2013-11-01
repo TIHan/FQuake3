@@ -35,11 +35,10 @@ open Engine.Renderer.Core
 
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
-        {
-            Axis.X = Vector3.ofNativePtr <| NativePtr.add ptr 0;
-            Axis.Y = Vector3.ofNativePtr <| NativePtr.add ptr 1;
-            Axis.Z = Vector3.ofNativePtr <| NativePtr.add ptr 2;
-        }
+        Axis.create
+            (Vector3.ofNativePtr <| NativePtr.add ptr 0)
+            (Vector3.ofNativePtr <| NativePtr.add ptr 1)
+            (Vector3.ofNativePtr <| NativePtr.add ptr 2)
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (axis: Axis) =
         let mutable nativeX = NativePtr.get ptr 0
@@ -178,12 +177,11 @@ module ViewParms =
 
 module Rgba =
     let inline ofNativePtr (ptr: nativeptr<byte>) =
-        {
-            R = NativePtr.get ptr 0;
-            G = NativePtr.get ptr 1;
-            B = NativePtr.get ptr 2;
-            A = NativePtr.get ptr 3;
-        }
+        Rgba.create
+            (NativePtr.get ptr 0)
+            (NativePtr.get ptr 1)
+            (NativePtr.get ptr 2)
+            (NativePtr.get ptr 3)
 
     let inline toNativeByPtr (ptr: nativeptr<byte>) (rgba: Rgba) =
         NativePtr.set ptr 0 rgba.R
