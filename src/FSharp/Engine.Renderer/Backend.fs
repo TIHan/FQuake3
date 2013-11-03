@@ -105,7 +105,31 @@ module GL =
         let DstBlendBits = 0x000000f0
 
         [<Literal>]
+        let DepthMaskTrue = 0x00000100
+
+        [<Literal>]
+        let PolyModeLine = 0x00001000
+
+        [<Literal>]
+        let DepthTestDisable = 0x00010000
+
+        [<Literal>]
         let DepthFuncEqual = 0x00020000
+
+        [<Literal>]
+        let ATestGt0 = 0x10000000
+
+        [<Literal>]
+        let ATestLt80 = 0x20000000
+
+        [<Literal>]
+        let ATestGe80 = 0x40000000
+
+        [<Literal>]
+        let ATestBits = 0x70000000
+
+        [<Literal>]
+        let Default = DepthMaskTrue
 
     /// Based on Q3: GL_State
     /// state
@@ -116,14 +140,14 @@ module GL =
         let diff = stateBits ^^^ state.GLStateBits
         
         match diff with
-        | 0UL -> ()
+        | 0UL -> state
         | _ ->
 
         //
         // check depthFunc bits
         //
-        if diff &&& uint64 GLS.DepthFuncEqual <> uint64 0 then
-            match stateBits &&& uint64 GLS.DepthFuncEqual <> uint64 0 with
+        if diff &&& uint64 GLS.DepthFuncEqual <> 0UL then
+            match stateBits &&& uint64 GLS.DepthFuncEqual <> 0UL with
             | true ->
                 glDepthFunc <| GLenum GL_EQUAL
             | _ ->
@@ -132,8 +156,8 @@ module GL =
         //
         // check blend bits
         //
-        if diff &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> uint64 0 then
-            if stateBits &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> uint64 0 then
+        if diff &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> 0UL then
+            if stateBits &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> 0UL then
                 let srcFactor =
                     match int (stateBits &&& uint64 GLS.SrcBlendBits) with
                     | GLS.SrcBlendZero -> GL_ZERO
@@ -164,8 +188,53 @@ module GL =
             else
                 glDisable <| GLenum GL_BLEND
 
-        // TODO:
-        ()
+        //
+        // check depthmask
+        //
+        if diff &&& uint64 GLS.DepthMaskTrue <> 0UL then
+            if stateBits &&& uint64 GLS.DepthMaskTrue <> 0UL then
+                glDepthMask <| GLboolean GL_TRUE
+            else
+                glDepthMask <| GLboolean GL_FALSE
+        
+        //
+        // fill/line mode
+        //
+        if diff &&& uint64 GLS.PolyModeLine <> 0UL then
+            if stateBits &&& uint64 GLS.PolyModeLine <> 0UL then
+                glPolygonMode (GLenum GL_FRONT_AND_BACK, GLenum GL_LINE)
+            else
+                glPolygonMode (GLenum GL_FRONT_AND_BACK, GLenum GL_FILL)
+
+        //
+        // depthtest
+        //
+        if diff &&& uint64 GLS.DepthTestDisable <> 0UL then
+            if stateBits &&& uint64 GLS.DepthTestDisable <> 0UL then
+                glDisable <| GLenum GL_DEPTH_TEST
+            else
+                glEnable <| GLenum GL_DEPTH_TEST
+
+        //
+        // alpha test
+        //
+        if diff &&& uint64 GLS.ATestBits <> 0UL then
+            match int (stateBits &&& uint64 GLS.ATestBits) with
+            | 0 ->
+                glDisable <| GLenum GL_ALPHA_TEST
+            | GLS.ATestGt0 ->
+                glEnable <| GLenum GL_ALPHA_TEST
+                glAlphaFunc (GLenum GL_GREATER, 0.f)
+            | GLS.ATestLt80 ->
+                glEnable <| GLenum GL_ALPHA_TEST
+                glAlphaFunc (GLenum GL_LESS, 0.5f)
+            | GLS.ATestGe80 ->
+                glEnable <| GLenum GL_ALPHA_TEST
+                glAlphaFunc (GLenum GL_GEQUAL, 0.5f)
+            | _ ->
+                raise <| Exception "Invalid alpha test state bits."
+        
+        { state with GLStateBits = stateBits }
 
 
 /// Based on Q3: SetViewportAndScissor

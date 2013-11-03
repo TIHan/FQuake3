@@ -38,6 +38,12 @@ let OpenGLCallingConvention = CallingConvention.Cdecl
 //
 
 [<Literal>]
+let GL_TRUE = 1
+
+[<Literal>]
+let GL_FALSE = 1
+
+[<Literal>]
 let GL_EQUAL = 0x0202
 
 [<Literal>]
@@ -48,6 +54,30 @@ let GL_MODELVIEW = 0x1700
 
 [<Literal>]
 let GL_PROJECTION = 0x1701
+
+[<Literal>]
+let GL_FRONT_AND_BACK = 0x0408
+
+[<Literal>]
+let GL_LINE = 0x1B01
+
+[<Literal>]
+let GL_FILL = 0x1B02
+
+[<Literal>]
+let GL_DEPTH_TEST = 0x0B71
+
+[<Literal>]
+let GL_ALPHA_TEST = 0x0BC0
+
+[<Literal>]
+let GL_GREATER = 0x0204
+
+[<Literal>]
+let GL_LESS = 0x0201
+
+[<Literal>]
+let GL_GEQUAL = 0x0206
 
 // BlendingFactorDest
 [<Literal>]
@@ -90,8 +120,12 @@ type GLenum = uint32
 type GLint = int
 type GLsizei = int
 type GLfloat = single
+type GLboolean = byte
+type GLclampf = single
 
 let inline GLenum a = uint32 a
+let inline GLboolean a = byte a
+let inline GLcampf a = single a
 
 //
 
@@ -121,3 +155,12 @@ extern void glDisable (GLenum cap)
 
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glBlendFunc (GLenum sfactor, GLenum dfactor)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glDepthMask (GLboolean flag)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glPolygonMode (GLenum face, GLenum mode)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glAlphaFunc (GLenum func, GLclampf ref)
