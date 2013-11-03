@@ -35,7 +35,7 @@ open Engine.Renderer.Core
 open GL
 
 // Hmm, I wonder if this is ok...
-let inline fixedPtr (f: nativeptr<_> -> unit) (a: obj) =
+let inline fixed' (f: nativeptr<_> -> unit) (a: obj) =
     let handle = GCHandle.Alloc (a, GCHandleType.Pinned)
     let addr = handle.AddrOfPinnedObject ()
 
@@ -45,8 +45,67 @@ let inline fixedPtr (f: nativeptr<_> -> unit) (a: obj) =
 
 [<RequireQualifiedAccess>]
 module GL =
-    [<Literal>]
-    let DepthfuncEqual = 0x00020000
+    [<RequireQualifiedAccess>]
+    module GLS =
+        [<Literal>]
+        let SrcBlendZero = 0x00000001
+
+        [<Literal>]
+        let SrcBlendOne = 0x00000002
+
+        [<Literal>]
+        let SrcBlendDstColor = 0x00000003
+
+        [<Literal>]
+        let SrcBlendOneMinusDstColor = 0x00000004
+
+        [<Literal>]
+        let SrcBlendSrcAlpha = 0x00000005
+
+        [<Literal>]
+        let SrcBlendOneMinusSrcAlpha = 0x00000006
+
+        [<Literal>]
+        let SrcBlendDstAlpha = 0x00000007
+
+        [<Literal>]
+        let SrcBlendOneMinusDstAlpha = 0x00000008
+
+        [<Literal>]
+        let SrcBlendAlphaSaturate = 0x00000009
+
+        [<Literal>]
+        let SrcBlendBits = 0x0000000f
+
+        [<Literal>]
+        let DstBlendZero = 0x00000010
+
+        [<Literal>]
+        let DstBlendOne = 0x00000020
+
+        [<Literal>]
+        let DstBlendSrcColor = 0x00000030
+
+        [<Literal>]
+        let DstBlendOneMinusSrcColor = 0x00000040
+
+        [<Literal>]
+        let DstBlendSrcAlpha = 0x00000050
+
+        [<Literal>]
+        let DstBlendOneMinusSrcAlpha = 0x00000060
+
+        [<Literal>]
+        let DstBlendDstAlpha = 0x00000070
+
+        [<Literal>]
+        let DstBlendOneMinusDstAlpha = 0x00000080
+
+        [<Literal>]
+        let DstBlendBits = 0x000000f0
+
+        [<Literal>]
+        let DepthFuncEqual = 0x00020000
 
     /// Based on Q3: GL_State
     /// state
@@ -63,12 +122,49 @@ module GL =
         //
         // check depthFunc bits
         //
-        if diff &&& uint64 DepthfuncEqual <> uint64 0 then
-            match stateBits &&& uint64 DepthfuncEqual <> uint64 0 with
+        if diff &&& uint64 GLS.DepthFuncEqual <> uint64 0 then
+            match stateBits &&& uint64 GLS.DepthFuncEqual <> uint64 0 with
             | true ->
                 glDepthFunc <| GLenum GL_EQUAL
             | _ ->
                 glDepthFunc <| GLenum GL_LEQUAL
+
+        //
+        // check blend bits
+        //
+        if diff &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> uint64 0 then
+            if stateBits &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> uint64 0 then
+                let srcFactor =
+                    match int (stateBits &&& uint64 GLS.SrcBlendBits) with
+                    | GLS.SrcBlendZero -> GL_ZERO
+                    | GLS.SrcBlendOne -> GL_ONE
+                    | GLS.SrcBlendDstColor -> GL_DST_COLOR
+                    | GLS.SrcBlendOneMinusDstColor -> GL_ONE_MINUS_DST_COLOR
+                    | GLS.SrcBlendSrcAlpha -> GL_SRC_ALPHA
+                    | GLS.SrcBlendOneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
+                    | GLS.SrcBlendDstAlpha -> GL_DST_ALPHA
+                    | GLS.SrcBlendOneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
+                    | GLS.SrcBlendAlphaSaturate -> GL_SRC_ALPHA_SATURATE
+                    | _ -> raise <| Exception "Invalid src blend state bits."
+                
+                let dstFactor =
+                    match int (stateBits &&& uint64 GLS.DstBlendBits) with
+                    | GLS.DstBlendZero -> GL_ZERO
+                    | GLS.DstBlendOne -> GL_ONE
+                    | GLS.DstBlendSrcColor -> GL_SRC_COLOR
+                    | GLS.DstBlendOneMinusSrcColor -> GL_ONE_MINUS_SRC_COLOR
+                    | GLS.DstBlendSrcAlpha -> GL_SRC_ALPHA
+                    | GLS.DstBlendOneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
+                    | GLS.DstBlendDstAlpha -> GL_DST_ALPHA
+                    | GLS.DstBlendOneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
+                    | _ -> raise <| Exception "Invalid dst blend state bits."
+
+                glEnable <| GLenum GL_BLEND
+                glBlendFunc (GLenum srcFactor, GLenum dstFactor)
+            else
+                glDisable <| GLenum GL_BLEND
+
+        // TODO:
         ()
 
 
@@ -78,7 +174,7 @@ let setViewportAndScissor (backend: Backend) =
     let view = backend.View
 
     glMatrixMode <| GLenum GL_PROJECTION
-    fixedPtr (fun ptr -> glLoadMatrixf ptr) view.ProjectionMatrix
+    fixed' (fun ptr -> glLoadMatrixf ptr) view.ProjectionMatrix
     glMatrixMode <| GLenum GL_MODELVIEW
 
     // set the window clipping

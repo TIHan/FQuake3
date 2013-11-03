@@ -49,6 +49,43 @@ let GL_MODELVIEW = 0x1700
 [<Literal>]
 let GL_PROJECTION = 0x1701
 
+// BlendingFactorDest
+[<Literal>]
+let GL_ZERO = 0
+
+[<Literal>]
+let GL_ONE = 1
+
+[<Literal>]
+let GL_SRC_COLOR = 0x0300
+
+[<Literal>]
+let GL_ONE_MINUS_SRC_COLOR = 0x0301
+
+[<Literal>]
+let GL_SRC_ALPHA = 0x0302
+
+[<Literal>]
+let GL_ONE_MINUS_SRC_ALPHA = 0x0303
+
+[<Literal>]
+let GL_DST_ALPHA = 0x0304
+
+[<Literal>]
+let GL_ONE_MINUS_DST_ALPHA = 0x0305
+
+[<Literal>]
+let GL_DST_COLOR = 0x0306
+
+[<Literal>]
+let GL_ONE_MINUS_DST_COLOR = 0x0307
+
+[<Literal>]
+let GL_SRC_ALPHA_SATURATE = 0x0308
+
+[<Literal>]
+let GL_BLEND = 0x0BE2
+
 type GLenum = uint32
 type GLint = int
 type GLsizei = int
@@ -74,4 +111,13 @@ extern void glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
 extern void glFinish ()
 
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
-extern void glDepthFunc (GLenum func);
+extern void glDepthFunc (GLenum func)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glEnable (GLenum cap)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glDisable (GLenum cap)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glBlendFunc (GLenum sfactor, GLenum dfactor)
