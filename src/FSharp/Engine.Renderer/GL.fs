@@ -113,8 +113,38 @@ let GL_ONE_MINUS_DST_COLOR = 0x0307
 [<Literal>]
 let GL_SRC_ALPHA_SATURATE = 0x0308
 
+//
+
 [<Literal>]
 let GL_BLEND = 0x0BE2
+
+//
+
+[<Literal>]
+let GL_DEPTH_BUFFER_BIT = 0x00000100
+
+[<Literal>]
+let GL_ACCUM_BUFFER_BIT = 0x00000200
+
+[<Literal>]
+let GL_STENCIL_BUFFER_BIT = 0x00000400
+
+[<Literal>]
+let GL_VIEWPORT_BIT = 0x00000800
+
+[<Literal>]
+let GL_TRANSFORM_BIT = 0x00001000
+
+[<Literal>]
+let GL_EnABLE_BIT = 0x00002000
+
+[<Literal>]
+let GL_COLOR_BUFFER_BIT = 0x00004000
+
+[<Literal>]
+let GL_HINT_BIT = 0x00008000
+
+//
 
 type GLenum = uint32
 type GLint = int
@@ -122,10 +152,12 @@ type GLsizei = int
 type GLfloat = single
 type GLboolean = byte
 type GLclampf = single
+type GLbitfield = uint32
 
 let inline GLenum a = uint32 a
 let inline GLboolean a = byte a
 let inline GLcampf a = single a
+let inline GLbitfield a = uint32 a
 
 //
 
@@ -164,3 +196,9 @@ extern void glPolygonMode (GLenum face, GLenum mode)
 
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glAlphaFunc (GLenum func, GLclampf ref)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+
+[<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
+extern void glClear (GLbitfield mask)

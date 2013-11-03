@@ -236,7 +236,6 @@ module GL =
         
         { state with GLStateBits = stateBits }
 
-
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
 let setViewportAndScissor (backend: Backend) =
@@ -249,3 +248,58 @@ let setViewportAndScissor (backend: Backend) =
     // set the window clipping
     glViewport (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
     glScissor (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+
+/// SyncGLState
+let private syncGLState (r_finish: Cvar) (state: GLState) =
+    match r_finish.Integer with
+    | 1 when not state.HasFinishCalled ->
+        glFinish ()
+        { state with HasFinishCalled = true }
+    | 0 ->
+        { state with HasFinishCalled = true }
+    | _ ->
+        state
+
+/// Based on Q3: RB_BeginDrawingView
+/// BeginDrawingView
+///
+/// Any mirrored or portaled views have already been drawn, so prepare
+/// to actually render the visible surfaces for this view
+let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar) (r_fastsky: Cvar) (glState: GLState) (backend: Backend) =
+    // sync with gl if needed
+    let glState = syncGLState r_finish glState
+
+    // we will need to change the projection matrix before drawing
+    // 2D images again
+    let backend = { backend with IsProjection2D = false }
+
+    // set the modelview matrix for the viewer
+    setViewportAndScissor backend
+
+    // ensures that depth writes are enabled for the depth clear
+    let glState = GL.state (uint64 GL.GLS.Default) glState
+    // clear relevant buffers
+    let clearBits = GL_DEPTH_BUFFER_BIT
+
+    let clearBits =
+        if r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2 then
+            clearBits ||| GL_STENCIL_BUFFER_BIT
+        else
+            clearBits
+
+    let clearBits =
+        if r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel) then
+#if DEBUG
+            glClearColor (0.8f, 0.7f, 0.4f, 1.f) // FIXME: get color of sky
+#else
+            glClearColor (0.f, 0.f, 0.f, 1.f) // FIXME: get color of sky
+#endif
+            clearBits ||| GL_COLOR_BUFFER_BIT // FIXME: only if sky shaders have been used
+        else
+            clearBits
+
+    glClear <| GLbitfield clearBits
+
+    // TODO:
+
+    glState, backend
