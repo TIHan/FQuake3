@@ -24,11 +24,13 @@ namespace Engine.Net
 
 open System.Net
 open System.Net.Sockets
+open System.Security
 open System.Runtime.InteropServices
 open FSharpx.Collections
 open Engine.NativeInterop
 
 module private Native =
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void NET_Init ()
 

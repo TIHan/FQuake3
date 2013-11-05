@@ -21,10 +21,12 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Input
 
+open System.Security
 open System.Runtime.InteropServices
 open Engine.NativeInterop
 
 module private Native =
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void IN_Frame ()
 

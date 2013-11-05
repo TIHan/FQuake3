@@ -26,6 +26,7 @@ module GL
 #nowarn "51"
 
 open System
+open System.Security
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
@@ -161,44 +162,58 @@ let inline GLbitfield a = uint32 a
 
 //
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glMatrixMode (GLenum mode)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glLoadMatrixf (GLfloat *m)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glViewport (GLint x, GLint y, GLsizei width, GLsizei height)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glScissor (GLint x, GLint y, GLsizei width, GLsizei height)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glFinish ()
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glDepthFunc (GLenum func)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glEnable (GLenum cap)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glDisable (GLenum cap)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glBlendFunc (GLenum sfactor, GLenum dfactor)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glDepthMask (GLboolean flag)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glPolygonMode (GLenum face, GLenum mode)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glAlphaFunc (GLenum func, GLclampf ref)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 
+[<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenGL, CallingConvention = OpenGLCallingConvention)>]
 extern void glClear (GLbitfield mask)

@@ -26,6 +26,7 @@ open System.IO
 open System.Text
 open System.Threading
 open System.Diagnostics
+open System.Security
 open System.Runtime.InteropServices
 open Engine.Input
 open Engine.Common
@@ -35,15 +36,19 @@ open Engine.Command
 open Engine.NativeInterop
 
 module private Native =
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_CreateConsole ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_Milliseconds ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_InitStreamThread ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 

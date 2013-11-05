@@ -22,21 +22,26 @@ Copyright (C) 1999-2005 Id Software, Inc.
 namespace Engine.Command
 
 open System.Text
+open System.Security
 open System.Runtime.InteropServices
 open Engine.NativeInterop
 
 module private Native =
     type XCommand = delegate of unit -> unit
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Cmd_AddCommand (string cmdName, XCommand func)
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern int Cmd_Argc ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Cmd_ArgsBuffer (StringBuilder buffer, int length)
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Cbuf_ExecuteText(int execWhen, string text)
 

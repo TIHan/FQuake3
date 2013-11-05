@@ -21,6 +21,8 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 module Engine.Core
 
+#nowarn "9"
+
 open System
 open System.Runtime.InteropServices
 open Engine.Math
@@ -39,15 +41,10 @@ module Constants =
     let EntityIdMaxNormal = MaxGEntities - 2
 
 /// Axis
-#if MATH_RECORD_TYPES
-[<StructLayout (LayoutKind.Sequential)>]
-type Axis =
-    { X: Vector3; Y: Vector3; Z: Vector3 }
-
-    static member inline Create (x, y, z) =
-        { X = x; Y = y; Z = z }
+#if USE_MATH_OBJS
 #else
 [<Struct>]
+#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
     val X : Vector3
@@ -58,7 +55,6 @@ type Axis =
 
     static member inline Create (x, y, z) =
         Axis (x, y, z)
-#endif
 
     member inline this.Item
         with get (i) =

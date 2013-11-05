@@ -21,22 +21,28 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Common
 
+open System.Security
 open System.Runtime.InteropServices
 open Engine.NativeInterop
 
 module private Native =
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Com_Init (string commandLine)
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern bool Com_IsDedicated ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern bool Com_IsViewLogEnabled ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Com_Frame ()
 
+    [<SuppressUnmanagedCodeSecurity>]
     [<DllImport(LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern void Com_Printf (string fmt);
 
