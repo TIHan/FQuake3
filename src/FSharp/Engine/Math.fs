@@ -25,6 +25,7 @@ namespace Engine.Math
 
 open System
 open System.Runtime.InteropServices
+open Microsoft.FSharp.NativeInterop
 
 /// Math Module
 [<RequireQualifiedAccess>]
@@ -48,10 +49,7 @@ module Math =
         x + (t * (y - x))
 
 /// Vector2
-#if USE_MATH_OBJS
-#else
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
     val X : single
@@ -81,10 +79,7 @@ module Vector2 =
     let unitY = create 0.f 1.f
 
 /// Vector3
-#if USE_MATH_OBJS
-#else
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
     val X : single
@@ -209,11 +204,8 @@ module Vector3 =
     let inline lerp (v1: Vector3) (v2: Vector3) (t: single) =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
 
-/// Vector4
-#if USE_MATH_OBJS
-#else      
+/// Vector4    
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
     val X : single
@@ -254,10 +246,7 @@ module Vector4 =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 /// Matrix2x2
-#if USE_MATH_OBJS
-#else
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix2x2 =
     val M11 : single val M12 : single
@@ -292,10 +281,7 @@ module Matrix2x2 =
     let zero = create 0.f 0.f 0.f 0.f
 
 /// Matrix3x3
-#if USE_MATH_OBJS
-#else 
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix3x3 =
     val M11 : single val M12 : single val M13 : single
@@ -409,10 +395,7 @@ module Euler =
         Vector3.create (lerpAngle a1.X a2.X t) (lerpAngle a1.Y a2.Y t) (lerpAngle a1.Z a2.Z t)
 
 /// Quaternion
-#if USE_MATH_OBJS
-#else
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
     val W : single
@@ -425,8 +408,11 @@ type Quaternion =
     static member inline Create (w, x, y, z) =
         Quaternion (w, x, y, z)
 
-    member inline q.Conjugate with get () =
+    static member inline GetConjugate (q: Quaternion) =
         Quaternion.Create (q.W, -q.X, -q.Y, -q.Z) 
+
+    member inline q.Conjugate with get () =
+        Quaternion.GetConjugate (q)
 
     static member inline (*) (q1: Quaternion, q2: Quaternion) =
         Quaternion.Create (
@@ -450,7 +436,8 @@ module Quaternion =
     let inline create w x y z =
         Quaternion.Create (w, x, y, z)
 
-    let inline conjugate (q: Quaternion) = q.Conjugate 
+    let inline conjugate (q: Quaternion) =
+        q.Conjugate
 
     let inline dotProduct (q1: Quaternion) (q2: Quaternion) =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 

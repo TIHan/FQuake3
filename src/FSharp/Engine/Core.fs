@@ -41,10 +41,6 @@ module Constants =
     let EntityIdMaxNormal = MaxGEntities - 2
 
 /// Axis
-#if USE_MATH_OBJS
-#else
-[<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
     val X : Vector3
