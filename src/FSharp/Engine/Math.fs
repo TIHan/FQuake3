@@ -455,10 +455,16 @@ module Quaternion =
     let inline dotProduct (q1: Quaternion) (q2: Quaternion) =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 
 
+    let inline length (q: Quaternion) =
+        sqrt <| dotProduct q q
+
     let inline normalize (q: Quaternion) =
-        // magnitude
-        let mag = sqrt <| dotProduct q q
-        create (q.W / mag) (q.X / mag) (q.Y / mag) (q.Z / mag)
+        let ``1 / length`` = 1.f / length q
+        create
+            (q.W * ``1 / length``)
+            (q.X * ``1 / length``)
+            (q.Y * ``1 / length``)
+            (q.Z * ``1 / length``)
 
     let ofEulerDegrees (v: Vector3) =
         let pitch = Math.``PI / 360`` * v.[0]
@@ -485,9 +491,12 @@ module Quaternion =
     let ofAxisAngle (axis: Vector3) (angle: single) =
         let angle = angle * 0.5f
         let sinAngle = sin angle
-        let cosAngle = cos angle
 
-        create cosAngle (axis.X * sinAngle) (axis.Y * sinAngle) (axis.Z * sinAngle)
+        create
+            (cos angle)
+            (axis.X * sinAngle)
+            (axis.Y * sinAngle)
+            (axis.Z * sinAngle)
 
     /// Note: Not sure if we will need this in the future.
     let rotatePointAroundVector (point: Vector3) (axis: Vector3) (degrees: single) =
