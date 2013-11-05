@@ -88,6 +88,13 @@ type Vector3 =
 
     new (x, y, z) = { X = x; Y = y; Z = z }
 
+/// Vector3 Functions
+module Vector3Functions =
+    let inline create x y z =
+        Vector3 (x, y, z)
+
+open Vector3Functions
+type Vector3 with
     static member inline Create (x, y, z) =
         Vector3 (x, y, z)
 
@@ -320,10 +327,7 @@ module Matrix3x3 =
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Matrix4x4
-#if USE_MATH_OBJS
-#else
 [<Struct>]
-#endif
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix4x4 =
     val M11 : single val M12 : single val M13 : single val M14 : single
@@ -405,27 +409,36 @@ type Quaternion =
 
     new (w, x, y, z) = { W = w; X = x; Y = y; Z = z }
 
-    static member inline Create (w, x, y, z) =
+/// Quaternion Functions
+module QuaternionFunctions =
+    let inline create w x y z =
         Quaternion (w, x, y, z)
 
-    static member inline GetConjugate (q: Quaternion) =
-        Quaternion.Create (q.W, -q.X, -q.Y, -q.Z) 
+    let inline conjugate (q: Quaternion) =
+        create q.W -q.X -q.Y -q.Z
+        
+    let inline dot (q1: Quaternion) (q2: Quaternion) =
+        (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W)
 
-    member inline q.Conjugate with get () =
-        Quaternion.GetConjugate (q)
+    let inline length (q: Quaternion) =
+        sqrt <| dot q q
+
+open QuaternionFunctions
+type Quaternion with
+    member inline this.Conjugate with get () = conjugate this
+    member inline this.Length with get () = length this
 
     static member inline (*) (q1: Quaternion, q2: Quaternion) =
-        Quaternion.Create (
-            (q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z),
-            (q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y),
-            (q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z),
-            (q1.W * q2.Z) + (q1.Z * q2.W) + (q1.X * q2.Y) - (q1.Y * q2.X)
-        )
+        create
+            ((q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z))
+            ((q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y))
+            ((q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z))
+            ((q1.W * q2.Z) + (q1.Z * q2.W) + (q1.X * q2.Y) - (q1.Y * q2.X))
 
     static member inline (*) (q: Quaternion, v) =
         let vn = Vector3.normalize v
-        let vq = Quaternion.Create (0.f, vn.X, vn.Y, vn.Z)
-        let result = q * (vq * q.Conjugate)
+        let vq = create 0.f vn.X vn.Y vn.Z
+        let result = q * (vq * conjugate q)
 
         Vector3.create result.X result.Y result.Z
 
@@ -433,17 +446,10 @@ type Quaternion =
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Quaternion =
-    let inline create w x y z =
-        Quaternion.Create (w, x, y, z)
-
-    let inline conjugate (q: Quaternion) =
-        q.Conjugate
-
-    let inline dotProduct (q1: Quaternion) (q2: Quaternion) =
-        (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W) 
-
-    let inline length (q: Quaternion) =
-        sqrt <| dotProduct q q
+    let inline create w x y z =     create w x y z
+    let inline conjugate q =        conjugate q
+    let inline dotProduct q1 q2 =   dot q1 q2
+    let inline length q =           length q 
 
     let inline normalize (q: Quaternion) =
         let ``1 / length`` = 1.f / length q
@@ -453,7 +459,7 @@ module Quaternion =
             (q.Y * ``1 / length``)
             (q.Z * ``1 / length``)
 
-    let ofEulerDegrees (v: Vector3) =
+    let inline ofEulerDegrees (v: Vector3) =
         let pitch = Math.``PI / 360`` * v.[0]
         let yaw =   Math.``PI / 360`` * v.[1]
         let roll =  Math.``PI / 360`` * v.[2]
@@ -475,7 +481,7 @@ module Quaternion =
             ((cosRoll * sinPitch * cosYaw) + (sinRoll * cosPitch * sinYaw))
             ((cosRoll * cosPitch * sinYaw) - (sinRoll * sinPitch * cosYaw))
 
-    let ofAxisAngle (axis: Vector3) (angle: single) =
+    let inline ofAxisAngle (axis: Vector3) (angle: single) =
         let angle = angle * 0.5f
         let sinAngle = sin angle
 
@@ -486,6 +492,6 @@ module Quaternion =
             (axis.Z * sinAngle)
 
     /// Note: Not sure if we will need this in the future.
-    let rotatePointAroundVector (point: Vector3) (axis: Vector3) (degrees: single) =
+    let inline rotatePointAroundVector (point: Vector3) (axis: Vector3) (degrees: single) =
         let q = ofAxisAngle axis (Math.``PI / 180`` * degrees)
         q * point
