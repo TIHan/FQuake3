@@ -152,9 +152,9 @@ let worldToLocal (world: Vector3) (orientation: OrientationR) =
 /// CullLocalPointAndRadius
 /// </summary>
 [<Pure>]
-let cullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
+let cullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
     let transformed = localPointToWorld point orientation
-    cullPointAndRadius transformed radius frustum noCull
+    cullPointAndRadius transformed radius frustum r_nocull
 
 /// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
