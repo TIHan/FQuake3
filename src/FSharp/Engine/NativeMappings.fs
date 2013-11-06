@@ -31,6 +31,7 @@ open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
 open Engine.Net
+open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
 
@@ -205,4 +206,13 @@ module Address =
             Port = native.port;
         }
 
+module Md3Frame =
+    let inline ofNativePtr (ptr: nativeptr<md3Frame_t>) =
+        let mutable native = NativePtr.read ptr
 
+        {
+            Bounds = Bounds.ofNativePtr &&native.bounds;
+            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
+            Radius = native.radius;
+            Name = NativePtr.toString &&native.name;
+        }

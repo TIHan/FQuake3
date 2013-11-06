@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __QM_H__
 
 #include "game/q_shared.h"
+#include "qcommon/qfiles.h"
 
 #define define_mapping_assembly(name) \
 static const gchar* Assembly = name \
@@ -112,5 +113,6 @@ define_mapping_prototype (mat4x4, gfloat*);
 define_mapping_prototype (cvar, cvar_t*);
 define_mapping_prototype (bounds, vec3_t*);
 define_mapping_prototype (axis, vec3_t*);
+define_mapping_prototype (md3_frame, md3Frame_t*);
 
 #endif /* __QM_H__ */

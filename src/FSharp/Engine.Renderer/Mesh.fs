@@ -30,7 +30,7 @@ open Engine.Renderer.Core
 
 /// CalculateCullLocalBox
 [<Pure>]
-let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cvar) (tr: TrGlobals) =
+let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: Cvar) (tr: TrGlobals) =
     let inline calculateBounds i j =
         match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
         | true -> oldFrame.Bounds.[i].[j]
@@ -51,7 +51,7 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cva
                     (calculateBounds 1 2)
         }
 
-    let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum noCull
+    let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum r_nocull
     let perfCounters = PerfCounter.incrementBoxMd3 clip tr.PerfCounters
     let tr = { tr with PerfCounters = perfCounters }
 
@@ -67,11 +67,11 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (noCull: Cva
 /// CullModel
 /// Note: This is internal.
 [<Pure>]
-let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (noCull: Cvar) (tr: TrGlobals) =
+let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (r_nocull: Cvar) (tr: TrGlobals) =
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
     | true ->
-        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum r_nocull
 
         match entity.Frame = entity.OldFrame with
         | true ->
@@ -84,12 +84,12 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
             | ClipType.In ->
                 (ClipType.In, tr)
             | _ ->
-                calculateCullLocalBox newFrame oldFrame noCull tr
+                calculateCullLocalBox newFrame oldFrame r_nocull tr
         | _ ->
             let sphereCullB =
                 match newFrame = oldFrame with
                 | true -> sphereCull
-                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius tr.Orientation tr.ViewParms.Frustum noCull
+                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius tr.Orientation tr.ViewParms.Frustum r_nocull
                 
             match sphereCull = sphereCullB with
             | true ->
@@ -102,8 +102,8 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
                 | ClipType.In ->
                     (ClipType.In, tr)
                 | _ ->
-                    calculateCullLocalBox newFrame oldFrame noCull tr
+                    calculateCullLocalBox newFrame oldFrame r_nocull tr
             | _ ->
-                calculateCullLocalBox newFrame oldFrame noCull tr
+                calculateCullLocalBox newFrame oldFrame r_nocull tr
     | _ ->
-        calculateCullLocalBox newFrame oldFrame noCull tr
+        calculateCullLocalBox newFrame oldFrame r_nocull tr

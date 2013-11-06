@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_mesh.c: triangle model functions
 
 #include "tr_local.h"
+#include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 static float ProjectRadius( float r, vec3_t location )
 {
@@ -76,6 +78,7 @@ R_CullModel
 =============
 */
 static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
+#if 0
 	vec3_t		bounds[2];
 	md3Frame_t	*oldFrame, *newFrame;
 	int			i;
@@ -154,6 +157,23 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 		tr.pc.c_box_cull_md3_out++;
 		return CULL_OUT;
 	}
+#else
+	md3Frame_t* newFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.frame;
+	md3Frame_t* oldFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.oldframe;
+	trGlobals_t* _tr = &tr;
+	MObject m_tuple;
+
+	qm_invoke("Engine.Renderer", "Engine.Renderer", "Mesh", "cullModelByFrames", 5, {
+		__args[0] = m_object_as_arg (qm_of_md3_frame (newFrame));
+		__args[1] = m_object_as_arg (qm_of_md3_frame (oldFrame));
+		__args[2] = m_object_as_arg (qm_of_ref_entity (&ent->e));
+		__args[3] = m_object_as_arg (qm_of_cvar (r_nocull));
+		__args[4] = m_object_as_arg (qm_of_tr_globals (&tr));
+	}, m_tuple);
+
+	qm_to_tr_globals (m_object_get_property (m_tuple, "Item2"), &_tr);
+	return (gint)m_object_unbox_struct (m_object_get_property(m_tuple, "Item1"));
+#endif
 }
 
 
