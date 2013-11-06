@@ -43,14 +43,10 @@ module Constants =
 /// Axis
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
-
-    new (x, y, z) = { X = x; Y = y; Z = z }
+    { X: Vector3; Y: Vector3; Z: Vector3 }
 
     static member inline Create (x, y, z) =
-        Axis (x, y, z)
+        { X = x; Y = y; Z = z }
 
     member inline this.Item
         with get (i) =

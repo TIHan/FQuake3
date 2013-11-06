@@ -187,12 +187,21 @@ module Message =
         }
 
 module IPAddress =
+    let inline ofNativePtr (ptr: nativeptr<byte>) =
+        {
+            Octet1 = NativePtr.get ptr 0;
+            Octet2 = NativePtr.get ptr 1;
+            Octet3 = NativePtr.get ptr 2;
+            Octet4 = NativePtr.get ptr 3;
+        }
+
+module Address =
     let inline ofNativePtr (ptr: nativeptr<netadr_t>) =
         let mutable native = NativePtr.read ptr
 
         {
             Type = enum<AddressType> (int native.type');
-            IP = NativePtr.toStructure &&native.ip;
+            IP = IPAddress.ofNativePtr &&native.ip
             Port = native.port;
         }
 

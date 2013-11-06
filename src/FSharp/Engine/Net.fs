@@ -22,6 +22,8 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 namespace Engine.Net
 
+#nowarn "9"
+
 open System.Net
 open System.Net.Sockets
 open System.Security
@@ -58,21 +60,9 @@ type AddressType =
     | IPX = 5           // TODO: Remove IPX.
     | BroadcastIPX = 6  // TODO: Remove IPX.
 
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type IPAddress =
-    val Octet0 : byte
-    val Octet1 : byte
-    val Octet2 : byte
-    val Octet3 : byte
-
-    new (octet0, octet1, octet2, octet3) =
-        {
-            Octet0 = octet0;
-            Octet1 = octet1;
-            Octet2 = octet2;
-            Octet3 = octet3;
-        }
+    { Octet1: byte; Octet2: byte; Octet3: byte; Octet4: byte }
 
 /// Based on Q3: netadr_t
 /// Address

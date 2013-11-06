@@ -49,16 +49,12 @@ module Math =
         x + (t * (y - x))
 
 /// Vector2
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
-    val X : single
-    val Y : single
-
-    new (x, y) = { X = x; Y = y }
+    { X: single; Y: single }
 
     static member inline Create (x, y) =
-        Vector2 (x, y)
+        { X = x; Y = y }
 
     member inline this.Item
         with get (i) =
@@ -79,24 +75,12 @@ module Vector2 =
     let unitY = create 0.f 1.f
 
 /// Vector3
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
-    val X : single
-    val Y : single
-    val Z : single
+    { X: single; Y: single; Z: single }
 
-    new (x, y, z) = { X = x; Y = y; Z = z }
-
-/// Vector3 Functions
-module Vector3Functions =
-    let inline create x y z =
-        Vector3 (x, y, z)
-
-open Vector3Functions
-type Vector3 with
     static member inline Create (x, y, z) =
-        Vector3 (x, y, z)
+        { X = x; Y = y; Z = z }
 
     member inline this.Item
         with get (i) =
@@ -212,18 +196,12 @@ module Vector3 =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
 
 /// Vector4    
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
-    val X : single
-    val Y : single
-    val Z : single
-    val W : single
-
-    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w; }
+    { X: single; Y: single; Z: single; W: single }
 
     static member inline Create (x, y, z, w) =
-        Vector4 (x, y, z, w)
+        { X = x; Y = y; Z = z; W = w }
     
     member inline this.Item
         with get (i) =
@@ -253,23 +231,18 @@ module Vector4 =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 /// Matrix2x2
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix2x2 =
-    val M11 : single val M12 : single
-    val M21 : single val M22 : single
+    {
+        M11: single; M12: single
+        M21: single; M22: single
+    }
 
-    new (m11, m12, m21, m22) =
+    static member inline Create (m11, m12, m21, m22) =
         { 
             M11 = m11; M12 = m12;
             M21 = m21; M22 = m22;
         }
-
-    static member inline Create (m11, m12, m21, m22) =
-        Matrix2x2 (
-            m11, m12,
-            m21, m22
-        )
 
     member inline this.Item
             with get (i, j) =
@@ -288,26 +261,20 @@ module Matrix2x2 =
     let zero = create 0.f 0.f 0.f 0.f
 
 /// Matrix3x3
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix3x3 =
-    val M11 : single val M12 : single val M13 : single
-    val M21 : single val M22 : single val M23 : single
-    val M31 : single val M32 : single val M33 : single
+    {
+        M11: single; M12: single; M13: single
+        M21: single; M22: single; M23: single
+        M31: single; M32: single; M33: single     
+    }
 
-    new (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
         {
             M11 = m11; M12 = m12; M13 = m13;
             M21 = m21; M22 = m22; M23 = m23;
             M31 = m31; M32 = m32; M33 = m33;
         }
-
-    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
-        Matrix3x3 (
-            m11, m12, m13,
-            m21, m22, m23,
-            m31, m32, m33
-        )
     
     member inline this.Item
             with get (i, j) =
@@ -327,29 +294,22 @@ module Matrix3x3 =
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Matrix4x4
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix4x4 =
-    val M11 : single val M12 : single val M13 : single val M14 : single
-    val M21 : single val M22 : single val M23 : single val M24 : single
-    val M31 : single val M32 : single val M33 : single val M34 : single
-    val M41 : single val M42 : single val M43 : single val M44 : single
+    {
+        M11: single; M12: single; M13: single; M14: single
+        M21: single; M22: single; M23: single; M24: single
+        M31: single; M32: single; M33: single; M34: single
+        M41: single; M42: single; M43: single; M44: single        
+    }
 
-    new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
         {
             M11 = m11; M12 = m12; M13 = m13; M14 = m14;
             M21 = m21; M22 = m22; M23 = m23; M24 = m24;
             M31 = m31; M32 = m32; M33 = m33; M34 = m34;
             M41 = m41; M42 = m42; M43 = m43; M44 = m44;
         }
-
-    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
-        Matrix4x4 (
-            m11, m12, m13, m14,
-            m21, m22, m23, m24,
-            m31, m32, m33, m34,
-            m41, m42, m43, m44
-        )
     
     member inline this.Item
             with get (i, j) =
@@ -382,63 +342,37 @@ module Matrix4x4 =
 
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
-/// Euler
-/// Uses Vector3
-[<RequireQualifiedAccess>]
-module Euler =
-    let inline lerp (a1: Vector3) (a2: Vector3) t =
-        let inline lerpAngle a b t =
-            let b =
-                match b - a with
-                | x when x > 180.f -> b - 360.f 
-                | x when x < -180.f -> b + 360.f
-                | _ -> b
-
-            Math.lerp a b t
-
-        Vector3.create (lerpAngle a1.X a2.X t) (lerpAngle a1.Y a2.Y t) (lerpAngle a1.Z a2.Z t)
-
 /// Quaternion
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
-    val W : single
-    val X : single
-    val Y : single
-    val Z : single
+    { W: single; X: single; Y: single; Z: single }
 
-    new (w, x, y, z) = { W = w; X = x; Y = y; Z = z }
-
-/// Quaternion Functions
-module QuaternionFunctions =
-    let inline create w x y z =
-        Quaternion (w, x, y, z)
-
-    let inline conjugate (q: Quaternion) =
-        create q.W -q.X -q.Y -q.Z
+    static member inline Create (w, x, y, z) =
+        { W = w; X = x; Y = y; Z = z }
         
-    let inline dot (q1: Quaternion) (q2: Quaternion) =
+    static member inline Dot (q1: Quaternion, q2: Quaternion) =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W)
 
-    let inline length (q: Quaternion) =
-        sqrt <| dot q q
+    member inline q.Conjugate
+        with get () =
+            Quaternion.Create (q.W, -q.X, -q.Y, -q.Z)
 
-open QuaternionFunctions
-type Quaternion with
-    member inline this.Conjugate with get () = conjugate this
-    member inline this.Length with get () = length this
+    member inline q.Length
+        with get () =
+            sqrt <| Quaternion.Dot (q, q)
 
     static member inline (*) (q1: Quaternion, q2: Quaternion) =
-        create
-            ((q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z))
-            ((q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y))
-            ((q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z))
+        Quaternion.Create (
+            ((q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z)),
+            ((q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y)),
+            ((q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z)),
             ((q1.W * q2.Z) + (q1.Z * q2.W) + (q1.X * q2.Y) - (q1.Y * q2.X))
+        )
 
     static member inline (*) (q: Quaternion, v) =
         let vn = Vector3.normalize v
-        let vq = create 0.f vn.X vn.Y vn.Z
-        let result = q * (vq * conjugate q)
+        let vq = Quaternion.Create (0.f, vn.X, vn.Y, vn.Z)
+        let result = q * (vq * q.Conjugate)
 
         Vector3.create result.X result.Y result.Z
 
@@ -446,10 +380,17 @@ type Quaternion with
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Quaternion =
-    let inline create w x y z =     create w x y z
-    let inline conjugate q =        conjugate q
-    let inline dotProduct q1 q2 =   dot q1 q2
-    let inline length q =           length q 
+    let inline create w x y z =
+        Quaternion.Create (w, x, y, z)
+
+    let inline dot (q1: Quaternion) (q2: Quaternion) =
+        Quaternion.Dot (q1, q2)
+
+    let inline conjugate (q: Quaternion) =
+        q.Conjugate
+
+    let inline length (q: Quaternion) =
+        q.Length
 
     let inline normalize (q: Quaternion) =
         let ``1 / length`` = 1.f / length q

@@ -29,18 +29,12 @@ open Engine.Math
 open Engine.Files
 
 /// Rgba
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
-    val R : byte
-    val G : byte
-    val B : byte
-    val A : byte
-
-    new (r, g, b, a) = { R = r; G = g; B = b; A = a }
+    { R: byte; G: byte; B: byte; A: byte }
 
     static member inline Create (r, g, b, a) =
-        Rgba (r, g, b, a)
+        { R = r; G = g; B = b; A = a }
 
     member inline this.Item
         with get (i) =
