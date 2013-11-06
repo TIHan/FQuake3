@@ -131,4 +131,7 @@ module System =
 
             // Flush standard out
             io.FlushOut ()
+
+            // Perform a Generation 0 collect
+            GC.Collect 0
         ()

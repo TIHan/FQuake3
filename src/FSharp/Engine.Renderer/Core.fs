@@ -171,12 +171,12 @@ module Plane =
     let inline ofPoints (a: Vector3) (b: Vector3) (c: Vector3) =
         let d1 = b - a
         let d2 = c - a
-        let cross = Vector3.crossProduct d2 d1
+        let cross = Vector3.cross d2 d1
         let normal = Vector3.normalize cross
         
         match Vector3.length cross with
         | 0.f -> { Normal = normal; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
-        | _ -> { Normal = normal; Distance = Vector3.dotProduct a normal; Type = PlaneType.X; SignBits = 0uy }
+        | _ -> { Normal = normal; Distance = Vector3.dot a normal; Type = PlaneType.X; SignBits = 0uy }
 
 /// <summary>
 /// Frustum

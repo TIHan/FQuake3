@@ -44,8 +44,8 @@ let private TransformSize = 8
 /// CullLocalBox
 /// </summary>
 [<Pure>]
-let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (noCull: Cvar) =
-    match noCull.Integer = 1 with
+let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+    match r_nocull.Integer = 1 with
     | true -> ClipType.Clip
     | _ ->
 
@@ -65,7 +65,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
         match isFront with
         | true -> (front, back)
         | _ ->
-            let distance = Vector3.dotProduct (transform n) frust.Normal
+            let distance = Vector3.dot (transform n) frust.Normal
 
             match distance > frust.Distance with
             | true -> checkFrustumPlane frust 1 back (back = 1) (n + 1)
@@ -95,8 +95,8 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 /// CullPointAndRadius
 /// </summary>
 [<Pure>]
-let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noCull: Cvar) =
-    match noCull.Integer = 1 with
+let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (r_nocull: Cvar) =
+    match r_nocull.Integer = 1 with
     | true -> ClipType.Clip
     | _ ->
 
@@ -108,7 +108,7 @@ let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noC
         | true -> (mightBeClipped, canCullOut)
         | _ ->
         let frust = frustum.[n]
-        let distance = (Vector3.dotProduct point frust.Normal) - frust.Distance
+        let distance = (Vector3.dot point frust.Normal) - frust.Distance
 
         match distance < -radius with
         | true -> checkFrustumPlanes mightBeClipped true (n + 1)
@@ -126,7 +126,7 @@ let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (noC
 /// </summary>
 [<Pure>]
 let localPointToWorld (local: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dotProduct local orientation.Axis.[i] + orientation.Origin.[i]
+    let inline f i = Vector3.dot local orientation.Axis.[i] + orientation.Origin.[i]
     Vector3.create (f 0) (f 1) (f 2)
 
 /// <summary>
@@ -135,7 +135,7 @@ let localPointToWorld (local: Vector3) (orientation: OrientationR) =
 /// </summary>
 [<Pure>]
 let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dotProduct local orientation.Axis.[i]
+    let inline f i = Vector3.dot local orientation.Axis.[i]
     Vector3.create (f 0) (f 1) (f 2)
 
 /// <summary>
@@ -144,7 +144,7 @@ let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
 /// </summary>
 [<Pure>]
 let worldToLocal (world: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dotProduct world orientation.Axis.[i]
+    let inline f i = Vector3.dot world orientation.Axis.[i]
     Vector3.create (f 0) (f 1) (f 2)
 
 /// <summary>
@@ -246,7 +246,7 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
                 1.0f / axisLength
         | _ -> 1.0f
 
-    let inline calculateOrigin i = (Vector3.dotProduct delta axis.[i]) * axisLength
+    let inline calculateOrigin i = (Vector3.dot delta axis.[i]) * axisLength
 
     {
         Origin = origin;
@@ -371,28 +371,28 @@ let setupFrustum (view: ViewParms) =
         Left =
             {
                 Normal = leftNormal;
-                Distance = Vector3.dotProduct view.Orientation.Origin leftNormal;
+                Distance = Vector3.dot view.Orientation.Origin leftNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits leftNormal;
             };
         Right = 
             {
                 Normal = rightNormal;
-                Distance = Vector3.dotProduct view.Orientation.Origin rightNormal;
+                Distance = Vector3.dot view.Orientation.Origin rightNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits rightNormal;
             };
         Bottom =
             {
                 Normal = bottomNormal;
-                Distance = Vector3.dotProduct view.Orientation.Origin bottomNormal;
+                Distance = Vector3.dot view.Orientation.Origin bottomNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits bottomNormal;
             };
         Top =
             {
                 Normal = topNormal;
-                Distance = Vector3.dotProduct view.Orientation.Origin topNormal;
+                Distance = Vector3.dot view.Orientation.Origin topNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits topNormal;
             }
@@ -405,7 +405,7 @@ let setupFrustum (view: ViewParms) =
 [<Pure>]
 let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
     let local = v - surface.Origin
-    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dotProduct local surface.Axis.[i]) camera.Axis.[i] transformed
+    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dot local surface.Axis.[i]) camera.Axis.[i] transformed
     transform 0 Vector3.zero |> transform 1 |> transform 2 |> (+) camera.Origin
 
 /// <summary>
@@ -414,7 +414,7 @@ let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
 /// </summary>
 [<Pure>]
 let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
-    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dotProduct v surface.Axis.[i]) camera.Axis.[i] transformed
+    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dot v surface.Axis.[i]) camera.Axis.[i] transformed
     transform 0 Vector3.zero |> transform 1 |> transform 2
 
 /// <summary>
@@ -470,10 +470,10 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (tr: TrGlobals) =
     // rotate the plane, but keep the non-rotated version for matching
     // against the portalSurface entities
     let normal = localNormalToWorld originalPlane.Normal orientation
-    let distance = originalPlane.Distance + Vector3.dotProduct normal orientation.Origin
+    let distance = originalPlane.Distance + Vector3.dot normal orientation.Origin
 
     // translate the original plane
-    let originalDistance = originalPlane.Distance + Vector3.dotProduct originalPlane.Normal orientation.Origin
+    let originalDistance = originalPlane.Distance + Vector3.dot originalPlane.Normal orientation.Origin
 
     (
         { originalPlane with Distance = originalDistance },
@@ -485,7 +485,7 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (tr: TrGlobals) =
 [<Pure>]
 let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
     let y = Vector3.perpendicular normal
-    Axis.create normal y (Vector3.crossProduct normal y)
+    Axis.create normal y (Vector3.cross normal y)
 
 /// Tries to find the closest portal entity based on a plane.
 [<Pure>]
@@ -493,7 +493,7 @@ let tryFindClosestPortalEntityByPlane (plane: Plane) (tr: TrGlobals) =
     tr.Refdef.Entities |>
     List.tryFind (fun x ->
         let isPortalSurface = not (x.Entity.Type <> RefEntityType.PortalSurface)
-        let distance = (Vector3.dotProduct x.Entity.Origin plane.Normal) - plane.Distance
+        let distance = (Vector3.dot x.Entity.Origin plane.Normal) - plane.Distance
         let isWithinDistance = not (distance > 64.f || distance < -64.f)
 
         isPortalSurface && isWithinDistance
@@ -517,7 +517,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
 
     // project the origin onto the surface plane to get
     // an origin point we can rotate around
-    let distance = (Vector3.dotProduct entity.Origin plane.Normal) - plane.Distance
+    let distance = (Vector3.dot entity.Origin plane.Normal) - plane.Distance
     let surface = { surface with Origin = Vector3.multiplyAdd -distance surface.Axis.X entity.Origin }
 
     // now get the camera origin and orientation
@@ -544,7 +544,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
         false,
         surface,
         { camera with 
-            Axis = camera.Axis.Set (Y = y, Z = Vector3.crossProduct camera.Axis.X y)
+            Axis = camera.Axis.Set (Y = y, Z = Vector3.cross camera.Axis.X y)
         }
     )
 

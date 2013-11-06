@@ -164,10 +164,10 @@ module Vector3 =
     let inline multiplyAdd s (v1: Vector3) (v2: Vector3) =
         create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
 
-    let inline dotProduct (v1: Vector3) (v2: Vector3) =
+    let inline dot (v1: Vector3) (v2: Vector3) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
 
-    let inline crossProduct (v1: Vector3) (v2: Vector3) =
+    let inline cross (v1: Vector3) (v2: Vector3) =
         create
             ((v1.Y * v2.Z) - (v1.Z * v2.Y))
             ((v1.Z * v2.X) - (v1.X * v2.Z))
@@ -190,7 +190,7 @@ module Vector3 =
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let vn = normalize uv
-        crossProduct v vn
+        cross v vn
 
     let inline lerp (v1: Vector3) (v2: Vector3) (t: single) =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)

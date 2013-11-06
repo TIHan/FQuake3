@@ -238,6 +238,7 @@ module GL =
 
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
+/// Internal
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
 
@@ -248,6 +249,19 @@ let setViewportAndScissor (backend: Backend) =
     // set the window clipping
     glViewport (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
     glScissor (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+
+/// Based on Q3: RB_Hyperspace
+/// Hyperspace
+///
+/// A player has predicted a teleport, but hasn't arrived yet
+/// Internal
+let hyperspace (backend: Backend) =
+    let color = single (backend.Refdef.Time &&& 255) / 255.f
+
+    glClearColor (color, color, color, 1.f)
+    glClear <| GLbitfield GL_COLOR_BUFFER_BIT
+
+    { backend with IsHyperspace = true }
 
 /// SyncGLState
 let private syncGLState (r_finish: Cvar) (state: GLState) =
@@ -300,6 +314,20 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
 
     glClear <| GLbitfield clearBits
 
-    // TODO:
+    match backend.Refdef.RdFlags.HasFlag RdFlags.Hyperspace with
+    | true ->
+        glState, hyperspace backend
+    | _ ->
 
-    glState, backend
+    if backend.View.IsPortal then
+        () // TODO:
+    else
+        () // TODO:
+
+    // force face culling to set next time
+    { glState with FaceCulling = -1 },
+    // we will only draw a sun if there was sky rendered in this view
+    { backend with
+        HasSkyRenderedThisView = false
+        IsHyperspace = false
+    }
