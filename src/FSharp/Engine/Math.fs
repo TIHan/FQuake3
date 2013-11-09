@@ -49,6 +49,27 @@ module Math =
     let inline lerp (x: single) (y: single) (t: single) =
         x + (t * (y - x))
 
+/// Single with Units of Measure
+type single<[<Measure>] 'Measure> = float32<'Measure>
+
+/// Degrees
+[<Measure>] type deg
+
+/// Radians
+[<Measure>] type rad
+
+[<RequireQualifiedAccess>]
+module Convert =
+    [<Literal>]
+    let ``PI / 180`` = 0.0174532925199433f<rad/deg>
+
+    [<Literal>]
+    let ``180 / PI`` = 57.2957795130823f<deg/rad>
+
+    let inline degToRad x : single<rad> = x * ``PI / 180``
+    let inline radToDeg x : single<deg> = x * ``180 / PI``
+
+
 /// Vector2
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -462,8 +483,8 @@ module Quaternion =
             ((cosRoll * sinPitch * cosYaw) + (sinRoll * cosPitch * sinYaw))
             ((cosRoll * cosPitch * sinYaw) - (sinRoll * sinPitch * cosYaw))
 
-    let inline ofAxisAngle (axis: Vector3) (angle: single) =
-        let angle = angle * 0.5f
+    let inline ofAxisAngle (axis: Vector3) (angle: single<rad>) =
+        let angle = angle * 0.5f</rad>
         let sinAngle = sin angle
 
         create
@@ -472,7 +493,9 @@ module Quaternion =
             (axis.Y * sinAngle)
             (axis.Z * sinAngle)
 
-    /// Note: Not sure if we will need this in the future.
-    let inline rotatePointAroundVector (point: Vector3) (axis: Vector3) (degrees: single) =
-        let q = ofAxisAngle axis (Math.``PI / 180`` * degrees)
+/// Transform
+[<RequireQualifiedAccess>]
+module Transform =
+    let inline rotateAroundPoint (point: Vector3) (axis: Vector3) (angle: single<deg>) =
+        let q = Quaternion.ofAxisAngle axis (Convert.degToRad angle)
         q * point

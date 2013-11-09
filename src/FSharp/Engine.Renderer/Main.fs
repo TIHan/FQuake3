@@ -532,13 +532,16 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     | true -> (false, surface, camera)
     | _ ->
 
-    let degrees =
+    let angle =
         match (entity.OldFrame <> 0, entity.Frame <> 0) with
         | (true, true) -> single refdef.Time / 1000.f * single entity.Frame // continuous rotate
         | (true, false) -> single entity.SkinId + (sin <| single refdef.Time * 0.003f) * 4.f // bobbing rotate, with skinId being the rotation offset
         | _ -> single entity.SkinId
 
-    let y = Quaternion.rotatePointAroundVector camera.Axis.Y camera.Axis.X degrees
+    // We know the angle should be in degrees.
+    let angle = angle * 1.f<deg>
+
+    let y = Transform.rotateAroundPoint camera.Axis.Y camera.Axis.X angle
 
     (
         false,
