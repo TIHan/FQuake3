@@ -49,12 +49,16 @@ module Math =
         x + (t * (y - x))
 
 /// Vector2
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
-    { X: single; Y: single }
+    val X : single
+    val Y : single
+
+    new (x, y) = { X = x; Y = y }
 
     static member inline Create (x, y) =
-        { X = x; Y = y }
+        Vector2 (x, y)
 
     member inline this.Item
         with get (i) =
@@ -75,12 +79,17 @@ module Vector2 =
     let unitY = create 0.f 1.f
 
 /// Vector3
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
-    { X: single; Y: single; Z: single }
+    val X : single
+    val Y : single
+    val Z : single
+
+    new (x, y, z) = { X = x; Y = y; Z = z }
 
     static member inline Create (x, y, z) =
-        { X = x; Y = y; Z = z }
+        Vector3 (x, y, z)
 
     member inline this.Item
         with get (i) =
@@ -195,13 +204,19 @@ module Vector3 =
     let inline lerp (v1: Vector3) (v2: Vector3) (t: single) =
         create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
 
-/// Vector4    
+/// Vector4
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
-    { X: single; Y: single; Z: single; W: single }
+    val X : single
+    val Y : single
+    val Z : single
+    val W : single
+
+    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
 
     static member inline Create (x, y, z, w) =
-        { X = x; Y = y; Z = z; W = w }
+        Vector4 (x, y, z, w)
     
     member inline this.Item
         with get (i) =
@@ -227,22 +242,27 @@ module Vector4 =
 
     let zero = create 0.f 0.f 0.f 0.f
 
-    let inline dotProduct (v1: Vector4) (v2: Vector4) =
+    let inline dot (v1: Vector4) (v2: Vector4) =
         (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
 
 /// Matrix2x2
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix2x2 =
-    {
-        M11: single; M12: single
-        M21: single; M22: single
-    }
+    val M11 : single; val M12 : single
+    val M21 : single; val M22 : single
 
-    static member inline Create (m11, m12, m21, m22) =
+    new (m11, m12, m21, m22) =
         { 
             M11 = m11; M12 = m12;
             M21 = m21; M22 = m22;
         }
+
+    static member inline Create (m11, m12, m21, m22) =
+        Matrix2x2 (
+            m11, m12,
+            m21, m22
+        )
 
     member inline this.Item
             with get (i, j) =
@@ -261,20 +281,26 @@ module Matrix2x2 =
     let zero = create 0.f 0.f 0.f 0.f
 
 /// Matrix3x3
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix3x3 =
-    {
-        M11: single; M12: single; M13: single
-        M21: single; M22: single; M23: single
-        M31: single; M32: single; M33: single     
-    }
+    val M11 : single; val M12 : single; val M13 : single
+    val M21 : single; val M22 : single; val M23 : single
+    val M31 : single; val M32 : single; val M33 : single     
 
-    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+    new (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
         {
             M11 = m11; M12 = m12; M13 = m13;
             M21 = m21; M22 = m22; M23 = m23;
             M31 = m31; M32 = m32; M33 = m33;
         }
+
+    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
+        Matrix3x3 (
+            m11, m12, m13,
+            m21, m22, m23,
+            m31, m32, m33
+        )
     
     member inline this.Item
             with get (i, j) =
@@ -294,22 +320,29 @@ module Matrix3x3 =
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Matrix4x4
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Matrix4x4 =
-    {
-        M11: single; M12: single; M13: single; M14: single
-        M21: single; M22: single; M23: single; M24: single
-        M31: single; M32: single; M33: single; M34: single
-        M41: single; M42: single; M43: single; M44: single        
-    }
+    val M11 : single; val M12 : single; val M13 : single; val M14 : single
+    val M21:  single; val M22 : single; val M23 : single; val M24 : single
+    val M31 : single; val M32 : single; val M33 : single; val M34 : single
+    val M41 : single; val M42 : single; val M43 : single; val M44 : single        
 
-    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+    new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
         {
             M11 = m11; M12 = m12; M13 = m13; M14 = m14;
             M21 = m21; M22 = m22; M23 = m23; M24 = m24;
             M31 = m31; M32 = m32; M33 = m33; M34 = m34;
             M41 = m41; M42 = m42; M43 = m43; M44 = m44;
         }
+
+    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
+        Matrix4x4 (
+            m11, m12, m13, m14,
+            m21, m22, m23, m24,
+            m31, m32, m33, m34,
+            m41, m42, m43, m44
+        )
     
     member inline this.Item
             with get (i, j) =
@@ -343,12 +376,18 @@ module Matrix4x4 =
     let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
 
 /// Quaternion
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
-    { W: single; X: single; Y: single; Z: single }
+    val W : single
+    val X : single
+    val Y : single
+    val Z : single
+
+    new (w, x, y, z) = { W = w; X = x; Y = y; Z = z }
 
     static member inline Create (w, x, y, z) =
-        { W = w; X = x; Y = y; Z = z }
+        Quaternion (w, x, y, z)
         
     static member inline Dot (q1: Quaternion, q2: Quaternion) =
         (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W)

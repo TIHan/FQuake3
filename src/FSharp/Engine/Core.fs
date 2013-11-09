@@ -41,12 +41,17 @@ module Constants =
     let EntityIdMaxNormal = MaxGEntities - 2
 
 /// Axis
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
-    { X: Vector3; Y: Vector3; Z: Vector3 }
+    val X : Vector3
+    val Y : Vector3
+    val Z : Vector3
+
+    new (x, y, z) = { X = x; Y = y; Z = z }
 
     static member inline Create (x, y, z) =
-        { X = x; Y = y; Z = z }
+        Axis (x, y, z)
 
     member inline this.Item
         with get (i) =
