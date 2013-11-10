@@ -37,15 +37,9 @@ module Math =
     let E = 2.7182818284590452354f
 
     [<Literal>]
-    let ``PI / 180`` = 0.0174532925199433f
-
-    [<Literal>]
     let ``PI / 360`` = 0.00872664625997165f
-
-    [<Literal>]
-    let ``180 / PI`` = 57.2957795130823f
         
-    let inline lerp x y t = x + (t * (y - x))
+    let inline lerp x y t = x + (y - x) * t
 
 /// Single with Units of Measure
 type single<[<Measure>] 'Measure> = float32<'Measure>
@@ -196,16 +190,16 @@ module Vector3 =
         create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
 
     let inline dot (v1: Vector3) (v2: Vector3) =
-        (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z)
+        v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z
 
     let inline cross (v1: Vector3) (v2: Vector3) =
         create
-            ((v1.Y * v2.Z) - (v1.Z * v2.Y))
-            ((v1.Z * v2.X) - (v1.X * v2.Z))
-            ((v1.X * v2.Y) - (v1.Y * v2.X))
+            (v1.Y * v2.Z - v1.Z * v2.Y)
+            (v1.Z * v2.X - v1.X * v2.Z)
+            (v1.X * v2.Y - v1.Y * v2.X)
 
     let inline lengthSquared (v: Vector3) =
-        (v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z)
+        v.X * v.X + v.Y * v.Y + v.Z * v.Z
 
     let inline length v =
         sqrt <| lengthSquared v
@@ -265,7 +259,7 @@ module Vector4 =
     let zero = create 0.f 0.f 0.f 0.f
 
     let inline dot (v1: Vector4) (v2: Vector4) =
-        (v1.X * v2.X) + (v1.Y * v2.Y) + (v1.Z * v2.Z) + (v1.W * v2.W)
+        v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
 
 /// Matrix2x2
 [<Struct>]
@@ -380,7 +374,7 @@ type Matrix4x4 =
 #else
     static member inline (*) (m1: Matrix4x4, m2: Matrix4x4) =
 #endif
-        let inline f i j = (m1.[i, 0] * m2.[0, j]) + (m1.[i, 1] * m2.[1, j]) + (m1.[i, 2] * m2.[2, j]) + (m1.[i, 3] * m2.[3, j])
+        let inline f i j = m1.[i, 0] * m2.[0, j] + m1.[i, 1] * m2.[1, j] + m1.[i, 2] * m2.[2, j] + m1.[i, 3] * m2.[3, j]
         Matrix4x4.Create (
             f 0 0, f 0 1, f 0 2, f 0 3,
             f 1 0, f 1 1, f 1 2, f 1 3,
@@ -412,27 +406,29 @@ type Quaternion =
         Quaternion (w, x, y, z)
         
     static member inline Dot (q1: Quaternion, q2: Quaternion) =
-        (q1.X * q2.X) + (q1.Y * q2.Y) + (q1.Z * q2.Z) + (q1.W * q2.W)
+        q1.X * q2.X + q1.Y * q2.Y + q1.Z * q2.Z + q1.W * q2.W
 
-    member inline q.Conjugate
-        with get () =
-            Quaternion.Create (q.W, -q.X, -q.Y, -q.Z)
+    member inline q.Conjugate with get () = Quaternion.Create (q.W, -q.X, -q.Y, -q.Z)
 
-    member inline q.Length
-        with get () =
-            sqrt <| Quaternion.Dot (q, q)
+    member inline q.Length with get () = sqrt <| Quaternion.Dot (q, q)
 
     static member inline (*) (q1: Quaternion, q2: Quaternion) =
         Quaternion.Create (
-            ((q1.W * q2.W) - (q1.X * q2.X) - (q1.Y * q2.Y) - (q1.Z * q2.Z)),
-            ((q1.W * q2.X) + (q1.X * q2.W) + (q1.Y * q2.Z) - (q1.Z * q2.Y)),
-            ((q1.W * q2.Y) + (q1.Y * q2.W) + (q1.Z * q2.X) - (q1.X * q2.Z)),
-            ((q1.W * q2.Z) + (q1.Z * q2.W) + (q1.X * q2.Y) - (q1.Y * q2.X))
+            (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z),
+            (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y),
+            (q1.W * q2.Y + q1.Y * q2.W + q1.Z * q2.X - q1.X * q2.Z),
+            (q1.W * q2.Z + q1.Z * q2.W + q1.X * q2.Y - q1.Y * q2.X)
         )
 
+    /// Steps:
+    /// normalize vector
+    /// create quat based on normalized vector's x,y,z
+    /// then multiply by the passed quat's conjugate (inverse)
+    /// then multiply by the passed quat
+    /// create vector based on result quat's x,y,z
     static member inline (*) (q: Quaternion, v) =
-        let vn = Vector3.normalize v
-        let vq = Quaternion.Create (0.f, vn.X, vn.Y, vn.Z)
+        let vl = 1.f / Vector3.length v
+        let vq = Quaternion.Create (0.f, v.X * vl, v.Y * vl, v.Z * vl)
         let result = q * (vq * q.Conjugate)
 
         Vector3.create result.X result.Y result.Z
@@ -444,14 +440,11 @@ module Quaternion =
     let inline create w x y z =
         Quaternion.Create (w, x, y, z)
 
-    let inline dot (q1: Quaternion) (q2: Quaternion) =
-        Quaternion.Dot (q1, q2)
+    let inline dot (q1: Quaternion) (q2: Quaternion) = Quaternion.Dot (q1, q2)
 
-    let inline conjugate (q: Quaternion) =
-        q.Conjugate
+    let inline conjugate (q: Quaternion) = q.Conjugate
 
-    let inline length (q: Quaternion) =
-        q.Length
+    let inline length (q: Quaternion) = q.Length
 
     let inline normalize (q: Quaternion) =
         let ``1 / length`` = 1.f / length q
@@ -478,10 +471,10 @@ module Quaternion =
         let sinPitchYaw = sinPitch * sinYaw
 
         create
-            ((cosRoll * cosPitchYaw) + (sinRoll * sinPitchYaw))
-            ((sinRoll * cosPitchYaw) - (cosRoll * sinPitchYaw))
-            ((cosRoll * sinPitch * cosYaw) + (sinRoll * cosPitch * sinYaw))
-            ((cosRoll * cosPitch * sinYaw) - (sinRoll * sinPitch * cosYaw))
+            (cosRoll * cosPitchYaw + sinRoll * sinPitchYaw)
+            (sinRoll * cosPitchYaw - cosRoll * sinPitchYaw)
+            (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
+            (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
 
     let inline ofAxisAngle (axis: Vector3) (angle: single<rad>) =
         let angle = angle * 0.5f</rad>
@@ -496,6 +489,6 @@ module Quaternion =
 /// Transform
 [<RequireQualifiedAccess>]
 module Transform =
-    let inline rotateAroundPoint (point: Vector3) (axis: Vector3) (angle: single<deg>) =
-        let q = Quaternion.ofAxisAngle axis (Deg.toRad angle)
+    let inline rotateAroundPoint point axis angle : Vector3 =
+        let q = Quaternion.ofAxisAngle axis <| Deg.toRad angle
         q * point
