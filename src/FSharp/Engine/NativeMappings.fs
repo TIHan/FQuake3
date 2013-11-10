@@ -35,7 +35,7 @@ open Engine.Files
 open Engine.Math
 open Engine.NativeInterop
 
-module bool =
+module Boolean =
     let inline ofNativePtr (ptr: nativeptr<qboolean>) =
         let mutable native = NativePtr.read ptr
 
@@ -146,7 +146,7 @@ module Cvar =
             ResetString = NativePtr.toString native.resetString;
             LatchedString = NativePtr.toString native.latchedString;
             Flags = native.flags;
-            IsModified = Convert.ToBoolean native.modified;
+            IsModified = Boolean.ofNativePtr &&native.modified;
             ModificationCount = native.modificationCount;
             Value = native.value;
             Integer = native.integer;
@@ -178,9 +178,9 @@ module Message =
         let mutable native = NativePtr.read ptr
 
         {
-            IsAllowedOverflow = Convert.ToBoolean native.allowoverflow;
-            IsOverflowed = Convert.ToBoolean native.overflowed;
-            IsOutOfBand = Convert.ToBoolean native.oob;
+            IsAllowedOverflow = Boolean.ofNativePtr &&native.allowoverflow;
+            IsOverflowed = Boolean.ofNativePtr &&native.overflowed;
+            IsOutOfBand = Boolean.ofNativePtr &&native.oob;
             Data = ByteString.ofNativePtr native.cursize native.data;
             MaxSize = native.maxsize;
             ReadCount = native.readcount;

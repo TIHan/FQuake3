@@ -134,8 +134,8 @@ module ViewParms =
             Orientation = OrientationR.ofNativePtr &&native.or';
             World = OrientationR.ofNativePtr &&native.world;
             PvsOrigin = Vector3.ofNativePtr &&native.pvsOrigin;
-            IsPortal = Convert.ToBoolean native.isPortal;
-            IsMirror = Convert.ToBoolean native.isMirror;
+            IsPortal = Boolean.ofNativePtr &&native.isPortal;
+            IsMirror = Boolean.ofNativePtr &&native.isMirror;
             FrameSceneId = native.frameSceneNum;
             FrameCount = native.frameCount;
             PortalPlane = Plane.ofNativePtr &&native.portalPlane;
@@ -157,8 +157,8 @@ module ViewParms =
         OrientationR.toNativeByPtr &&native.or' view.Orientation
         OrientationR.toNativeByPtr &&native.world view.World
         Vector3.toNativeByPtr &&native.pvsOrigin view.PvsOrigin
-        native.isPortal <- bool.toNative view.IsPortal
-        native.isMirror <- bool.toNative view.IsMirror
+        native.isPortal <- Boolean.toNative view.IsPortal
+        native.isMirror <- Boolean.toNative view.IsMirror
         native.frameSceneNum <- view.FrameSceneId
         native.frameCount <- view.FrameCount
         Plane.toNativeByPtr &&native.portalPlane view.PortalPlane
@@ -357,7 +357,7 @@ module RefEntity =
             LightingOrigin = Vector3.ofNativePtr &&native.lightingOrigin;
             ShadowPlane = native.shadowPlane;
             Axis = Axis.ofNativePtr &&native.axis;
-            HasNonNormalizedAxes = Convert.ToBoolean native.nonNormalizedAxes;
+            HasNonNormalizedAxes = Boolean.ofNativePtr &&native.nonNormalizedAxes;
             Origin = Vector3.ofNativePtr &&native.origin;
             Frame = native.frame;
             OldOrigin = Vector3.ofNativePtr &&native.oldorigin;
@@ -382,7 +382,7 @@ module RefEntity =
         Vector3.toNativeByPtr &&native.lightingOrigin entity.LightingOrigin
         native.shadowPlane <- native.shadowPlane
         Axis.toNativeByPtr &&native.axis entity.Axis
-        native.nonNormalizedAxes <- bool.toNative entity.HasNonNormalizedAxes
+        native.nonNormalizedAxes <- Boolean.toNative entity.HasNonNormalizedAxes
         Vector3.toNativeByPtr &&native.origin entity.Origin
         native.frame <- entity.Frame
         Vector3.toNativeByPtr &&native.oldorigin entity.OldOrigin
@@ -406,8 +406,8 @@ module TrRefEntity =
         {
             Entity = RefEntity.ofNativePtr &&native.e;
             AxisLength = native.axisLength;
-            NeedDlights = Convert.ToBoolean native.needDlights;
-            IsLightingCalculated = Convert.ToBoolean native.lightingCalculated;
+            NeedDlights = Boolean.ofNativePtr &&native.needDlights;
+            IsLightingCalculated = Boolean.ofNativePtr &&native.lightingCalculated;
             LightDirection = Vector3.ofNativePtr &&native.lightDir;
             AmbientLight = Vector3.ofNativePtr &&native.ambientLight;
             AmbientLightInt = native.ambientLightInt;
@@ -419,8 +419,8 @@ module TrRefEntity =
         
         RefEntity.toNativeByPtr &&native.e refEntity.Entity
         native.axisLength <- refEntity.AxisLength
-        native.needDlights <- bool.toNative refEntity.NeedDlights
-        native.lightingCalculated <- bool.toNative refEntity.IsLightingCalculated
+        native.needDlights <- Boolean.toNative refEntity.NeedDlights
+        native.lightingCalculated <- Boolean.toNative refEntity.IsLightingCalculated
         Vector3.toNativeByPtr &&native.lightDir refEntity.LightDirection
         Vector3.toNativeByPtr &&native.ambientLight refEntity.AmbientLight
         native.ambientLightInt <- refEntity.AmbientLightInt
@@ -541,12 +541,12 @@ module Backend =
             Refdef = TrRefdef.ofNativePtr &&native.refdef;
             View = ViewParms.ofNativePtr &&native.viewParms;
             Orientation = OrientationR.ofNativePtr &&native.or';
-            IsHyperspace = bool.ofNativePtr &&native.isHyperspace;
+            IsHyperspace = Boolean.ofNativePtr &&native.isHyperspace;
             CurrentEntity = Option.ofNativePtr (fun x -> TrRefEntity.ofNativePtr x) native.currentEntity;
-            HasSkyRenderedThisView = bool.ofNativePtr &&native.skyRenderedThisView;
-            IsProjection2D = bool.ofNativePtr &&native.projection2D;
+            HasSkyRenderedThisView = Boolean.ofNativePtr &&native.skyRenderedThisView;
+            IsProjection2D = Boolean.ofNativePtr &&native.projection2D;
             Color2D = Rgba.ofNativePtr &&native.color2D;
-            IsVertex2D = bool.ofNativePtr &&native.vertexes2D;
+            IsVertex2D = Boolean.ofNativePtr &&native.vertexes2D;
             Entity2D = TrRefEntity.ofNativePtr &&native.entity2D;
         }
 

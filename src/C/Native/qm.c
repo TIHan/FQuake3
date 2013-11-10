@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 define_mapping_assembly ("Engine");
 define_mapping_namespace ("Engine.Native");
 
-define_mapping (qboolean, qboolean*, "bool");
+define_mapping (qboolean, qboolean*, "Boolean");
 define_mapping (vec3, vec3_t, "Vector3");
 define_mapping (vec4, vec4_t, "Vector4");
 define_mapping (mat4x4, gfloat*, "Matrix4x4");

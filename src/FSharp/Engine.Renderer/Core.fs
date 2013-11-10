@@ -21,6 +21,8 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 module Engine.Renderer.Core
 
+#nowarn "9"
+
 open System
 open System.Runtime.InteropServices
 open FSharpx.Collections
@@ -29,12 +31,18 @@ open Engine.Math
 open Engine.Files
 
 /// Rgba
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Rgba =
-    { R: byte; G: byte; B: byte; A: byte }
+    val R : byte
+    val G : byte
+    val B : byte
+    val A : byte
+
+    new (r, g, b, a) = { R = r; G = g; B = b; A = a }
 
     static member inline Create (r, g, b, a) =
-        { R = r; G = g; B = b; A = a }
+        Rgba (r, g, b, a)
 
     member inline this.Item
         with get (i) =
