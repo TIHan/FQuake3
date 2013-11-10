@@ -26,7 +26,6 @@ namespace Engine.Math
 
 open System
 open System.Runtime.InteropServices
-open Microsoft.FSharp.NativeInterop
 
 /// Math Module
 [<RequireQualifiedAccess>]
@@ -46,8 +45,7 @@ module Math =
     [<Literal>]
     let ``180 / PI`` = 57.2957795130823f
         
-    let inline lerp (x: single) (y: single) (t: single) =
-        x + (t * (y - x))
+    let inline lerp x y t = x + (t * (y - x))
 
 /// Single with Units of Measure
 type single<[<Measure>] 'Measure> = float32<'Measure>
@@ -59,16 +57,18 @@ type single<[<Measure>] 'Measure> = float32<'Measure>
 [<Measure>] type rad
 
 [<RequireQualifiedAccess>]
-module Convert =
+module Deg =
     [<Literal>]
     let ``PI / 180`` = 0.0174532925199433f<rad/deg>
 
+    let inline toRad x : single<rad> = x * ``PI / 180``
+
+[<RequireQualifiedAccess>]
+module Rad =
     [<Literal>]
-    let ``180 / PI`` = 57.2957795130823f<deg/rad>
+    let ``180 / PI`` = 57.2957795130823f<deg/rad>    
 
-    let inline degToRad x : single<rad> = x * ``PI / 180``
-    let inline radToDeg x : single<deg> = x * ``180 / PI``
-
+    let inline toDeg x : single<deg> = x * ``180 / PI``
 
 /// Vector2
 [<Struct>]
@@ -497,5 +497,5 @@ module Quaternion =
 [<RequireQualifiedAccess>]
 module Transform =
     let inline rotateAroundPoint (point: Vector3) (axis: Vector3) (angle: single<deg>) =
-        let q = Quaternion.ofAxisAngle axis (Convert.degToRad angle)
+        let q = Quaternion.ofAxisAngle axis (Deg.toRad angle)
         q * point
