@@ -72,6 +72,7 @@
     <Compile Include="ErlNet.fs" />
     <Compile Include="Net.fs" />
     <Compile Include="IO.fs" />
+    <Compile Include="SDL.fs" />
     <Compile Include="System.fs" />
     <Compile Include="Md3.fs" />
     <Compile Include="Md4.fs" />
@@ -92,6 +93,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>copy $(TargetDir)..\lib\sdl2\SDL2.dll $(TargetDir)</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
