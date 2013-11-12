@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "resource.h"
 #include "glw_win.h"
 #include "win_local.h"
+#include "../qm.h" // FQuake3
 
 extern void WG_CheckHardwareGamma( void );
 extern void WG_RestoreGamma( void );
@@ -576,6 +577,7 @@ static qboolean GLW_InitDriver( const char *drivername, int colorbits )
 #define	WINDOW_STYLE	(WS_OVERLAPPED|WS_BORDER|WS_CAPTION|WS_VISIBLE)
 static qboolean GLW_CreateWindow( const char *drivername, int width, int height, int colorbits, qboolean cdsFullscreen )
 {
+#if 1
 	RECT			r;
 	cvar_t			*vid_xpos, *vid_ypos;
 	int				stylebits;
@@ -705,6 +707,19 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 	SetFocus( g_wv.hWnd );
 
 	return qtrue;
+#else
+	MObject m_result;
+
+	qm_invoke("Engine.Renderer", "Engine.Renderer", "Window", "create", 2, {
+		__args [0] = &width;
+		__args [1] = &height;
+		//__args [2] = &colorbits;
+		//__args [3] = m_object_as_arg (qm_of_qboolean (&cdsFullscreen));
+	}, m_result);
+
+	g_wv.hWnd = m_object_unbox_struct(m_result);
+	return qtrue;
+#endif
 }
 
 static void PrintCDSError( int value )

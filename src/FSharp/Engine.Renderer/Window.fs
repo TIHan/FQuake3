@@ -29,13 +29,14 @@ open System
 open System.Diagnostics.Contracts
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
+open Engine.NativeInterop
 open Engine.Core
 open Engine.Math
 open Engine.Renderer.Core
 open GL
 open SDL
 
-let create width height colorbits isFullscreen =
+let create (width: int) (height: int) =
     SDL_GL_SetAttribute (SDL_GLattr.SDL_GL_CONTEXT_MAJOR_VERSION, 1) |> ignore
     SDL_GL_SetAttribute (SDL_GLattr.SDL_GL_CONTEXT_MINOR_VERSION, 0) |> ignore
  

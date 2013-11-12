@@ -110,7 +110,7 @@ type SDL_WindowFlags =
     | SDL_WINDOW_FOREIGN = 0x00000800
     | SDL_WINDOW_ALLOW_HIGHDPI = 0x00002000
 
-type SDL_Window = nativeint
+type SDL_Window = int
 
 [<SuppressUnmanagedCodeSecurity>]
 [<DllImport (LibOpenSDL, CallingConvention = OpenSDLCallingConvention)>]
