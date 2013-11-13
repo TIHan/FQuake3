@@ -24,6 +24,7 @@ module Engine.Renderer.Core
 #nowarn "9"
 
 open System
+open System.Security
 open System.Runtime.InteropServices
 open FSharpx.Collections
 open Engine.Core
@@ -1224,3 +1225,7 @@ module TrGlobals =
         let entity = tr.Refdef.Entities.[entityId]
         { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
         
+module NativeInternal =
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport ("Engine.Renderer.Native.dll")>]
+    extern void set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

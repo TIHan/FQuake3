@@ -30,6 +30,15 @@ let LibQuake3 = "quake3.dll"
 [<Literal>]
 let DefaultCallingConvention = CallingConvention.Cdecl
 
+// Hmm, I wonder if this is ok...
+let inline fixed' (f: nativeptr<_> -> 'a) (a: obj) =
+    let handle = GCHandle.Alloc (a, GCHandleType.Pinned)
+    let addr = handle.AddrOfPinnedObject ()
+
+    f <| NativePtr.ofNativeInt addr
+
+    handle.Free ()
+
 /// NativePtr
 module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =

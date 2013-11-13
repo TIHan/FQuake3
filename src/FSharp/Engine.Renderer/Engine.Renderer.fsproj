@@ -61,7 +61,6 @@
     <Compile Include="Main.fs" />
     <Compile Include="Mesh.fs" />
     <Compile Include="GL.fs" />
-    <Compile Include="Window.fs" />
     <Compile Include="Backend.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />

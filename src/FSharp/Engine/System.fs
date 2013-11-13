@@ -34,7 +34,6 @@ open Engine.Net
 open Engine.IO
 open Engine.Command
 open Engine.NativeInterop
-open SDL // need to init
 
 module private Native =
     [<SuppressUnmanagedCodeSecurity>]
@@ -91,28 +90,12 @@ module System =
     let StartStreamThread () =
         Native.Sys_InitStreamThread ()
 
-    let create (width: int) (height: int) =
-        SDL_GL_SetAttribute (SDL_GLattr.SDL_GL_CONTEXT_MAJOR_VERSION, 1) |> ignore
-        SDL_GL_SetAttribute (SDL_GLattr.SDL_GL_CONTEXT_MINOR_VERSION, 0) |> ignore
-
-        SDL_GL_SetAttribute(SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1) |> ignore
-        SDL_GL_SetAttribute(SDL_GLattr.SDL_GL_DEPTH_SIZE, 24) |> ignore
- 
-        let flags = SDL_WindowFlags.SDL_WINDOW_OPENGL// ||| SDL_WindowFlags.SDL_WINDOW_SHOWN
-        let handle = SDL_CreateWindow ("FQuake3", 0, 0, width, height, 0u)
-        handle
-
     let Start () =
         SetupUnhandledExceptions ()
 
         use io = new StandardIO ()
 
         io.RedirectOut Common.Printf
-
-        (* SDL INIT *)
-        if SDL_Init <| uint32 SDL_INIT_VIDEO < 0 then
-            raise <| Exception "SDL failed to initialize"
-        (************)
 
         // done before Com/Sys_Init since we need this for error output
         CreateConsole ()

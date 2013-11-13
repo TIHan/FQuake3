@@ -708,6 +708,7 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 
 	return qtrue;
 #else
+	// Incomplete!!!
 	MObject m_result;
 
 	qm_invoke("Engine.Renderer", "Engine.Renderer", "Window", "create", 2, {

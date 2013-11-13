@@ -26,22 +26,15 @@ module Engine.Renderer.Backend
 #nowarn "51"
 
 open System
+open System.Security
 open System.Diagnostics.Contracts
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.Core
 open Engine.Math
 open Engine.Renderer.Core
+open Engine.NativeInterop
 open GL
-
-// Hmm, I wonder if this is ok...
-let inline fixed' (f: nativeptr<_> -> unit) (a: obj) =
-    let handle = GCHandle.Alloc (a, GCHandleType.Pinned)
-    let addr = handle.AddrOfPinnedObject ()
-
-    f <| NativePtr.ofNativeInt addr
-
-    handle.Free ()
 
 [<RequireQualifiedAccess>]
 module GL =
@@ -241,14 +234,9 @@ module GL =
 /// Internal
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
-
-    glMatrixMode <| GLenum GL_PROJECTION
-    fixed' (fun ptr -> glLoadMatrixf ptr) view.ProjectionMatrix
-    glMatrixMode <| GLenum GL_MODELVIEW
-
-    // set the window clipping
-    glViewport (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
-    glScissor (view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+    fixed' (fun ptr -> 
+        NativeInternal.set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+    ) view.ProjectionMatrix
 
 /// Based on Q3: RB_Hyperspace
 /// Hyperspace
