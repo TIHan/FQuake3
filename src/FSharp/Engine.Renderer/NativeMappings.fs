@@ -584,6 +584,7 @@ module Backend =
 
         Boolean.toNativeByPtr &&native.isHyperspace value.IsHyperspace
         Boolean.toNativeByPtr &&native.skyRenderedThisView value.HasSkyRenderedThisView
+        Boolean.toNativeByPtr &&native.projection2D value.IsProjection2D
 
         NativePtr.write ptr native
 
