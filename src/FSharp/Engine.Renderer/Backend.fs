@@ -196,9 +196,7 @@ let setViewportAndScissor (backend: Backend) =
 let hyperspace (backend: Backend) =
     let color = single (backend.Refdef.Time &&& 255) / 255.f
 
-    glClearColor (color, color, color, 1.f)
-    glClear <| GLbitfield GL_COLOR_BUFFER_BIT
-
+    Internal.er_gl_hyperspace_clear color
     { backend with IsHyperspace = true }
 
 /// SyncGLState

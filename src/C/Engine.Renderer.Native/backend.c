@@ -116,6 +116,13 @@ er_gl_disable_alpha_test ()
 }
 
 ER_EXPORT void ER_DECL
+er_gl_hyperspace_clear (GLclampf color)
+{
+	glClearColor (color, color, color, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT);
+}
+
+ER_EXPORT void ER_DECL
 er_set_viewport_and_scissor (
 		const GLfloat *projection_matrix,
 		GLint viewport_x, GLint viewport_y,
