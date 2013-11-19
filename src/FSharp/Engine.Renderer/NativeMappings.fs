@@ -578,6 +578,15 @@ module Backend =
             Entity2D = TrRefEntity.ofNativePtr &&native.entity2D;
         }
 
+    // TODO: NOT FINISHED!
+    let inline toNativeByPtr (ptr: nativeptr<backEndState_t>) (value: Backend) =
+        let mutable native = NativePtr.read ptr
+
+        Boolean.toNativeByPtr &&native.isHyperspace value.IsHyperspace
+        Boolean.toNativeByPtr &&native.skyRenderedThisView value.HasSkyRenderedThisView
+
+        NativePtr.write ptr native
+
 // TODO: This will need more work over time.
 module TrGlobals =
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =

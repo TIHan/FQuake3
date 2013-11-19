@@ -439,6 +439,7 @@ to actually render the visible surfaces for this view
 =================
 */
 void RB_BeginDrawingView (void) {
+#if 1
 	int clearBits = 0;
 
 	// sync with gl if needed
@@ -515,6 +516,23 @@ void RB_BeginDrawingView (void) {
 	} else {
 		qglDisable (GL_CLIP_PLANE0);
 	}
+#else
+	MObject m_tuple;
+	glstate_t* _glState = &glState;
+	backEndState_t* _backEnd = &backEnd;
+
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Backend", "beginDrawingView", 6, {
+		__args [0] = m_object_as_arg (qm_of_cvar (r_finish));
+		__args [1] = m_object_as_arg (qm_of_cvar (r_measureOverdraw));
+		__args [2] = m_object_as_arg (qm_of_cvar (r_shadows));
+		__args [3] = m_object_as_arg (qm_of_cvar (r_fastsky));
+		__args [4] = m_object_as_arg (qm_of_gl_state (&glState));
+		__args [5] = m_object_as_arg (qm_of_tr_back_end_state (&backEnd));
+	}, m_tuple);
+
+	qm_to_gl_state (m_object_get_property (m_tuple, "Item1"), &_glState);
+	qm_to_tr_back_end_state (m_object_get_property (m_tuple, "Item2"), &_backEnd);
+#endif
 }
 
 
