@@ -40,86 +40,47 @@ open GL
 module GL =
     [<RequireQualifiedAccess>]
     module GLS =
-        [<Literal>]
-        let SrcBlendZero = 0x00000001
+        type SrcBlend =
+            | Zero =                0x00000001
+            | One =                 0x00000002
+            | DstColor =            0x00000003
+            | OneMinusDstColor =    0x00000004
+            | SrcAlpha =            0x00000005
+            | OneMinusSrcAlpha =    0x00000006
+            | DstAlpha =            0x00000007
+            | OneMinusDstAlpha =    0x00000008
+            | AlphaSaturate =       0x00000009
+            | Bits =                0x0000000f
+
+        type DstBlend =
+            | Zero =                0x00000010
+            | One =                 0x00000020
+            | SrcColor =            0x00000030
+            | OneMinusSrcColor =    0x00000040
+            | SrcAlpha =            0x00000050
+            | OneMinusSrcAlpha =    0x00000060
+            | DstAlpha =            0x00000070
+            | OneMinusDstAlpha =    0x00000080
+            | Bits =                0x000000f0
 
         [<Literal>]
-        let SrcBlendOne = 0x00000002
+        let DepthMaskTrue =         0x00000100
 
         [<Literal>]
-        let SrcBlendDstColor = 0x00000003
+        let PolyModeLine =          0x00001000
 
         [<Literal>]
-        let SrcBlendOneMinusDstColor = 0x00000004
+        let DepthTestDisable =      0x00010000
 
         [<Literal>]
-        let SrcBlendSrcAlpha = 0x00000005
+        let DepthFuncEqual =        0x00020000
 
-        [<Literal>]
-        let SrcBlendOneMinusSrcAlpha = 0x00000006
-
-        [<Literal>]
-        let SrcBlendDstAlpha = 0x00000007
-
-        [<Literal>]
-        let SrcBlendOneMinusDstAlpha = 0x00000008
-
-        [<Literal>]
-        let SrcBlendAlphaSaturate = 0x00000009
-
-        [<Literal>]
-        let SrcBlendBits = 0x0000000f
-
-        [<Literal>]
-        let DstBlendZero = 0x00000010
-
-        [<Literal>]
-        let DstBlendOne = 0x00000020
-
-        [<Literal>]
-        let DstBlendSrcColor = 0x00000030
-
-        [<Literal>]
-        let DstBlendOneMinusSrcColor = 0x00000040
-
-        [<Literal>]
-        let DstBlendSrcAlpha = 0x00000050
-
-        [<Literal>]
-        let DstBlendOneMinusSrcAlpha = 0x00000060
-
-        [<Literal>]
-        let DstBlendDstAlpha = 0x00000070
-
-        [<Literal>]
-        let DstBlendOneMinusDstAlpha = 0x00000080
-
-        [<Literal>]
-        let DstBlendBits = 0x000000f0
-
-        [<Literal>]
-        let DepthMaskTrue = 0x00000100
-
-        [<Literal>]
-        let PolyModeLine = 0x00001000
-
-        [<Literal>]
-        let DepthTestDisable = 0x00010000
-
-        [<Literal>]
-        let DepthFuncEqual = 0x00020000
-
-        [<Literal>]
-        let ATestGt0 = 0x10000000
-
-        [<Literal>]
-        let ATestLt80 = 0x20000000
-
-        [<Literal>]
-        let ATestGe80 = 0x40000000
-
-        [<Literal>]
-        let ATestBits = 0x70000000
+        type ATest =
+            | None =                0x00000000
+            | Gt0 =                 0x10000000
+            | Lt80 =                0x20000000
+            | Ge80 =                0x40000000
+            | Bits =                0x70000000
 
         [<Literal>]
         let Default = DepthMaskTrue
@@ -149,31 +110,31 @@ module GL =
         //
         // check blend bits
         //
-        if diff &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> 0UL then
-            if stateBits &&& uint64 (GLS.SrcBlendBits ||| GLS.DstBlendBits) <> 0UL then
+        if diff &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
+            if stateBits &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
                 let srcFactor =
-                    match int (stateBits &&& uint64 GLS.SrcBlendBits) with
-                    | GLS.SrcBlendZero -> GL_ZERO
-                    | GLS.SrcBlendOne -> GL_ONE
-                    | GLS.SrcBlendDstColor -> GL_DST_COLOR
-                    | GLS.SrcBlendOneMinusDstColor -> GL_ONE_MINUS_DST_COLOR
-                    | GLS.SrcBlendSrcAlpha -> GL_SRC_ALPHA
-                    | GLS.SrcBlendOneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
-                    | GLS.SrcBlendDstAlpha -> GL_DST_ALPHA
-                    | GLS.SrcBlendOneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
-                    | GLS.SrcBlendAlphaSaturate -> GL_SRC_ALPHA_SATURATE
+                    match enum<GLS.SrcBlend> (int (stateBits &&& uint64 GLS.SrcBlend.Bits)) with
+                    | GLS.SrcBlend.Zero -> GL_ZERO
+                    | GLS.SrcBlend.One -> GL_ONE
+                    | GLS.SrcBlend.DstColor -> GL_DST_COLOR
+                    | GLS.SrcBlend.OneMinusDstColor -> GL_ONE_MINUS_DST_COLOR
+                    | GLS.SrcBlend.SrcAlpha -> GL_SRC_ALPHA
+                    | GLS.SrcBlend.OneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
+                    | GLS.SrcBlend.DstAlpha -> GL_DST_ALPHA
+                    | GLS.SrcBlend.OneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
+                    | GLS.SrcBlend.AlphaSaturate -> GL_SRC_ALPHA_SATURATE
                     | _ -> raise <| Exception "Invalid src blend state bits."
                 
                 let dstFactor =
-                    match int (stateBits &&& uint64 GLS.DstBlendBits) with
-                    | GLS.DstBlendZero -> GL_ZERO
-                    | GLS.DstBlendOne -> GL_ONE
-                    | GLS.DstBlendSrcColor -> GL_SRC_COLOR
-                    | GLS.DstBlendOneMinusSrcColor -> GL_ONE_MINUS_SRC_COLOR
-                    | GLS.DstBlendSrcAlpha -> GL_SRC_ALPHA
-                    | GLS.DstBlendOneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
-                    | GLS.DstBlendDstAlpha -> GL_DST_ALPHA
-                    | GLS.DstBlendOneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
+                    match enum<GLS.DstBlend> (int (stateBits &&& uint64 GLS.DstBlend.Bits)) with
+                    | GLS.DstBlend.Zero -> GL_ZERO
+                    | GLS.DstBlend.One -> GL_ONE
+                    | GLS.DstBlend.SrcColor -> GL_SRC_COLOR
+                    | GLS.DstBlend.OneMinusSrcColor -> GL_ONE_MINUS_SRC_COLOR
+                    | GLS.DstBlend.SrcAlpha -> GL_SRC_ALPHA
+                    | GLS.DstBlend.OneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
+                    | GLS.DstBlend.DstAlpha -> GL_DST_ALPHA
+                    | GLS.DstBlend.OneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
                     | _ -> raise <| Exception "Invalid dst blend state bits."
 
                 glEnable <| GLenum GL_BLEND
@@ -211,17 +172,17 @@ module GL =
         //
         // alpha test
         //
-        if diff &&& uint64 GLS.ATestBits <> 0UL then
-            match int (stateBits &&& uint64 GLS.ATestBits) with
-            | 0 ->
+        if diff &&& uint64 GLS.ATest.Bits <> 0UL then
+            match enum<GLS.ATest> (int (stateBits &&& uint64 GLS.ATest.Bits)) with
+            | GLS.ATest.None ->
                 glDisable <| GLenum GL_ALPHA_TEST
-            | GLS.ATestGt0 ->
+            | GLS.ATest.Gt0 ->
                 glEnable <| GLenum GL_ALPHA_TEST
                 glAlphaFunc (GLenum GL_GREATER, 0.f)
-            | GLS.ATestLt80 ->
+            | GLS.ATest.Lt80 ->
                 glEnable <| GLenum GL_ALPHA_TEST
                 glAlphaFunc (GLenum GL_LESS, 0.5f)
-            | GLS.ATestGe80 ->
+            | GLS.ATest.Ge80 ->
                 glEnable <| GLenum GL_ALPHA_TEST
                 glAlphaFunc (GLenum GL_GEQUAL, 0.5f)
             | _ ->
