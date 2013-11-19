@@ -1267,4 +1267,8 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
+    extern void er_gl_finish ()
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
     extern void er_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

@@ -203,7 +203,7 @@ let hyperspace (backend: Backend) =
 let private syncGLState (r_finish: Cvar) (state: GLState) =
     match r_finish.Integer with
     | 1 when not state.HasFinishCalled ->
-        glFinish ()
+        Internal.er_gl_finish ()
         { state with HasFinishCalled = true }
     | 0 ->
         { state with HasFinishCalled = true }

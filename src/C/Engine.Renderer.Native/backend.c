@@ -123,6 +123,12 @@ er_gl_hyperspace_clear (GLclampf color)
 }
 
 ER_EXPORT void ER_DECL
+er_gl_finish ()
+{
+	glFinish ();
+}
+
+ER_EXPORT void ER_DECL
 er_set_viewport_and_scissor (
 		const GLfloat *projection_matrix,
 		GLint viewport_x, GLint viewport_y,
