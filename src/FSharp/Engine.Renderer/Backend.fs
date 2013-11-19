@@ -168,18 +168,12 @@ module GL =
         // alpha test
         //
         if diff &&& uint64 GLS.ATest.Bits <> 0UL then
-            match enum<GLS.ATest> (int (stateBits &&& uint64 GLS.ATest.Bits)) with
-            | GLS.ATest.None ->
-                glDisable <| GLenum GL_ALPHA_TEST
-            | GLS.ATest.Gt0 ->
-                glEnable <| GLenum GL_ALPHA_TEST
-                glAlphaFunc (GLenum GL_GREATER, 0.f)
-            | GLS.ATest.Lt80 ->
-                glEnable <| GLenum GL_ALPHA_TEST
-                glAlphaFunc (GLenum GL_LESS, 0.5f)
-            | GLS.ATest.Ge80 ->
-                glEnable <| GLenum GL_ALPHA_TEST
-                glAlphaFunc (GLenum GL_GEQUAL, 0.5f)
+            let atest = enum<GLS.ATest> (int (stateBits &&& uint64 GLS.ATest.Bits))
+            match atest with
+            | GLS.ATest.None -> Internal.er_gl_disable_alpha_test ()
+            | GLS.ATest.Gt0
+            | GLS.ATest.Lt80
+            | GLS.ATest.Ge80 -> Internal.er_gl_enable_alpha_test <| uint32 atest
             | _ ->
                 raise <| Exception "Invalid alpha test state bits."
         

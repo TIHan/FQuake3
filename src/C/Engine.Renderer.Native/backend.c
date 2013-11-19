@@ -44,8 +44,7 @@ er_gl_enable_blend (GLbitfield src_bits, GLbitfield dst_bits)
 	case GLS_SRCBLEND_DST_ALPHA: src_factor =			GL_DST_ALPHA; break;
 	case GLS_SRCBLEND_ONE_MINUS_DST_ALPHA: src_factor = GL_ONE_MINUS_DST_ALPHA; break;
 	case GLS_SRCBLEND_ALPHA_SATURATE: src_factor =		GL_SRC_ALPHA_SATURATE; break;
-	default:
-		src_factor = GL_ZERO;
+	default: return; // shouldn't happen
 	}
 
 	switch (dst_bits)
@@ -58,8 +57,7 @@ er_gl_enable_blend (GLbitfield src_bits, GLbitfield dst_bits)
 	case GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA: dst_factor = GL_ONE_MINUS_SRC_ALPHA; break;
 	case GLS_DSTBLEND_DST_ALPHA: dst_factor =			GL_DST_ALPHA; break;
 	case GLS_DSTBLEND_ONE_MINUS_DST_ALPHA: dst_factor = GL_ONE_MINUS_DST_ALPHA; break;
-	default:
-		dst_factor = GL_ZERO;
+	default: return; // shouldn't happen
 	}
 
 	glEnable (GL_BLEND);
@@ -95,6 +93,26 @@ er_gl_depth_test (GLboolean will_disable)
 	{
 		glEnable (GL_DEPTH_TEST);
 	}
+}
+
+ER_EXPORT void ER_DECL
+er_gl_enable_alpha_test (GLbitfield atest_bits)
+{
+	glEnable (GL_ALPHA_TEST);
+
+	switch (atest_bits)
+	{
+	case GLS_ATEST_GT_0: glAlphaFunc (GL_GREATER, 0.0f); break;
+	case GLS_ATEST_LT_80: glAlphaFunc (GL_LESS, 0.5f); break;
+	case GLS_ATEST_GE_80: glAlphaFunc (GL_GEQUAL, 0.5f); break;
+	default: return; // shouldn't happen
+	}
+}
+
+ER_EXPORT void ER_DECL
+er_gl_disable_alpha_test ()
+{
+	glDisable (GL_ALPHA_TEST);
 }
 
 ER_EXPORT void ER_DECL

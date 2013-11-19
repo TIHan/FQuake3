@@ -1255,4 +1255,12 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
+    extern void er_gl_enable_alpha_test (uint32 atest_bits)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_disable_alpha_test ()
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
     extern void er_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
