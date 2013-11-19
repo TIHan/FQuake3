@@ -33,6 +33,7 @@ open Engine.Native
 type glstate_t =
     val mutable currenttextures : int
     val private currenttextures1 : int
+    val mutable currenttmu : int
     val mutable finishedCalled : qboolean
     val mutable texEnv : int
     val private texEnv2 : int

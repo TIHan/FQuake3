@@ -90,6 +90,34 @@ module OrientationR =
 
         NativePtr.write ptr native
 
+module GLState =
+    let inline ofNativePtr (ptr: nativeptr<glstate_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            CurrentTexture1 = NativePtr.get &&native.currenttextures 0;
+            CurrentTexture2 = NativePtr.get &&native.currenttextures 1;
+            CurrentTextureMappingUnit = native.currenttmu;
+            HasFinishCalled = Boolean.ofNativePtr &&native.finishedCalled;
+            TextureEnvironment1 = NativePtr.get &&native.texEnv 0;
+            TextureEnvironment2 = NativePtr.get &&native.texEnv 1;
+            FaceCulling = native.faceCulling;
+            GLStateBits = native.glStateBits;
+        }
+
+    let inline toNativeByPtr (ptr: nativeptr<glstate_t>) (value: GLState) =
+        let mutable native = NativePtr.read ptr
+
+        NativePtr.set &&native.currenttextures 0 value.CurrentTexture1
+        NativePtr.set &&native.currenttextures 1 value.CurrentTexture2
+        native.currenttmu <- value.CurrentTextureMappingUnit
+        NativePtr.set &&native.texEnv 0 value.TextureEnvironment1
+        NativePtr.set &&native.texEnv 1 value.TextureEnvironment2
+        native.faceCulling <- value.FaceCulling
+        native.glStateBits <- value.GLStateBits
+
+        NativePtr.write ptr native
+
 module Plane =
     let inline ofNativePtr (ptr: nativeptr<cplane_t>) =
         let mutable native = NativePtr.read ptr
