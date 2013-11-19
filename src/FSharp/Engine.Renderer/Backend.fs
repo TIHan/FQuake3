@@ -41,6 +41,7 @@ module GL =
     [<RequireQualifiedAccess>]
     module GLS =
         type SrcBlend =
+            | None =                0x00000000
             | Zero =                0x00000001
             | One =                 0x00000002
             | DstColor =            0x00000003
@@ -53,6 +54,7 @@ module GL =
             | Bits =                0x0000000f
 
         type DstBlend =
+            | None =                0x00000000
             | Zero =                0x00000010
             | One =                 0x00000020
             | SrcColor =            0x00000030
@@ -110,35 +112,37 @@ module GL =
         //
         if diff &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
             if stateBits &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
-                let srcFactor =
-                    match enum<GLS.SrcBlend> (int (stateBits &&& uint64 GLS.SrcBlend.Bits)) with
-                    | GLS.SrcBlend.Zero -> GL_ZERO
-                    | GLS.SrcBlend.One -> GL_ONE
-                    | GLS.SrcBlend.DstColor -> GL_DST_COLOR
-                    | GLS.SrcBlend.OneMinusDstColor -> GL_ONE_MINUS_DST_COLOR
-                    | GLS.SrcBlend.SrcAlpha -> GL_SRC_ALPHA
-                    | GLS.SrcBlend.OneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
-                    | GLS.SrcBlend.DstAlpha -> GL_DST_ALPHA
-                    | GLS.SrcBlend.OneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
-                    | GLS.SrcBlend.AlphaSaturate -> GL_SRC_ALPHA_SATURATE
+                let srcBlend = enum<GLS.SrcBlend> (int (stateBits &&& uint64 GLS.SrcBlend.Bits))
+                let dstBlend = enum<GLS.DstBlend> (int (stateBits &&& uint64 GLS.DstBlend.Bits))
+
+                let srcBits =
+                    match srcBlend with
+                    | GLS.SrcBlend.Zero
+                    | GLS.SrcBlend.One
+                    | GLS.SrcBlend.DstColor
+                    | GLS.SrcBlend.OneMinusDstColor
+                    | GLS.SrcBlend.SrcAlpha
+                    | GLS.SrcBlend.OneMinusSrcAlpha
+                    | GLS.SrcBlend.DstAlpha
+                    | GLS.SrcBlend.OneMinusDstAlpha
+                    | GLS.SrcBlend.AlphaSaturate -> uint32 srcBlend
                     | _ -> raise <| Exception "Invalid src blend state bits."
                 
-                let dstFactor =
-                    match enum<GLS.DstBlend> (int (stateBits &&& uint64 GLS.DstBlend.Bits)) with
-                    | GLS.DstBlend.Zero -> GL_ZERO
-                    | GLS.DstBlend.One -> GL_ONE
-                    | GLS.DstBlend.SrcColor -> GL_SRC_COLOR
-                    | GLS.DstBlend.OneMinusSrcColor -> GL_ONE_MINUS_SRC_COLOR
-                    | GLS.DstBlend.SrcAlpha -> GL_SRC_ALPHA
-                    | GLS.DstBlend.OneMinusSrcAlpha -> GL_ONE_MINUS_SRC_ALPHA
-                    | GLS.DstBlend.DstAlpha -> GL_DST_ALPHA
-                    | GLS.DstBlend.OneMinusDstAlpha -> GL_ONE_MINUS_DST_ALPHA
+                let dstBits =
+                    match dstBlend with
+                    | GLS.DstBlend.Zero
+                    | GLS.DstBlend.One
+                    | GLS.DstBlend.SrcColor
+                    | GLS.DstBlend.OneMinusSrcColor
+                    | GLS.DstBlend.SrcAlpha
+                    | GLS.DstBlend.OneMinusSrcAlpha
+                    | GLS.DstBlend.DstAlpha
+                    | GLS.DstBlend.OneMinusDstAlpha -> uint32 dstBlend
                     | _ -> raise <| Exception "Invalid dst blend state bits."
 
-                glEnable <| GLenum GL_BLEND
-                glBlendFunc (GLenum srcFactor, GLenum dstFactor)
+                Internal.er_gl_enable_blend (srcBits, dstBits)
             else
-                glDisable <| GLenum GL_BLEND
+                Internal.er_gl_disable_blend ()
 
         //
         // check depthmask

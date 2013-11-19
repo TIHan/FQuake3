@@ -1235,4 +1235,12 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
+    extern void er_gl_enable_blend (uint32 src_bits, uint32 dst_bits)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_disable_blend ()
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
     extern void er_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

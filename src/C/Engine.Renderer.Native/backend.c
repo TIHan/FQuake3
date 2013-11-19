@@ -20,12 +20,56 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 */
 
 #include "backend.h"
-#include <gl\glew.h>
 
 ER_EXPORT void ER_DECL
-er_gl_depth_func(GLboolean is_equal)
+er_gl_depth_func (GLboolean is_equal)
 {
-	glDepthFunc(is_equal == GL_TRUE ? GL_EQUAL : GL_LEQUAL);
+	glDepthFunc (is_equal == GL_TRUE ? GL_EQUAL : GL_LEQUAL);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_enable_blend (GLbitfield src_bits, GLbitfield dst_bits)
+{
+	GLenum src_factor;
+	GLenum dst_factor;
+
+	switch (src_bits)
+	{
+	case GLS_SRCBLEND_ZERO: src_factor =				GL_ZERO; break;
+	case GLS_SRCBLEND_ONE: src_factor =					GL_ONE; break;
+	case GLS_SRCBLEND_DST_COLOR: src_factor =			GL_DST_COLOR; break;
+	case GLS_SRCBLEND_ONE_MINUS_DST_COLOR: src_factor = GL_ONE_MINUS_DST_COLOR; break;
+	case GLS_SRCBLEND_SRC_ALPHA: src_factor =			GL_SRC_ALPHA; break;
+	case GLS_SRCBLEND_ONE_MINUS_SRC_ALPHA: src_factor = GL_ONE_MINUS_SRC_ALPHA; break;
+	case GLS_SRCBLEND_DST_ALPHA: src_factor =			GL_DST_ALPHA; break;
+	case GLS_SRCBLEND_ONE_MINUS_DST_ALPHA: src_factor = GL_ONE_MINUS_DST_ALPHA; break;
+	case GLS_SRCBLEND_ALPHA_SATURATE: src_factor =		GL_SRC_ALPHA_SATURATE; break;
+	default:
+		src_factor = GL_ZERO;
+	}
+
+	switch (dst_bits)
+	{
+	case GLS_DSTBLEND_ZERO: dst_factor =				GL_ZERO; break;
+	case GLS_DSTBLEND_ONE: dst_factor =					GL_ONE; break;
+	case GLS_DSTBLEND_SRC_COLOR: dst_factor =			GL_SRC_COLOR; break;
+	case GLS_DSTBLEND_ONE_MINUS_SRC_COLOR: dst_factor = GL_ONE_MINUS_SRC_COLOR; break;
+	case GLS_DSTBLEND_SRC_ALPHA: dst_factor =			GL_SRC_ALPHA; break;
+	case GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA: dst_factor = GL_ONE_MINUS_SRC_ALPHA; break;
+	case GLS_DSTBLEND_DST_ALPHA: dst_factor =			GL_DST_ALPHA; break;
+	case GLS_DSTBLEND_ONE_MINUS_DST_ALPHA: dst_factor = GL_ONE_MINUS_DST_ALPHA; break;
+	default:
+		dst_factor = GL_ZERO;
+	}
+
+	glEnable (GL_BLEND);
+	glBlendFunc (src_factor, dst_factor);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_disable_blend ()
+{
+	glDisable (GL_BLEND);
 }
 
 ER_EXPORT void ER_DECL

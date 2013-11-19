@@ -34,6 +34,16 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #	error Compiler not supported.
 #endif
 
+#if defined(_WIN32)
+#	include <windows.h>
+#	include <gl/gl.h>
+// TODO: Added GL headers for other OSes.
+#else
+#	error Compiler not supported.
+#endif
+
+// IMPORTANT: Any change to these will need to be reflected in Backend.fs.
+// GLS
 #define GLS_SRCBLEND_ZERO						0x00000001
 #define GLS_SRCBLEND_ONE						0x00000002
 #define GLS_SRCBLEND_DST_COLOR					0x00000003
@@ -68,5 +78,6 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #define	GLS_ATEST_BITS							0x70000000
 
 #define GLS_DEFAULT								GLS_DEPTHMASK_TRUE
+// END GLS
 
 #endif /* __BACKEND_H__ */
