@@ -246,9 +246,18 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
     | _ ->
 
     if backend.View.IsPortal then
-        () // TODO:
+        let plane =
+            Vector4.create
+                (Vector3.dot backend.View.Orientation.Axis.[0] backend.View.PortalPlane.Normal)
+                (Vector3.dot backend.View.Orientation.Axis.[1] backend.View.PortalPlane.Normal)
+                (Vector3.dot backend.View.Orientation.Axis.[2] backend.View.PortalPlane.Normal)
+                (Vector3.dot backend.View.PortalPlane.Normal backend.View.Orientation.Origin)
+        
+        fixed2' (fun ptr ptr2 ->
+            Internal.er_gl_enable_clip_plane (ptr, ptr2)
+        ) Main.flipMatrix plane
     else
-        () // TODO:
+        Internal.er_gl_disable_clip_plane ()
 
     // force face culling to set next time
     { glState with FaceCulling = -1 },

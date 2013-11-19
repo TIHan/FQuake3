@@ -39,6 +39,17 @@ let inline fixed' (f: nativeptr<_> -> 'a) (a: obj) =
 
     handle.Free ()
 
+let inline fixed2' (f: nativeptr<_> -> nativeptr<_> -> 'a) (a: obj) (b: obj) =
+    let handle = GCHandle.Alloc (a, GCHandleType.Pinned)
+    let handle2 = GCHandle.Alloc (b, GCHandleType.Pinned)
+    let addr = handle.AddrOfPinnedObject ()
+    let addr2 = handle2.AddrOfPinnedObject ()
+
+    f (NativePtr.ofNativeInt addr) <| NativePtr.ofNativeInt addr2
+
+    handle.Free ()
+    handle2.Free ()
+
 /// NativePtr
 module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =

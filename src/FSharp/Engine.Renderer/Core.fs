@@ -1283,4 +1283,12 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
+    extern void er_gl_enable_clip_plane (single *flip_matrix, double *plane)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_disable_clip_plane ()
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
     extern void er_gl_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

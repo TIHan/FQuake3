@@ -153,6 +153,19 @@ er_gl_clear (GLbitfield clear_bits)
 	glClear (clear_bits);
 }
 
+ER_EXPORT void ER_DECL
+er_gl_enable_clip_plane (const GLfloat *flip_matrix, const GLdouble *plane)
+{
+	glLoadMatrixf (flip_matrix);
+	glClipPlane (GL_CLIP_PLANE0, plane);
+	glEnable (GL_CLIP_PLANE0);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_disable_clip_plane ()
+{
+	glDisable (GL_CLIP_PLANE0);
+}
 
 ER_EXPORT void ER_DECL
 er_gl_set_viewport_and_scissor (
