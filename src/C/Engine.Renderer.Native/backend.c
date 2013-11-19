@@ -73,6 +73,31 @@ er_gl_disable_blend ()
 }
 
 ER_EXPORT void ER_DECL
+er_gl_depth_mask (GLboolean is_true)
+{
+	glDepthMask (is_true == GL_TRUE ? GL_TRUE : GL_FALSE);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_polygon_mode (GLboolean is_line)
+{
+	glPolygonMode (GL_FRONT_AND_BACK, is_line == GL_TRUE ? GL_LINE : GL_FILL);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_depth_test (GLboolean will_disable)
+{
+	if (will_disable == GL_TRUE)
+	{
+		glDisable (GL_DEPTH_TEST);
+	}
+	else
+	{
+		glEnable (GL_DEPTH_TEST);
+	}
+}
+
+ER_EXPORT void ER_DECL
 er_set_viewport_and_scissor (
 		const GLfloat *projection_matrix,
 		GLint viewport_x, GLint viewport_y,

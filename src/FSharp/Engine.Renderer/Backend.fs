@@ -103,9 +103,8 @@ module GL =
         // check depthFunc bits
         //
         if diff &&& uint64 GLS.DepthFuncEqual <> 0UL then
-            match stateBits &&& uint64 GLS.DepthFuncEqual <> 0UL with
-            | true ->   Internal.er_gl_depth_func true
-            | _ ->      Internal.er_gl_depth_func false
+            stateBits &&& uint64 GLS.DepthFuncEqual <> 0UL
+            |> Internal.er_gl_depth_func
 
         //
         // check blend bits
@@ -148,28 +147,22 @@ module GL =
         // check depthmask
         //
         if diff &&& uint64 GLS.DepthMaskTrue <> 0UL then
-            if stateBits &&& uint64 GLS.DepthMaskTrue <> 0UL then
-                glDepthMask <| GLboolean GL_TRUE
-            else
-                glDepthMask <| GLboolean GL_FALSE
+            stateBits &&& uint64 GLS.DepthMaskTrue <> 0UL
+            |> Internal.er_gl_depth_mask
         
         //
         // fill/line mode
         //
         if diff &&& uint64 GLS.PolyModeLine <> 0UL then
-            if stateBits &&& uint64 GLS.PolyModeLine <> 0UL then
-                glPolygonMode (GLenum GL_FRONT_AND_BACK, GLenum GL_LINE)
-            else
-                glPolygonMode (GLenum GL_FRONT_AND_BACK, GLenum GL_FILL)
+            stateBits &&& uint64 GLS.PolyModeLine <> 0UL
+            |> Internal.er_gl_polygon_mode
 
         //
         // depthtest
         //
         if diff &&& uint64 GLS.DepthTestDisable <> 0UL then
-            if stateBits &&& uint64 GLS.DepthTestDisable <> 0UL then
-                glDisable <| GLenum GL_DEPTH_TEST
-            else
-                glEnable <| GLenum GL_DEPTH_TEST
+            stateBits &&& uint64 GLS.DepthTestDisable <> 0UL
+            |> Internal.er_gl_polygon_mode
 
         //
         // alpha test
