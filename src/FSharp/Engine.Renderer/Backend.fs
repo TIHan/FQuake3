@@ -102,10 +102,8 @@ module GL =
         //
         if diff &&& uint64 GLS.DepthFuncEqual <> 0UL then
             match stateBits &&& uint64 GLS.DepthFuncEqual <> 0UL with
-            | true ->
-                glDepthFunc <| GLenum GL_EQUAL
-            | _ ->
-                glDepthFunc <| GLenum GL_LEQUAL
+            | true ->   Internal.er_gl_depth_func true
+            | _ ->      Internal.er_gl_depth_func false
 
         //
         // check blend bits
@@ -196,7 +194,7 @@ module GL =
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
     fixed' (fun ptr -> 
-        NativeInternal.set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+        Internal.er_set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
     ) view.ProjectionMatrix
 
 /// Based on Q3: RB_Hyperspace

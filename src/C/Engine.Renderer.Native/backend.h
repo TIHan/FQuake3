@@ -22,7 +22,17 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #ifndef __BACKEND_H__
 #define __BACKEND_H__
 
-#include <m.h>
+#if defined(_WIN32)
+#	define ER_IMPORT	__declspec(dllimport)
+#	define ER_EXPORT	__declspec(dllexport)
+#	define ER_DECL		__cdecl
+#elif defined(__GNUC__)
+#	define ER_EXPORT	__attribute__((visibility("default")))
+#	define ER_IMPORT
+#	define ER_DECL		__attribute__((cdecl))
+#else
+#	error Compiler not supported.
+#endif
 
 #define GLS_SRCBLEND_ZERO						0x00000001
 #define GLS_SRCBLEND_ONE						0x00000002

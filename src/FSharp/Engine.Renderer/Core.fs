@@ -1225,7 +1225,14 @@ module TrGlobals =
         let entity = tr.Refdef.Entities.[entityId]
         { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
         
-module NativeInternal =
+module Internal =
+    [<Literal>]
+    let LibNative = "Engine.Renderer.Native.dll"
+
     [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport ("Engine.Renderer.Native.dll")>]
-    extern void set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+    [<DllImport (LibNative)>]
+    extern void er_gl_depth_func (bool is_equal)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

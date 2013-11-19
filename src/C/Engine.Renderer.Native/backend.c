@@ -22,8 +22,14 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #include "backend.h"
 #include <gl\glew.h>
 
-M_EXPORT void M_DECL
-set_viewport_and_scissor (
+ER_EXPORT void ER_DECL
+er_gl_depth_func(GLboolean is_equal)
+{
+	glDepthFunc(is_equal == GL_TRUE ? GL_EQUAL : GL_LEQUAL);
+}
+
+ER_EXPORT void ER_DECL
+er_set_viewport_and_scissor (
 		const GLfloat *projection_matrix,
 		GLint viewport_x, GLint viewport_y,
 		GLsizei viewport_width, GLsizei viewport_height)
@@ -36,3 +42,4 @@ set_viewport_and_scissor (
 	glViewport (viewport_x, viewport_y, viewport_width, viewport_height);
 	glScissor (viewport_x, viewport_y, viewport_width, viewport_height);
 }
+
