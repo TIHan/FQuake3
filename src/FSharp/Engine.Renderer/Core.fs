@@ -1271,4 +1271,16 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
-    extern void er_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+    extern uint32 er_gl_get_clear_bits (bool use_stencil_buffer, bool use_color_buffer)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_clear_with_color (uint32 clear_bits, single red, single green, single blue)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_clear (uint32 clear_bits)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibNative)>]
+    extern void er_gl_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)

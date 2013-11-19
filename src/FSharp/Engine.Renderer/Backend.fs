@@ -34,7 +34,6 @@ open Engine.Core
 open Engine.Math
 open Engine.Renderer.Core
 open Engine.NativeInterop
-open GL
 
 [<RequireQualifiedAccess>]
 module GL =
@@ -185,7 +184,7 @@ module GL =
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
     fixed' (fun ptr -> 
-        Internal.er_set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
+        Internal.er_gl_set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
     ) view.ProjectionMatrix
 
 /// Based on Q3: RB_Hyperspace
@@ -228,31 +227,22 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
 
     // ensures that depth writes are enabled for the depth clear
     let glState = GL.state (uint64 GL.GLS.Default) glState
-    // clear relevant buffers
-    let clearBits = GL_DEPTH_BUFFER_BIT
 
-    let clearBits =
-        if r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2 then
-            clearBits ||| GL_STENCIL_BUFFER_BIT
-        else
-            clearBits
+    let useStencilBuf = r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2
+    let useColorBuf = r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel)
+    let clearBits = Internal.er_gl_get_clear_bits (useStencilBuf, useColorBuf)
 
-    let clearBits =
-        if r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel) then
+    if useColorBuf then
 #if DEBUG
-            glClearColor (0.8f, 0.7f, 0.4f, 1.f) // FIXME: get color of sky
+        Internal.er_gl_clear_with_color (clearBits, 0.8f, 0.7f, 0.4f) // FIXME: get color of sky
 #else
-            glClearColor (0.f, 0.f, 0.f, 1.f) // FIXME: get color of sky
+        Internal.er_gl_clear_with_color (clearBits, 0.f, 0.f, 0.f) // FIXME: get color of sky
 #endif
-            clearBits ||| GL_COLOR_BUFFER_BIT // FIXME: only if sky shaders have been used
-        else
-            clearBits
-
-    glClear <| GLbitfield clearBits
+    else
+        Internal.er_gl_clear clearBits
 
     match backend.Refdef.RdFlags.HasFlag RdFlags.Hyperspace with
-    | true ->
-        glState, hyperspace backend
+    | true -> glState, hyperspace backend
     | _ ->
 
     if backend.View.IsPortal then

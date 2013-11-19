@@ -128,8 +128,34 @@ er_gl_finish ()
 	glFinish ();
 }
 
+ER_EXPORT GLbitfield ER_DECL
+er_gl_get_clear_bits (GLboolean use_stencil_buffer, GLboolean use_color_buffer)
+{
+	// clear relevant buffers
+	GLbitfield clear_bits = GL_DEPTH_BUFFER_BIT;
+
+	clear_bits = use_stencil_buffer ? clear_bits | GL_STENCIL_BUFFER_BIT : clear_bits;
+	clear_bits = use_color_buffer ? clear_bits | GL_COLOR_BUFFER_BIT : clear_bits;
+
+	return clear_bits;
+}
+
 ER_EXPORT void ER_DECL
-er_set_viewport_and_scissor (
+er_gl_clear_with_color (GLbitfield clear_bits, GLclampf red, GLclampf green, GLclampf blue)
+{
+	glClearColor (red, green, blue, 1.0f);
+	glClear (clear_bits);
+}
+
+ER_EXPORT void ER_DECL
+er_gl_clear (GLbitfield clear_bits)
+{
+	glClear (clear_bits);
+}
+
+
+ER_EXPORT void ER_DECL
+er_gl_set_viewport_and_scissor (
 		const GLfloat *projection_matrix,
 		GLint viewport_x, GLint viewport_y,
 		GLsizei viewport_width, GLsizei viewport_height)
