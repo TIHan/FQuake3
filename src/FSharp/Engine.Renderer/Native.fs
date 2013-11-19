@@ -489,6 +489,7 @@ type backEndCounters_t =
     val mutable c_shaders : int
     val mutable c_vertexes : int
     val mutable c_indexes : int
+    val mutable c_overDraw : single
     val mutable c_totalIndexes : int
     val mutable c_dlightVertexes : int
     val mutable c_dlightIndexes : int
