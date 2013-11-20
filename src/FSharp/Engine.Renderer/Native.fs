@@ -36,9 +36,9 @@ type glstate_t =
     val mutable currenttmu : int
     val mutable finishedCalled : qboolean
     val mutable texEnv : int
-    val private texEnv2 : int
+    val private texEnv1 : int
     val mutable faceCulling : int
-    val mutable glStateBits : uint64
+    val mutable glStateBits : uint32
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]

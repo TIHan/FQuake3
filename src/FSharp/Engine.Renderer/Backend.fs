@@ -91,27 +91,27 @@ module GL =
     ///
     /// This routine is responsible for setting the most commonly changed state
     /// in Q3.
-    let state (stateBits: uint64) (state: GLState) =
+    let state (stateBits: uint32) (state: GLState) =
         let diff = stateBits ^^^ state.GLStateBits
         
         match diff with
-        | 0UL -> state
+        | 0u -> state
         | _ ->
 
         //
         // check depthFunc bits
         //
-        if diff &&& uint64 GLS.DepthFuncEqual <> 0UL then
-            stateBits &&& uint64 GLS.DepthFuncEqual <> 0UL
+        if diff &&& uint32 GLS.DepthFuncEqual <> 0u then
+            stateBits &&& uint32 GLS.DepthFuncEqual <> 0u
             |> Internal.er_gl_depth_func
 
         //
         // check blend bits
         //
-        if diff &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
-            if stateBits &&& (uint64 GLS.SrcBlend.Bits ||| uint64 GLS.DstBlend.Bits) <> 0UL then
-                let srcBlend = enum<GLS.SrcBlend> (int (stateBits &&& uint64 GLS.SrcBlend.Bits))
-                let dstBlend = enum<GLS.DstBlend> (int (stateBits &&& uint64 GLS.DstBlend.Bits))
+        if diff &&& (uint32 GLS.SrcBlend.Bits ||| uint32 GLS.DstBlend.Bits) <> 0u then
+            if stateBits &&& (uint32 GLS.SrcBlend.Bits ||| uint32 GLS.DstBlend.Bits) <> 0u then
+                let srcBlend = enum<GLS.SrcBlend> (int (stateBits &&& uint32 GLS.SrcBlend.Bits))
+                let dstBlend = enum<GLS.DstBlend> (int (stateBits &&& uint32 GLS.DstBlend.Bits))
 
                 let srcBits =
                     match srcBlend with
@@ -145,29 +145,29 @@ module GL =
         //
         // check depthmask
         //
-        if diff &&& uint64 GLS.DepthMaskTrue <> 0UL then
-            stateBits &&& uint64 GLS.DepthMaskTrue <> 0UL
+        if diff &&& uint32 GLS.DepthMaskTrue <> 0u then
+            stateBits &&& uint32 GLS.DepthMaskTrue <> 0u
             |> Internal.er_gl_depth_mask
         
         //
         // fill/line mode
         //
-        if diff &&& uint64 GLS.PolyModeLine <> 0UL then
-            stateBits &&& uint64 GLS.PolyModeLine <> 0UL
+        if diff &&& uint32 GLS.PolyModeLine <> 0u then
+            stateBits &&& uint32 GLS.PolyModeLine <> 0u
             |> Internal.er_gl_polygon_mode
 
         //
         // depthtest
         //
-        if diff &&& uint64 GLS.DepthTestDisable <> 0UL then
-            stateBits &&& uint64 GLS.DepthTestDisable <> 0UL
+        if diff &&& uint32 GLS.DepthTestDisable <> 0u then
+            stateBits &&& uint32 GLS.DepthTestDisable <> 0u
             |> Internal.er_gl_depth_test
 
         //
         // alpha test
         //
-        if diff &&& uint64 GLS.ATest.Bits <> 0UL then
-            let atest = enum<GLS.ATest> (int (stateBits &&& uint64 GLS.ATest.Bits))
+        if diff &&& uint32 GLS.ATest.Bits <> 0u then
+            let atest = enum<GLS.ATest> (int (stateBits &&& uint32 GLS.ATest.Bits))
             match atest with
             | GLS.ATest.None -> Internal.er_gl_disable_alpha_test ()
             | GLS.ATest.Gt0
@@ -226,7 +226,7 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
     setViewportAndScissor backend
 
     // ensures that depth writes are enabled for the depth clear
-    let glState = GL.state (uint64 GL.GLS.Default) glState
+    let glState = GL.state (uint32 GL.GLS.Default) glState
 
     let useStencilBuf = r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2
     let useColorBuf = r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel)

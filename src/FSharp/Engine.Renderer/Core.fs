@@ -73,7 +73,7 @@ type GLState =
         TextureEnvironment1 : int
         TextureEnvironment2 : int
         FaceCulling : int
-        GLStateBits : uint64
+        GLStateBits : uint32
     }
 
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
