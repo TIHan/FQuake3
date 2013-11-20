@@ -161,7 +161,7 @@ module GL =
         //
         if diff &&& uint64 GLS.DepthTestDisable <> 0UL then
             stateBits &&& uint64 GLS.DepthTestDisable <> 0UL
-            |> Internal.er_gl_polygon_mode
+            |> Internal.er_gl_depth_test
 
         //
         // alpha test

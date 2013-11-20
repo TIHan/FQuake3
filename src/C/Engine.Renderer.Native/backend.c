@@ -73,7 +73,7 @@ er_gl_disable_blend ()
 ER_EXPORT void ER_DECL
 er_gl_depth_mask (GLboolean is_true)
 {
-	glDepthMask (is_true == GL_TRUE ? GL_TRUE : GL_FALSE);
+	glDepthMask (is_true);
 }
 
 ER_EXPORT void ER_DECL
