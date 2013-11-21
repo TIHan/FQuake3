@@ -439,7 +439,7 @@ to actually render the visible surfaces for this view
 =================
 */
 void RB_BeginDrawingView (void) {
-#if 1
+#if 0
 	int clearBits = 0;
 
 	// sync with gl if needed

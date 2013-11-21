@@ -37,6 +37,16 @@ open Engine.NativeInterop
 
 [<RequireQualifiedAccess>]
 module GL =
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type Plane =
+        val X : double
+        val Y : double
+        val Z : double
+        val W : double
+
+        new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
+
     [<RequireQualifiedAccess>]
     module GLS =
         type SrcBlend =
@@ -246,13 +256,18 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
     | _ ->
 
     if backend.View.IsPortal then
+        let axis = backend.View.Orientation.Axis
+        let origin = backend.View.Orientation.Origin
+        let normal = backend.View.PortalPlane.Normal
+        let distance = backend.View.PortalPlane.Distance
         let plane =
-            Vector4.create
-                (Vector3.dot backend.View.Orientation.Axis.[0] backend.View.PortalPlane.Normal)
-                (Vector3.dot backend.View.Orientation.Axis.[1] backend.View.PortalPlane.Normal)
-                (Vector3.dot backend.View.Orientation.Axis.[2] backend.View.PortalPlane.Normal)
-                (Vector3.dot backend.View.PortalPlane.Normal backend.View.Orientation.Origin)
-        
+            GL.Plane (
+                double <| Vector3.dot axis.[0] normal,
+                double <| Vector3.dot axis.[1] normal,
+                double <| Vector3.dot axis.[2] normal,
+                double <| Vector3.dot normal origin - distance
+            )
+
         fixed2' (fun ptr ptr2 ->
             Internal.er_gl_enable_clip_plane (ptr, ptr2)
         ) Main.flipMatrix plane
