@@ -542,14 +542,14 @@ type shader_t =
 
     val mutable numUnfoggedPasses : int
 
-    val mutable stages : shaderStage_t
-    val private stages1 : shaderStage_t
-    val private stages2 : shaderStage_t
-    val private stages3 : shaderStage_t
-    val private stages4 : shaderStage_t
-    val private stages5 : shaderStage_t
-    val private stages6 : shaderStage_t
-    val private stages7 : shaderStage_t
+    val mutable stages : nativeptr<shaderStage_t>
+    val private stages1 : nativeptr<shaderStage_t>
+    val private stages2 : nativeptr<shaderStage_t>
+    val private stages3 : nativeptr<shaderStage_t>
+    val private stages4 : nativeptr<shaderStage_t>
+    val private stages5 : nativeptr<shaderStage_t>
+    val private stages6 : nativeptr<shaderStage_t>
+    val private stages7 : nativeptr<shaderStage_t>
 
     // Purposely private as we do not want to access this function pointer.
     val private optimalStageIteratorFunc : int
