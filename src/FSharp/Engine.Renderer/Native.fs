@@ -319,10 +319,243 @@ type image_t =
     // TODO:
 
 [<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 24)>]
+type skyParms_t_box =
+    [<FieldOffset (0)>]
+    val mutable value : nativeptr<image_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type skyParms_t =
+    val mutable cloudHeight : single
+    val mutable outerbox : skyParms_t_box
+    val mutable innerbox : skyParms_t_box
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type fogParms_t =
+    val mutable color : vec3_t
+    val mutable depthForOpaque : single
+
+type fogPass_t =
+    | FP_NONE = 0
+    | FP_EQUAL = 1
+    | FP_LE = 2
+
+type cullType_t =
+    | CT_FRONT_SIDED = 0
+    | CT_BACK_SIDED = 1
+    | CG_TWO_SIDED = 2
+
+type deform_t =
+    | DEFORM_NONE = 0
+    | DEFORM_WAVE = 1
+    | DEFORM_NORMALS = 2
+    | DEFORM_BULGE = 3
+    | DEFORM_MOVE = 4
+    | DEFORM_PROJECTION_SHADOW = 5
+    | DEFORM_AUTOSPRITE = 6
+    | DEFORM_AUTOSPRITE2 = 7
+    | DEFORM_TEXT0 = 8
+    | DEFORM_TEXT1 = 9
+    | DEFORM_TEXT2 = 10
+    | DEFORM_TEXT3 = 11
+    | DEFORM_TEXT4 = 12
+    | DEFORM_TEXT5 = 13
+    | DEFORM_TEXT6 = 14
+    | DEFORM_TEXT7 = 15
+
+type genFunc_t =
+    | GF_NONE = 0
+    | GF_SIN = 1
+    | GF_SQUARE = 2
+    | GF_TRIANGLE = 3
+    | GF_SAWTOOTH = 4
+    | GF_INVERSE_SAWTOOTH = 5
+    | GF_NOISE = 6
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type waveForm_t =
+    val mutable func : genFunc_t
+    val mutable base' : single
+    val mutable amplitude : single
+    val mutable phase : single
+    val mutable frequency : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type deformState_t =
+    val mutable deformation : deform_t
+    val mutable moveVector : vec3_t
+    val mutable deformationWave : waveForm_t
+    val mutable deformationSpread : single
+    val mutable bulgeWidth : single
+    val mutable bulgeHeight : single
+    val mutable bulgeSpeed : single
+
+type texCoordGen_t =
+    | TCGEN_BAD = 0
+    | TCGEN_IDENTITY = 1
+    | TCGEN_LIGHTMAP = 2
+    | TCGEN_TEXTURE = 3
+    | TCGEN_ENVIRONMENT_MAPPED = 4
+    | TCGEN_FOG = 5
+    | TCGEN_VECTOR = 6
+
+type texMod_t =
+    | TMOD_NONE = 0
+    | TMOD_TRANSFORM = 1
+    | TMOD_TURBULENT = 2
+    | TMOD_SCROLL = 3
+    | TMOD_SCALE = 4
+    | TMOD_STRETCH = 5
+    | TMOD_ROTATE = 6
+    | TMOD_ENTITY_TRANSLATE = 7
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type texModInfo_t =
+    val mutable type' : texMod_t
+    // TODO:
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type textureBundle_t =
+    val mutable image : nativeptr<image_t>
+    val private image1 : nativeptr<image_t>
+    val private image2 : nativeptr<image_t>
+    val private image3 : nativeptr<image_t>
+    val private image4 : nativeptr<image_t>
+    val private image5 : nativeptr<image_t>
+    val private image6 : nativeptr<image_t>
+    val private image7 : nativeptr<image_t>
+    val mutable numImageAnimations : int
+    val mutable imageAnimationSpeed : single
+    val mutable tcGen : texCoordGen_t
+    val mutable tcGenVectors : vec3_t
+    val private tcGenVectors1 : vec3_t
+    val mutable numTexMods : int
+    val mutable texMods : nativeptr<texModInfo_t>
+    val mutable videoMapHandle : int
+    val mutable isLightmap : qboolean
+    val mutable vertexLightmap : qboolean
+    val mutable isVideoMap : qboolean
+
+type colorGen_t =
+    | CGEN_BAD = 0
+    | CGEN_IDENTITY_LIGHTING = 1
+    | CGEN_IDENTITY = 2
+    | CGEN_ENTITY = 3
+    | CGEN_ONE_MINUS_ENTITY = 4
+    | CGEN_EXACT_VERTEX = 5
+    | CGEN_VERTEX = 6
+    | CGEN_ONE_MINUS_VERTEX = 7
+    | CGEN_WAVEFORM = 8
+    | CGEN_LIGHTING_DIFFUSE = 9
+    | CGEN_FOG = 10
+    | CGEN_CONST = 11
+
+type alphaGen_t =
+    | AGEN_IDENTITY = 0
+    | AGEN_SKIP = 1
+    | AGEN_ENTITY = 2
+    | AGEN_ONE_MINUS_ENTITY = 3
+    | AGEN_VERTEX = 4
+    | AGEN_ONE_MINUS_VERTEX = 5
+    | AGEN_LIGHTING_SPECULAR = 6
+    | AGEN_WAVEFORM = 7
+    | AGEN_PORTAL = 8
+    | AGEN_CONST = 9
+
+type acff_t =
+    | ACFF_NONE = 0
+    | ACFF_MODULATE_RGB = 1
+    | ACFF_MODULATE_RGBA = 2
+    | ACFF_MODULATE_ALPHA = 3
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type shaderStage_t =
+    val mutable active : qboolean
+    val mutable bundle : textureBundle_t
+    val private bundle1 : textureBundle_t
+    val mutable rgbWave : waveForm_t
+    val mutable rgbGen : colorGen_t
+    val mutable alphaWave : waveForm_t
+    val mutable alphaGen : alphaGen_t
+    val mutable constantColor : byte
+    val private constantColor1 : byte
+    val private constantColor2 : byte
+    val private constantcolor3 : byte
+    val mutable stateBits : uint32
+    val mutable adjustColorsForFog : acff_t
+    val mutable isDetail : qboolean
+
+type optimalStageIteratorFunc = delegate of unit -> unit
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
+type shader_t_name =
+    [<FieldOffset (0)>]
+    val private value : sbyte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 128)>]
+type shader_t_shaderStates =
+    [<FieldOffset (0)>]
+    val private value : int
+
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type shader_t =
-    val mutable shaderName : char
-    // TODO:
+    val mutable name : shader_t_name
+    val mutable lightmapIndex : int
+    val mutable index : int
+    val mutable sortedIndex : int
+    val mutable sort : single
+    val mutable defaultShader : qboolean
+    val mutable explicitlyDefined : qboolean
+    val mutable surfaceFlags : int
+    val mutable contentFlags : int
+    val mutable entityMergable : qboolean
+    val mutable isSky : qboolean
+    val mutable sky : skyParms_t
+    val mutable fogParms : fogParms_t
+    val mutable portalRange : single
+    val mutable multitextureEnv : int
+    val mutable cullType : cullType_t
+    val mutable polygonOffset : qboolean
+    val mutable noMipMaps : qboolean
+    val mutable noPicMip : qboolean
+    val mutable fogPass : fogPass_t
+    val mutable needsNormal : qboolean
+    val mutable needsST1 : qboolean
+    val mutable needsST2 : qboolean
+    val mutable needsColor : qboolean
+    val mutable numDeforms : int
+    val mutable deforms : deformState_t
+    val private deforms1 : deformState_t
+    val private deforms2 : deformState_t
+    val mutable numUnfoggedPasses : int
+    val mutable stages : shaderStage_t
+    val private stages1 : shaderStage_t
+    val private stages2 : shaderStage_t
+    val private stages3 : shaderStage_t
+    val private stages4 : shaderStage_t
+    val private stages5 : shaderStage_t
+    val private stages6 : shaderStage_t
+    val private stages7 : shaderStage_t
+    val mutable clamptime : single
+    val mutable timeOffset : single
+    val mutable numStates : int
+    val mutable currentShader : nativeptr<shader_t>
+    val mutable parentShader : nativeptr<shader_t>
+    val mutable currentstate : int
+    val mutable expireTime : int
+    val mutable remappedShader : nativeptr<shader_t>
+    val mutable shaderStates : shader_t_shaderStates
+    val mutable next : nativeptr<shader_t>
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 256)>]

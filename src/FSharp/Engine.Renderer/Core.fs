@@ -602,9 +602,9 @@ type CullType =
 
 /// <summary>
 /// Based on Q3: fogPass_t
-/// FogType
+/// FogPassType
 /// </summary>
-type FogType =
+type FogPassType =
     | None = 0  // surface is translucent and will just be adjusted properly
     | Equal = 1 // surface is opaque but possibly alpha tested
     | Le = 2    // surface is trnaslucent, but still needs a fog pass (fog surface)
@@ -925,7 +925,7 @@ type Shader =
         HasNoPicMip: bool;
 
         /// draw a blended pass, possibly with depth test equals
-        FogType: FogType;
+        FogPassType: FogPassType;
 
         // not all shaders will need all data to be gathered
         NeedsNormal: bool;
