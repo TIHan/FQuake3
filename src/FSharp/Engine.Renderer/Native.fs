@@ -492,6 +492,7 @@ type shaderStage_t =
     val mutable adjustColorsForFog : acff_t
     val mutable isDetail : qboolean
 
+[<UnmanagedFunctionPointer (CallingConvention.Cdecl)>]
 type optimalStageIteratorFunc = delegate of unit -> unit
 
 [<Struct>]
@@ -534,10 +535,13 @@ type shader_t =
     val mutable needsST2 : qboolean
     val mutable needsColor : qboolean
     val mutable numDeforms : int
+
     val mutable deforms : deformState_t
     val private deforms1 : deformState_t
     val private deforms2 : deformState_t
+
     val mutable numUnfoggedPasses : int
+
     val mutable stages : shaderStage_t
     val private stages1 : shaderStage_t
     val private stages2 : shaderStage_t
@@ -546,6 +550,10 @@ type shader_t =
     val private stages5 : shaderStage_t
     val private stages6 : shaderStage_t
     val private stages7 : shaderStage_t
+
+    // Purposely private as we do not want to access this function pointer.
+    val private optimalStageIteratorFunc : int
+
     val mutable clamptime : single
     val mutable timeOffset : single
     val mutable numStates : int
