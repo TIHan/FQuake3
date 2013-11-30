@@ -1194,6 +1194,31 @@ type Backend =
         Entity2D: TrRefEntity;
     }
 
+/// Based on Q3: renderCommandList_t
+/// RenderCommandList
+type RenderCommandList =
+    {
+        Commands: byte list;
+        UsedCommandCount: int;
+    }
+
+/// Based on Q3: backEndData_t
+/// BackendData
+///
+/// all of the information needed by the back end must be
+/// contained in a backEndData_t.  This entire structure is
+/// duplicated so the front and back end can run in parallel
+/// on an SMP machine
+type BackendData =
+    {
+        DrawSurfaces: DrawSurface list;
+        DynamicLights: Dlight list;
+        Entities: TrRefEntity list;
+        Polys: SurfacePoly list;
+        PolyVertices: PolyVertex list;
+        CommandList: RenderCommandList;
+    }
+
 /// <summary>
 /// Based on Q3: trGlobals_t
 /// TrGlobals
