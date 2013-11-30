@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "tr_local.h"
+#include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 // tr_shader.c -- this file deals with the parsing and definition of shaders
 
@@ -44,6 +46,7 @@ return a hash value for the filename
 ================
 */
 static long generateHashValue( const char *fname, const int size ) {
+#if 1
 	int		i;
 	long	hash;
 	char	letter;
@@ -61,6 +64,15 @@ static long generateHashValue( const char *fname, const int size ) {
 	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
 	hash &= (size-1);
 	return hash;
+#else
+	MObject m_result;
+
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Shader", "generateFileNameHashCode", 1, {
+		__args [0] = m_string_as_arg (m_string(fname));
+	}, m_result);
+
+	return *(gint*)m_object_unbox_struct (m_result);
+#endif
 }
 
 void R_RemapShader(const char *shaderName, const char *newShaderName, const char *timeOffset) {
@@ -2842,7 +2854,7 @@ a single large text block that can be scanned for shader names
 =====================
 */
 #define	MAX_SHADER_FILES	4096
-static void ScanAndLoadShaderFiles( void )
+/*static*/ M_EXPORT void M_DECL ScanAndLoadShaderFiles( void )
 {
 	char **shaderFiles;
 	char *buffers[MAX_SHADER_FILES];
@@ -2966,7 +2978,7 @@ static void ScanAndLoadShaderFiles( void )
 CreateInternalShaders
 ====================
 */
-static void CreateInternalShaders( void ) {
+/*static*/ M_EXPORT void M_DECL CreateInternalShaders( void ) {
 	tr.numShaders = 0;
 
 	// init the default shader
@@ -2987,7 +2999,7 @@ static void CreateInternalShaders( void ) {
 	tr.shadowShader = FinishShader();
 }
 
-static void CreateExternalShaders( void ) {
+/*static*/ M_EXPORT void M_DECL CreateExternalShaders( void ) {
 	tr.projectionShadowShader = R_FindShader( "projectionShadow", LIGHTMAP_NONE, qtrue );
 	tr.flareShader = R_FindShader( "flareShader", LIGHTMAP_NONE, qtrue );
 	tr.sunShader = R_FindShader( "sun", LIGHTMAP_NONE, qtrue );
@@ -2999,6 +3011,7 @@ R_InitShaders
 ==================
 */
 void R_InitShaders( void ) {
+#if 0
 	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
@@ -3010,4 +3023,11 @@ void R_InitShaders( void ) {
 	ScanAndLoadShaderFiles();
 
 	CreateExternalShaders();
+#else
+	MObject m_result;
+
+	Com_Memset(hashTable, 0, sizeof(hashTable));
+
+	qm_invoke("Engine.Renderer", "Engine.Renderer", "Shader", "init", 1, {}, m_result);
+#endif
 }
