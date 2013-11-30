@@ -77,8 +77,17 @@ let init () =
 
     Native.CreateExternalShaders ()
 
+
+//
+
+let mutable rendererShaderStateHandle : GCHandle option = None
 [<Obsolete ("Only called externally of F#.")>]
 let externalCreateRendererShaderState () =
     let state = RendererShaderState.create ()
-    GCHandle.Alloc (state, GCHandleType.Pinned) |> ignore // FIXME: We are only doing this to prevent GC when passed to unmanaged.
+
+    match rendererShaderStateHandle with
+    | None -> ()
+    | Some handle -> handle.Free ()
+
+    rendererShaderStateHandle <- Some <| GCHandle.Alloc (state, GCHandleType.Pinned)
     state

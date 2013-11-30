@@ -444,3 +444,29 @@ m_string_as_arg (MString str)
 {
 	return str.__priv;
 }
+
+//****************************
+// GCHandle
+//****************************
+
+guint32
+m_gchandle_new (MObject obj, gboolean is_pinned)
+{
+	return mono_gchandle_new ((MonoObject*)obj.__priv, is_pinned);
+}
+
+MObject
+m_gchandle_get_target (guint32 handle)
+{
+	MObject result;
+
+	result.__priv = mono_gchandle_get_target (handle);
+
+	return result;
+}
+
+MObject
+m_gchandle_free (guint32 handle)
+{
+	mono_gchandle_free (handle);
+}

@@ -133,6 +133,15 @@ m_array_as_arg (MArray arr);
 gpointer
 m_string_as_arg (MString str);
 
+guint32
+m_gchandle_new (MObject obj, gboolean is_pinned);
+
+MObject
+m_gchandle_get_target (guint32 handle);
+
+MObject
+m_gchandle_free (guint32 handle);
+
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
 { \
 if (!o.__priv) \
