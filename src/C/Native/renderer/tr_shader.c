@@ -39,10 +39,8 @@ static	shader_t*		hashTable[FILE_HASH_SIZE];
 
 #define MAX_SHADERTEXT_HASH		2048
 static char **shaderTextHashTable[MAX_SHADERTEXT_HASH];
-// FQ3 - space was here
-static MObject g_m_renderer_shader_state;
-static guint32 g_m_renderer_shader_state_handle;
-// End FQ3 - space was here
+
+
 /*
 ================
 return a hash value for the filename
@@ -3031,7 +3029,6 @@ void R_InitShaders( void ) {
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Shader", "externalCreateRendererShaderState", 1, {}, g_m_renderer_shader_state);
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Shader", "init", 1, {}, m_result);
 #endif
 }

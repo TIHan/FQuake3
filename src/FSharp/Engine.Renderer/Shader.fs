@@ -66,28 +66,16 @@ module RendererShaderState =
 let generateFileNameHashCode (filePath: string) =
     filePath.GetHashCode ()
 
+/// FIXME: We should never have global variables.
+let mutable globalRendererShaderState = Unchecked.defaultof<RendererShaderState>
+
 /// Based on Q3: R_InitShaders
 /// Init
 let init () =
     printfn "Initializing Shaders"
 
+    globalRendererShaderState <- RendererShaderState.create ()
+
     Native.CreateInternalShaders ()
-
     Native.ScanAndLoadShaderFiles ()
-
     Native.CreateExternalShaders ()
-
-
-//
-
-let mutable rendererShaderStateHandle : GCHandle option = None
-[<Obsolete ("Only called externally of F#.")>]
-let externalCreateRendererShaderState () =
-    let state = RendererShaderState.create ()
-
-    match rendererShaderStateHandle with
-    | None -> ()
-    | Some handle -> handle.Free ()
-
-    rendererShaderStateHandle <- Some <| GCHandle.Alloc (state, GCHandleType.Pinned)
-    state
