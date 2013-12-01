@@ -134,7 +134,7 @@ module Plane =
 
         Vector3.toNativeByPtr &&native.normal plane.Normal
         native.dist <- plane.Distance
-        NativePtr.ofStructure plane.Type &&native.type'
+        native.type' <- byte plane.Type
         native.signbits <- plane.SignBits
         
         NativePtr.write ptr native
@@ -588,6 +588,62 @@ module Backend =
 
         NativePtr.write ptr native
 
+module Image =
+    let ofNativePtr (ptr: nativeptr<image_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            Path = NativePtr.toString &&native.imgName;
+            Width = native.width;
+            Height = native.height;
+            UploadWidth = native.uploadWidth;
+            UploadHeight = native.uploadHeight;
+            TextureId = native.texnum;
+            FrameUsed = native.frameUsed;
+            InternalFormat = native.internalFormat;
+            IsMipmap = Boolean.ofNativePtr &&native.mipmap;
+            CanAllowPicmip = Boolean.ofNativePtr &&native.allowPicmip;
+            WrapClampMode = native.wrapClampMode;
+        }
+
+    let toNativeByPtr (ptr: nativeptr<image_t>) (value: Image) =
+        let mutable native = NativePtr.read ptr
+
+        native.imgName <- String.toStructure value.Path
+        native.width <- value.Width
+        native.height <- value.Height
+        native.uploadWidth <- value.UploadWidth
+        native.uploadHeight <- value.UploadHeight
+        native.texnum <- value.TextureId
+        native.frameUsed <- value.FrameUsed
+        native.internalFormat <- value.InternalFormat
+        native.mipmap <- Boolean.toNative value.IsMipmap
+        native.allowPicmip <- Boolean.toNative value.CanAllowPicmip
+        native.wrapClampMode <- value.WrapClampMode
+
+        NativePtr.write ptr native
+
+
+(* TODO: finish
+module Shader =
+    let inline ofNativePtr (ptr: nativeptr<shader_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            Name = NativePtr.toString &&native.name;
+            LightmapIndex = native.lightmapIndex;
+            Index = native.index;
+            SortedIndex = native.sortedIndex;
+            Sort = native.sort;
+            IsDefaultShader = Boolean.ofNativePtr &&native.defaultShader;
+            IsExplicitlyDefined = Boolean.ofNativePtr &&native.explicitlyDefined;
+            SurfaceFlags = native.surfaceFlags;
+            ContentFlags = native.contentFlags;
+            IsEntityMergable = Boolean.ofNativePtr &&native.entityMergable;
+            IsSky = Boolean.ofNativePtr &&native.isSky;
+        }
+*)
+
 // TODO: This will need more work over time.
 module TrGlobals =
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
@@ -600,6 +656,7 @@ module TrGlobals =
             Refdef = TrRefdef.ofNativePtr &&native.refdef;
             Orientation = OrientationR.ofNativePtr &&native.or';
             PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc
+            //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
         }
 
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (tr: TrGlobals) =
@@ -611,6 +668,9 @@ module TrGlobals =
         // TODO: Map TrRefDef - Property Refdef
         OrientationR.toNativeByPtr &&native.or' tr.Orientation
         FrontEndPerformanceCounters.toNativeByPtr &&native.pc tr.PerfCounters
+
+        // Images - Special Handling
+        //List.toNativePtrArrayByPtr native.images.value Image.toNativeByPtr tr.Images
 
         NativePtr.write ptr native
 

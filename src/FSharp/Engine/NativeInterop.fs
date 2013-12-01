@@ -55,10 +55,7 @@ module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
 
-    let inline ofStructure<'T,'U when 'T : struct and 'U : unmanaged> (structure: 'T) (x: nativeptr<'U>) =
-        System.Runtime.InteropServices.Marshal.StructureToPtr (structure, NativePtr.toNativeInt x, true)
-
-    let inline toString (x: nativeptr<'T>) =
+    let inline toString (x: nativeptr<_>) =
         System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt x)
 
     let inline toArray (size: int) (x: nativeptr<'T>) =
@@ -74,6 +71,27 @@ module NativePtr =
     let inline isValid x =
         NativePtr.toNativeInt x <> System.IntPtr.Zero
 
+    let inline zeroCreate () = NativePtr.ofNativeInt System.IntPtr.Zero
+
+module String =
+    let inline toStructure<'T when 'T : struct> (x: string) : 'T =
+        let mutable struct' = Unchecked.defaultof<'T>
+        match System.String.IsNullOrWhiteSpace (x) with
+        | true -> struct'
+        | _ ->
+
+        let bytes = System.Text.ASCIIEncoding.ASCII.GetBytes (x)
+
+        let handle = GCHandle.Alloc (struct', GCHandleType.Pinned)
+        let addr = handle.AddrOfPinnedObject ()
+
+        System.Runtime.InteropServices.Marshal.Copy (bytes, 0, addr, x.Length)
+
+        handle.Free ()
+
+        struct'
+
+        
 /// List
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (x: nativeptr<'T>) =
@@ -85,6 +103,11 @@ module List =
         List.init size (fun i ->
             f <| NativePtr.add x i
         )
+
+    let inline toNativePtrArrayByPtr<'T, 'U when 'T : unmanaged> (ptr: nativeptr<'T>) (f: nativeptr<'T> -> 'U -> unit) (value: 'U list) =
+        List.iteri (fun i x ->
+            f (NativePtr.add ptr i) x
+        ) value
 
 /// Option
 module Option =

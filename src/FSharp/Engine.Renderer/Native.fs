@@ -313,10 +313,27 @@ type world_t =
     // TODO:
 
 [<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 64)>]
+type image_t_imgName =
+    [<FieldOffset (0)>]
+    val mutable value : sbyte
+
+[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type image_t =
-    val mutable imgName : char
-    // TODO:
+    val mutable imgName : image_t_imgName
+    val mutable width : int
+    val mutable height : int
+    val mutable uploadWidth : int
+    val mutable uploadHeight : int
+    val mutable texnum : uint32
+    val mutable frameUsed : int
+    val mutable internalFormat : int
+    val mutable TMU : int
+    val mutable mipmap : qboolean
+    val mutable allowPicmip : qboolean
+    val mutable wrapClampMode : int
+    val mutable next : nativeptr<image_t>
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 24)>]
@@ -811,7 +828,7 @@ type trGlobals_t_models =
 [<StructLayout (LayoutKind.Explicit, Size = 8192)>]
 type trGlobals_t_images =
     [<FieldOffset (0)>]
-    val mutable images : nativeptr<image_t>
+    val mutable value : nativeptr<image_t>
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 65536)>]

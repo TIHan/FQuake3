@@ -570,14 +570,12 @@ type Image =
         UploadWidth : int;
         UploadHeight : int
 
-        TextureId : int;        // gl texture binding // TODO: Perhaps we should have GL specific types
+        TextureId : uint32;        // gl texture binding // TODO: Perhaps we should have GL specific types
         FrameUsed : int;
         InternalFormat : int;
         IsMipmap : bool;
         CanAllowPicmip : bool;
         WrapClampMode: int;     // GL_CLAMP or GL_REPEAT
-        
-        Next: Image option; // Is this a good idea?
     }
 
 /// <summary>
@@ -614,23 +612,23 @@ type FogPassType =
 /// </summary>
 type Skybox =
     {
-        Image0: Image;
         Image1: Image;
         Image2: Image;
         Image3: Image;
         Image4: Image;
         Image5: Image;
+        Image6: Image;
     }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Image0
-            | 1 -> this.Image1
-            | 2 -> this.Image2
-            | 3 -> this.Image3
-            | 4 -> this.Image4
-            | 5 -> this.Image5
+            | 0 -> this.Image1
+            | 1 -> this.Image2
+            | 2 -> this.Image3
+            | 3 -> this.Image4
+            | 4 -> this.Image5
+            | 5 -> this.Image6
             | _ -> raise <| IndexOutOfRangeException ()
 
 /// <summary>
@@ -1241,6 +1239,8 @@ type TrGlobals =
         Orientation: OrientationR;
 
         PerfCounters: FrontEndPerformanceCounters;
+
+       // Images: Image list;
         // TODO:
     }
 
