@@ -33,6 +33,7 @@ open Engine.Core
 open Engine.Net
 open Engine.Files
 open Engine.Math
+open Engine.FileSystem
 open Engine.NativeInterop
 
 module Boolean =
@@ -216,3 +217,30 @@ module Md3Frame =
             Radius = native.radius;
             Name = NativePtr.toString &&native.name;
         }
+
+module Directory =
+    let ofNativePtr (ptr: nativeptr<directory_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            Path = NativePtr.toString &&native.path;
+            GamePath = NativePtr.toString &&native.gamedir;
+        }
+
+module SearchPath =
+    let ofNativePtr (ptr: nativeptr<searchpath_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            Directory = Option.ofNativePtr Directory.ofNativePtr native.directory
+        }
+
+    let convertFrom_fs_searchpaths (ptr: nativeptr<searchpath_t>) =
+        let rec f (searchPaths: SearchPath list) (ptr: nativeptr<searchpath_t>) =
+            match NativePtr.isValid ptr with
+            | false -> searchPaths
+            | _ ->
+            let mutable native = NativePtr.read ptr
+            f (ofNativePtr ptr :: searchPaths) (native.next)
+
+        f [] ptr

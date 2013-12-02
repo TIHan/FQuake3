@@ -55,6 +55,7 @@ module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
 
+    // TODO: Need to revisit this.
     let inline toString (x: nativeptr<_>) =
         System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt x)
 

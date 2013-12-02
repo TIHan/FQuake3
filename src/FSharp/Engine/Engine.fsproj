@@ -72,6 +72,7 @@
     <Compile Include="ErlNet.fs" />
     <Compile Include="Net.fs" />
     <Compile Include="IO.fs" />
+    <Compile Include="FileSystem.fs" />
     <Compile Include="System.fs" />
     <Compile Include="Md3.fs" />
     <Compile Include="Md4.fs" />

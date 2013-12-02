@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include "unzip.h"
+#include "../qm.h" // IMPORTANT: Temporary
 
 /*
 =============================================================================
@@ -314,7 +315,35 @@ static byte fs_scrambledProductId[152] = {
 #ifdef FS_MISSING
 FILE*		missingFiles = NULL;
 #endif
+// FQ3 - space was here
+//============
 
+static MObject
+convert_from_fs_searchpaths ()
+{
+	MObject m_result;
+
+	qm_invoke ("Engine", "Engine.Native", "SearchPath", "convertFrom_fs_searchpaths", 1, {
+		__args [0] = fs_searchpaths;
+	}, m_result);
+
+	return m_result;
+}
+
+static MObject
+create_file_system ()
+{
+	MObject m_result;
+
+	qm_invoke ("Engine", "Engine", "FileSystem", "create", 1, {
+		__args [0] = m_object_as_arg (convert_from_fs_searchpaths ());
+	}, m_result);
+
+	return m_result;
+}
+
+//============
+// End FQ3
 /*
 ==============
 FS_Initialized
@@ -322,7 +351,17 @@ FS_Initialized
 */
 
 qboolean FS_Initialized() {
+#if 0
 	return (fs_searchpaths != NULL);
+#else
+	MObject m_result;
+
+	qm_invoke ("Engine", "Engine", "FileSystem", "isInitialized", 1, {
+		__args [0] = m_object_as_arg (create_file_system ());
+	}, m_result);
+
+	return *(qboolean*)m_object_unbox_struct (m_result);
+#endif
 }
 
 /*

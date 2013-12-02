@@ -142,3 +142,47 @@ type md3Tag_t =
     val mutable origin : vec3_t
     val mutable axis : vec3_t
     val private axis1 : vec3_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type fileInPack_t =
+    val mutable name : nativeptr<sbyte>
+    val mutable pos : uint32
+    val mutable next : nativeptr<fileInPack_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 256)>]
+type MAX_OSPATH =
+    [<FieldOffset (0)>]
+    val mutable value : sbyte
+
+type unzFile = nativeint
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type pack_t =
+    val mutable pakFilename : MAX_OSPATH
+    val mutable pakBasename : MAX_OSPATH
+    val mutable pakGamename : MAX_OSPATH
+    val mutable handle : unzFile
+    val mutable checksum : int
+    val mutable pure_checksum : int
+    val mutable numfiles : int
+    val mutable referenced : int
+    val mutable hashSize : int
+    val mutable hashTable : nativeptr<nativeptr<fileInPack_t>>
+    val mutable buildBuffer : nativeptr<fileInPack_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type directory_t =
+    val mutable path : MAX_OSPATH
+    val mutable gamedir : MAX_OSPATH
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type searchpath_t =
+    val mutable next : nativeptr<searchpath_t>
+    val mutable pack : nativeptr<pack_t>
+    val mutable directory : nativeptr<directory_t>
+    
