@@ -219,7 +219,7 @@ module Md3Frame =
             Name = NativePtr.toStringAnsi &&native.name;
         }
 
-module Directory =
+module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -228,12 +228,29 @@ module Directory =
 
         DirectoryInfo (Path.Combine (path, name))
 
+module Pak =
+    let ofNativePtr (ptr: nativeptr<pack_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+            FileInfo = FileInfo (NativePtr.toStringAnsi &&native.pakFilename);
+            Checksum = native.checksum;
+            PureChecksum = native.checksum;
+            FileCount = native.numfiles;
+        }
+
+module ServerPakChecksum =
+    let createFrom_fs_serverPaks (size: int) (ptr: nativeptr<int>) =
+        match NativePtr.isValid ptr with
+        | false -> []
+        | _ -> NativePtr.toList size ptr
+
 module SearchPath =
     let ofNativePtr (ptr: nativeptr<searchpath_t>) =
         let mutable native = NativePtr.read ptr
 
         {
-            Directory = Option.ofNativePtr Directory.ofNativePtr native.directory
+            DirectoryInfo = Option.ofNativePtr DirectoryInfo.ofNativePtr native.directory
         }
 
     let convertFrom_fs_searchpaths (ptr: nativeptr<searchpath_t>) =

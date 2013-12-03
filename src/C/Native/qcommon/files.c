@@ -331,12 +331,38 @@ convert_from_fs_searchpaths ()
 }
 
 static MObject
+convert_from_fs_server_paks ()
+{
+	MObject m_result;
+
+	qm_invoke("Engine", "Engine.Native", "ServerPakChecksum", "createFrom_fs_serverPaks", 2, {
+		__args [0] = &fs_numServerPaks;
+		__args [1] = &fs_serverPaks;
+	}, m_result);
+
+	return m_result;
+}
+
+static MObject
 create_file_system ()
 {
 	MObject m_result;
 
-	qm_invoke ("Engine", "Engine", "FileSystem", "create", 1, {
+	qm_invoke ("Engine", "Engine", "FileSystem", "create", 2, {
 		__args [0] = m_object_as_arg (convert_from_fs_searchpaths ());
+		__args [1] = m_object_as_arg (convert_from_fs_server_paks ());
+	}, m_result);
+
+	return m_result;
+}
+
+static MObject
+of_pack (pack_t* pack)
+{
+	MObject m_result;
+
+	qm_invoke ("Engine", "Engine.Native", "Pak", "ofNativePtr", 1, {
+		__args [0] = pack;
 	}, m_result);
 
 	return m_result;
@@ -370,6 +396,7 @@ FS_PakIsPure
 =================
 */
 qboolean FS_PakIsPure( pack_t *pack ) {
+#if 0
 	int i;
 
 	if ( fs_numServerPaks ) {
@@ -384,6 +411,16 @@ qboolean FS_PakIsPure( pack_t *pack ) {
 		return qfalse;	// not on the pure server pak list
 	}
 	return qtrue;
+#else
+	MObject m_result;
+
+	qm_invoke ("Engine", "Engine", "FileSystem", "isPakPure", 2, {
+		__args [0] = m_object_as_arg (of_pack (pack));
+		__args [1] = m_object_as_arg (create_file_system ());
+	}, m_result);
+
+	return *(qboolean*)m_object_unbox_struct (m_result);
+#endif
 }
 
 

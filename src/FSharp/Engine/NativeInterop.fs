@@ -65,6 +65,9 @@ module NativePtr =
             NativePtr.set ptr i <| NativePtr.get x i
         arr
 
+    let inline toList (size: int) (x: nativeptr<'T>) =
+        List.init size (fun i -> NativePtr.get x i)
+
     let inline toNativePtr x =
         NativePtr.toNativeInt x |> NativePtr.ofNativeInt
 

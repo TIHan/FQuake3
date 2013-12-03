@@ -28,8 +28,7 @@ open System.IO
 /// Pak
 type Pak =
     {
-        File: File;
-        Gamename: string;
+        FileInfo: FileInfo;
         Checksum: int;
         PureChecksum: int;
         FileCount: int;
@@ -40,22 +39,30 @@ type Pak =
 /// SearchPath
 type SearchPath =
     {
-        Directory: DirectoryInfo option;
+        DirectoryInfo: DirectoryInfo option;
     }
 
 /// FileSystem
 type FileSystem = 
     {
         SearchPaths: SearchPath list;
+        ServerPakChecksums: int list;
         // TODO:
     }
 
-let create searchPaths =
+let create searchPaths serverPakChecksums =
     {
         SearchPaths = searchPaths;
+        ServerPakChecksums = serverPakChecksums;
     }
 
 /// Based on Q3: FS_Initialized
-/// isInitialized
+/// IsInitialized
 let isInitialized (fs: FileSystem) =
     fs.SearchPaths.Length <> 0
+
+/// Based on Q3: FS_PakIsPure
+/// IsPakPure
+let isPakPure (pak: Pak) (fs: FileSystem) =
+    fs.ServerPakChecksums.Length = 0 ||
+    List.exists (fun x -> x = pak.Checksum) fs.ServerPakChecksums
