@@ -593,7 +593,7 @@ module Image =
         let mutable native = NativePtr.read ptr
 
         {
-            Path = NativePtr.toString &&native.imgName;
+            Path = NativePtr.toStringAnsi &&native.imgName;
             Width = native.width;
             Height = native.height;
             UploadWidth = native.uploadWidth;

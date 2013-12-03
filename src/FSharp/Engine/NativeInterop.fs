@@ -55,9 +55,8 @@ module NativePtr =
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
 
-    // TODO: Need to revisit this.
-    let inline toString (x: nativeptr<_>) =
-        System.Runtime.InteropServices.Marshal.PtrToStringAuto (NativePtr.toNativeInt x)
+    let inline toStringAnsi (x: nativeptr<_>) =
+        System.Runtime.InteropServices.Marshal.PtrToStringAnsi (NativePtr.toNativeInt x)
 
     let inline toArray (size: int) (x: nativeptr<'T>) =
         let arr = Array.zeroCreate<'T> size
@@ -81,7 +80,7 @@ module String =
         | true -> struct'
         | _ ->
 
-        let bytes = System.Text.ASCIIEncoding.ASCII.GetBytes (x)
+        let bytes = System.Text.Encoding.Default.GetBytes (x)
 
         let handle = GCHandle.Alloc (struct', GCHandleType.Pinned)
         let addr = handle.AddrOfPinnedObject ()

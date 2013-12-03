@@ -53,4 +53,5 @@ let create searchPaths =
 /// Based on Q3: FS_Initialized
 /// isInitialized
 let isInitialized (fs: FileSystem) =
+    printfn "%A" fs.SearchPaths
     fs.SearchPaths.Length <> 0

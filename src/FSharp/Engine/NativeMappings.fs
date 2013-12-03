@@ -142,10 +142,10 @@ module Cvar =
         let mutable native = NativePtr.read ptr
 
         {
-            Name = NativePtr.toString native.name;
-            String = NativePtr.toString native.string;
-            ResetString = NativePtr.toString native.resetString;
-            LatchedString = NativePtr.toString native.latchedString;
+            Name = NativePtr.toStringAnsi native.name;
+            String = NativePtr.toStringAnsi native.string;
+            ResetString = NativePtr.toStringAnsi native.resetString;
+            LatchedString = NativePtr.toStringAnsi native.latchedString;
             Flags = native.flags;
             IsModified = Boolean.ofNativePtr &&native.modified;
             ModificationCount = native.modificationCount;
@@ -215,7 +215,7 @@ module Md3Frame =
             Bounds = Bounds.ofNativePtr &&native.bounds;
             LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
             Radius = native.radius;
-            Name = NativePtr.toString &&native.name;
+            Name = NativePtr.toStringAnsi &&native.name;
         }
 
 module Directory =
@@ -223,8 +223,8 @@ module Directory =
         let mutable native = NativePtr.read ptr
 
         {
-            Path = NativePtr.toString &&native.path;
-            GamePath = NativePtr.toString &&native.gamedir;
+            Path = NativePtr.toStringAnsi &&native.path;
+            GamePath = NativePtr.toStringAnsi &&native.gamedir;
         }
 
 module SearchPath =
