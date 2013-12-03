@@ -26,6 +26,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 namespace Engine.Native
 
 open System
+open System.IO
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
@@ -222,10 +223,10 @@ module Directory =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
         let mutable native = NativePtr.read ptr
 
-        {
-            Path = NativePtr.toStringAnsi &&native.path;
-            GamePath = NativePtr.toStringAnsi &&native.gamedir;
-        }
+        let path = NativePtr.toStringAnsi &&native.path
+        let name = NativePtr.toStringAnsi &&native.gamedir
+
+        DirectoryInfo (Path.Combine (path, name))
 
 module SearchPath =
     let ofNativePtr (ptr: nativeptr<searchpath_t>) =

@@ -24,25 +24,30 @@ module Engine.FileSystem
 open System
 open System.IO
 
-/// Based on Q3: directory_t
-/// Directory
-type Directory =
+/// Based on Q3: pack_t
+/// Pak
+type Pak =
     {
-        Path: string;
-        GamePath: string;
+        File: File;
+        Gamename: string;
+        Checksum: int;
+        PureChecksum: int;
+        FileCount: int;
+        // TODO:
     }
 
 /// Based on Q3: searchpath_t
 /// SearchPath
 type SearchPath =
     {
-        Directory: Directory option;
+        Directory: DirectoryInfo option;
     }
 
 /// FileSystem
 type FileSystem = 
     {
         SearchPaths: SearchPath list;
+        // TODO:
     }
 
 let create searchPaths =
@@ -53,5 +58,4 @@ let create searchPaths =
 /// Based on Q3: FS_Initialized
 /// isInitialized
 let isInitialized (fs: FileSystem) =
-    printfn "%A" fs.SearchPaths
     fs.SearchPaths.Length <> 0
