@@ -26,6 +26,7 @@ open System.IO
 
 /// Based on Q3: pack_t
 /// Pak
+/// Not pure
 type Pak =
     {
         FileInfo: FileInfo;
@@ -37,12 +38,23 @@ type Pak =
 
 /// Based on Q3: searchpath_t
 /// SearchPath
+/// Not pure
 type SearchPath =
     {
         DirectoryInfo: DirectoryInfo option;
     }
 
+/// Based on Q3: fileHandleData_t, qfile_us, qfile_gus
+/// FileHandleData
+/// Not pure
+type FileData =
+    {
+        File: File;
+        IsUnique: bool;
+    }
+
 /// FileSystem
+/// Not pure
 type FileSystem = 
     {
         SearchPaths: SearchPath list;

@@ -156,6 +156,12 @@ type MAX_OSPATH =
     [<FieldOffset (0)>]
     val mutable value : sbyte
 
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 256)>]
+type MAX_ZPATH =
+    [<FieldOffset (0)>]
+    val mutable value : sbyte
+
 type unzFile = nativeint
 
 [<Struct>]
@@ -185,4 +191,27 @@ type searchpath_t =
     val mutable next : nativeptr<searchpath_t>
     val mutable pack : nativeptr<pack_t>
     val mutable directory : nativeptr<directory_t>
-    
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type qfile_gut =
+    val mutable o : nativeint
+    val mutable z : unzFile
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type qfile_ut =
+    val mutable file : qfile_gut
+    val mutable unique : qboolean
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type fileHandleData_t =
+    val mutable handleFiles : qfile_ut
+    val mutable handleSync : qboolean
+    val mutable baseOffset : int
+    val mutable fileSize : int
+    val mutable zipFilePos : int
+    val mutable zipFile : qboolean
+    val mutable streamed : qboolean
+    val mutable name : MAX_ZPATH
