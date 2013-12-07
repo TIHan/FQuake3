@@ -94,7 +94,7 @@ type Cvar =
     }
 
 /// Bounds
-type Bounds =
+type Bounds = 
     { From: Vector3; To: Vector3 }   
 
     member inline this.Item

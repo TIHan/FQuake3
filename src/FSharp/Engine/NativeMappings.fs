@@ -219,6 +219,24 @@ module Md3Frame =
             Name = NativePtr.toStringAnsi &&native.name;
         }
 
+module Md3Header =
+    let ofNativePtr (ptr: nativeptr<md3Header_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Id = native.ident;
+        Version = native.version;
+        Name = NativePtr.toStringAnsi &&native.name;
+        Flags = native.flags;
+        FrameCount = native.numFrames;
+        TagCount = native.numTags;
+        SurfaceCount = native.numSurfaces;
+        SkinCount = native.numSkins;
+        FrameOffset = native.ofsFrames;
+        TagOffset = native.ofsTags;
+        SurfaceOffset = native.numSurfaces;
+        EndOffset = native.ofsEnd }
+
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
         let mutable native = NativePtr.read ptr

@@ -31,6 +31,12 @@ module Constants =
     [<Literal>]
     let MaxQpath = 64
 
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = Constants.MaxQpath)>]
+type MAX_QPATH =
+    [<FieldOffset (0)>]
+    val mutable value : sbyte
+
 type qboolean =
     | qfalse = 0
     | qtrue = 1
@@ -142,6 +148,36 @@ type md3Tag_t =
     val mutable origin : vec3_t
     val mutable axis : vec3_t
     val private axis1 : vec3_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3Header_t =
+    val mutable ident : int
+    val mutable version : int
+    val mutable name : MAX_QPATH
+    val mutable flags : int
+    val mutable numFrames : int
+    val mutable numTags : int
+    val mutable numSurfaces : int
+    val mutable numSkins : int
+    val mutable ofsFrames : int
+    val mutable ofsTags : int
+    val mutable ofsSurfaces : int
+    val mutable ofsEnd : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md4Header_t =
+    val mutable ident : int
+    val mutable version : int
+    val mutable name : MAX_QPATH
+    val mutable numFrames : int
+    val mutable numBones : int
+    val mutable ofsBoneNames : int
+    val mutable ofsFrames : int
+    val mutable numLODs : int
+    val mutable ofsLODs : int
+    val mutable ofsEnd : int
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]

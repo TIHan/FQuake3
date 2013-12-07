@@ -107,3 +107,14 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
                 calculateCullLocalBox newFrame oldFrame r_nocull r
     | _ ->
         calculateCullLocalBox newFrame oldFrame r_nocull r
+
+/// Based on Q3: R_AddMD3Surfaces
+/// AddMd3Surfaces
+let addMd3Surfaces (entity: TrRefEntity) (r_nocull: Cvar) (r: Renderer) =
+    // don't add third_person objects if not in a portal
+    let isPersonalModel =
+        entity.Entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
+        && not r.ViewParms.IsPortal
+
+    // TODO:
+    ()

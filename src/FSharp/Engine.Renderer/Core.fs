@@ -240,10 +240,8 @@ type ViewParms =
         ZFar: single;
     }
 
-/// <summary>
 /// Based on Q3: refEntityType_t
 /// RefEntityType
-/// </summary>
 type RefEntityType =
     | Model = 0
     | Poly = 1
@@ -255,77 +253,131 @@ type RefEntityType =
     | PortalSurface = 7     // doesn't draw anything, just info for portals
     | MaxRefEntityType = 8
 
-/// <summary>
+/// Based on Q3: RF_ defines
+/// RenderFxFlags
+[<Flags>]
+type RenderFxFlags =
+    /// always have some light (viewmodel, some items)
+    | MinLight = 1
+
+    /// don't draw through eyes, only mirrors (player bodies, chat sprites)
+    | ThirdPerson = 2
+
+    /// only draw through eyes (view weapon, damage blood blob) 
+    | FirstPerson = 3
+
+    /// for view weapon Z crunching
+    | DepthHack = 8
+
+    /// don't add stencil shadows
+    | NoShadow = 64
+
+    /// use refEntity->lightingOrigin instead of refEntity->origin
+    /// for lighting.  This allows entities to sink into the floor
+    /// with their origin going solid, and allows all parts of a
+    /// player to get the same lighting
+    | LightingOrigin = 128
+
+    /// use refEntity->shadowPlane
+    | ShadowPlane = 256
+
+    /// mod the model frames by the maxframes to allow continuous
+    /// animation without needing to know the frame count
+    | WrapFrames = 512
+
 /// Based on Q3: refEntity_t
 /// RefEntity
-/// </summary>
-type RefEntity =
-    {
+type RefEntity = {
         Type: RefEntityType;
-        RenderFx: int;
-        ModelHandle: int;                   // opaque type outside refresh
-        LightingOrigin: Vector3;            // so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
-        ShadowPlane: single;                // projection shadows go here, stencils go slightly lower
-        Axis: Axis;                         // rotation vectors
-        HasNonNormalizedAxes: bool;         // axis are not normalized, i.e. they have scale
-        Origin: Vector3;                    // also used as MODEL_BEAM's "from"
-        Frame: int;                         // also used as MODEL_BEAM's diameter
-        OldOrigin: Vector3;                 // also used as MODEL_BEAM's "to"
-        OldFrame: int;
-        BackLerp: single;                   // 0.0 = current, 1.0 = old
-        SkinId: int;                        // inline skin index
-        CustomSkinHandle: int;              // NULL for default skin
-        CustomShaderHandle: int;            // use one image for the entire thing
-        ShaderRgba: Rgba;                   // colors used by rgbgen entity shaders
-        ShaderTextureCoordinate: Vector2;   // texture coordinates used by tcMod entity modifiers
-        ShaderTime: single;                 // subtracted from refdef time to control effect start times
-        Radius: single;
-        Rotation: single;
-    }
+        RenderFx: RenderFxFlags;
 
-/// <summary>
+        /// opaque type outside refresh
+        ModelHandle: int;
+
+        /// so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
+        LightingOrigin: Vector3;
+
+        /// projection shadows go here, stencils go slightly lower
+        ShadowPlane: single;
+
+        /// rotation vectors
+        Axis: Axis;
+
+        /// axis are not normalized, i.e. they have scale
+        HasNonNormalizedAxes: bool;
+
+        /// also used as MODEL_BEAM's "from"
+        Origin: Vector3;
+
+        /// also used as MODEL_BEAM's diameter
+        Frame: int;
+
+        /// also used as MODEL_BEAM's "to"
+        OldOrigin: Vector3;
+        OldFrame: int;
+
+        /// 0.0 = current, 1.0 = old
+        BackLerp: single;
+
+        /// inline skin index
+        SkinId: int;
+
+        /// NULL for default skin
+        CustomSkinHandle: int;
+
+        /// use one image for the entire thing
+        CustomShaderHandle: int;
+
+        /// colors used by rgbgen entity shaders
+        ShaderRgba: Rgba;
+
+        /// texture coordinates used by tcMod entity modifiers
+        ShaderTextureCoordinate: Vector2;
+
+        // subtracted from refdef time to control effect start times
+        ShaderTime: single;
+        Radius: single;
+        Rotation: single; }
+
 /// Based on Q3: trRefEntity_t
 /// TrRefEntity
 ///
 /// a trRefEntity_t has all the information passed in by
 /// the client game, as well as some locally derived info
-/// </summary>
-type TrRefEntity =
-    {
+type TrRefEntity = {
         Entity: RefEntity;
-        AxisLength: single;         // compensate for non-normalized axis
-        NeedDlights: bool;          // true for bmodels that touch a dlight
-        IsLightingCalculated: bool;
-        LightDirection: Vector3;    // normalized direction towards light
-        AmbientLight: Vector3;      // color normalized to 0-255
-        AmbientLightInt: int;       // 32 bit rgba packed
-        DirectedLight: Vector3;
-    }
 
-/// <summary>
+        /// compensate for non-normalized axis
+        AxisLength: single;
+
+        /// true for bmodels that touch a dlight
+        NeedDlights: bool;
+        IsLightingCalculated: bool;
+
+        /// normalized direction towards light
+        LightDirection: Vector3;
+
+        /// color normalized to 0-255
+        AmbientLight: Vector3;
+
+        /// 32 bit rgba packed
+        AmbientLightInt: int;
+        DirectedLight: Vector3; }
+
 /// Based on Q3: dlight_t
 /// Dlight
-/// </summary>
-type Dlight =
-    {
+type Dlight = {
         Origin: Vector3;
 
-        /// <summary>
         /// range from 0.0 to 1.0, should be color normalized
-        /// </summary>
         Color: Vector3;
         Radius: single;
 
-        /// <summary>
         /// origin in local coordinate system
-        /// </summary>
         Transformed: Vector3;
 
-        /// <summary>
         /// texture detail is lost tho when the lightmap is dark
-        /// </summary>
-        Additive: int;
-    }
+        Additive: int; }
 
 /// <summary>
 /// Based on Q3: drawVert_t
@@ -964,37 +1016,34 @@ type Shader =
         Next: Shader option;
     }
 
-/// <summary>
 /// Based on Q3: msurface_t
 /// DShader
-/// </summary>
-type MSurface =
-    {
-        ViewCount: int;         // if == tr.viewCount, already added
-        Shader: Shader option;
-        FogIndex: int;
-        Data: Surface option;   // any of srf*_t
-    }
+type MSurface = {
+    /// if == tr.viewCount, already added
+    ViewCount: int;
+    Shader: Shader option;
+    FogIndex: int;
 
-/// <summary>
+    /// any of srf*_t
+    Data: Surface option }
+
 /// Based on Q3: bmodel_t
 /// BModel
-/// </summary>
-type BModel =
-    {
-        Bounds: Bounds;         // for culling
-        Surfaces: MSurface seq;
-    }
+type BModel = {
+    /// for culling
+    Bounds: Bounds;
+    Surfaces: MSurface list }
 
-/// <summary>
 /// Based on Q3: mnode_t
 /// MNode
-/// </summary>
-type MNode =
-    {
+type MNode = {
         // common with leaf and node
-        Contents: int;          // -1 for nodes, to differentiate from leafs
-        VisFrame: int;          // node needs to be traversed if current
+
+        /// -1 for nodes, to differentiate from leafs
+        Contents: int;
+
+        /// node needs to be traversed if current
+        VisFrame: int;
 
         // for bounding box culling
         Mins: Vector3;
@@ -1010,8 +1059,7 @@ type MNode =
         Cluster: int;
         Area: int;
 
-        MarkSurfaces: MSurface seq;
-    }
+        MarkSurfaces: MSurface list }
 
 /// <summary>
 /// Based on Q3: fog_t
@@ -1073,30 +1121,24 @@ type World =
         EntityParsePoint: string;
     }
 
-/// <summary>
 /// Based on Q3: modtype_t
 /// ModelType
-/// </summary>
 type ModelType =
     | Bad = 0
     | Brush = 1
     | Mesh = 2
     | Md4 = 3
 
-/// <summary>
 /// Based on Q3: model_t
 /// Model
-/// </summary>
-type Model =
-    {
-        Name: string;
-        Type: ModelType;
-        Index: int;
-        DataSize: int;
-        BModel: BModel option;
-        Md3: Md3Header;
-
-    }
+type Model = {
+    Name: string;
+    Type: ModelType;
+    Index: int;
+    DataSize: int;
+    // TODO: In order for us to use BModel properly, we need to have shader native -> managed, managed -> native working.
+//    BModel: BModel option;  
+    Md3: Md3Header list }
 
 /// <summary>
 /// Based on Q3: refdef_t

@@ -650,9 +650,41 @@ type dlight_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type msurface_t =
+    val mutable viewCount : int
+    val mutable shader : nativeptr<shader_t>
+    val mutable fogIndex : int
+    val mutable data : nativeptr<surfaceType_t>
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type bmodel_t =
+    val mutable bounds : vec3_t
+    val private bounds1 : vec3_t
+    val mutable firstSurface : nativeptr<msurface_t>
+    val mutable numSurfaces : int
+
+type modtype_t =
+    | MOD_BAD = 0
+    | MOD_BRUSH = 1
+    | MOD_MESH = 2
+    | MOD_MD4 = 3
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type model_t =
-    val mutable name : sbyte
-    // TODO:
+    val mutable name : MAX_QPATH
+    val mutable type' : modtype_t
+    val mutable index : int
+    val mutable dataSize : int
+    val mutable bmodel : nativeptr<bmodel_t>
+
+    val mutable md3 : nativeptr<md3Header_t>
+    val private md3_1 : nativeint
+    val private md3_2 : nativeint
+
+    val mutable md4 : nativeptr<md4Header_t>
+    val mutable numLods : int
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 256)>]

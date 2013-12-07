@@ -154,6 +154,18 @@ module Frustum =
         Plane.toNativeByPtr (NativePtr.add ptr 2) frustum.Bottom
         Plane.toNativeByPtr (NativePtr.add ptr 3) frustum.Top
 
+module Model =
+    let ofNativePtr (ptr: nativeptr<model_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Name = NativePtr.toStringAnsi &&native.name;
+        Type = enum<ModelType> (int native.type');
+        Index = native.index;
+        DataSize = native.dataSize;
+        Md3 = List.ofNativePtrArrayMap 3 (fun x -> Md3Header.ofNativePtr x) native.md3
+        }
+
 module ViewParms =
     let inline ofNativePtr (ptr: nativeptr<viewParms_t>) =
         let mutable native = NativePtr.read ptr
@@ -380,7 +392,7 @@ module RefEntity =
 
         {
             RefEntity.Type = enum<RefEntityType> (int native.reType);
-            RenderFx = native.renderfx;
+            RenderFx = enum<RenderFxFlags> (native.renderfx);
             ModelHandle = native.hModel;
             LightingOrigin = Vector3.ofNativePtr &&native.lightingOrigin;
             ShadowPlane = native.shadowPlane;
@@ -405,7 +417,7 @@ module RefEntity =
         let mutable native = NativePtr.read ptr
 
         native.reType <- enum<refEntityType_t> (int entity.Type)
-        native.renderfx <- entity.RenderFx
+        native.renderfx <- int entity.RenderFx
         native.hModel <- entity.ModelHandle
         Vector3.toNativeByPtr &&native.lightingOrigin entity.LightingOrigin
         native.shadowPlane <- native.shadowPlane

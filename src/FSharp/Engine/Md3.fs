@@ -26,50 +26,44 @@ open Engine.Math
 
 /// Based on Q3: md3Header_t
 /// Md3Header
-type Md3Header =
-    {
-        Id: int;
-        Version: int;
+type Md3Header = {
+    Id: int;
+    Version: int;
 
-        /// model name
-        Name: string;
-        Flags: int;
-        FrameCount: int;
-        TagCount: int;
-        SurfaceCount: int;
-        SkinCount: int;
+    /// model name
+    Name: string;
+    Flags: int;
+    FrameCount: int;
+    TagCount: int;
+    SurfaceCount: int;
+    SkinCount: int;
 
-        /// first surface
-        FrameOffset: int;
+    /// first surface
+    FrameOffset: int;
 
-        /// numFrames * numTags
-        TagOffset: int;
+    /// numFrames * numTags
+    TagOffset: int;
 
-        /// first surface, others follow
-        SurfaceOffset: int;
+    /// first surface, others follow
+    SurfaceOffset: int;
 
-        /// end of file
-        EndOffset: int;
-    }
+    /// end of file
+    EndOffset: int }
 
 /// Based on Q3: md3Frame_t
 /// Md3Frame
-type Md3Frame =
-    {
-        Bounds: Bounds;
-        LocalOrigin: Vector3;
-        Radius: single;
-        Name: string;
-    }
+type Md3Frame = {
+    Bounds: Bounds;
+    LocalOrigin: Vector3;
+    Radius: single;
+    Name: string }
 
 /// Based on Q3: md3Tag_t
 /// Md3Tag
-type Md3Tag =
-    {
-        Name: string;
-        Origin: Vector3;
-        Axis: Axis;
-    }
+type Md3Tag = {
+    Name: string;
+    Origin: Vector3;
+    Axis: Axis }
 
 module Md3 =
     /// (('3'<<24)+('P'<<16)+('D'<<8)+'I')
