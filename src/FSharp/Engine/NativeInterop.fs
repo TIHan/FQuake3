@@ -59,11 +59,7 @@ module NativePtr =
         System.Runtime.InteropServices.Marshal.PtrToStringAnsi (NativePtr.toNativeInt x)
 
     let inline toArray (size: int) (x: nativeptr<'T>) =
-        let arr = Array.zeroCreate<'T> size
-        let ptr = &&arr.[0]
-        for i = 0 to size - 1 do
-            NativePtr.set ptr i <| NativePtr.get x i
-        arr
+        Array.init size (fun i -> NativePtr.get x i)
 
     let inline toList (size: int) (x: nativeptr<'T>) =
         List.init size (fun i -> NativePtr.get x i)
