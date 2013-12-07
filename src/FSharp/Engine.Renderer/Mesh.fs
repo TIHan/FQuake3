@@ -30,7 +30,7 @@ open Engine.Renderer.Core
 
 /// CalculateCullLocalBox
 [<Pure>]
-let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: Cvar) (tr: TrGlobals) =
+let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: Cvar) (r: Renderer) =
     let inline calculateBounds i j =
         match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
         | true -> oldFrame.Bounds.[i].[j]
@@ -51,9 +51,9 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
                     (calculateBounds 1 2)
         }
 
-    let clip = Main.cullLocalBox bounds tr.Orientation tr.ViewParms.Frustum r_nocull
-    let perfCounters = PerfCounter.incrementBoxMd3 clip tr.PerfCounters
-    let tr = { tr with PerfCounters = perfCounters }
+    let clip = Main.cullLocalBox bounds r.Orientation r.ViewParms.Frustum r_nocull
+    let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
+    let tr = { r with PerfCounters = perfCounters }
 
     match clip with
     | ClipType.In ->
@@ -67,16 +67,16 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
 /// CullModel
 /// Note: This is internal.
 [<Pure>]
-let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (r_nocull: Cvar) (tr: TrGlobals) =
+let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
     | true ->
-        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius tr.Orientation tr.ViewParms.Frustum r_nocull
+        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius r.Orientation r.ViewParms.Frustum r_nocull
 
         match entity.Frame = entity.OldFrame with
         | true ->
-            let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
-            let tr = { tr with PerfCounters = perfCounters }
+            let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
+            let tr = { r with PerfCounters = perfCounters }
 
             match sphereCull with
             | ClipType.Out ->
@@ -89,12 +89,12 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
             let sphereCullB =
                 match newFrame = oldFrame with
                 | true -> sphereCull
-                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius tr.Orientation tr.ViewParms.Frustum r_nocull
+                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius r.Orientation r.ViewParms.Frustum r_nocull
                 
             match sphereCull = sphereCullB with
             | true ->
-                let perfCounters = PerfCounter.incrementSphereMd3 sphereCull tr.PerfCounters
-                let tr = { tr with PerfCounters = perfCounters }
+                let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
+                let tr = { r with PerfCounters = perfCounters }
 
                 match sphereCull with
                 | ClipType.Out ->
@@ -104,6 +104,6 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
                 | _ ->
                     calculateCullLocalBox newFrame oldFrame r_nocull tr
             | _ ->
-                calculateCullLocalBox newFrame oldFrame r_nocull tr
+                calculateCullLocalBox newFrame oldFrame r_nocull r
     | _ ->
-        calculateCullLocalBox newFrame oldFrame r_nocull tr
+        calculateCullLocalBox newFrame oldFrame r_nocull r

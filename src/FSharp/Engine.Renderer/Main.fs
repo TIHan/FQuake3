@@ -454,12 +454,12 @@ let createPlaneAxis (drawSurface: DrawSurface) =
 /// rotate the plane if necessary
 /// </summary>
 [<Pure>]
-let tryRotatePlane (originalPlane: Plane) (entityId: int) (tr: TrGlobals) =
+let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
     match entityId <> Constants.EntityIdWorld with
-    | false -> (originalPlane, originalPlane, tr)
+    | false -> (originalPlane, originalPlane, r)
     | _ ->
 
-    let tr = TrGlobals.updateCurrentEntityById entityId tr
+    let tr = Renderer.updateCurrentEntityById entityId r
     match tr.CurrentEntity with
     | None -> raise <| Exception "Current entity does not exist"
     | Some (trEntity) ->
@@ -489,8 +489,8 @@ let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
 
 /// Tries to find the closest portal entity based on a plane.
 [<Pure>]
-let tryFindClosestPortalEntityByPlane (plane: Plane) (tr: TrGlobals) =
-    tr.Refdef.Entities |>
+let tryFindClosestPortalEntityByPlane (plane: Plane) (r: Renderer) =
+    r.Refdef.Entities |>
     List.tryFind (fun x ->
         let isPortalSurface = not (x.Entity.Type <> RefEntityType.PortalSurface)
         let distance = (Vector3.dot x.Entity.Origin plane.Normal) - plane.Distance
@@ -559,12 +559,12 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
 ///
 /// Returns true if it should be mirrored
 [<Pure>]
-let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (tr: TrGlobals) =
+let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (r: Renderer) =
     // create plane axis for the portal we are seeing
     let originalPlane = createPlaneAxis drawSurface
 
     // rotate the plane if necessary
-    match tryRotatePlane originalPlane entityId tr with
+    match tryRotatePlane originalPlane entityId r with
     | (originalPlane, plane, tr) ->
 
     let surface = { surface with Axis = transformAxisOfNormal plane.Normal surface.Axis }
@@ -595,25 +595,25 @@ let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: O
 /// IsMirror
 /// Note: this is internal
 [<Pure>]
-let isMirror (drawSurface: DrawSurface) (entityId: int) (tr: TrGlobals) =
+let isMirror (drawSurface: DrawSurface) (entityId: int) (r: Renderer) =
     // create plane axis for the portal we are seeing
     let originalPlane = createPlaneAxis drawSurface
 
     // rotate the plane if necessary
-    match tryRotatePlane originalPlane entityId tr with
-    | (originalPlane, plane, tr) ->
+    match tryRotatePlane originalPlane entityId r with
+    | (originalPlane, plane, r) ->
 
     // locate the portal entity closest to this plane.
     // origin will be the origin of the portal, origin2 will be
     // the origin of the camera
-    match tryFindClosestPortalEntityByPlane originalPlane tr with
-    | None -> (false, tr)
+    match tryFindClosestPortalEntityByPlane originalPlane r with
+    | None -> (false, r)
     | Some e ->
 
     // if the entity is just a mirror, don't use as a camera point
     match e.Entity.OldOrigin = e.Entity.Origin with
-    | true -> (true, tr)
-    | _ -> (false, tr)
+    | true -> (true, r)
+    | _ -> (false, r)
 
 /// Based on Q3: R_DecomposeSort
 /// DecomposeSort

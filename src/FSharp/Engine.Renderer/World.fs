@@ -32,5 +32,5 @@ open Engine.Renderer.Core
 ///
 /// Returns true if the grid is completely culled away.
 /// Also sets the clipped hint bit in tess
-let cullTriangleSurface (surface: SurfaceTriangles) (tr: TrGlobals) =
+let cullTriangleSurface (surface: SurfaceTriangles) (r: Renderer) =
     ()

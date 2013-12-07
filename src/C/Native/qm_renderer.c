@@ -37,6 +37,6 @@ define_mapping (orientation, orientation_t*, "Orientation");
 define_mapping (plane, cplane_t*, "Plane");
 define_mapping (surface, surfaceType_t*, "Surface");
 define_mapping (draw_surf, drawSurf_t*, "DrawSurface");
-define_mapping (tr_globals, trGlobals_t*, "TrGlobals");
+define_mapping (tr_globals, trGlobals_t*, "Renderer");
 define_mapping (tr_back_end_state, backEndState_t*, "Backend");
 define_mapping (gl_state, glstate_t*, "GLState");

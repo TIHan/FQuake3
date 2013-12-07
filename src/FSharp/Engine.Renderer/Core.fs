@@ -1219,7 +1219,7 @@ type BackendData =
 
 /// <summary>
 /// Based on Q3: trGlobals_t
-/// TrGlobals
+/// Renderer
 ///
 /// Most renderer globals are defined here.
 /// backend functions should never modify any of these fields,
@@ -1229,7 +1229,7 @@ type BackendData =
 /// TODO: Not finished.
 /// !!
 /// </summary>
-type TrGlobals =
+type Renderer =
     {
         CurrentEntity: TrRefEntity option;
         CurrentEntityId: int;
@@ -1245,10 +1245,10 @@ type TrGlobals =
     }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module TrGlobals =
-    let updateCurrentEntityById entityId (tr: TrGlobals) =
-        let entity = tr.Refdef.Entities.[entityId]
-        { tr with CurrentEntity = Some entity; CurrentEntityId = entityId }
+module Renderer =
+    let updateCurrentEntityById entityId (r: Renderer) =
+        let entity = r.Refdef.Entities.[entityId]
+        { r with CurrentEntity = Some entity; CurrentEntityId = entityId }
         
 module Internal =
     [<Literal>]

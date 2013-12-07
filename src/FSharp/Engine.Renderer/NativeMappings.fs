@@ -645,7 +645,7 @@ module Shader =
 *)
 
 // TODO: This will need more work over time.
-module TrGlobals =
+module Renderer =
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -659,15 +659,15 @@ module TrGlobals =
             //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
         }
 
-    let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (tr: TrGlobals) =
+    let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (r: Renderer) =
         let mutable native = NativePtr.read ptr
 
-        TrRefEntity.toNativeByPtr native.currentEntity tr.CurrentEntity.Value
-        native.currentEntityNum <- tr.CurrentEntityId
-        ViewParms.toNativeByPtr &&native.viewParms tr.ViewParms
+        TrRefEntity.toNativeByPtr native.currentEntity r.CurrentEntity.Value
+        native.currentEntityNum <- r.CurrentEntityId
+        ViewParms.toNativeByPtr &&native.viewParms r.ViewParms
         // TODO: Map TrRefDef - Property Refdef
-        OrientationR.toNativeByPtr &&native.or' tr.Orientation
-        FrontEndPerformanceCounters.toNativeByPtr &&native.pc tr.PerfCounters
+        OrientationR.toNativeByPtr &&native.or' r.Orientation
+        FrontEndPerformanceCounters.toNativeByPtr &&native.pc r.PerfCounters
 
         // Images - Special Handling
         //List.toNativePtrArrayByPtr native.images.value Image.toNativeByPtr tr.Images
