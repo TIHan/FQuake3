@@ -456,10 +456,6 @@ module TrRefEntity =
         
         NativePtr.write ptr native
 
-    module Option =
-        let inline ofNativePtr (ptr: nativeptr<trRefEntity_t>) =
-            Some <| ofNativePtr ptr
-
 module Refdef =
     let inline ofNativePtr (ptr: nativeptr<refdef_t>) =
         let mutable native = NativePtr.read ptr
@@ -650,7 +646,7 @@ module Renderer =
         let mutable native = NativePtr.read ptr
 
         {
-            CurrentEntity = TrRefEntity.Option.ofNativePtr native.currentEntity;
+            CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity;
             CurrentEntityId = native.currentEntityNum;
             ViewParms = ViewParms.ofNativePtr &&native.viewParms;
             Refdef = TrRefdef.ofNativePtr &&native.refdef;
