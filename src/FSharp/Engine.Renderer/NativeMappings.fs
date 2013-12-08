@@ -163,7 +163,7 @@ module Model =
         Type = enum<ModelType> (int native.type');
         Index = native.index;
         DataSize = native.dataSize;
-        Md3 = List.ofNativePtrArrayMap 3 (fun x -> Md3Header.ofNativePtr x) native.md3
+        Md3 = Md3.ofNativePtr native.md3
         LodCount = native.numLods }
 
 module ViewParms =

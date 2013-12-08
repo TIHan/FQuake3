@@ -237,6 +237,19 @@ module Md3Header =
         SurfaceOffset = native.numSurfaces;
         EndOffset = native.ofsEnd }
 
+module Md3 =
+    let ofNativePtr (ptr: nativeptr<md3Header_t>) =
+        let mutable native = NativePtr.read ptr
+
+        let mutable bytePtr : nativeptr<byte> = NativePtr.toNativePtr ptr
+        let mutable framePtr : nativeptr<md3Frame_t> =
+            NativePtr.add bytePtr native.ofsFrames
+            |> NativePtr.toNativePtr
+
+        {
+        Header = Md3Header.ofNativePtr ptr;
+        Frames = List.ofNativePtrArrayMap native.numFrames Md3Frame.ofNativePtr framePtr }
+
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
         let mutable native = NativePtr.read ptr

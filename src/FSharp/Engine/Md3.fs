@@ -65,6 +65,13 @@ type Md3Tag = {
     Origin: Vector3;
     Axis: Axis }
 
+/// Md3
+type Md3 = {
+    Header: Md3Header;
+    Frames: Md3Frame list }
+
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Md3 =
     /// (('3'<<24)+('P'<<16)+('D'<<8)+'I')
     /// Is this right?

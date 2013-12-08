@@ -133,7 +133,7 @@ let addMd3Surfaces (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
         | None -> raise <| Exception "Current model does not exist."
         | Some x -> x
 
-    let frameCount = model.Md3.[0].FrameCount
+    let frameCount = model.Md3.Header.FrameCount
 
     let frame =
         match canWrapFrames with
