@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static float ProjectRadius( float r, vec3_t location )
 {
+#if 0
 	float pr;
 	float dist;
 	float c;
@@ -70,6 +71,17 @@ static float ProjectRadius( float r, vec3_t location )
 		pr = 1.0f;
 
 	return pr;
+#else
+	MObject m_result;
+
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Mesh", "projectRadius", 3, {
+		__args[0] = &r;
+		__args[1] = m_object_as_arg (qm_of_vec3 (location));
+		__args[2] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
+	}, m_result);
+
+	return *(gfloat *)m_object_unbox_struct (m_result);
+#endif
 }
 
 /*
