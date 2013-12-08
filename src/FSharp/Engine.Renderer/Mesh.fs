@@ -139,8 +139,10 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
 
 /// Based on Q3: R_ComputeLOD
 /// ComputeLod
-let computeLod (entity: RefEntity) (model: Model) (r_lodbias: Cvar) =
-    match model.Md3Lods.Length = 0 with
+[<Pure>]
+let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias: Cvar) (r: Renderer) =
+    let lodCount = model.Md3Lods.Length
+    match lodCount = 0 with
     // model has only 1 LOD level, skip computations and bias
     | true -> 0
     | _ ->
@@ -150,12 +152,26 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodbias: Cvar) =
 
     let frame = model.Md3.Frames.[entity.Frame]
     let radius = Bounds.radius frame.Bounds
-    // TODO:
-    0
+    
+    let projectedRadius = projectRadius radius entity.Origin r.ViewParms
+    
+    let lod =
+        match projectedRadius <> 0.f with
+        | true ->
+            let lodscale = if r_lodscale.Value > 20.f then 20.f else r_lodscale.Value
+            1.f - projectedRadius * lodscale
+        // object intersects near view plane, e.g. view weapon
+        | _ -> 0.f
+        |> (*) (single <| lodCount + 1)
+        |> int
+        |> (+) r_lodbias.Integer
+
+    // Clamp lod
+    if lodCount < 0 then 0 elif lod > lodCount then lodCount else lod
 
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces
-let addMd3Surfaces (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
+let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_nocull: Cvar) (r: Renderer) =
     // don't add third_person objects if not in a portal
     let isPersonalModel =
         entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
@@ -195,6 +211,7 @@ let addMd3Surfaces (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
 
     let frame = validateFrame frame
     let oldFrame = validateFrame oldFrame
-
+    let lod = computeLod entity model r_lodscale r_lodbias r
+    let md3 = model.Md3Lods.[lod]
     // TODO:
     ()
