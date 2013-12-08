@@ -164,7 +164,7 @@ module Model =
         Index = native.index;
         DataSize = native.dataSize;
         Md3 = Md3.ofNativePtr native.md3
-        LodCount = native.numLods }
+        Md3Lods = List.ofNativePtrArrayMap (native.numLods - 1) (fun x -> Md3.ofNativePtr <| NativePtr.read x) &&native.md3 }
 
 module ViewParms =
     let inline ofNativePtr (ptr: nativeptr<viewParms_t>) =

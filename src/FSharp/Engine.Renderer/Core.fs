@@ -1139,7 +1139,7 @@ type Model = {
     // TODO: In order for us to use BModel properly, we need to have shader native -> managed, managed -> native working.
 //    BModel: BModel option;  
     Md3: Md3;
-    LodCount: int }
+    Md3Lods: Md3 list }
 
 /// <summary>
 /// Based on Q3: refdef_t

@@ -111,7 +111,7 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
 /// Based on Q3: R_ComputeLOD
 /// ComputeLod
 let computeLod (entity: TrRefEntity) (model: Model) (r_lodbias: Cvar) =
-    match model.LodCount < 2 with
+    match model.Md3Lods.Length = 0 with
     | true -> 0
     | _ ->
 
