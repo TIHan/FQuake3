@@ -95,11 +95,22 @@ type Cvar =
 
 /// Bounds
 type Bounds = 
-    { From: Vector3; To: Vector3 }   
+    { Mins: Vector3; Maxs: Vector3 }   
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.From | 1 -> this.To
+            | 0 -> this.Mins | 1 -> this.Maxs
             | _ -> raise <| IndexOutOfRangeException ()
+
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Bounds =
+    let radius (bounds: Bounds) =
+        let inline f i =
+            let a = abs bounds.Mins.[i]
+            let b = abs bounds.Maxs.[i]
+            if a > b then a else b
+        
+        Vector3.length <| Vector3 (f 0, f 1, f 2)
 

@@ -28,6 +28,35 @@ open Engine.Files
 open Engine.Math
 open Engine.Renderer.Core
 
+/// Based on Q3: ProjectRadius
+/// ProjectRadius
+[<Pure>]
+let projectRadius radius location (view: ViewParms) =
+    let axis = view.Orientation.Axis
+    let origin = view.Orientation.Origin
+
+    let c = Vector3.dot axis.X origin
+    let distance = Vector3.dot axis.X location - c
+
+    match distance <= 0.f with
+    | true -> 0.f
+    | _ ->
+
+    let p = Vector3 (0.f, abs radius, -distance)
+
+    let inline f i = 
+        p.X * view.ProjectionMatrix.[0, i] +
+        p.Y * view.ProjectionMatrix.[1, i] +
+        p.Z * view.ProjectionMatrix.[2, i] +
+        view.ProjectionMatrix.[3, i]
+
+    let pr = f 1 / f 3
+
+    match pr > 1.f with
+    | true -> 1.f
+    | _ -> pr
+
+
 /// CalculateCullLocalBox
 [<Pure>]
 let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: Cvar) (r: Renderer) =
@@ -39,12 +68,12 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
     // calculate a bounding box in the current coordinate system
     let bounds =
         {
-            From =
+            Bounds.Mins =
                 Vector3.create
                     (calculateBounds 0 0)
                     (calculateBounds 0 1)
                     (calculateBounds 0 2);
-            To =
+            Maxs =
                 Vector3.create
                     (calculateBounds 1 0)
                     (calculateBounds 1 1)
@@ -110,11 +139,17 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
 
 /// Based on Q3: R_ComputeLOD
 /// ComputeLod
-let computeLod (entity: TrRefEntity) (model: Model) (r_lodbias: Cvar) =
+let computeLod (entity: RefEntity) (model: Model) (r_lodbias: Cvar) =
     match model.Md3Lods.Length = 0 with
+    // model has only 1 LOD level, skip computations and bias
     | true -> 0
     | _ ->
 
+    // multiple LODs exist, so compute projected bounding sphere
+    // and use that as a criteria for selecting LOD
+
+    let frame = model.Md3.Frames.[entity.Frame]
+    let radius = Bounds.radius frame.Bounds
     // TODO:
     0
 
