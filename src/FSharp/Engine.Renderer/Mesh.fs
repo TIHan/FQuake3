@@ -213,5 +213,16 @@ let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_n
     let oldFrame = validateFrame oldFrame
     let lod = computeLod entity model r_lodscale r_lodbias r
     let md3 = if lod > 0 then model.Md3Lods.[lod - 1] else model.Md3
+    
+    //
+    // cull the entire model if merged bounding box of both frames
+    // is outside the view frustum.
+    //
+    let cull,r' = cullModelByFrames md3.Frames.[frame] md3.Frames.[oldFrame] entity r_nocull r
+
+    match cull = ClipType.Out with
+    | true -> r'
+    | _ ->
+
     // TODO:
-    ()
+    r'
