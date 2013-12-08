@@ -1138,7 +1138,8 @@ type Model = {
     DataSize: int;
     // TODO: In order for us to use BModel properly, we need to have shader native -> managed, managed -> native working.
 //    BModel: BModel option;  
-    Md3: Md3Header list }
+    Md3: Md3Header list
+    LodCount: int }
 
 /// <summary>
 /// Based on Q3: refdef_t
@@ -1275,6 +1276,8 @@ type Renderer =
     {
         CurrentEntity: TrRefEntity option;
         CurrentEntityId: int;
+
+        CurrentModel: Model option;
 
         ViewParms: ViewParms;
         Refdef: TrRefdef;

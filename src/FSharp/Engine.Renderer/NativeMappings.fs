@@ -164,7 +164,7 @@ module Model =
         Index = native.index;
         DataSize = native.dataSize;
         Md3 = List.ofNativePtrArrayMap 3 (fun x -> Md3Header.ofNativePtr x) native.md3
-        }
+        LodCount = native.numLods }
 
 module ViewParms =
     let inline ofNativePtr (ptr: nativeptr<viewParms_t>) =
@@ -660,6 +660,7 @@ module Renderer =
         {
             CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity;
             CurrentEntityId = native.currentEntityNum;
+            CurrentModel = Option.ofNativePtr Model.ofNativePtr native.currentModel;
             ViewParms = ViewParms.ofNativePtr &&native.viewParms;
             Refdef = TrRefdef.ofNativePtr &&native.refdef;
             Orientation = OrientationR.ofNativePtr &&native.or';
@@ -672,6 +673,7 @@ module Renderer =
 
         TrRefEntity.toNativeByPtr native.currentEntity r.CurrentEntity.Value
         native.currentEntityNum <- r.CurrentEntityId
+        // TODO: Map Model - Property CurrentModel
         ViewParms.toNativeByPtr &&native.viewParms r.ViewParms
         // TODO: Map TrRefDef - Property Refdef
         OrientationR.toNativeByPtr &&native.or' r.Orientation

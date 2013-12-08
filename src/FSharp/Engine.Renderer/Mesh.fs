@@ -108,13 +108,58 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
     | _ ->
         calculateCullLocalBox newFrame oldFrame r_nocull r
 
+/// Based on Q3: R_ComputeLOD
+/// ComputeLod
+let computeLod (entity: TrRefEntity) (model: Model) (r_lodbias: Cvar) =
+    match model.LodCount < 2 with
+    | true -> 0
+    | _ ->
+
+    // TODO:
+    0
+
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces
-let addMd3Surfaces (entity: TrRefEntity) (r_nocull: Cvar) (r: Renderer) =
+let addMd3Surfaces (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
     // don't add third_person objects if not in a portal
     let isPersonalModel =
-        entity.Entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
+        entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
         && not r.ViewParms.IsPortal
+
+    let canWrapFrames = entity.RenderFx.HasFlag RenderFxFlags.WrapFrames
+
+    let model =
+        match r.CurrentModel with
+        | None -> raise <| Exception "Current model does not exist."
+        | Some x -> x
+
+    let frameCount = model.Md3.[0].FrameCount
+
+    let frame =
+        match canWrapFrames with
+        | false -> entity.Frame
+        | true -> entity.Frame % frameCount
+
+    let oldFrame =
+        match canWrapFrames with
+        | false -> entity.OldFrame
+        | true -> entity.OldFrame % frameCount
+
+    //
+    // Validate the frames so there is no chance of a crash.
+    // This will write directly into the entity structure, so
+    // when the surfaces are rendered, they don't need to be
+    // range checked again.
+    //
+    let inline validateFrame frame' =
+        match frame' >= frameCount || frame' < 0 with
+        | true ->
+            printfn "R_AddMd3Surfaces: no such frame %d to %d for '%s'" frame oldFrame model.Name
+            0
+        | _ -> frame'
+
+    let frame = validateFrame frame
+    let oldFrame = validateFrame oldFrame
 
     // TODO:
     ()
