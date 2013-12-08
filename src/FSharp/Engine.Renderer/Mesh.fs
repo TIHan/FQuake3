@@ -212,6 +212,6 @@ let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_n
     let frame = validateFrame frame
     let oldFrame = validateFrame oldFrame
     let lod = computeLod entity model r_lodscale r_lodbias r
-    let md3 = model.Md3Lods.[lod]
+    let md3 = if lod > 0 then model.Md3Lods.[lod - 1] else model.Md3
     // TODO:
     ()
