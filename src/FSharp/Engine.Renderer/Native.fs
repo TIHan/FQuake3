@@ -307,12 +307,6 @@ type trRefEntity_t =
     val mutable directedLight : vec3_t
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type world_t =
-    val mutable name : char
-    // TODO:
-
-[<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 64)>]
 type image_t_imgName =
     [<FieldOffset (0)>]
@@ -663,6 +657,85 @@ type bmodel_t =
     val private bounds1 : vec3_t
     val mutable firstSurface : nativeptr<msurface_t>
     val mutable numSurfaces : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type dshader_t =
+    val mutable shader : MAX_QPATH
+    val mutable surfaceFlags : int
+    val mutable contentFlags : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type mnode_t =
+    val mutable contents : int
+    val mutable visframe : int
+    val mutable mins : vec3_t
+    val mutable maxs : vec3_t
+    val mutable parent : nativeptr<mnode_t>
+    val mutable plane : nativeptr<cplane_t>
+
+    val mutable children : nativeptr<mnode_t>
+    val mutable children1 : nativeint
+
+    val mutable cluster : int
+    val mutable area : int
+    val mutable firstmarksurface : nativeptr<nativeptr<msurface_t>>
+    val mutable nummarksurfaces : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type fog_t =
+    val mutable originalBrushNumber : int
+
+    val mutable bounds : vec3_t
+    val private bounds1 : vec3_t
+    
+    val mutable colorInt : uint32
+    val mutable tcScale : single
+    val mutable parms : fogParms_t
+    val mutable hasSurface : qboolean
+
+    val mutable surface : single
+    val private surface1 : single
+    val private surface2 : single
+    val private surface3 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type world_t =
+    val mutable name : MAX_QPATH
+    val mutable baseName : MAX_QPATH
+    val mutable dataSize : int
+    val mutable numShaders : int
+    val mutable shaders : nativeptr<dshader_t>
+    val mutable bmodels : nativeptr<bmodel_t>
+    val mutable numplanes : int
+    val mutable planes : nativeptr<cplane_t>
+    val mutable numnodes : int
+    val mutable numDecisionNodes : int
+    val mutable nodes : nativeptr<mnode_t>
+    val mutable numsurfaces : int
+    val mutable surfaces : nativeptr<msurface_t>
+    val mutable nummarksurfaces : int
+    val mutable marksurfaces : nativeptr<nativeptr<msurface_t>>
+    val mutable numfogs : int
+    val mutable fogs : nativeptr<fog_t>
+    val mutable lightGridOrigin : vec3_t
+    val mutable lightGridSize : vec3_t
+    val mutable lightGridInverseSize : vec3_t
+
+    val mutable lightGridBounds : int
+    val private lightGridBounds1 : int
+    val mutable lightGridBounds2 : int
+    
+    val mutable lightGridData : nativeptr<byte>
+    val mutable numClusters : int
+    val mutable clusterBytes : int
+    val mutable vis : nativeptr<byte>
+    val mutable novis : nativeptr<byte>
+    val mutable entityString : nativeptr<sbyte>
+    val mutable entityParsePoint : nativeptr<sbyte>
 
 type modtype_t =
     | MOD_BAD = 0

@@ -28,6 +28,23 @@ open Engine.Files
 open Engine.Math
 open Engine.Renderer.Core
 
+/// Based on Q3: setupEntityLightingGrid
+/// SetupEntityLightingGrid
+let setupEntityLightingGrid (rentity: TrRefEntity) =
+    let entity = rentity.Entity
+
+    let lightOrigin =
+        match entity.RenderFx.HasFlag RenderFxFlags.LightingOrigin with
+        // seperate lightOrigins are needed so an object that is
+        // sinking into the ground can still be lit, and so
+        // multi-part models can be lit identically
+        | true -> entity.LightingOrigin
+        | _ -> entity.Origin
+
+    // TODO:
+    ()
+
+
 /// Based on Q3: R_SetupEntityLighting
 /// SetupEntityLighting
 ///
