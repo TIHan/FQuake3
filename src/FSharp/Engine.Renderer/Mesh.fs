@@ -82,15 +82,15 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
 
     let clip = Main.cullLocalBox bounds r.Orientation r.ViewParms.Frustum r_nocull
     let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
-    let tr = { r with PerfCounters = perfCounters }
+    let r' = { r with PerfCounters = perfCounters }
 
     match clip with
     | ClipType.In ->
-        (ClipType.In, tr)
+        (ClipType.In, r')
     | ClipType.Clip ->
-        (ClipType.Clip, tr)
+        (ClipType.Clip, r')
     | _ ->
-        (ClipType.Out, tr)
+        (ClipType.Out, r')
 
 /// Based on Q3: R_CullModel
 /// CullModel
@@ -105,15 +105,15 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
         match entity.Frame = entity.OldFrame with
         | true ->
             let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
-            let tr = { r with PerfCounters = perfCounters }
+            let r' = { r with PerfCounters = perfCounters }
 
             match sphereCull with
             | ClipType.Out ->
-                (ClipType.Out, tr)
+                (ClipType.Out, r')
             | ClipType.In ->
-                (ClipType.In, tr)
+                (ClipType.In, r')
             | _ ->
-                calculateCullLocalBox newFrame oldFrame r_nocull tr
+                calculateCullLocalBox newFrame oldFrame r_nocull r'
         | _ ->
             let sphereCullB =
                 match newFrame = oldFrame with
@@ -123,15 +123,15 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
             match sphereCull = sphereCullB with
             | true ->
                 let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
-                let tr = { r with PerfCounters = perfCounters }
+                let r' = { r with PerfCounters = perfCounters }
 
                 match sphereCull with
                 | ClipType.Out ->
-                    (ClipType.Out, tr)
+                    (ClipType.Out, r')
                 | ClipType.In ->
-                    (ClipType.In, tr)
+                    (ClipType.In, r')
                 | _ ->
-                    calculateCullLocalBox newFrame oldFrame r_nocull tr
+                    calculateCullLocalBox newFrame oldFrame r_nocull r'
             | _ ->
                 calculateCullLocalBox newFrame oldFrame r_nocull r
     | _ ->
@@ -142,6 +142,9 @@ let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEnti
 [<Pure>]
 let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias: Cvar) (r: Renderer) =
     let lodCount = model.Md3Lods.Length
+
+    let inline clampLod lod = if lod < 0 then 0 elif lod > lodCount then lodCount else lod
+
     match lodCount = 0 with
     // model has only 1 LOD level, skip computations and bias
     | true -> 0
@@ -152,22 +155,19 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
 
     let frame = model.Md3.Frames.[entity.Frame]
     let radius = Bounds.radius frame.Bounds
-    
+    //printfn "%i" r_lodbias.Integer
     let projectedRadius = projectRadius radius entity.Origin r.ViewParms
-    
-    let lod =
-        match projectedRadius <> 0.f with
-        | true ->
-            let lodscale = if r_lodscale.Value > 20.f then 20.f else r_lodscale.Value
-            1.f - projectedRadius * lodscale
-        // object intersects near view plane, e.g. view weapon
-        | _ -> 0.f
-        |> (*) (single <| lodCount + 1)
-        |> int
-        |> (+) r_lodbias.Integer
-
-    // Clamp lod
-    if lodCount < 0 then 0 elif lod > lodCount then lodCount else lod
+    match projectedRadius <> 0.f with
+    | true ->
+        let lodscale = if r_lodscale.Value > 20.f then 20.f else r_lodscale.Value
+        1.f - projectedRadius * lodscale
+    // object intersects near view plane, e.g. view weapon
+    | _ -> 0.f
+    |> (*) (single <| lodCount + 1)
+    |> int
+    |> clampLod
+    |> (+) r_lodbias.Integer
+    |> clampLod
 
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces

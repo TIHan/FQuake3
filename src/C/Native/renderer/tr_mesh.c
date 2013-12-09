@@ -80,7 +80,7 @@ static float ProjectRadius( float r, vec3_t location )
 		__args[2] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, m_result);
 
-	return *(gfloat *)m_object_unbox_struct (m_result);
+	return *(gfloat*)m_object_unbox_struct (m_result);
 #endif
 }
 
@@ -196,6 +196,7 @@ R_ComputeLOD
 =================
 */
 int R_ComputeLOD( trRefEntity_t *ent ) {
+#if 0
 	float radius;
 	float flod, lodscale;
 	float projectedRadius;
@@ -251,6 +252,19 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		lod = 0;
 
 	return lod;
+#else
+	MObject m_result;
+
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Mesh", "computeLod", 5, {
+		__args [0] = m_object_as_arg (qm_of_ref_entity (ent));
+		__args [1] = m_object_as_arg (qm_of_model (tr.currentModel));
+		__args [2] = m_object_as_arg (qm_of_cvar (r_lodscale));
+		__args [3] = m_object_as_arg (qm_of_cvar (r_lodbias));
+		__args [4] = m_object_as_arg (qm_of_tr_globals (&tr));
+	}, m_result);
+
+	return *(gint*)m_object_unbox_struct (m_result);
+#endif
 }
 
 /*

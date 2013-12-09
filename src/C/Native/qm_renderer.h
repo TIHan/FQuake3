@@ -41,5 +41,6 @@ define_mapping_prototype (draw_surf, drawSurf_t*);
 define_mapping_prototype (tr_globals, trGlobals_t*);
 define_mapping_prototype (tr_back_end_state, backEndState_t*);
 define_mapping_prototype (gl_state, glstate_t*);
+define_mapping_prototype (model, model_t*);
 
 #endif /* __QM_RENDERER_H__ */
