@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_map.c
 
 #include "tr_local.h"
-
+#include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 /*
 
 Loads and prepares a map file for scene rendering.
@@ -1642,6 +1643,7 @@ R_LoadLightGrid
 ================
 */
 void R_LoadLightGrid( lump_t *l ) {
+#if 0
 	int		i;
 	vec3_t	maxs;
 	int		numGridPoints;
@@ -1679,6 +1681,54 @@ void R_LoadLightGrid( lump_t *l ) {
 		R_ColorShiftLightingBytes( &w->lightGridData[i*8], &w->lightGridData[i*8] );
 		R_ColorShiftLightingBytes( &w->lightGridData[i*8+3], &w->lightGridData[i*8+3] );
 	}
+#else
+	int		i;
+	vec3_t	maxs;
+	int		numGridPoints;
+	world_t	*w;
+	float	*wMins, *wMaxs;
+
+	w = &s_worldData;
+
+	w->lightGridInverseSize[0] = 1.0f / w->lightGridSize[0];
+	w->lightGridInverseSize[1] = 1.0f / w->lightGridSize[1];
+	w->lightGridInverseSize[2] = 1.0f / w->lightGridSize[2];
+
+	wMins = w->bmodels[0].bounds[0];
+	wMaxs = w->bmodels[0].bounds[1];
+
+	for (i = 0; i < 3; i++) {
+		w->lightGridOrigin[i] = w->lightGridSize[i] * ceil(wMins[i] / w->lightGridSize[i]);
+		maxs[i] = w->lightGridSize[i] * floor(wMaxs[i] / w->lightGridSize[i]);
+		w->lightGridBounds[i] = (maxs[i] - w->lightGridOrigin[i]) / w->lightGridSize[i] + 1;
+	}
+
+	numGridPoints = w->lightGridBounds[0] * w->lightGridBounds[1] * w->lightGridBounds[2];
+
+	if (l->filelen != numGridPoints * 8) {
+		ri.Printf(PRINT_WARNING, "WARNING: light grid mismatch\n");
+		w->lightGridData = NULL;
+		return;
+	}
+
+	w->lightGridData = ri.Hunk_Alloc(l->filelen, h_low);
+	Com_Memcpy(w->lightGridData, (void *)(fileBase + l->fileofs), l->filelen);
+
+	// deal with overbright bits
+	for (i = 0; i < numGridPoints; i++) {
+		R_ColorShiftLightingBytes(&w->lightGridData[i * 8], &w->lightGridData[i * 8]);
+		R_ColorShiftLightingBytes(&w->lightGridData[i * 8 + 3], &w->lightGridData[i * 8 + 3]);
+	}
+
+	{
+		MObject m_unit;
+
+		qm_invoke ("Engine.Renderer", "Engine.Renderer.Native", "Bsp", "setLightGridData", 2, {
+			__args[0] = &l->filelen;
+			__args[1] = w->lightGridData;
+		}, m_unit);
+	}
+#endif
 }
 
 /*

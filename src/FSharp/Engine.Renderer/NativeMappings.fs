@@ -684,3 +684,12 @@ module Renderer =
 
         NativePtr.write ptr native
 
+module Bsp =
+    // this will be used to prevent major copying
+    let mutable private lightGridData = Unchecked.defaultof<byte[]>
+
+    let setLightGridData (size: int) (ptr: nativeptr<byte>) =
+        lightGridData <- NativePtr.toArray size ptr
+
+    let getLightGridData () = lightGridData
+
