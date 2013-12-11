@@ -30,7 +30,7 @@ open Engine.Renderer.Core
 
 /// Based on Q3: setupEntityLightingGrid
 /// SetupEntityLightingGrid
-let setupEntityLightingGrid (rentity: TrRefEntity) =
+let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
     let entity = rentity.Entity
 
     let lightOrigin =
@@ -40,6 +40,8 @@ let setupEntityLightingGrid (rentity: TrRefEntity) =
         // multi-part models can be lit identically
         | true -> entity.LightingOrigin
         | _ -> entity.Origin
+        |> (-) lightGrid.Origin
+
 
     // TODO:
     ()

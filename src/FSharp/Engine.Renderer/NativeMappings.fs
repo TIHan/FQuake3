@@ -652,6 +652,33 @@ module Shader =
         }
 *)
 
+module Bsp =
+    // this will be used to prevent major copying
+    let mutable private lightGridData = Unchecked.defaultof<byte list>
+
+    let setLightGridData (size: int) (ptr: nativeptr<byte>) =
+        lightGridData <- NativePtr.toList size ptr
+
+    let getLightGridData () = lightGridData
+
+module LightGridBounds =
+    let ofNativePtr (ptr: nativeptr<int>) =
+        {
+        Bounds1 = NativePtr.get ptr 0
+        Bounds2 = NativePtr.get ptr 1
+        Bounds3 = NativePtr.get ptr 2 }
+
+module LightGrid =
+    let ofNativePtr (ptr: nativeptr<world_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Origin = Vector3.ofNativePtr &&native.lightGridOrigin;
+        Size = Vector3.ofNativePtr &&native.lightGridSize;
+        InverseSize = Vector3.ofNativePtr &&native.lightGridInverseSize;
+        Bounds = LightGridBounds.ofNativePtr &&native.lightGridBounds;
+        Data = Bsp.getLightGridData () }
+
 // TODO: This will need more work over time.
 module Renderer =
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
@@ -683,13 +710,4 @@ module Renderer =
         //List.toNativePtrArrayByPtr native.images.value Image.toNativeByPtr tr.Images
 
         NativePtr.write ptr native
-
-module Bsp =
-    // this will be used to prevent major copying
-    let mutable private lightGridData = Unchecked.defaultof<byte[]>
-
-    let setLightGridData (size: int) (ptr: nativeptr<byte>) =
-        lightGridData <- NativePtr.toArray size ptr
-
-    let getLightGridData () = lightGridData
 

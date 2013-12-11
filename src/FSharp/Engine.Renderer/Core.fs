@@ -1089,37 +1089,36 @@ type LightGridBounds =
             | 2 -> this.Bounds3
             | _ -> raise <| IndexOutOfRangeException ()
 
-/// <summary>
+/// LightGrid
+type LightGrid = {
+    Origin: Vector3;
+    Size: Vector3;
+    InverseSize: Vector3;
+    Bounds: LightGridBounds;
+    Data: byte list }
+
 /// Based on Q3: world_t
 /// World
-/// </summary>
-type World =
-    {
-        Name: string;           // ie: maps/tim_dm2.bsp
-        BaseName: string;       // ie: tim_dm2
-        DataSize: int;
-        Shaders: DShader seq;
-        BModels: BModel seq;
-        Planes: Plane seq;
-        Nodes: MNode seq;
-        Surfaces: MSurface seq;
-        MarkSurfaces: MSurface seq;
-        Fogs: Fog seq;
-        LightGridOrigin: Vector3;
-        LightGridSize: Vector3;
-        LightGridInverseSize: Vector3;
-        LightGridBounds: LightGridBounds;
-        LightGridData: byte option; // FIXME: this right? byte *lightGridData
-        ClusterCount: int;
-        ClusterByteCount: int;
+type World = {
+    Name: string;           // ie: maps/tim_dm2.bsp
+    BaseName: string;       // ie: tim_dm2
+    DataSize: int;
+    Shaders: DShader list;
+    BModels: BModel list;
+    Planes: Plane list;
+    Nodes: MNode list;
+    Surfaces: MSurface list;
+    MarkSurfaces: MSurface list;
+    Fogs: Fog list;
+    LightGrid: LightGrid;
+    ClusterCount: int;
+    ClusterByteCount: int;
 
-        // FIXME: I dont think this is right, looks like it may be just data. We'll see.
-        Vis: byte option;           // may be passed in by CM_LoadMap to save space
-        NoVis: byte option;         // clusterBytes of 0xff
+    Vis: byte list;           // may be passed in by CM_LoadMap to save space
+    NoVis: byte list;         // clusterBytes of 0xff
 
-        EntityString: string;
-        EntityParsePoint: string;
-    }
+    EntityString: string;
+    EntityParsePoint: string }
 
 /// Based on Q3: modtype_t
 /// ModelType

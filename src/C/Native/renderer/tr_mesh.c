@@ -90,7 +90,7 @@ R_CullModel
 =============
 */
 static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
-#if 0
+#if 1
 	vec3_t		bounds[2];
 	md3Frame_t	*oldFrame, *newFrame;
 	int			i;
@@ -196,7 +196,7 @@ R_ComputeLOD
 =================
 */
 int R_ComputeLOD( trRefEntity_t *ent ) {
-#if 0
+#if 1
 	float radius;
 	float flod, lodscale;
 	float projectedRadius;
