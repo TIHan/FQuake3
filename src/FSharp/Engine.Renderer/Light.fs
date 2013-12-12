@@ -42,7 +42,11 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
         | _ -> entity.Origin
         |> (-) lightGrid.Origin
 
+    let inline f i = lightOrigin.[i] * lightGrid.InverseSize.[i]
 
+    let v = Vector3.create (f 0) (f 1) (f 2)
+    let pos = floor v
+    let frac = v - pos
     // TODO:
     ()
 

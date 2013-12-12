@@ -126,6 +126,9 @@ type Vector3 =
     static member inline Truncate (v: Vector3) =
         Vector3.Create (truncate v.X, truncate v.Y, truncate v.Z)
 
+    static member inline Floor (v: Vector3) =
+        Vector3.Create (floor v.X, floor v.Y, floor v.Z)
+
     static member inline (*) (v1: Vector3, v2: Vector3) =
         Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
