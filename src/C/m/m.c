@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 typedef MonoDomain _MDomain;
 typedef MonoObject _MObject;
+typedef MonoString _MString;
+typedef MonoMethod _MMethod;
 
 typedef struct {
 	MonoAssembly *assembly;
@@ -110,11 +112,11 @@ m_load_assembly (const gchar *name)
 {
 	MonoAssembly *const assembly = mono_domain_assembly_open (mono_domain_get (), name);
 	if (!assembly)
-		g_error ("M: Unable to load %s assembly.\n", name);
+		g_error ("m: Unable to load %s assembly.\n", name);
 }
 
 
-MMethod
+MMethod *
 m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name)
 {
 	gchar name[256];
@@ -124,14 +126,12 @@ m_method (const gchar *assembly_name, const gchar *name_space, const gchar *stat
 	MonoMethodDesc *method_desc;
 	MonoMethod *method;
 
-	MMethod result;
-
 	get_method_desc (name_space, static_class_name, method_name, name);
 
 	assembly = find_assembly (assembly_name);
 
 	if (!assembly)
-		g_error ("M: Unable to find assembly %s.\n", assembly_name);
+		g_error ("m: Unable to find assembly %s.\n", assembly_name);
 
 	image = mono_assembly_get_image (assembly);
 	method_desc = mono_method_desc_new (name, FALSE);
@@ -139,25 +139,17 @@ m_method (const gchar *assembly_name, const gchar *name_space, const gchar *stat
 
 	mono_method_desc_free (method_desc);
 
-	if (method)
-	{
-		result.__priv = method;	
-		return result;
-	}
+	if (!method)
+		g_error("m: Unable to find %s.\n", name);
 
-	g_error ("M: Unable to find %s.\n", name);
+	return (MMethod*)method;
 }
 
 
 MObject *
-m_method_invoke (MMethod method, void **params)
+m_method_invoke (MMethod *method, void **params)
 {
-	if (method.__priv)
-	{
-		return (MObject*)mono_runtime_invoke((MonoMethod*)method.__priv, NULL, params, NULL);
-	}
-
-	g_error ("m: Method doesn't exist.\n");
+	return (MObject*)mono_runtime_invoke((MonoMethod*)method, NULL, params, NULL);
 }
 
 
@@ -198,38 +190,6 @@ m_object_get_property (MObject *obj, const gchar *property_name)
 	}
 
 	return (MObject*)mono_property_get_value (prop, (MonoObject *)obj, NULL, NULL);
-}
-
-
-void
-m_object_set_property (MObject *obj, const gchar *property_name, gpointer value)
-{
-	MonoClass *klass = mono_object_get_class ((MonoObject*)obj);
-	MonoProperty *prop = mono_class_get_property_from_name (klass, property_name);
-	MonoType *type = mono_class_get_type (klass);
-
-	gpointer args[1];
-
-	args[0] = value;
-	if (mono_type_is_struct (type))
-	{
-		mono_property_set_value (prop, mono_object_unbox ((MonoObject*)obj), args, NULL); 
-	}
-	else
-	{
-		mono_property_set_value (prop, (MonoObject*)obj, args, NULL);
-	}
-}
-
-
-void
-m_object_set_field (MObject *obj, const gchar *field_name, gpointer value)
-{
-	MonoClass *klass = mono_object_get_class ((MonoObject*)obj);
-	MonoClassField *field = mono_class_get_field_from_name (klass, field_name);
-	MonoType *type = mono_class_get_type (klass);
-
-	mono_field_set_value ((MonoObject*)obj, field, value);
 }
 
 
@@ -285,21 +245,15 @@ m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gcha
 }
 
 
-MString
+MString *
 m_string (const gchar* text)
 {
-	MString result;
-
-
 	if (text)
 	{
-		result.__priv = mono_string_new (mono_domain_get (), text);
+		return (MString*)mono_string_new (mono_domain_get (), text);
 	}
-	else
-	{
-		result.__priv = mono_string_new (mono_domain_get (), "");
-	}
-	return result;
+	
+	return (MString*)mono_string_new (mono_domain_get (), "");
 }
 
 //****************************
@@ -320,9 +274,9 @@ m_object_as_arg (MObject *obj)
 }
 
 gpointer
-m_string_as_arg (MString str)
+m_string_as_arg (MString *str)
 {
-	return str.__priv;
+	return str;
 }
 
 //****************************

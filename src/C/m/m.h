@@ -39,16 +39,8 @@ THE SOFTWARE.
 
 typedef struct _MDomain MDomain;
 typedef struct _MObject MObject;
-
-typedef struct
-{
-	gpointer __priv;
-} MString;
-
-typedef struct
-{
-	gpointer __priv;
-} MMethod;
+typedef struct _MString MString;
+typedef struct _MMethod MMethod;
 
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename);
@@ -62,23 +54,17 @@ m_domain_free (MDomain *domain);
 void
 m_load_assembly (const gchar *name);
 
-MMethod
+MMethod *
 m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name);
 
 MObject *
-m_method_invoke (MMethod method, void **params);
+m_method_invoke (MMethod *method, gpointer *params);
 
 MObject *
 m_object (const gchar *assembly_name, const gchar *name_space, const gchar *struct_name, gint argc, gpointer *args);
 
 MObject *
 m_object_get_property (MObject *obj, const gchar *property_name);
-
-void
-m_object_set_property (MObject *obj, const gchar *property_name, gpointer value);
-
-void
-m_object_set_field (MObject *obj, const gchar *field_name, gpointer value);
 
 MObject *
 m_object_invoke (MObject *obj, const gchar *method_name, gint argc, gpointer *args);
@@ -87,16 +73,16 @@ gpointer
 m_object_unbox_struct (MObject *obj);
 
 MObject *
-m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
+m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, gpointer *params);
 
-MString
+MString *
 m_string (const gchar* text);
 
 gpointer
 m_object_as_arg (MObject *obj);
 
 gpointer
-m_string_as_arg (MString str);
+m_string_as_arg (MString *str);
 
 guint32
 m_gchandle_new (MObject *obj, gboolean is_pinned);
@@ -109,8 +95,8 @@ m_gchandle_free (guint32 handle);
 
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
 { \
-if (!o.__priv) \
-	o = m_method(assembly_name, name_space, static_class_name, method_name); \
+	if (!o) \
+		o = m_method(assembly_name, name_space, static_class_name, method_name); \
 } \
 
 #define m_method_invoke_args(method,argc,arg_assignment,o) \
@@ -133,10 +119,10 @@ if (!o.__priv) \
 
 #define m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
-	static MMethod m_cache; \
-	m_method_cache (assembly_name, name_space, static_class_name, method_name, m_cache); \
+	static MMethod *cache; \
+	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
 \
-	m_method_invoke_args (m_cache, argc, arg_assignment, o); \
+	m_method_invoke_args (cache, argc, arg_assignment, o); \
 } \
 
 #endif /* __M_H__ */
