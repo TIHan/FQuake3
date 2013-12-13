@@ -38,16 +38,7 @@ THE SOFTWARE.
 #endif
 
 typedef struct _MDomain MDomain;
-
-typedef struct
-{
-	gpointer __priv;
-} MObject;
-
-typedef struct
-{
-	gpointer __priv;
-} MArray;
+typedef struct _MObject MObject;
 
 typedef struct
 {
@@ -59,19 +50,14 @@ typedef struct
 	gpointer __priv;
 } MMethod;
 
-#if 0
-void
-m_setup_debugger (MDomain* domain);
-#endif
-
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename);
 
 void
-m_domain_exec (const MDomain const* domain, const gchar *assembly_name, const gint argc, gchar *argv[]);
+m_domain_exec (MDomain *domain, const gchar *assembly_name, const gint argc, gchar *argv[]);
 
 void
-m_domain_free (MDomain *const domain);
+m_domain_free (MDomain *domain);
 
 void
 m_load_assembly (const gchar *name);
@@ -79,67 +65,46 @@ m_load_assembly (const gchar *name);
 MMethod
 m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name);
 
-MObject
+MObject *
 m_method_invoke (MMethod method, void **params);
 
-MObject
+MObject *
 m_object (const gchar *assembly_name, const gchar *name_space, const gchar *struct_name, gint argc, gpointer *args);
 
-MObject
-m_object_get_property (const MObject object, const gchar *property_name);
-
-MArray
-m_object_get_property_array (const MObject object, const gchar *property_name);
+MObject *
+m_object_get_property (MObject *obj, const gchar *property_name);
 
 void
-m_object_set_property (const MObject object, const gchar *property_name, gpointer value);
+m_object_set_property (MObject *obj, const gchar *property_name, gpointer value);
 
 void
-m_object_set_field (const MObject object, const gchar *field_name, gpointer value);
+m_object_set_field (MObject *obj, const gchar *field_name, gpointer value);
 
-MObject
-m_object_invoke (const MObject object, const gchar *method_name, gint argc, gpointer *args);
+MObject *
+m_object_invoke (MObject *obj, const gchar *method_name, gint argc, gpointer *args);
 
 gpointer
-m_object_unbox_struct (const MObject object);
+m_object_unbox_struct (MObject *obj);
 
-gboolean
-m_object_is_struct (MObject obj);
-
-MObject
+MObject *
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params);
-
-MArray
-m_array (const gchar *assembly_name, const gchar *name_space, const gchar *name, const gint size);
-
-MArray
-m_array_int32 (const gint size);
-
-gchar*
-m_array_addr_with_size (const MArray object, const gint size, const gint index);
-
-gint
-m_array_length (const MArray object);
 
 MString
 m_string (const gchar* text);
 
 gpointer
-m_object_as_arg (MObject obj);
-
-gpointer
-m_array_as_arg (MArray arr);
+m_object_as_arg (MObject *obj);
 
 gpointer
 m_string_as_arg (MString str);
 
 guint32
-m_gchandle_new (MObject obj, gboolean is_pinned);
+m_gchandle_new (MObject *obj, gboolean is_pinned);
 
-MObject
+MObject *
 m_gchandle_get_target (guint32 handle);
 
-MObject
+void
 m_gchandle_free (guint32 handle);
 
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
@@ -154,7 +119,7 @@ if (!o.__priv) \
 \
 	arg_assignment \
 \
-	*(MObject *)&o = m_method_invoke(method, __args); \
+	o = m_method_invoke(method, __args); \
 } \
 
 #define m_invoke_method_args(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
@@ -163,7 +128,7 @@ if (!o.__priv) \
 \
 	arg_assignment \
 \
-	*(MObject *)&o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
+	o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
 #define m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \

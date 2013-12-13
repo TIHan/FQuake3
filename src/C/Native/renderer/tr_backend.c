@@ -424,10 +424,10 @@ static void SetViewportAndScissor( void ) {
 }
 #else
 static void SetViewportAndScissor(void) {
-	MObject m_void;
+	MObject *unit;
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Backend", "setViewportAndScissor", 1, {
 		__args[0] = m_object_as_arg (qm_of_tr_back_end_state (&backEnd));
-	}, m_void);
+	}, unit);
 }
 #endif
 /*
@@ -517,9 +517,10 @@ void RB_BeginDrawingView (void) {
 		qglDisable (GL_CLIP_PLANE0);
 	}
 #else
-	MObject m_tuple;
 	glstate_t* _glState = &glState;
 	backEndState_t* _backEnd = &backEnd;
+
+	MObject *tuple;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Backend", "beginDrawingView", 6, {
 		__args [0] = m_object_as_arg (qm_of_cvar (r_finish));
@@ -528,10 +529,10 @@ void RB_BeginDrawingView (void) {
 		__args [3] = m_object_as_arg (qm_of_cvar (r_fastsky));
 		__args [4] = m_object_as_arg (qm_of_gl_state (&glState));
 		__args [5] = m_object_as_arg (qm_of_tr_back_end_state (&backEnd));
-	}, m_tuple);
+	}, tuple);
 
-	qm_to_gl_state (m_object_get_property (m_tuple, "Item1"), &_glState);
-	qm_to_tr_back_end_state (m_object_get_property (m_tuple, "Item2"), &_backEnd);
+	qm_to_gl_state (m_object_get_property (tuple, "Item1"), &_glState);
+	qm_to_tr_back_end_state (m_object_get_property (tuple, "Item2"), &_backEnd);
 #endif
 }
 

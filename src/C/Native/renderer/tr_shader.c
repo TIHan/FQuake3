@@ -3025,10 +3025,10 @@ void R_InitShaders( void ) {
 
 	CreateExternalShaders();
 #else
-	MObject m_result;
+	MObject *result;
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Shader", "init", 1, {}, m_result);
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Shader", "init", 1, {}, result);
 #endif
 }

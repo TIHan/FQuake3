@@ -1721,12 +1721,12 @@ void R_LoadLightGrid( lump_t *l ) {
 	}
 
 	{
-		MObject m_unit;
+		MObject *unit;
 
 		qm_invoke ("Engine.Renderer", "Engine.Renderer.Native", "Bsp", "setLightGridData", 2, {
 			__args[0] = &l->filelen;
 			__args[1] = w->lightGridData;
-		}, m_unit);
+		}, unit);
 	}
 #endif
 }

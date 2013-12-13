@@ -41,35 +41,34 @@ m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_nam
 
 #define of_invoke(static_class_name,method_name,arg) \
 { \
-	MObject m_result; \
+	MObject *result; \
 	qm_invoke (Assembly, Namespace, static_class_name, method_name, 1, { \
 		__args [0] = arg; \
-	}, m_result); \
-	return m_result; \
+	}, result); \
+	return result; \
 } \
 
 #define to_invoke(static_class_name,method_name,argc,arg_assignment) \
 { \
-	MObject m_void; \
-	qm_invoke (Assembly, Namespace, static_class_name, method_name, argc, arg_assignment, m_void); \
-	return m_void; \
+	MObject *unit; \
+	qm_invoke (Assembly, Namespace, static_class_name, method_name, argc, arg_assignment, unit); \
 } \
 
 #define define_of_prototype(name,type) \
-MObject \
+MObject * \
 qm_of_##name## (type ptr); \
 
 #define define_to_prototype(name,type) \
 void \
-qm_to_##name## (MObject obj, type ptr); \
+qm_to_##name## (MObject *obj, type ptr); \
 
 #define define_to_of_struct_prototype(name,type) \
 void \
-qm_to_of_struct_##name## (MObject obj, type ptr); \
+qm_to_of_struct_##name## (MObject *obj, type ptr); \
 
 #define define_of(name,type,managed_name) \
-	MObject \
-	qm_of_##name## (type ptr) \
+MObject * \
+qm_of_##name## (type ptr) \
 { \
 	to_invoke (managed_name, "ofNativePtr", 1, { \
 		__args[0] = ptr; \
@@ -78,7 +77,7 @@ qm_to_of_struct_##name## (MObject obj, type ptr); \
 
 #define define_to(name,type,managed_name) \
 void \
-qm_to_##name## (MObject obj, type ptr) \
+qm_to_##name## (MObject *obj, type ptr) \
 { \
 	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = ptr; \
@@ -88,7 +87,7 @@ qm_to_##name## (MObject obj, type ptr) \
 
 #define define_to_of_struct(name,type,managed_name) \
 void \
-qm_to_of_struct_##name## (MObject obj, type ptr) \
+qm_to_of_struct_##name## (MObject *obj, type ptr) \
 { \
 	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = ptr; \

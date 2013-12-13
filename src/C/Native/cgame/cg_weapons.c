@@ -961,14 +961,14 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	angles[YAW] += scale * fracsin * 0.01;
 	angles[PITCH] += scale * fracsin * 0.01;
 #else
-	MObject m_tuple;
+	MObject *tuple;
 
 	qm_invoke ("CGame", "CGame", "Weapons", "calculateWeaponPosition", 1, {
 		__args [0] = m_object_as_arg (qm_of_cg (&cg));
-	}, m_tuple);
+	}, tuple);
 
-	qm_to_vec3 (m_object_get_property (m_tuple, "Item1"), origin);
-	qm_to_vec3 (m_object_get_property (m_tuple, "Item2"), angles);
+	qm_to_vec3 (m_object_get_property (tuple, "Item1"), origin);
+	qm_to_vec3 (m_object_get_property (tuple, "Item2"), angles);
 #endif
 }
 

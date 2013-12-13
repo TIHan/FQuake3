@@ -525,19 +525,19 @@ int NET_IPSocket( char *net_interface, int port ) {
 
 	return newsocket;
 #else
-	MObject m_new_socket;
-	MObject m_str;
+	MObject *new_socket;
+	MObject *str;
 
 	qm_invoke ("Engine", "Engine", "Option", "ofString", 1, {
 		__args [0] = m_string_as_arg (m_string (net_interface));
-	}, m_str);
+	}, str);
 
 	qm_invoke ("Engine", "Engine.Net", "Net", "createIPSocket", 2, {
-		__args [0] = m_object_as_arg (m_str);
+		__args [0] = m_object_as_arg (str);
 		__args [1] = &port;
-	}, m_new_socket);
+	}, new_socket);
 
-	return *(gint*)m_object_unbox_struct (m_new_socket);
+	return *(gint*)m_object_unbox_struct (new_socket);
 #endif
 }
 

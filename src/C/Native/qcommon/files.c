@@ -318,54 +318,54 @@ FILE*		missingFiles = NULL;
 // FQ3 - space was here
 //============
 
-static MObject
+static MObject *
 convert_from_fs_searchpaths ()
 {
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine", "Engine.Native", "SearchPath", "convertFrom_fs_searchpaths", 1, {
 		__args [0] = fs_searchpaths;
-	}, m_result);
+	}, result);
 
-	return m_result;
+	return result;
 }
 
-static MObject
+static MObject *
 convert_from_fs_server_paks ()
 {
-	MObject m_result;
+	MObject *result;
 
-	qm_invoke("Engine", "Engine.Native", "ServerPakChecksum", "createFrom_fs_serverPaks", 2, {
+	qm_invoke ("Engine", "Engine.Native", "ServerPakChecksum", "createFrom_fs_serverPaks", 2, {
 		__args [0] = &fs_numServerPaks;
 		__args [1] = &fs_serverPaks;
-	}, m_result);
+	}, result);
 
-	return m_result;
+	return result;
 }
 
-static MObject
+static MObject *
 create_file_system ()
 {
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine", "Engine", "FileSystem", "create", 2, {
 		__args [0] = m_object_as_arg (convert_from_fs_searchpaths ());
 		__args [1] = m_object_as_arg (convert_from_fs_server_paks ());
-	}, m_result);
+	}, result);
 
-	return m_result;
+	return result;
 }
 
-static MObject
+static MObject *
 of_pack (pack_t* pack)
 {
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine", "Engine.Native", "Pak", "ofNativePtr", 1, {
 		__args [0] = pack;
-	}, m_result);
+	}, result);
 
-	return m_result;
+	return result;
 }
 
 //============
@@ -380,13 +380,13 @@ qboolean FS_Initialized() {
 #if 0
 	return (fs_searchpaths != NULL);
 #else
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine", "Engine", "FileSystem", "isInitialized", 1, {
 		__args [0] = m_object_as_arg (create_file_system ());
-	}, m_result);
+	}, result);
 
-	return *(qboolean*)m_object_unbox_struct (m_result);
+	return *(qboolean*)m_object_unbox_struct (result);
 #endif
 }
 
@@ -412,14 +412,14 @@ qboolean FS_PakIsPure( pack_t *pack ) {
 	}
 	return qtrue;
 #else
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine", "Engine", "FileSystem", "isPakPure", 2, {
 		__args [0] = m_object_as_arg (of_pack (pack));
 		__args [1] = m_object_as_arg (create_file_system ());
-	}, m_result);
+	}, result);
 
-	return *(qboolean*)m_object_unbox_struct (m_result);
+	return *(qboolean*)m_object_unbox_struct (result);
 #endif
 }
 

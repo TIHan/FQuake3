@@ -72,15 +72,15 @@ static float ProjectRadius( float r, vec3_t location )
 
 	return pr;
 #else
-	MObject m_result;
+	MObject *result;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Mesh", "projectRadius", 3, {
 		__args[0] = &r;
 		__args[1] = m_object_as_arg (qm_of_vec3 (location));
 		__args[2] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
-	}, m_result);
+	}, result);
 
-	return *(gfloat*)m_object_unbox_struct (m_result);
+	return *(gfloat*)m_object_unbox_struct (result);
 #endif
 }
 
