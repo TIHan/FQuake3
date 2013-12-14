@@ -537,7 +537,7 @@ int NET_IPSocket( char *net_interface, int port ) {
 		__args [1] = &port;
 	}, new_socket);
 
-	return *(gint*)m_object_unbox_struct (new_socket);
+	return *(gint*)m_object_unbox (new_socket);
 #endif
 }
 

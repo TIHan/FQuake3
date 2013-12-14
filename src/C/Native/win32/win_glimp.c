@@ -718,7 +718,7 @@ static qboolean GLW_CreateWindow( const char *drivername, int width, int height,
 		//__args [3] = m_object_as_arg (qm_of_qboolean (&cdsFullscreen));
 	}, m_result);
 
-	g_wv.hWnd = m_object_unbox_struct(m_result);
+	g_wv.hWnd = m_object_unbox(m_result);
 	return qtrue;
 #endif
 }

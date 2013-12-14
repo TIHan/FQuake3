@@ -117,7 +117,7 @@ int R_CullLocalBox (vec3_t bounds[2])
 		__args [3] = m_object_as_arg (qm_of_cvar (r_nocull));
 	}, result);
 
-	return *(gint*)m_object_unbox_struct (result);
+	return *(gint*)m_object_unbox (result);
 #endif
 }
 
@@ -143,7 +143,7 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 		__args [4] = m_object_as_arg (qm_of_cvar (r_nocull));
 	}, result);
 
-	return *(gint *)m_object_unbox_struct (result);
+	return *(gint *)m_object_unbox (result);
 #endif
 }
 
@@ -194,7 +194,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 		__args [3] = m_object_as_arg (qm_of_cvar (r_nocull));
 	}, result);
 
-	return *(gint *)m_object_unbox_struct (result);
+	return *(gint *)m_object_unbox (result);
 #endif
 }
 
@@ -639,7 +639,7 @@ void R_SetupProjection( void ) {
 	}, tuple);
 
 	qm_to_mat4x4 (m_object_get_property (tuple, "Item1"), tr.viewParms.projectionMatrix);
-	tr.viewParms.zFar = *(gfloat *)m_object_unbox_struct (m_object_get_property (tuple, "Item2"));
+	tr.viewParms.zFar = *(gfloat *)m_object_unbox (m_object_get_property (tuple, "Item2"));
 #endif
 }
 

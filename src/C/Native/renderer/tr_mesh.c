@@ -80,7 +80,7 @@ static float ProjectRadius( float r, vec3_t location )
 		__args[2] = m_object_as_arg (qm_of_view_parms (&tr.viewParms));
 	}, result);
 
-	return *(gfloat*)m_object_unbox_struct (result);
+	return *(gfloat*)m_object_unbox (result);
 #endif
 }
 
@@ -184,7 +184,7 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 	}, m_tuple);
 
 	qm_to_tr_globals (m_object_get_property (m_tuple, "Item2"), &_tr);
-	return (gint)m_object_unbox_struct (m_object_get_property(m_tuple, "Item1"));
+	return (gint)m_object_unbox (m_object_get_property(m_tuple, "Item1"));
 #endif
 }
 
@@ -263,7 +263,7 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		__args [4] = m_object_as_arg (qm_of_tr_globals (&tr));
 	}, m_result);
 
-	return *(gint*)m_object_unbox_struct (m_result);
+	return *(gint*)m_object_unbox (m_result);
 #endif
 }
 

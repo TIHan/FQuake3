@@ -91,7 +91,7 @@ qm_to_of_struct_##name## (MObject *obj, type ptr) \
 { \
 	to_invoke (managed_name, "toNativeByPtr", 2, { \
 		__args [0] = ptr; \
-		__args [1] = m_object_unbox_struct (obj); \
+		__args [1] = m_object_unbox (obj); \
 	}); \
 } \
 

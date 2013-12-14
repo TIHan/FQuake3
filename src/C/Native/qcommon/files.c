@@ -386,7 +386,7 @@ qboolean FS_Initialized() {
 		__args [0] = m_object_as_arg (create_file_system ());
 	}, result);
 
-	return *(qboolean*)m_object_unbox_struct (result);
+	return *(qboolean*)m_object_unbox (result);
 #endif
 }
 
@@ -419,7 +419,7 @@ qboolean FS_PakIsPure( pack_t *pack ) {
 		__args [1] = m_object_as_arg (create_file_system ());
 	}, result);
 
-	return *(qboolean*)m_object_unbox_struct (result);
+	return *(qboolean*)m_object_unbox (result);
 #endif
 }
 

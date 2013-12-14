@@ -210,7 +210,7 @@ m_object_invoke (MObject *obj, const gchar *method_name, gint argc, gpointer *ar
 
 
 gpointer
-m_object_unbox_struct (MObject *obj)
+m_object_unbox (MObject *obj)
 {
 	return mono_object_unbox ((MonoObject*)obj);
 }
@@ -268,7 +268,7 @@ m_object_as_arg (MObject *obj)
 
 	if (mono_type_is_struct (type)) 
 	{
-		return m_object_unbox_struct (obj);
+		return m_object_unbox (obj);
 	}
 	return obj;
 }

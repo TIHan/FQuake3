@@ -72,7 +72,7 @@ static long generateHashValue( const char *fname, const int size ) {
 		__args [0] = m_string_as_arg (m_string(fname));
 	}, m_result);
 
-	return *(gint*)m_object_unbox_struct (m_result);
+	return *(gint*)m_object_unbox (m_result);
 #endif
 }
 

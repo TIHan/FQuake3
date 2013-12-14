@@ -70,7 +70,7 @@ MObject *
 m_object_invoke (MObject *obj, const gchar *method_name, gint argc, gpointer *args);
 
 gpointer
-m_object_unbox_struct (MObject *obj);
+m_object_unbox (MObject *obj);
 
 MObject *
 m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, gpointer *params);
