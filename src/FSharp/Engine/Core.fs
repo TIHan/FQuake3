@@ -73,8 +73,8 @@ module Axis =
     let inline create x y z =
         Axis.Create (x, y, z)
 
-    let zero =      create Vector3.zero Vector3.zero Vector3.zero
-    let identity =  create Vector3.unitX Vector3.unitY Vector3.unitZ
+    let zero =      create Vec3.zero Vec3.zero Vec3.zero
+    let identity =  create Vec3.right Vec3.up Vec3.forward
 
 /// <summary>
 /// Based on Q3: cvar_t
@@ -112,5 +112,5 @@ module Bounds =
             let b = abs bounds.Maxs.[i]
             if a > b then a else b
         
-        Vector3.length <| Vector3 (f 0, f 1, f 2)
+        Vec3.length <| Vector3 (f 0, f 1, f 2)
 

@@ -64,35 +64,30 @@ module Rad =
 
     let inline toDeg x : single<deg> = x * ``180 / PI``
 
-/// Vector2
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector2 =
-    val X : single
-    val Y : single
+    val x : single
+    val y : single
 
-    new (x, y) = { X = x; Y = y }
-
-    static member inline Create (x, y) =
-        Vector2 (x, y)
+    new (x, y) = { x = x; y = y }
+    new (x) = { x = x; y = x }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X | 1 -> this.Y
+            | 0 -> this.x | 1 -> this.y
             | _ -> raise <| IndexOutOfRangeException ()
+and vec2 = Vector2
 
 /// Vector2 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Vector2 =
-    let inline create x y = 
-        Vector2.Create (x, y)
-    
-    let zero =  create 0.f 0.f
-    let one =   create 1.f 1.f
-    let unitX = create 1.f 0.f
-    let unitY = create 0.f 1.f
+module Vec2 =    
+    let zero =  vec2 (0.f)
+    let one =   vec2 (1.f)
+    let right = vec2 (1.f, 0.f)
+    let up =    vec2 (0.f, 1.f)
 
 /// Vector3
 [<Struct>]
@@ -103,9 +98,7 @@ type Vector3 =
     val Z : single
 
     new (x, y, z) = { X = x; Y = y; Z = z }
-
-    static member inline Create (x, y, z) =
-        Vector3 (x, y, z)
+    new (x) = { X = x; Y = x; Z = x }
 
     member inline this.Item
         with get (i) =
@@ -113,45 +106,45 @@ type Vector3 =
             | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    member inline this.Set (?X: single, ?Y: single, ?Z: single) =
-        Vector3.Create (
-            (match X with | Some x -> x | None -> this.X),
-            (match Y with | Some y -> y | None -> this.Y),
-            (match Z with | Some z -> z | None -> this.Z)
+    member inline this.Set (?x: single, ?y: single, ?z: single) =
+        vec3 (
+            (match x with | Some x -> x | None -> this.X),
+            (match y with | Some y -> y | None -> this.Y),
+            (match z with | Some z -> z | None -> this.Z)
         )
 
-    static member inline Abs (v: Vector3) =
-        Vector3.Create (abs v.X, abs v.Y, abs v.Z)
+    static member inline Abs (v: vec3) =
+        vec3 (abs v.X, abs v.Y, abs v.Z)
 
-    static member inline Truncate (v: Vector3) =
-        Vector3.Create (truncate v.X, truncate v.Y, truncate v.Z)
+    static member inline Truncate (v: vec3) =
+        vec3 (truncate v.X, truncate v.Y, truncate v.Z)
 
-    static member inline Floor (v: Vector3) =
-        Vector3.Create (floor v.X, floor v.Y, floor v.Z)
+    static member inline Floor (v: vec3) =
+        vec3 (floor v.X, floor v.Y, floor v.Z)
 
-    static member inline (*) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+    static member inline (*) (v1: vec3, v2: vec3) =
+        vec3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
-    static member inline (/) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
+    static member inline (/) (v1: vec3, v2: vec3) =
+        vec3 (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
 
-    static member inline (+) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
+    static member inline (+) (v1: vec3, v2: vec3) =
+        vec3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
 
-    static member inline (-) (v1: Vector3, v2: Vector3) =
-        Vector3.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+    static member inline (-) (v1: vec3, v2: vec3) =
+        vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
-    static member inline (*) (v: Vector3, s) =
-        Vector3.Create (v.X * s, v.Y * s, v.Z * s)
+    static member inline (*) (v: vec3, s) =
+        vec3 (v.X * s, v.Y * s, v.Z * s)
 
-    static member inline (/) (v: Vector3, s) =
-        Vector3.Create (v.X / s, v.Y / s, v.Z / s)
+    static member inline (/) (v: vec3, s) =
+        vec3 (v.X / s, v.Y / s, v.Z / s)
 
-    static member inline (+) (v: Vector3, s) =
-        Vector3.Create (v.X + s, v.Y + s, v.Z + s)
+    static member inline (+) (v: vec3, s) =
+        vec3 (v.X + s, v.Y + s, v.Z + s)
 
-    static member inline (-) (v: Vector3, s) =
-        Vector3.Create (v.X - s, v.Y - s, v.Z - s)
+    static member inline (-) (v: vec3, s) =
+        vec3 (v.X - s, v.Y - s, v.Z - s)
 
     static member inline (*) (s, v) =
         v * s
@@ -164,21 +157,19 @@ type Vector3 =
 
     static member inline (-) (s, v) =
         v / s
+and vec3 = Vector3
 
 /// Vector3 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Vector3 =
-    let inline create x y z =
-        Vector3.Create (x, y, z)
+module Vec3 =
+    let zero =  vec3 (0.f)
+    let one =   vec3 (1.f)
+    let right = vec3 (1.f, 0.f, 0.f)
+    let up =    vec3 (0.f, 1.f, 0.f)
+    let forward = vec3 (0.f, 0.f, 1.f)
 
-    let zero =  create 0.f 0.f 0.f
-    let one =   create 1.f 1.f 1.f
-    let unitX = create 1.f 0.f 0.f
-    let unitY = create 0.f 1.f 0.f
-    let unitZ = create 0.f 0.f 1.f
-
-    let inline minDimension (v: Vector3) =
+    let inline minDimension (v: vec3) =
         match v.X < v.Y with
         | true ->
             match v.X < v.Z with
@@ -189,19 +180,20 @@ module Vector3 =
             | true -> 1
             | _ -> 2
         
-    let inline multiplyAdd s (v1: Vector3) (v2: Vector3) =
-        create (s * v1.X + v2.X) (s * v1.Y + v2.Y) (s * v1.Z + v2.Z) 
+    let inline multiplyAdd s (v1: vec3) (v2: vec3) =
+        vec3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z) 
 
-    let inline dot (v1: Vector3) (v2: Vector3) =
+    let inline dot (v1: vec3) (v2: vec3) =
         v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z
 
-    let inline cross (v1: Vector3) (v2: Vector3) =
-        create
-            (v1.Y * v2.Z - v1.Z * v2.Y)
-            (v1.Z * v2.X - v1.X * v2.Z)
-            (v1.X * v2.Y - v1.Y * v2.X)
+    let inline cross (v1: vec3) (v2: vec3) =
+        vec3 (
+            v1.Y * v2.Z - v1.Z * v2.Y,
+            v1.Z * v2.X - v1.X * v2.Z,
+            v1.X * v2.Y - v1.Y * v2.X
+        )
 
-    let inline lengthSquared (v: Vector3) =
+    let inline lengthSquared (v: vec3) =
         v.X * v.X + v.Y * v.Y + v.Z * v.Z
 
     let inline length v =
@@ -209,19 +201,19 @@ module Vector3 =
 
     let inline normalize v =
         let length = 1.f / length v
-        create (v.X * length) (v.Y * length) (v.Z * length)
+        vec3 (v.X * length, v.Y * length, v.Z * length)
 
     let inline perpendicular v =
         let uv =
             match abs v |> minDimension with
-            | 0 -> unitX | 1 -> unitY | 2 -> unitZ
+            | 0 -> right | 1 -> up | 2 -> forward
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let vn = normalize uv
         cross v vn
 
-    let inline lerp (v1: Vector3) (v2: Vector3) (t: single) =
-        create (Math.lerp v1.X v2.X t) (Math.lerp v1.Y v2.Y t) (Math.lerp v1.Z v2.Z t)
+    let inline lerp (v1: vec3) (v2: vec3) (t: single) =
+        vec3 (Math.lerp v1.X v2.X t, Math.lerp v1.Y v2.Y t, Math.lerp v1.Z v2.Z t)
 
 /// Vector4
 [<Struct>]
@@ -430,11 +422,11 @@ type Quaternion =
     /// then multiply by the passed quat
     /// create vector based on result quat's x,y,z
     static member inline (*) (q: Quaternion, v) =
-        let vl = 1.f / Vector3.length v
+        let vl = 1.f / Vec3.length v
         let vq = Quaternion.Create (0.f, v.X * vl, v.Y * vl, v.Z * vl)
         let result = q * (vq * q.Conjugate)
 
-        Vector3.create result.X result.Y result.Z
+        vec3 (result.X, result.Y, result.Z)
 
 /// Quaternion Module
 [<RequireQualifiedAccess>]

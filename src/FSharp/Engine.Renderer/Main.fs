@@ -51,12 +51,12 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 
     // transform into world space
     let inline transform i =
-        let v = Vector3.create bounds.[i &&& 1].X bounds.[(i >>> 1) &&& 1].Y bounds.[(i >>> 2) &&& 1].Z
+        let v = vec3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
 
         orientation.Origin
-        |> Vector3.multiplyAdd v.X orientation.Axis.[0]
-        |> Vector3.multiplyAdd v.Y orientation.Axis.[1]
-        |> Vector3.multiplyAdd v.Z orientation.Axis.[2]
+        |> Vec3.multiplyAdd v.X orientation.Axis.[0]
+        |> Vec3.multiplyAdd v.Y orientation.Axis.[1]
+        |> Vec3.multiplyAdd v.Z orientation.Axis.[2]
 
     let rec checkFrustumPlane (frust: Plane) front back isFront n =
         match n with
@@ -65,7 +65,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
         match isFront with
         | true -> (front, back)
         | _ ->
-            let distance = Vector3.dot (transform n) frust.Normal
+            let distance = Vec3.dot (transform n) frust.Normal
 
             match distance > frust.Distance with
             | true -> checkFrustumPlane frust 1 back (back = 1) (n + 1)
@@ -108,7 +108,7 @@ let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (r_n
         | true -> (mightBeClipped, canCullOut)
         | _ ->
         let frust = frustum.[n]
-        let distance = (Vector3.dot point frust.Normal) - frust.Distance
+        let distance = (Vec3.dot point frust.Normal) - frust.Distance
 
         match distance < -radius with
         | true -> checkFrustumPlanes mightBeClipped true (n + 1)
@@ -126,8 +126,8 @@ let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (r_n
 /// </summary>
 [<Pure>]
 let localPointToWorld (local: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dot local orientation.Axis.[i] + orientation.Origin.[i]
-    Vector3.create (f 0) (f 1) (f 2)
+    let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
+    vec3 (f 0, f 1, f 2)
 
 /// <summary>
 /// Based on Q3: R_LocalNormalToWorld
@@ -135,8 +135,8 @@ let localPointToWorld (local: Vector3) (orientation: OrientationR) =
 /// </summary>
 [<Pure>]
 let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dot local orientation.Axis.[i]
-    Vector3.create (f 0) (f 1) (f 2)
+    let inline f i = Vec3.dot local orientation.Axis.[i]
+    vec3 (f 0, f 1, f 2)
 
 /// <summary>
 /// Based on Q3: R_WorldToLocal
@@ -144,8 +144,8 @@ let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
 /// </summary>
 [<Pure>]
 let worldToLocal (world: Vector3) (orientation: OrientationR) =
-    let inline f i = Vector3.dot world orientation.Axis.[i]
-    Vector3.create (f 0) (f 1) (f 2)
+    let inline f i = Vec3.dot world orientation.Axis.[i]
+    vec3 (f 0, f 1, f 2)
 
 /// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
@@ -240,18 +240,18 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
         match entity.HasNonNormalizedAxes with
         | true ->
             // TODO: Is it ok to compare the single like this?
-            match Vector3.length axis.X with
+            match Vec3.length axis.X with
             | 0.f -> 0.f
             | axisLength ->
                 1.0f / axisLength
         | _ -> 1.0f
 
-    let inline calculateOrigin i = (Vector3.dot delta axis.[i]) * axisLength
+    let inline calculateOrigin i = (Vec3.dot delta axis.[i]) * axisLength
 
     {
         Origin = origin;
         Axis = axis;
-        ViewOrigin = Vector3.create (calculateOrigin 0) (calculateOrigin 1) (calculateOrigin 2);
+        ViewOrigin = vec3 (calculateOrigin 0, calculateOrigin 1, calculateOrigin 2);
         ModelMatrix = glMatrix * viewParms.World.ModelMatrix;
     }
 
@@ -278,7 +278,7 @@ let rotateForViewer (viewParms: ViewParms) =
             1.f
         
     {
-        Origin = Vector3.zero;
+        Origin = Vec3.zero;
         Axis = Axis.identity;
         ViewOrigin = origin;
         // convert from our coordinate system (looking down X)
@@ -308,8 +308,8 @@ let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: Orien
         let y = if (acc &&& 2) <> 0 then visibilityBounds.[0].[1] else visibilityBounds.[1].[1]
         let z = if (acc &&& 4) <> 0 then visibilityBounds.[0].[2] else visibilityBounds.[1].[2]
 
-        let v = Vector3.create x y z
-        let possibleDistance = Vector3.lengthSquared <| v - orientation.Origin
+        let v = vec3 (x, y, z)
+        let possibleDistance = Vec3.lengthSquared <| v - orientation.Origin
 
         calculateFarthestCornerDistance (if possibleDistance > distance then possibleDistance else distance) (acc + 1)
 
@@ -362,37 +362,37 @@ let setupFrustum (view: ViewParms) =
     let xNormal = xs * view.Orientation.Axis.[0]
     let yNormal = ys * view.Orientation.Axis.[0]
 
-    let leftNormal = Vector3.multiplyAdd xc view.Orientation.Axis.[1] xNormal
-    let rightNormal = Vector3.multiplyAdd -xc view.Orientation.Axis.[1] xNormal
-    let bottomNormal = Vector3.multiplyAdd yc view.Orientation.Axis.[2] yNormal
-    let topNormal = Vector3.multiplyAdd -yc view.Orientation.Axis.[2] yNormal
+    let leftNormal = Vec3.multiplyAdd xc view.Orientation.Axis.[1] xNormal
+    let rightNormal = Vec3.multiplyAdd -xc view.Orientation.Axis.[1] xNormal
+    let bottomNormal = Vec3.multiplyAdd yc view.Orientation.Axis.[2] yNormal
+    let topNormal = Vec3.multiplyAdd -yc view.Orientation.Axis.[2] yNormal
 
     {
         Left =
             {
                 Normal = leftNormal;
-                Distance = Vector3.dot view.Orientation.Origin leftNormal;
+                Distance = Vec3.dot view.Orientation.Origin leftNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits leftNormal;
             };
         Right = 
             {
                 Normal = rightNormal;
-                Distance = Vector3.dot view.Orientation.Origin rightNormal;
+                Distance = Vec3.dot view.Orientation.Origin rightNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits rightNormal;
             };
         Bottom =
             {
                 Normal = bottomNormal;
-                Distance = Vector3.dot view.Orientation.Origin bottomNormal;
+                Distance = Vec3.dot view.Orientation.Origin bottomNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits bottomNormal;
             };
         Top =
             {
                 Normal = topNormal;
-                Distance = Vector3.dot view.Orientation.Origin topNormal;
+                Distance = Vec3.dot view.Orientation.Origin topNormal;
                 Type = PlaneType.NonAxial;
                 SignBits = Plane.CalculateSignBits topNormal;
             }
@@ -405,8 +405,8 @@ let setupFrustum (view: ViewParms) =
 [<Pure>]
 let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
     let local = v - surface.Origin
-    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dot local surface.Axis.[i]) camera.Axis.[i] transformed
-    transform 0 Vector3.zero |> transform 1 |> transform 2 |> (+) camera.Origin
+    let inline transform i transformed = Vec3.multiplyAdd (Vec3.dot local surface.Axis.[i]) camera.Axis.[i] transformed
+    transform 0 Vec3.zero |> transform 1 |> transform 2 |> (+) camera.Origin
 
 /// <summary>
 /// Based on Q3: R_MirrorVector
@@ -414,8 +414,8 @@ let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
 /// </summary>
 [<Pure>]
 let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
-    let inline transform i transformed = Vector3.multiplyAdd (Vector3.dot v surface.Axis.[i]) camera.Axis.[i] transformed
-    transform 0 Vector3.zero |> transform 1 |> transform 2
+    let inline transform i transformed = Vec3.multiplyAdd (Vec3.dot v surface.Axis.[i]) camera.Axis.[i] transformed
+    transform 0 Vec3.zero |> transform 1 |> transform 2
 
 /// <summary>
 /// Based on Q3: R_PlaneForSurface
@@ -441,7 +441,7 @@ let planeForSurface (surface: Surface) (plane: Plane) =
 
         { plane4 with Type = plane.Type; SignBits = plane.SignBits }
     | _ ->
-        { Normal = Vector3.create 1.f 0.f 0.f; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
+        { Normal = Vec3.right; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
 
 /// <summary>
 /// create plane axis for the portal we are seeing
@@ -470,10 +470,10 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
     // rotate the plane, but keep the non-rotated version for matching
     // against the portalSurface entities
     let normal = localNormalToWorld originalPlane.Normal orientation
-    let distance = originalPlane.Distance + Vector3.dot normal orientation.Origin
+    let distance = originalPlane.Distance + Vec3.dot normal orientation.Origin
 
     // translate the original plane
-    let originalDistance = originalPlane.Distance + Vector3.dot originalPlane.Normal orientation.Origin
+    let originalDistance = originalPlane.Distance + Vec3.dot originalPlane.Normal orientation.Origin
 
     (
         { originalPlane with Distance = originalDistance },
@@ -484,8 +484,8 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
 /// Transforms existing axis based on a normal.
 [<Pure>]
 let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
-    let y = Vector3.perpendicular normal
-    Axis.create normal y (Vector3.cross normal y)
+    let y = Vec3.perpendicular normal
+    Axis.create normal y (Vec3.cross normal y)
 
 /// Tries to find the closest portal entity based on a plane.
 [<Pure>]
@@ -493,7 +493,7 @@ let tryFindClosestPortalEntityByPlane (plane: Plane) (r: Renderer) =
     r.Refdef.Entities |>
     List.tryFind (fun x ->
         let isPortalSurface = not (x.Entity.Type <> RefEntityType.PortalSurface)
-        let distance = (Vector3.dot x.Entity.Origin plane.Normal) - plane.Distance
+        let distance = (Vec3.dot x.Entity.Origin plane.Normal) - plane.Distance
         let isWithinDistance = not (distance > 64.f || distance < -64.f)
 
         isPortalSurface && isWithinDistance
@@ -506,7 +506,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     match entity.OldOrigin = entity.Origin with
     | true ->
         let origin = plane.Normal * plane.Distance
-        let axis = surface.Axis.Set (X = Vector3.zero - surface.Axis.X)
+        let axis = surface.Axis.Set (X = Vec3.zero - surface.Axis.X)
 
         (
             true,
@@ -517,14 +517,14 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
 
     // project the origin onto the surface plane to get
     // an origin point we can rotate around
-    let distance = (Vector3.dot entity.Origin plane.Normal) - plane.Distance
-    let surface = { surface with Origin = Vector3.multiplyAdd -distance surface.Axis.X entity.Origin }
+    let distance = (Vec3.dot entity.Origin plane.Normal) - plane.Distance
+    let surface = { surface with Origin = Vec3.multiplyAdd -distance surface.Axis.X entity.Origin }
 
     // now get the camera origin and orientation
     let camera =
         { camera with
             Origin = entity.OldOrigin;
-            Axis = entity.Axis.Set (X = Vector3.zero - entity.Axis.X, Y = Vector3.zero - entity.Axis.Y);
+            Axis = entity.Axis.Set (X = Vec3.zero - entity.Axis.X, Y = Vec3.zero - entity.Axis.Y);
         }
 
     // optionally rotate and if a speed is specified
@@ -547,7 +547,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
         false,
         surface,
         { camera with 
-            Axis = camera.Axis.Set (Y = y, Z = Vector3.cross camera.Axis.X y)
+            Axis = camera.Axis.Set (Y = y, Z = Vec3.cross camera.Axis.X y)
         }
     )
 

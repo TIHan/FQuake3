@@ -167,7 +167,7 @@ type Plane =
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Plane =
-    let zero = { Normal = Vector3.zero; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
+    let zero = { Normal = Vec3.zero; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
     let calculateSignBits (plane: Plane) =
         Plane.CalculateSignBits plane.Normal
 
@@ -180,12 +180,12 @@ module Plane =
     let inline ofPoints (a: Vector3) (b: Vector3) (c: Vector3) =
         let d1 = b - a
         let d2 = c - a
-        let cross = Vector3.cross d2 d1
-        let normal = Vector3.normalize cross
+        let cross = Vec3.cross d2 d1
+        let normal = Vec3.normalize cross
         
-        match Vector3.length cross with
+        match Vec3.length cross with
         | 0.f -> { Normal = normal; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
-        | _ -> { Normal = normal; Distance = Vector3.dot a normal; Type = PlaneType.X; SignBits = 0uy }
+        | _ -> { Normal = normal; Distance = Vec3.dot a normal; Type = PlaneType.X; SignBits = 0uy }
 
 /// <summary>
 /// Frustum
@@ -332,7 +332,7 @@ type RefEntity = {
         ShaderRgba: Rgba;
 
         /// texture coordinates used by tcMod entity modifiers
-        ShaderTextureCoordinate: Vector2;
+        ShaderTextureCoordinate: vec2;
 
         // subtracted from refdef time to control effect start times
         ShaderTime: single;
@@ -820,14 +820,14 @@ type TextureModification =
 
         // used for TMOD_TRANSFORM
         Matrix: Matrix2x2;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
-        Translate: Vector2;     // t' = s * m[0][1] + t * m[0][1] + trans[1]
+        Translate: vec2;     // t' = s * m[0][1] + t * m[0][1] + trans[1]
 
         // used for TMOD_SCALE
-        Scale: Vector2;         // s *= scale[0]
+        Scale: vec2;         // s *= scale[0]
                                 // t *= scale[1]
 
         // used for TMOD_SCROLL
-        Scroll: Vector2;        // s' = s + scroll[0] * time
+        Scroll: vec2;        // s' = s + scroll[0] * time
                                 // t' = t + scroll[1] * time
 
         // + = clockwise

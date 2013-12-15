@@ -262,10 +262,10 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
         let distance = backend.View.PortalPlane.Distance
         let plane =
             GL.Plane (
-                double <| Vector3.dot axis.[0] normal,
-                double <| Vector3.dot axis.[1] normal,
-                double <| Vector3.dot axis.[2] normal,
-                double <| Vector3.dot normal origin - distance
+                double <| Vec3.dot axis.[0] normal,
+                double <| Vec3.dot axis.[1] normal,
+                double <| Vec3.dot axis.[2] normal,
+                double <| Vec3.dot normal origin - distance
             )
 
         fixed2' (fun ptr ptr2 ->

@@ -35,8 +35,8 @@ let projectRadius radius location (view: ViewParms) =
     let axis = view.Orientation.Axis
     let origin = view.Orientation.Origin
 
-    let c = Vector3.dot axis.X origin
-    let distance = Vector3.dot axis.X location - c
+    let c = Vec3.dot axis.X origin
+    let distance = Vec3.dot axis.X location - c
 
     match distance <= 0.f with
     | true -> 0.f
@@ -69,15 +69,17 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
     let bounds =
         {
             Bounds.Mins =
-                Vector3.create
-                    (calculateBounds 0 0)
-                    (calculateBounds 0 1)
-                    (calculateBounds 0 2);
+                vec3 (
+                    (calculateBounds 0 0),
+                    (calculateBounds 0 1),
+                    (calculateBounds 0 2)
+                 );
             Maxs =
-                Vector3.create
-                    (calculateBounds 1 0)
-                    (calculateBounds 1 1)
+                vec3 (
+                    (calculateBounds 1 0),
+                    (calculateBounds 1 1),
                     (calculateBounds 1 2)
+                )
         }
 
     let clip = Main.cullLocalBox bounds r.Orientation r.ViewParms.Frustum r_nocull

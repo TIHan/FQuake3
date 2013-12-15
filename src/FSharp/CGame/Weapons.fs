@@ -28,7 +28,7 @@ open CGame.Core
 
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
-let mutable calculateWeaponPositionFsx : CGame -> (Vector3 * Vector3) = fun _ -> (Vector3.zero, Vector3.zero)
+let mutable calculateWeaponPositionFsx : CGame -> (Vector3 * Vector3) = fun _ -> (Vec3.zero, Vec3.zero)
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
     let origin = cg.Refdef.ViewOrigin
@@ -42,10 +42,11 @@ let calculateWeaponPosition (cg: CGame) =
 
     // gun angles from bobbing
     let angles =
-        Vector3.create
-            (angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f)) // PITCH
-            (angles.Y + (scale * cg.BobFractionSin * 0.01f)) // YAW
+        vec3 (
+            (angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f)), // PITCH
+            (angles.Y + (scale * cg.BobFractionSin * 0.01f)), // YAW
             (angles.Z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
+        )
         
     let originZ =
         // drop the weapon when landing
@@ -60,9 +61,10 @@ let calculateWeaponPosition (cg: CGame) =
     let scale = cg.XYSpeed + 40.f
     let fractionSin = sin <| single cg.Time * 0.001f
     let angles =
-        Vector3.create
-            (angles.X + (scale * fractionSin * 0.01f)) // PITCH
-            (angles.Y + (scale * fractionSin * 0.01f)) // YAW
+        vec3 (
+            (angles.X + (scale * fractionSin * 0.01f)), // PITCH
+            (angles.Y + (scale * fractionSin * 0.01f)), // YAW
             (angles.Z + (scale * fractionSin * 0.01f)) // ROLL
+        )
 
-    (origin.Set (Z = originZ), angles)
+    (origin.Set (z = originZ), angles)
