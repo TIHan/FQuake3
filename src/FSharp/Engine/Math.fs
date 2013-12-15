@@ -272,44 +272,32 @@ and mat2 = Matrix2
 module Mat2 =
     let zero = mat2 (0.f, 0.f, 0.f, 0.f)
 
-/// Matrix3x3
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type Matrix3x3 =
-    val M11 : single; val M12 : single; val M13 : single
-    val M21 : single; val M22 : single; val M23 : single
-    val M31 : single; val M32 : single; val M33 : single     
+type Matrix3 =
+    val m11 : single; val m12 : single; val m13 : single
+    val m21 : single; val m22 : single; val m23 : single
+    val m31 : single; val m32 : single; val m33 : single     
 
     new (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
         {
-            M11 = m11; M12 = m12; M13 = m13;
-            M21 = m21; M22 = m22; M23 = m23;
-            M31 = m31; M32 = m32; M33 = m33;
-        }
-
-    static member inline Create (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
-        Matrix3x3 (
-            m11, m12, m13,
-            m21, m22, m23,
-            m31, m32, m33
-        )
+        m11 = m11; m12 = m12; m13 = m13;
+        m21 = m21; m22 = m22; m23 = m23;
+        m31 = m31; m32 = m32; m33 = m33 }
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13
-                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23
-                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33
+                | (0, 0) -> this.m11 | (0, 1) -> this.m12 | (0, 2) -> this.m13
+                | (1, 0) -> this.m21 | (1, 1) -> this.m22 | (1, 2) -> this.m23
+                | (2, 0) -> this.m31 | (2, 1) -> this.m32 | (2, 2) -> this.m33
                 | _ -> raise <| IndexOutOfRangeException ()
+and mat3 = Matrix3
 
-/// Matrix3x3 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Matrix3x3 =
-    let inline create m11 m12 m13 m21 m22 m23 m31 m32 m33 =
-        Matrix3x3.Create (m11, m12, m13, m21, m22, m23, m31, m32, m33)
-
-    let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
+module Matrix3 =
+    let zero = mat3 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
 
 /// Matrix4x4
 [<Struct>]
