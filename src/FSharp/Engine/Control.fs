@@ -25,8 +25,9 @@ module Engine.Control
 type IO<'a> = IO of 'a
  
 type IOBuilder () =
-    member this.Bind (IO x, f) : IO<_>  = f x
-    member this.Delay f                 = f ()
-    member this.Return x                = IO x
+    member inline this.Bind (IO x, f) : IO<_>  = f x
+    member inline this.Delay f                 = f ()
+    member inline this.Return x                = IO x
+    member inline this.Zero ()                 = IO ()
  
 let io = IOBuilder ()

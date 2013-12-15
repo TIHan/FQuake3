@@ -26,10 +26,13 @@ module Engine.Renderer.Core
 open System
 open System.Security
 open System.Runtime.InteropServices
+open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
 open Engine.Core
+open Engine.Control
 open Engine.Math
 open Engine.Files
+open Engine.NativeInterop
 
 /// Rgba
 [<Struct>]
@@ -1361,3 +1364,12 @@ module Internal =
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
     extern void er_gl_set_viewport_and_scissor (single *projection_matrix, int viewport_x, int viewport_y, int viewport_width, int viewport_height)
+
+module GL =
+    let inline setViewportAndScissor (projectionMatrix: mat4) (viewportX: int) (viewportY: int) (viewportWidth: int) (viewportHeight: int) = io {
+        let handle = GCHandle.Alloc (projectionMatrix, GCHandleType.Pinned)
+        let addr =
+            handle.AddrOfPinnedObject ()
+            |> NativePtr.ofNativeInt<single>
+        Internal.er_gl_set_viewport_and_scissor (addr, viewportX, viewportY, viewportWidth, viewportHeight)
+        handle.Free () }

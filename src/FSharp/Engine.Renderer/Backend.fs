@@ -34,6 +34,7 @@ open Engine.Core
 open Engine.Math
 open Engine.Renderer.Core
 open Engine.NativeInterop
+open Engine.Control
 
 [<RequireQualifiedAccess>]
 module GL =
@@ -191,11 +192,16 @@ module GL =
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
 /// Internal
+(*
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
     fixed' (fun ptr -> 
         Internal.er_gl_set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
     ) view.ProjectionMatrix
+*)
+let setViewportAndScissor (backend: Backend) = io {
+    let view = backend.View
+    do! GL.setViewportAndScissor view.ProjectionMatrix view.ViewportX view.ViewportY view.ViewportWidth view.ViewportHeight }
 
 /// Based on Q3: RB_Hyperspace
 /// Hyperspace
