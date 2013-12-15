@@ -72,9 +72,6 @@ m_object_invoke (MObject *obj, const gchar *method_name, gint argc, gpointer *ar
 gpointer
 m_object_unbox (MObject *obj);
 
-MObject *
-m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, gpointer *params);
-
 MString *
 m_string (const gchar* text);
 
@@ -106,15 +103,6 @@ m_gchandle_free (guint32 handle);
 	arg_assignment \
 \
 	o = m_method_invoke(method, __args); \
-} \
-
-#define m_invoke_method_args(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
-{ \
-	gpointer __args [argc]; \
-\
-	arg_assignment \
-\
-	o = m_invoke_method (assembly_name, name_space, static_class_name, method_name, __args); \
 } \
 
 #define m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \

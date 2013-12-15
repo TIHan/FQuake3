@@ -216,35 +216,6 @@ m_object_unbox (MObject *obj)
 }
 
 
-MObject *
-m_invoke_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name, void **params)
-{
-	gchar name[256];
-	MonoAssembly *assembly;
-	MonoImage *image;
-	MonoMethodDesc *method_desc;
-	MonoMethod *method;
-
-	get_method_desc (name_space, static_class_name, method_name, name);
-
-	assembly = find_assembly (assembly_name);
-
-	if (!assembly)
-		g_error ("m: Unable to find assembly %s.\n", assembly_name);
-
-	image = mono_assembly_get_image (assembly);
-	method_desc = mono_method_desc_new (name, FALSE);
-	method = mono_method_desc_search_in_image (method_desc, image);
-
-	mono_method_desc_free (method_desc);
-
-	if (!method)
-		g_error("M: Unable to invoke %s.\n", name);
-
-	return (MObject*)mono_runtime_invoke (method, NULL, params, NULL);
-}
-
-
 MString *
 m_string (const gchar* text)
 {
