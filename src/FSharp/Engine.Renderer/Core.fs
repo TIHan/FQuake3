@@ -819,7 +819,7 @@ type TextureModification =
         Wave: WaveForm;
 
         // used for TMOD_TRANSFORM
-        Matrix: Matrix2x2;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
+        Matrix: mat2;        // s' = s * m[0][0] + t * m[1][0] + trans[0]
         Translate: vec2;     // t' = s * m[0][1] + t * m[0][1] + trans[1]
 
         // used for TMOD_SCALE

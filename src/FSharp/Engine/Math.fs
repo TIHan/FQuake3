@@ -249,40 +249,28 @@ module Vec4 =
     let inline dot (v1: vec4) (v2:vec4) =
         v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
 
-/// Matrix2x2
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type Matrix2x2 =
-    val M11 : single; val M12 : single
-    val M21 : single; val M22 : single
+type Matrix2 =
+    val m11 : single; val m12 : single
+    val m21 : single; val m22 : single
 
-    new (m11, m12, m21, m22) =
-        { 
-            M11 = m11; M12 = m12;
-            M21 = m21; M22 = m22;
-        }
-
-    static member inline Create (m11, m12, m21, m22) =
-        Matrix2x2 (
-            m11, m12,
-            m21, m22
-        )
+    new (m11, m12, m21, m22) = { 
+        m11 = m11; m12 = m12;
+        m21 = m21; m22 = m22 }
 
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M11 | (0, 1) -> this.M12
-                | (1, 0) -> this.M21 | (1, 1) -> this.M22
+                | (0, 0) -> this.m11 | (0, 1) -> this.m12
+                | (1, 0) -> this.m21 | (1, 1) -> this.m22
                 | _ -> raise <| IndexOutOfRangeException ()
+and mat2 = Matrix2
 
-/// Matrix2x2 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Matrix2x2 =
-    let inline create m11 m12 m21 m22 =
-        Matrix2x2.Create (m11, m12, m21, m22)
-
-    let zero = create 0.f 0.f 0.f 0.f
+module Mat2 =
+    let zero = mat2 (0.f, 0.f, 0.f, 0.f)
 
 /// Matrix3x3
 [<Struct>]
