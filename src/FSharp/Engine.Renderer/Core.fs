@@ -1075,7 +1075,7 @@ type Fog =
 
         // for clipping distance in fog when outside
         HasSurface: bool;
-        Surface: Vector4;
+        Surface: vec4;
     }
 
 type LightGridBounds =

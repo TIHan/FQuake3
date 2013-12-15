@@ -188,7 +188,7 @@ let transformModelToClip (source: vec3) (modelMatrix: Matrix4x4) (projectionMatr
 /// TransformClipToWindow
 /// </summary>
 [<Pure>]
-let transformClipToWindow (clip: Vector4) (view: ViewParms) =
+let transformClipToWindow (clip: vec4) (view: ViewParms) =
     let normalized =
         vec4 (
             (clip.X / clip.W),

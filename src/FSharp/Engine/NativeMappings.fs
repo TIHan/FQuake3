@@ -90,7 +90,7 @@ module Vec4 =
 
         vec4 (native.value, native.value1, native.value2, native.value3)
 
-    let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: Vector4) =
+    let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: vec4) =
         let mutable native = NativePtr.read ptr
 
         native.value <- v.X
