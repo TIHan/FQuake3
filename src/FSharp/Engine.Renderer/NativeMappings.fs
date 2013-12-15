@@ -407,7 +407,7 @@ module RefEntity =
             CustomSkinHandle = native.customSkin;
             CustomShaderHandle = native.customShader;
             ShaderRgba = Rgba.ofNativePtr &&native.shaderRGBA;
-            ShaderTextureCoordinate = Vector2.ofNativePtr &&native.shaderTexCoord;
+            ShaderTextureCoordinate = Vec2.ofNativePtr &&native.shaderTexCoord;
             ShaderTime = native.shaderTime;
             Radius = native.radius;
             Rotation = native.rotation;
@@ -432,7 +432,7 @@ module RefEntity =
         native.customSkin <- entity.CustomSkinHandle
         native.customShader <- entity.CustomShaderHandle
         Rgba.toNativeByPtr &&native.shaderRGBA entity.ShaderRgba
-        Vector2.toNativeByPtr &&native.shaderTexCoord entity.ShaderTextureCoordinate
+        Vec2.toNativeByPtr &&native.shaderTexCoord entity.ShaderTextureCoordinate
         native.shaderTime <- entity.ShaderTime
         native.radius <- entity.Radius
         native.rotation <- entity.Rotation

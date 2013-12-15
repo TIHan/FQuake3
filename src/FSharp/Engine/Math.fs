@@ -214,7 +214,6 @@ module Vec3 =
     let inline lerp (v1: vec3) (v2: vec3) (t: single) =
         vec3 (Math.lerp v1.X v2.X t, Math.lerp v1.Y v2.Y t, Math.lerp v1.Z v2.Z t)
 
-/// Vector4
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
@@ -224,9 +223,7 @@ type Vector4 =
     val W : single
 
     new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
-
-    static member inline Create (x, y, z, w) =
-        Vector4 (x, y, z, w)
+    new (x) = { X = x; Y = x; Z = x; W = x }
     
     member inline this.Item
         with get (i) =
@@ -234,25 +231,22 @@ type Vector4 =
             | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
             | _ -> raise <| IndexOutOfRangeException ()
 
-    static member inline (*) (v1: Vector4, v2: Vector4) =
-        Vector4.Create (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
+    static member inline (*) (v1: vec4, v2: vec4) =
+        vec4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
         
-    static member inline (+) (v1: Vector4, v2: Vector4) =
-        Vector4.Create (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
+    static member inline (+) (v1: vec4, v2: vec4) =
+        vec4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
 
-    static member inline (-) (v1: Vector4, v2: Vector4) =
-        Vector4.Create (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W)  
+    static member inline (-) (v1: vec4, v2: vec4) =
+        vec4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W) 
+and vec4 = Vector4 
 
-// Vector4 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Vector4 =
-    let inline create x y z w =
-        Vector4.Create (x, y, z, w)
+module Vec4 =
+    let zero = vec4 (0.f)
 
-    let zero = create 0.f 0.f 0.f 0.f
-
-    let inline dot (v1: Vector4) (v2: Vector4) =
+    let inline dot (v1: vec4) (v2:vec4) =
         v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
 
 /// Matrix2x2

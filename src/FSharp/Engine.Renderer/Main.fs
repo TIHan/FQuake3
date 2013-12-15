@@ -167,18 +167,20 @@ let transformModelToClip (source: vec3) (modelMatrix: Matrix4x4) (projectionMatr
         (source.Z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
           
     let eye =
-        Vector4.create
-            (calculateEye 0) (calculateEye 1)
-            (calculateEye 2) (calculateEye 3)
+        vec4 (
+            calculateEye 0, calculateEye 1,
+            calculateEye 2, calculateEye 3
+        )
 
     let inline calculateDestination i =
         (eye.X * projectionMatrix.[0, i]) + (eye.Y * projectionMatrix.[1, i]) +
         (eye.Z * projectionMatrix.[2, i]) + (eye.W * projectionMatrix.[3, i])
 
     (eye,
-        Vector4.create
-            (calculateDestination 0) (calculateDestination 1)
-            (calculateDestination 2) (calculateDestination 3)
+        vec4 (
+            calculateDestination 0, calculateDestination 1,
+            calculateDestination 2, calculateDestination 3
+        )
     )
     
 /// <summary>
@@ -188,18 +190,20 @@ let transformModelToClip (source: vec3) (modelMatrix: Matrix4x4) (projectionMatr
 [<Pure>]
 let transformClipToWindow (clip: Vector4) (view: ViewParms) =
     let normalized =
-        Vector4.create
-            (clip.X / clip.W)
-            (clip.Y / clip.W)
-            ((clip.Z + clip.W) / (2.f * clip.W))
+        vec4 (
+            (clip.X / clip.W),
+            (clip.Y / clip.W),
+            ((clip.Z + clip.W) / (2.f * clip.W)),
             0.f
+        )
 
     let window =
-        Vector4.create
-            (truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f))
-            (truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f))
-            normalized.Z
+        vec4 (
+            (truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f)),
+            (truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f)),
+            normalized.Z,
             0.f
+        )
 
     (normalized, window)
 
