@@ -158,15 +158,14 @@ type Vector3 =
         v / s
 and vec3 = Vector3
 
-/// vec3 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vec3 =
-    let zero =  vec3 (0.f)
-    let one =   vec3 (1.f)
-    let right = vec3 (1.f, 0.f, 0.f)
-    let up =    vec3 (0.f, 1.f, 0.f)
-    let forward = vec3 (0.f, 0.f, 1.f)
+    let zero =      vec3 (0.f)
+    let one =       vec3 (1.f)
+    let right =     vec3 (1.f, 0.f, 0.f)
+    let up =        vec3 (0.f, 1.f, 0.f)
+    let forward =   vec3 (0.f, 0.f, 1.f)
 
     let inline minDimension (v: vec3) =
         match v.X < v.Y with
@@ -296,64 +295,51 @@ and mat3 = Matrix3
 
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Matrix3 =
+module Mat3 =
     let zero = mat3 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
 
-/// Matrix4x4
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type Matrix4x4 =
-    val M11 : single; val M12 : single; val M13 : single; val M14 : single
-    val M21:  single; val M22 : single; val M23 : single; val M24 : single
-    val M31 : single; val M32 : single; val M33 : single; val M34 : single
-    val M41 : single; val M42 : single; val M43 : single; val M44 : single        
+type Matrix4 =
+    val m11 : single; val m12 : single; val m13 : single; val m14 : single
+    val m21 : single; val m22 : single; val m23 : single; val m24 : single
+    val m31 : single; val m32 : single; val m33 : single; val m34 : single
+    val m41 : single; val m42 : single; val m43 : single; val m44 : single        
 
     new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
         {
-            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
-            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
-            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
-            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
-        }
-
-    static member inline Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
-        Matrix4x4 (
-            m11, m12, m13, m14,
-            m21, m22, m23, m24,
-            m31, m32, m33, m34,
-            m41, m42, m43, m44
-        )
+        m11 = m11; m12 = m12; m13 = m13; m14 = m14;
+        m21 = m21; m22 = m22; m23 = m23; m24 = m24;
+        m31 = m31; m32 = m32; m33 = m33; m34 = m34;
+        m41 = m41; m42 = m42; m43 = m43; m44 = m44 }
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13 | (0, 3) -> this.M14
-                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23 | (1, 3) -> this.M24
-                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33 | (2, 3) -> this.M34
-                | (3, 0) -> this.M41 | (3, 1) -> this.M42 | (3, 2) -> this.M43 | (3, 3) -> this.M44
+                | (0, 0) -> this.m11 | (0, 1) -> this.m12 | (0, 2) -> this.m13 | (0, 3) -> this.m14
+                | (1, 0) -> this.m21 | (1, 1) -> this.m22 | (1, 2) -> this.m23 | (1, 3) -> this.m24
+                | (2, 0) -> this.m31 | (2, 1) -> this.m32 | (2, 2) -> this.m33 | (2, 3) -> this.m34
+                | (3, 0) -> this.m41 | (3, 1) -> this.m42 | (3, 2) -> this.m43 | (3, 3) -> this.m44
                 | _ -> raise <| IndexOutOfRangeException ()
 
 #if DEBUG
-    static member (*) (m1: Matrix4x4, m2: Matrix4x4) =
+    static member (*) (m1: mat4, m2: mat4) =
 #else
-    static member inline (*) (m1: Matrix4x4, m2: Matrix4x4) =
+    static member inline (*) (m1: mat4, m2: mat4) =
 #endif
         let inline f i j = m1.[i, 0] * m2.[0, j] + m1.[i, 1] * m2.[1, j] + m1.[i, 2] * m2.[2, j] + m1.[i, 3] * m2.[3, j]
-        Matrix4x4.Create (
+        mat4 (
             f 0 0, f 0 1, f 0 2, f 0 3,
             f 1 0, f 1 1, f 1 2, f 1 3,
             f 2 0, f 2 1, f 2 2, f 2 3,
             f 3 0, f 3 1, f 3 2, f 3 3
         )
+and mat4 = Matrix4
 
-/// Matrix4x4 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Matrix4x4 =
-    let inline create m11 m12 m13 m14 m21 m22 m23 m24 m31 m32 m33 m34 m41 m42 m43 m44 =
-        Matrix4x4.Create (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44)
-
-    let zero = create 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f 0.f
+module Mat4 =
+    let zero = mat4 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -446,7 +432,6 @@ module Quat =
             (axis.Z * sinAngle)
         )
 
-/// Transform
 [<RequireQualifiedAccess>]
 module Transform =
     let inline rotateAroundPoint point axis angle : vec3 =

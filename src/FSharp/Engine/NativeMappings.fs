@@ -100,27 +100,28 @@ module Vec4 =
 
         NativePtr.write ptr native  
 
-module Matrix4x4 =
+module Mat4 =
     let inline ofNativePtr (ptr: nativeptr<single>) =
-        Matrix4x4.create
-            (NativePtr.get ptr 0)
-            (NativePtr.get ptr 1)
-            (NativePtr.get ptr 2)
-            (NativePtr.get ptr 3)
-            (NativePtr.get ptr 4)
-            (NativePtr.get ptr 5)
-            (NativePtr.get ptr 6)
-            (NativePtr.get ptr 7)
-            (NativePtr.get ptr 8)
-            (NativePtr.get ptr 9)
-            (NativePtr.get ptr 10)
-            (NativePtr.get ptr 11)
-            (NativePtr.get ptr 12)
-            (NativePtr.get ptr 13)
-            (NativePtr.get ptr 14)
+        mat4 (
+            (NativePtr.get ptr 0),
+            (NativePtr.get ptr 1),
+            (NativePtr.get ptr 2),
+            (NativePtr.get ptr 3),
+            (NativePtr.get ptr 4),
+            (NativePtr.get ptr 5),
+            (NativePtr.get ptr 6),
+            (NativePtr.get ptr 7),
+            (NativePtr.get ptr 8),
+            (NativePtr.get ptr 9),
+            (NativePtr.get ptr 10),
+            (NativePtr.get ptr 11),
+            (NativePtr.get ptr 12),
+            (NativePtr.get ptr 13),
+            (NativePtr.get ptr 14),
             (NativePtr.get ptr 15)
+        )
 
-    let inline toNativeByPtr (ptr: nativeptr<single>) (m: Matrix4x4) =
+    let inline toNativeByPtr (ptr: nativeptr<single>) (m: mat4) =
         NativePtr.set ptr 0 m.[0, 0]
         NativePtr.set ptr 1 m.[0, 1]
         NativePtr.set ptr 2 m.[0, 2]

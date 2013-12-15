@@ -32,7 +32,7 @@ define_mapping_namespace ("Engine.Native");
 define_mapping (qboolean, qboolean*, "Boolean");
 define_mapping (vec3, vec3_t, "Vec3");
 define_mapping (vec4, vec4_t, "Vec4");
-define_mapping (mat4x4, gfloat*, "Matrix4x4");
+define_mapping (mat4x4, gfloat*, "Mat4");
 define_mapping (cvar, cvar_t*, "Cvar");
 define_mapping (bounds, vec3_t*, "Bounds");
 define_mapping (axis, vec3_t*, "Axis");

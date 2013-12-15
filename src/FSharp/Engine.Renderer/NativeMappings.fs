@@ -77,7 +77,7 @@ module OrientationR =
             Origin = Vec3.ofNativePtr &&native.origin;
             Axis = Axis.ofNativePtr &&native.axis;
             ViewOrigin = Vec3.ofNativePtr &&native.viewOrigin;
-            ModelMatrix = Matrix4x4.ofNativePtr &&native.modelMatrix;
+            ModelMatrix = Mat4.ofNativePtr &&native.modelMatrix;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<orientationr_t>) (orientation: OrientationR) =
@@ -86,7 +86,7 @@ module OrientationR =
         Vec3.toNativeByPtr &&native.origin orientation.Origin
         Axis.toNativeByPtr &&native.axis orientation.Axis
         Vec3.toNativeByPtr &&native.viewOrigin orientation.ViewOrigin
-        Matrix4x4.toNativeByPtr &&native.modelMatrix orientation.ModelMatrix
+        Mat4.toNativeByPtr &&native.modelMatrix orientation.ModelMatrix
 
         NativePtr.write ptr native
 
@@ -185,7 +185,7 @@ module ViewParms =
             ViewportHeight = native.viewportHeight;
             FovX = native.fovX;
             FovY = native.fovY;
-            ProjectionMatrix = Matrix4x4.ofNativePtr &&native.projectionMatrix;
+            ProjectionMatrix = Mat4.ofNativePtr &&native.projectionMatrix;
             Frustum = Frustum.ofNativePtr &&native.frustum;
             VisibilityBounds = Bounds.ofNativePtr &&native.visBounds;
             ZFar = native.zFar;
@@ -208,7 +208,7 @@ module ViewParms =
         native.viewportHeight <- view.ViewportHeight
         native.fovX <- view.FovX
         native.fovY <- view.FovY
-        Matrix4x4.toNativeByPtr &&native.projectionMatrix view.ProjectionMatrix
+        Mat4.toNativeByPtr &&native.projectionMatrix view.ProjectionMatrix
         Frustum.toNativeByPtr &&native.frustum view.Frustum
         Bounds.toNativeByPtr &&native.visBounds view.VisibilityBounds
         native.zFar <- view.ZFar

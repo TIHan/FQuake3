@@ -30,11 +30,11 @@ open Engine.Renderer.Core
 let flipMatrix =
     // convert from our coordinate system (looking down X)
     // to OpenGL's coordinate system (looking down -Z)
-    Matrix4x4.create
-        0.f 0.f -1.f 0.f
-        -1.f 0.f  0.f 0.f
-        0.f 1.f  0.f 0.f
-        0.f 0.f  0.f 1.f
+    mat4 (
+        0.f,  0.f, -1.f, 0.f,
+        -1.f, 0.f,  0.f, 0.f,
+        0.f,  1.f,  0.f, 0.f,
+        0.f,  0.f,  0.f, 1.f)
 
 [<Literal>]
 let private TransformSize = 8
@@ -161,7 +161,7 @@ let cullLocalPointAndRadius (point: vec3) (radius: single) (orientation: Orienta
 /// TransformModelToClip
 /// </summary>
 [<Pure>]
-let transformModelToClip (source: vec3) (modelMatrix: Matrix4x4) (projectionMatrix: Matrix4x4) =
+let transformModelToClip (source: vec3) (modelMatrix: mat4) (projectionMatrix: mat4) =
     let inline calculateEye i =
         (source.X * modelMatrix.[0, i]) + (source.Y * modelMatrix.[1, i]) +
         (source.Z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
@@ -208,7 +208,7 @@ let transformClipToWindow (clip: vec4) (view: ViewParms) =
     (normalized, window)
 
 // TODO: This will need to go away eventually.
-let myGLMultMatrix (a: Matrix4x4) (b: Matrix4x4) =
+let myGLMultMatrix (a: mat4) (b: mat4) =
     a * b
 
 /// <summary>
@@ -229,11 +229,11 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
     let origin = entity.Origin
 
     let glMatrix =
-        Matrix4x4.create
-            axis.[0].[0] axis.[0].[1] axis.[0].[2] 0.f
-            axis.[1].[0] axis.[1].[1] axis.[1].[2] 0.f
-            axis.[2].[0] axis.[2].[1] axis.[2].[2] 0.f
-            origin.X origin.Y origin.Z 1.f
+        mat4 (
+            axis.[0].[0], axis.[0].[1], axis.[0].[2], 0.f,
+            axis.[1].[0], axis.[1].[1], axis.[1].[2], 0.f,
+            axis.[2].[0], axis.[2].[1], axis.[2].[2], 0.f,
+            origin.X, origin.Y, origin.Z, 1.f)
 
     // calculate the viewer origin in the model's space
     // needed for fog, specular, and environment mapping
@@ -272,23 +272,22 @@ let rotateForViewer (viewParms: ViewParms) =
     let axis = viewParms.Orientation.Axis
 
     let viewerMatrix =
-        Matrix4x4.create
-            axis.[0].[0] axis.[1].[0] axis.[2].[0] 0.f
-            axis.[0].[1] axis.[1].[1] axis.[2].[1] 0.f
-            axis.[0].[2] axis.[1].[2] axis.[2].[2] 0.f
-            (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2])
-            (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2])
-            (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2])
-            1.f
+        mat4 (
+            axis.[0].[0], axis.[1].[0], axis.[2].[0], 0.f,
+            axis.[0].[1], axis.[1].[1], axis.[2].[1], 0.f,
+            axis.[0].[2], axis.[1].[2], axis.[2].[2], 0.f,
+            (-origin.[0] * axis.[0].[0] + -origin.[1] * axis.[0].[1] + -origin.[2] * axis.[0].[2]),
+            (-origin.[0] * axis.[1].[0] + -origin.[1] * axis.[1].[1] + -origin.[2] * axis.[1].[2]),
+            (-origin.[0] * axis.[2].[0] + -origin.[1] * axis.[2].[1] + -origin.[2] * axis.[2].[2]),
+            1.f)
         
     {
-        Origin = Vec3.zero;
-        Axis = Axis.identity;
-        ViewOrigin = origin;
-        // convert from our coordinate system (looking down X)
-        // to OpenGL's coordinate system (looking down -Z)
-        ModelMatrix = viewerMatrix * flipMatrix;
-    }
+    Origin = Vec3.zero;
+    Axis = Axis.identity;
+    ViewOrigin = origin;
+    // convert from our coordinate system (looking down X)
+    // to OpenGL's coordinate system (looking down -Z)
+    ModelMatrix = viewerMatrix * flipMatrix }
 
 /// <summary>
 /// Based on Q3: SetFarClip
@@ -339,11 +338,11 @@ let setupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: 
     let depth = zFar - zNear
 
     (
-        Matrix4x4.create
-            (2.f * zNear / width) 0.f 0.f 0.f
-            0.f (2.f * zNear / height) 0.f 0.f
-            ((xMax + xMin) / width) ((yMax + yMin) / height) (-(zFar + zNear) / depth) -1.f
-            0.f 0.f (-2.f * zFar * zNear / depth) 0.f,
+        mat4 (
+            (2.f * zNear / width), 0.f, 0.f, 0.f,
+            0.f, (2.f * zNear / height), 0.f, 0.f,
+            ((xMax + xMin) / width), ((yMax + yMin) / height), (-(zFar + zNear) / depth), -1.f,
+            0.f, 0.f, (-2.f * zFar * zNear / depth), 0.f),
         zFar
     )
 
@@ -372,35 +371,30 @@ let setupFrustum (view: ViewParms) =
     let topNormal = Vec3.multiplyAdd -yc view.Orientation.Axis.[2] yNormal
 
     {
-        Left =
-            {
-                Normal = leftNormal;
-                Distance = Vec3.dot view.Orientation.Origin leftNormal;
-                Type = PlaneType.NonAxial;
-                SignBits = Plane.CalculateSignBits leftNormal;
-            };
-        Right = 
-            {
-                Normal = rightNormal;
-                Distance = Vec3.dot view.Orientation.Origin rightNormal;
-                Type = PlaneType.NonAxial;
-                SignBits = Plane.CalculateSignBits rightNormal;
-            };
-        Bottom =
-            {
-                Normal = bottomNormal;
-                Distance = Vec3.dot view.Orientation.Origin bottomNormal;
-                Type = PlaneType.NonAxial;
-                SignBits = Plane.CalculateSignBits bottomNormal;
-            };
-        Top =
-            {
-                Normal = topNormal;
-                Distance = Vec3.dot view.Orientation.Origin topNormal;
-                Type = PlaneType.NonAxial;
-                SignBits = Plane.CalculateSignBits topNormal;
-            }
-    }
+    Left =
+        {
+        Normal = leftNormal;
+        Distance = Vec3.dot view.Orientation.Origin leftNormal;
+        Type = PlaneType.NonAxial;
+        SignBits = Plane.CalculateSignBits leftNormal };
+    Right = 
+        {
+        Normal = rightNormal;
+        Distance = Vec3.dot view.Orientation.Origin rightNormal;
+        Type = PlaneType.NonAxial;
+        SignBits = Plane.CalculateSignBits rightNormal };
+    Bottom =
+        {
+        Normal = bottomNormal;
+        Distance = Vec3.dot view.Orientation.Origin bottomNormal;
+        Type = PlaneType.NonAxial;
+        SignBits = Plane.CalculateSignBits bottomNormal };
+    Top =
+        {
+        Normal = topNormal;
+        Distance = Vec3.dot view.Orientation.Origin topNormal;
+        Type = PlaneType.NonAxial;
+        SignBits = Plane.CalculateSignBits topNormal }}
 
 /// <summary>
 /// Based on Q3: R_MirrorPoint

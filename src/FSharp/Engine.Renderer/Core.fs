@@ -129,7 +129,7 @@ type OrientationR =
         /// FIXME: This directly points to viewParms orientation origin? Yuck.
         /// </summary>
         ViewOrigin: vec3;
-        ModelMatrix: Matrix4x4;
+        ModelMatrix: mat4;
     }
 
 /// <summary>
@@ -234,7 +234,7 @@ type ViewParms =
         ViewportHeight: int;
         FovX: single;
         FovY: single;
-        ProjectionMatrix: Matrix4x4;
+        ProjectionMatrix: mat4;
         Frustum: Frustum;
         VisibilityBounds: Bounds;
         ZFar: single;
