@@ -28,7 +28,7 @@ open CGame.Core
 
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
-let mutable calculateWeaponPositionFsx : CGame -> (Vector3 * Vector3) = fun _ -> (Vec3.zero, Vec3.zero)
+let mutable calculateWeaponPositionFsx : CGame -> (vec3 * vec3) = fun _ -> (Vec3.zero, Vec3.zero)
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
     let origin = cg.Refdef.ViewOrigin

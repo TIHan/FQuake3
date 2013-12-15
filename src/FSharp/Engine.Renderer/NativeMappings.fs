@@ -36,18 +36,18 @@ open Engine.Renderer.Core
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         Axis.create
-            (Vector3.ofNativePtr <| NativePtr.add ptr 0)
-            (Vector3.ofNativePtr <| NativePtr.add ptr 1)
-            (Vector3.ofNativePtr <| NativePtr.add ptr 2)
+            (Vec3.ofNativePtr <| NativePtr.add ptr 0)
+            (Vec3.ofNativePtr <| NativePtr.add ptr 1)
+            (Vec3.ofNativePtr <| NativePtr.add ptr 2)
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (axis: Axis) =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
         let mutable nativeZ = NativePtr.get ptr 2
 
-        Vector3.toNativeByPtr &&nativeX axis.X
-        Vector3.toNativeByPtr &&nativeY axis.Y
-        Vector3.toNativeByPtr &&nativeZ axis.Z
+        Vec3.toNativeByPtr &&nativeX axis.X
+        Vec3.toNativeByPtr &&nativeY axis.Y
+        Vec3.toNativeByPtr &&nativeZ axis.Z
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY
@@ -57,14 +57,14 @@ module Orientation =
     let inline ofNativePtr (ptr: nativeptr<orientation_t>) =
         let mutable native = NativePtr.read ptr
         {
-            Orientation.Origin = Vector3.ofNativePtr &&native.origin;
+            Orientation.Origin = Vec3.ofNativePtr &&native.origin;
             Axis = Axis.ofNativePtr &&native.axis;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<orientation_t>) (orientation: Orientation) =
         let mutable native = NativePtr.read ptr
 
-        Vector3.toNativeByPtr &&native.origin orientation.Origin
+        Vec3.toNativeByPtr &&native.origin orientation.Origin
         Axis.toNativeByPtr &&native.axis orientation.Axis
 
         NativePtr.write ptr native
@@ -74,18 +74,18 @@ module OrientationR =
         let mutable native = NativePtr.read ptr
 
         {
-            Origin = Vector3.ofNativePtr &&native.origin;
+            Origin = Vec3.ofNativePtr &&native.origin;
             Axis = Axis.ofNativePtr &&native.axis;
-            ViewOrigin = Vector3.ofNativePtr &&native.viewOrigin;
+            ViewOrigin = Vec3.ofNativePtr &&native.viewOrigin;
             ModelMatrix = Matrix4x4.ofNativePtr &&native.modelMatrix;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<orientationr_t>) (orientation: OrientationR) =
         let mutable native = NativePtr.read ptr
 
-        Vector3.toNativeByPtr &&native.origin orientation.Origin
+        Vec3.toNativeByPtr &&native.origin orientation.Origin
         Axis.toNativeByPtr &&native.axis orientation.Axis
-        Vector3.toNativeByPtr &&native.viewOrigin orientation.ViewOrigin
+        Vec3.toNativeByPtr &&native.viewOrigin orientation.ViewOrigin
         Matrix4x4.toNativeByPtr &&native.modelMatrix orientation.ModelMatrix
 
         NativePtr.write ptr native
@@ -123,7 +123,7 @@ module Plane =
         let mutable native = NativePtr.read ptr
 
         {
-            Normal = Vector3.ofNativePtr &&native.normal;
+            Normal = Vec3.ofNativePtr &&native.normal;
             Distance = native.dist;
             Type = NativePtr.toStructure &&native.type';
             SignBits = native.signbits;
@@ -132,7 +132,7 @@ module Plane =
     let inline toNativeByPtr (ptr: nativeptr<cplane_t>) (plane: Plane) =
         let mutable native = NativePtr.read ptr
 
-        Vector3.toNativeByPtr &&native.normal plane.Normal
+        Vec3.toNativeByPtr &&native.normal plane.Normal
         native.dist <- plane.Distance
         native.type' <- byte plane.Type
         native.signbits <- plane.SignBits
@@ -173,7 +173,7 @@ module ViewParms =
         {
             Orientation = OrientationR.ofNativePtr &&native.or';
             World = OrientationR.ofNativePtr &&native.world;
-            PvsOrigin = Vector3.ofNativePtr &&native.pvsOrigin;
+            PvsOrigin = Vec3.ofNativePtr &&native.pvsOrigin;
             IsPortal = Boolean.ofNativePtr &&native.isPortal;
             IsMirror = Boolean.ofNativePtr &&native.isMirror;
             FrameSceneId = native.frameSceneNum;
@@ -196,7 +196,7 @@ module ViewParms =
         
         OrientationR.toNativeByPtr &&native.or' view.Orientation
         OrientationR.toNativeByPtr &&native.world view.World
-        Vector3.toNativeByPtr &&native.pvsOrigin view.PvsOrigin
+        Vec3.toNativeByPtr &&native.pvsOrigin view.PvsOrigin
         native.isPortal <- Boolean.toNative view.IsPortal
         native.isMirror <- Boolean.toNative view.IsMirror
         native.frameSceneNum <- view.FrameSceneId
@@ -234,12 +234,12 @@ module DrawVertex =
         let mutable native = NativePtr.read ptr
 
         {
-            DrawVertex.Vertex = Vector3.ofNativePtr &&native.xyz;
+            DrawVertex.Vertex = Vec3.ofNativePtr &&native.xyz;
             St0 = NativePtr.get &&native.st 0;
             St1 = NativePtr.get &&native.st 1;
             Lightmap0 = NativePtr.get &&native.lightmap 0;
             Lightmap1 = NativePtr.get &&native.lightmap 1;
-            Normal = Vector3.ofNativePtr &&native.normal;
+            Normal = Vec3.ofNativePtr &&native.normal;
             Color = Rgba.ofNativePtr &&native.color;
         }
 
@@ -248,7 +248,7 @@ module PolyVertex =
         let mutable native = NativePtr.read ptr
 
         {
-            Vertex = Vector3.ofNativePtr &&native.xyz;
+            Vertex = Vec3.ofNativePtr &&native.xyz;
             St0 = NativePtr.get &&native.st 0;
             St1 = NativePtr.get &&native.st 1;
             Modulate0 = NativePtr.get &&native.modulate 0;
@@ -292,7 +292,7 @@ module Surface =
             DlightBit0 = NativePtr.get &&native.dlightBits 0;
             DlightBit1 = NativePtr.get &&native.dlightBits 1;
             Bounds = Bounds.ofNativePtr &&native.bounds;
-            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
+            LocalOrigin = Vec3.ofNativePtr &&native.localOrigin;
             Radius = native.radius;
             Indices = List.ofNativePtrArray native.numIndexes native.indexes;
             Vertices = List.ofNativePtrArrayMap native.numVerts DrawVertex.ofNativePtr native.verts;
@@ -324,9 +324,9 @@ module Surface =
             DlightBit0 = NativePtr.get &&native.dlightBits 0;
             DlightBit1 = NativePtr.get &&native.dlightBits 1;
             MeshBounds = Bounds.ofNativePtr &&native.meshBounds;
-            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
+            LocalOrigin = Vec3.ofNativePtr &&native.localOrigin;
             MeshRadius = native.meshRadius;
-            LodOrigin = Vector3.ofNativePtr &&native.lodOrigin;
+            LodOrigin = Vec3.ofNativePtr &&native.lodOrigin;
             LodRadius = native.lodRadius;
             LodFixed = native.lodFixed;
             LodStitched = native.lodStitched;
@@ -342,9 +342,9 @@ module Surface =
         let mutable native = NativePtr.read ptr
 
         {
-            Origin = Vector3.ofNativePtr &&native.origin;
-            Normal = Vector3.ofNativePtr &&native.normal;
-            Color = Vector3.ofNativePtr &&native.color;
+            Origin = Vec3.ofNativePtr &&native.origin;
+            Normal = Vec3.ofNativePtr &&native.normal;
+            Color = Vec3.ofNativePtr &&native.color;
         }
         |> Flare
 
@@ -394,13 +394,13 @@ module RefEntity =
             RefEntity.Type = enum<RefEntityType> (int native.reType);
             RenderFx = enum<RenderFxFlags> (native.renderfx);
             ModelHandle = native.hModel;
-            LightingOrigin = Vector3.ofNativePtr &&native.lightingOrigin;
+            LightingOrigin = Vec3.ofNativePtr &&native.lightingOrigin;
             ShadowPlane = native.shadowPlane;
             Axis = Axis.ofNativePtr &&native.axis;
             HasNonNormalizedAxes = Boolean.ofNativePtr &&native.nonNormalizedAxes;
-            Origin = Vector3.ofNativePtr &&native.origin;
+            Origin = Vec3.ofNativePtr &&native.origin;
             Frame = native.frame;
-            OldOrigin = Vector3.ofNativePtr &&native.oldorigin;
+            OldOrigin = Vec3.ofNativePtr &&native.oldorigin;
             OldFrame = native.oldframe;
             BackLerp = native.backlerp;
             SkinId = native.skinNum;
@@ -419,13 +419,13 @@ module RefEntity =
         native.reType <- enum<refEntityType_t> (int entity.Type)
         native.renderfx <- int entity.RenderFx
         native.hModel <- entity.ModelHandle
-        Vector3.toNativeByPtr &&native.lightingOrigin entity.LightingOrigin
+        Vec3.toNativeByPtr &&native.lightingOrigin entity.LightingOrigin
         native.shadowPlane <- native.shadowPlane
         Axis.toNativeByPtr &&native.axis entity.Axis
         native.nonNormalizedAxes <- Boolean.toNative entity.HasNonNormalizedAxes
-        Vector3.toNativeByPtr &&native.origin entity.Origin
+        Vec3.toNativeByPtr &&native.origin entity.Origin
         native.frame <- entity.Frame
-        Vector3.toNativeByPtr &&native.oldorigin entity.OldOrigin
+        Vec3.toNativeByPtr &&native.oldorigin entity.OldOrigin
         native.oldframe <- entity.OldFrame
         native.backlerp <- entity.BackLerp
         native.skinNum <- entity.SkinId
@@ -448,10 +448,10 @@ module TrRefEntity =
             AxisLength = native.axisLength;
             NeedDlights = Boolean.ofNativePtr &&native.needDlights;
             IsLightingCalculated = Boolean.ofNativePtr &&native.lightingCalculated;
-            LightDirection = Vector3.ofNativePtr &&native.lightDir;
-            AmbientLight = Vector3.ofNativePtr &&native.ambientLight;
+            LightDirection = Vec3.ofNativePtr &&native.lightDir;
+            AmbientLight = Vec3.ofNativePtr &&native.ambientLight;
             AmbientLightInt = native.ambientLightInt;
-            DirectedLight = Vector3.ofNativePtr &&native.directedLight;
+            DirectedLight = Vec3.ofNativePtr &&native.directedLight;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<trRefEntity_t>) (refEntity: TrRefEntity) =
@@ -461,10 +461,10 @@ module TrRefEntity =
         native.axisLength <- refEntity.AxisLength
         native.needDlights <- Boolean.toNative refEntity.NeedDlights
         native.lightingCalculated <- Boolean.toNative refEntity.IsLightingCalculated
-        Vector3.toNativeByPtr &&native.lightDir refEntity.LightDirection
-        Vector3.toNativeByPtr &&native.ambientLight refEntity.AmbientLight
+        Vec3.toNativeByPtr &&native.lightDir refEntity.LightDirection
+        Vec3.toNativeByPtr &&native.ambientLight refEntity.AmbientLight
         native.ambientLightInt <- refEntity.AmbientLightInt
-        Vector3.toNativeByPtr &&native.directedLight refEntity.DirectedLight
+        Vec3.toNativeByPtr &&native.directedLight refEntity.DirectedLight
         
         NativePtr.write ptr native
 
@@ -477,7 +477,7 @@ module Refdef =
             Y = native.y;
             Width = native.width;
             Height = native.height;
-            ViewOrigin = Vector3.ofNativePtr &&native.vieworg;
+            ViewOrigin = Vec3.ofNativePtr &&native.vieworg;
             ViewAxis = Axis.ofNativePtr &&native.viewaxis;
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags)
@@ -490,7 +490,7 @@ module Refdef =
         native.y <- refdef.Y
         native.width <- refdef.Width
         native.height <- refdef.Height
-        Vector3.toNativeByPtr &&native.vieworg refdef.ViewOrigin
+        Vec3.toNativeByPtr &&native.vieworg refdef.ViewOrigin
         Axis.toNativeByPtr &&native.viewaxis refdef.ViewAxis
         native.time <- refdef.Time
         native.rdflags <- int refdef.RdFlags
@@ -502,10 +502,10 @@ module Dlight =
         let mutable native = NativePtr.read ptr
 
         {
-            Origin = Vector3.ofNativePtr &&native.origin;
-            Color = Vector3.ofNativePtr &&native.color;
+            Origin = Vec3.ofNativePtr &&native.origin;
+            Color = Vec3.ofNativePtr &&native.color;
             Radius = native.radius;
-            Transformed = Vector3.ofNativePtr &&native.transformed;
+            Transformed = Vec3.ofNativePtr &&native.transformed;
             Additive = native.additive;
         }
 
@@ -518,7 +518,7 @@ module TrRefdef =
             Y = native.y;
             Width = native.width;
             Height = native.height;
-            ViewOrigin = Vector3.ofNativePtr &&native.vieworg;
+            ViewOrigin = Vec3.ofNativePtr &&native.vieworg;
             ViewAxis = Axis.ofNativePtr &&native.viewaxis;
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags);
@@ -673,9 +673,9 @@ module LightGrid =
         let mutable native = NativePtr.read ptr
 
         {
-        Origin = Vector3.ofNativePtr &&native.lightGridOrigin;
-        Size = Vector3.ofNativePtr &&native.lightGridSize;
-        InverseSize = Vector3.ofNativePtr &&native.lightGridInverseSize;
+        Origin = Vec3.ofNativePtr &&native.lightGridOrigin;
+        Size = Vec3.ofNativePtr &&native.lightGridSize;
+        InverseSize = Vec3.ofNativePtr &&native.lightGridInverseSize;
         Bounds = LightGridBounds.ofNativePtr &&native.lightGridBounds;
         Data = Bsp.getLightGridData () }
 

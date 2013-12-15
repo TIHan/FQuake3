@@ -95,7 +95,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 /// CullPointAndRadius
 /// </summary>
 [<Pure>]
-let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (r_nocull: Cvar) =
+let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocull: Cvar) =
     match r_nocull.Integer = 1 with
     | true -> ClipType.Clip
     | _ ->
@@ -125,7 +125,7 @@ let cullPointAndRadius (point: Vector3) (radius: single) (frustum: Frustum) (r_n
 /// LocalPointToWorld
 /// </summary>
 [<Pure>]
-let localPointToWorld (local: Vector3) (orientation: OrientationR) =
+let localPointToWorld (local: vec3) (orientation: OrientationR) =
     let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
     vec3 (f 0, f 1, f 2)
 
@@ -134,7 +134,7 @@ let localPointToWorld (local: Vector3) (orientation: OrientationR) =
 /// LocalNormalToWorld
 /// </summary>
 [<Pure>]
-let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
+let localNormalToWorld (local: vec3) (orientation: OrientationR) =
     let inline f i = Vec3.dot local orientation.Axis.[i]
     vec3 (f 0, f 1, f 2)
 
@@ -143,7 +143,7 @@ let localNormalToWorld (local: Vector3) (orientation: OrientationR) =
 /// WorldToLocal
 /// </summary>
 [<Pure>]
-let worldToLocal (world: Vector3) (orientation: OrientationR) =
+let worldToLocal (world: vec3) (orientation: OrientationR) =
     let inline f i = Vec3.dot world orientation.Axis.[i]
     vec3 (f 0, f 1, f 2)
 
@@ -152,7 +152,7 @@ let worldToLocal (world: Vector3) (orientation: OrientationR) =
 /// CullLocalPointAndRadius
 /// </summary>
 [<Pure>]
-let cullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+let cullLocalPointAndRadius (point: vec3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
     let transformed = localPointToWorld point orientation
     cullPointAndRadius transformed radius frustum r_nocull
 
@@ -161,7 +161,7 @@ let cullLocalPointAndRadius (point: Vector3) (radius: single) (orientation: Orie
 /// TransformModelToClip
 /// </summary>
 [<Pure>]
-let transformModelToClip (source: Vector3) (modelMatrix: Matrix4x4) (projectionMatrix: Matrix4x4) =
+let transformModelToClip (source: vec3) (modelMatrix: Matrix4x4) (projectionMatrix: Matrix4x4) =
     let inline calculateEye i =
         (source.X * modelMatrix.[0, i]) + (source.Y * modelMatrix.[1, i]) +
         (source.Z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
@@ -403,7 +403,7 @@ let setupFrustum (view: ViewParms) =
 /// MirrorPoint
 /// </summary>
 [<Pure>]
-let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
+let mirrorPoint (v: vec3) (surface: Orientation) (camera: Orientation) =
     let local = v - surface.Origin
     let inline transform i transformed = Vec3.multiplyAdd (Vec3.dot local surface.Axis.[i]) camera.Axis.[i] transformed
     transform 0 Vec3.zero |> transform 1 |> transform 2 |> (+) camera.Origin
@@ -413,7 +413,7 @@ let mirrorPoint (v: Vector3) (surface: Orientation) (camera: Orientation) =
 /// MirrorVector
 /// </summary>
 [<Pure>]
-let mirrorVector (v: Vector3) (surface: Orientation) (camera: Orientation) =
+let mirrorVector (v: vec3) (surface: Orientation) (camera: Orientation) =
     let inline transform i transformed = Vec3.multiplyAdd (Vec3.dot v surface.Axis.[i]) camera.Axis.[i] transformed
     transform 0 Vec3.zero |> transform 1 |> transform 2
 
@@ -483,7 +483,7 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
 
 /// Transforms existing axis based on a normal.
 [<Pure>]
-let transformAxisOfNormal (normal: Vector3) (axis: Axis) =
+let transformAxisOfNormal (normal: vec3) (axis: Axis) =
     let y = Vec3.perpendicular normal
     Axis.create normal y (Vec3.cross normal y)
 
@@ -559,7 +559,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
 ///
 /// Returns true if it should be mirrored
 [<Pure>]
-let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: Vector3) (r: Renderer) =
+let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: vec3) (r: Renderer) =
     // create plane axis for the portal we are seeing
     let originalPlane = createPlaneAxis drawSurface
 

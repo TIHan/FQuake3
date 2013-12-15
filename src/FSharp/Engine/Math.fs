@@ -89,7 +89,6 @@ module Vec2 =
     let right = vec2 (1.f, 0.f)
     let up =    vec2 (0.f, 1.f)
 
-/// Vector3
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
@@ -159,7 +158,7 @@ type Vector3 =
         v / s
 and vec3 = Vector3
 
-/// Vector3 Module
+/// vec3 Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vec3 =
@@ -449,7 +448,7 @@ module Quaternion =
             (q.Y * ``1 / length``)
             (q.Z * ``1 / length``)
 
-    let inline ofEulerDegrees (v: Vector3) =
+    let inline ofEulerDegrees (v: vec3) =
         let pitch = Math.``PI / 360`` * v.[0]
         let yaw =   Math.``PI / 360`` * v.[1]
         let roll =  Math.``PI / 360`` * v.[2]
@@ -471,7 +470,7 @@ module Quaternion =
             (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw)
             (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
 
-    let inline ofAxisAngle (axis: Vector3) (angle: single<rad>) =
+    let inline ofAxisAngle (axis: vec3) (angle: single<rad>) =
         let angle = angle * 0.5f</rad>
         let sinAngle = sin angle
 
@@ -484,6 +483,6 @@ module Quaternion =
 /// Transform
 [<RequireQualifiedAccess>]
 module Transform =
-    let inline rotateAroundPoint point axis angle : Vector3 =
+    let inline rotateAroundPoint point axis angle : vec3 =
         let q = Quaternion.ofAxisAngle axis <| Deg.toRad angle
         q * point

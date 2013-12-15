@@ -104,7 +104,7 @@ type PlaneType =
 /// Orientation
 /// </summary>
 type Orientation =
-    { Origin: Vector3; Axis: Axis }
+    { Origin: vec3; Axis: Axis }
 
 /// <summary>
 /// Based on Q3: orientationr_t
@@ -117,7 +117,7 @@ type OrientationR =
         /// <summary>
         /// in world coordinates
         /// </summary>
-        Origin: Vector3;
+        Origin: vec3;
 
         /// <summary>
         /// orientation in world
@@ -128,7 +128,7 @@ type OrientationR =
         /// viewParms->or.origin in local coordinates
         /// FIXME: This directly points to viewParms orientation origin? Yuck.
         /// </summary>
-        ViewOrigin: Vector3;
+        ViewOrigin: vec3;
         ModelMatrix: Matrix4x4;
     }
 
@@ -138,7 +138,7 @@ type OrientationR =
 /// </summary>
 type Plane =
     {
-        Normal: Vector3;
+        Normal: vec3;
         Distance: single;
 
         /// <summary>
@@ -156,7 +156,7 @@ type Plane =
     /// Based on Q3: SetPlaneSignBits
     /// CalculateSignBits
     /// </summary>
-    static member inline CalculateSignBits (normal: Vector3) =
+    static member inline CalculateSignBits (normal: vec3) =
         let rec calculatePlaneSignBits bits acc =
             match acc with
             | 3 -> bits
@@ -177,7 +177,7 @@ module Plane =
     ///
     /// The normal will point out of the clock for clockwise ordered points
     /// </summary>
-    let inline ofPoints (a: Vector3) (b: Vector3) (c: Vector3) =
+    let inline ofPoints (a: vec3) (b: vec3) (c: vec3) =
         let d1 = b - a
         let d2 = c - a
         let cross = Vec3.cross d2 d1
@@ -222,7 +222,7 @@ type ViewParms =
     {
         Orientation: OrientationR;
         World: OrientationR;
-        PvsOrigin: Vector3;         // may be different than or.origin for portals
+        PvsOrigin: vec3;         // may be different than or.origin for portals
         IsPortal: bool;             // true if this view is through a portal
         IsMirror: bool;             // the portal is a mirror, invert the face culling
         FrameSceneId: int;          // copied from tr.frameSceneNum
@@ -295,7 +295,7 @@ type RefEntity = {
         ModelHandle: int;
 
         /// so multi-part models can be lit identically (RF_LIGHTING_ORIGIN)
-        LightingOrigin: Vector3;
+        LightingOrigin: vec3;
 
         /// projection shadows go here, stencils go slightly lower
         ShadowPlane: single;
@@ -307,13 +307,13 @@ type RefEntity = {
         HasNonNormalizedAxes: bool;
 
         /// also used as MODEL_BEAM's "from"
-        Origin: Vector3;
+        Origin: vec3;
 
         /// also used as MODEL_BEAM's diameter
         Frame: int;
 
         /// also used as MODEL_BEAM's "to"
-        OldOrigin: Vector3;
+        OldOrigin: vec3;
         OldFrame: int;
 
         /// 0.0 = current, 1.0 = old
@@ -355,26 +355,26 @@ type TrRefEntity = {
         IsLightingCalculated: bool;
 
         /// normalized direction towards light
-        LightDirection: Vector3;
+        LightDirection: vec3;
 
         /// color normalized to 0-255
-        AmbientLight: Vector3;
+        AmbientLight: vec3;
 
         /// 32 bit rgba packed
         AmbientLightInt: int;
-        DirectedLight: Vector3; }
+        DirectedLight: vec3; }
 
 /// Based on Q3: dlight_t
 /// Dlight
 type Dlight = {
-        Origin: Vector3;
+        Origin: vec3;
 
         /// range from 0.0 to 1.0, should be color normalized
-        Color: Vector3;
+        Color: vec3;
         Radius: single;
 
         /// origin in local coordinate system
-        Transformed: Vector3;
+        Transformed: vec3;
 
         /// texture detail is lost tho when the lightmap is dark
         Additive: int; }
@@ -385,12 +385,12 @@ type Dlight = {
 /// </summary>
 type DrawVertex =
     {
-        Vertex: Vector3;
+        Vertex: vec3;
         St0: single;
         St1: single;
         Lightmap0: single;
         Lightmap1: single;
-        Normal: Vector3;
+        Normal: vec3;
         Color: Rgba;
     }
 
@@ -400,7 +400,7 @@ type DrawVertex =
 /// </summary>
 type PolyVertex =
     {
-        Vertex: Vector3;
+        Vertex: vec3;
         St0: single;
         St1: single;
         Modulate0: byte;
@@ -435,7 +435,7 @@ type SurfaceDisplayList =
 /// SurfaceFlare
 /// </summary>
 type SurfaceFlare =
-    { Origin: Vector3; Normal: Vector3; Color: Vector3 }
+    { Origin: vec3; Normal: vec3; Color: vec3 }
 
 /// <summary>
 /// Based on Q3: srfGridMesh_t
@@ -448,13 +448,13 @@ type SurfaceGridMesh =
 
         // culling information
         MeshBounds: Bounds;
-        LocalOrigin: Vector3;
+        LocalOrigin: vec3;
         MeshRadius: single;
 
         // lod information, which may be different
         // than the culling information to allow for
         // groups of curves that LOD as a unit
-        LodOrigin: Vector3;
+        LodOrigin: vec3;
         LodRadius: single;
         LodFixed: int;
         LodStitched: int;
@@ -532,7 +532,7 @@ type SurfaceTriangles =
 
         // culling information (FIXME: use this!)
         Bounds: Bounds;
-        LocalOrigin: Vector3;
+        LocalOrigin: vec3;
         Radius: single;
 
         // triangle definitions
@@ -591,7 +591,7 @@ type TrRefdef =
         Y: int;
         Width: int;
         Height: int;
-        ViewOrigin: Vector3;
+        ViewOrigin: vec3;
         ViewAxis: Axis;             // transformation matrix
         Time: int;                  // time in milliseconds for shader effects and other time dependent rendering issues
         RdFlags: RdFlags;
@@ -700,7 +700,7 @@ type SkyParms =
 /// </summary>
 type FogParms =
     {
-        Color: Vector3;
+        Color: vec3;
         DepthForOpaque: single;
     }
 
@@ -759,7 +759,7 @@ type DeformType =
 type DeformStage =
     {
         Type: DeformType;       // vertex coordinate modification type
-        MoveVector: Vector3;
+        MoveVector: vec3;
         Wave: WaveForm;
         Spread: single;
         BulgeWidth: single;
@@ -784,7 +784,7 @@ type TextureCoordinateType =
 /// TextureCoordinateVectors
 /// </summary>
 type TextureCoordinateVectors =
-    { X: Vector3; Y: Vector3 }
+    { X: vec3; Y: vec3 }
 
     member inline this.Item
         with get (i) =
@@ -1046,8 +1046,8 @@ type MNode = {
         VisFrame: int;
 
         // for bounding box culling
-        Mins: Vector3;
-        Maxs: Vector3;
+        Mins: vec3;
+        Maxs: vec3;
         Parent: MNode option;
 
         // node specific
@@ -1091,9 +1091,9 @@ type LightGridBounds =
 
 /// LightGrid
 type LightGrid = {
-    Origin: Vector3;
-    Size: Vector3;
-    InverseSize: Vector3;
+    Origin: vec3;
+    Size: vec3;
+    InverseSize: vec3;
     Bounds: LightGridBounds;
     Data: byte list }
 
@@ -1150,7 +1150,7 @@ type Refdef =
         Y: int;
         Width: int;
         Height: int;
-        ViewOrigin: Vector3;
+        ViewOrigin: vec3;
         ViewAxis: Axis;         // transformation matrix
 
         // time in milliseconds for shader effects and other time dependent rendering issues

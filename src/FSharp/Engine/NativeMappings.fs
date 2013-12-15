@@ -69,13 +69,13 @@ module Vector2 =
 
         NativePtr.write ptr native  
 
-module Vector3 =
+module Vec3 =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         let mutable native = NativePtr.read ptr
 
         vec3 (native.value, native.value1, native.value2)
 
-    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: Vector3) =
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: vec3) =
         let mutable native = NativePtr.read ptr
 
         native.value <- v.X
@@ -157,16 +157,16 @@ module Cvar =
 module Bounds =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         {
-            Mins = Vector3.ofNativePtr <| NativePtr.add ptr 0;
-            Maxs = Vector3.ofNativePtr <| NativePtr.add ptr 1;
+            Mins = Vec3.ofNativePtr <| NativePtr.add ptr 0;
+            Maxs = Vec3.ofNativePtr <| NativePtr.add ptr 1;
         }
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
 
-        Vector3.toNativeByPtr &&nativeX bounds.Mins
-        Vector3.toNativeByPtr &&nativeY bounds.Maxs
+        Vec3.toNativeByPtr &&nativeX bounds.Mins
+        Vec3.toNativeByPtr &&nativeY bounds.Maxs
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY
@@ -214,7 +214,7 @@ module Md3Frame =
 
         {
             Bounds = Bounds.ofNativePtr &&native.bounds;
-            LocalOrigin = Vector3.ofNativePtr &&native.localOrigin;
+            LocalOrigin = Vec3.ofNativePtr &&native.localOrigin;
             Radius = native.radius;
             Name = NativePtr.toStringAnsi &&native.name;
         }

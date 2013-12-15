@@ -49,11 +49,11 @@ module Constants =
 /// TODO: Not finished.
 type PlayerState =
     {
-        Origin: Vector3;
-        Velocity: Vector3;
+        Origin: vec3;
+        Velocity: vec3;
 
         /// for fixed views
-        ViewAngles: Vector3; 
+        ViewAngles: vec3; 
     }
 
 /// Based on Q3: snapshot_t
@@ -101,7 +101,7 @@ type CGame =
         LandTime: int;
 
         Refdef: Refdef;
-        RefdefViewAngles: Vector3;
+        RefdefViewAngles: vec3;
 
         // temp working variables for player view
         BobCycle: int;

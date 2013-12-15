@@ -44,9 +44,9 @@ module Constants =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
-    val X : Vector3
-    val Y : Vector3
-    val Z : Vector3
+    val X : vec3
+    val Y : vec3
+    val Z : vec3
 
     new (x, y, z) = { X = x; Y = y; Z = z }
 
@@ -59,7 +59,7 @@ type Axis =
             | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    member inline this.Set (?X: Vector3, ?Y: Vector3, ?Z: Vector3) =
+    member inline this.Set (?X: vec3, ?Y: vec3, ?Z: vec3) =
         Axis.Create (
             (match X with | Some x -> x | None -> this.X),
             (match Y with | Some y -> y | None -> this.Y),
@@ -95,7 +95,7 @@ type Cvar =
 
 /// Bounds
 type Bounds = 
-    { Mins: Vector3; Maxs: Vector3 }   
+    { Mins: vec3; Maxs: vec3 }   
 
     member inline this.Item
         with get (i) =
@@ -112,5 +112,5 @@ module Bounds =
             let b = abs bounds.Maxs.[i]
             if a > b then a else b
         
-        Vec3.length <| Vector3 (f 0, f 1, f 2)
+        Vec3.length <| vec3 (f 0, f 1, f 2)
 

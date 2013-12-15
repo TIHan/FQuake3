@@ -42,7 +42,7 @@ let projectRadius radius location (view: ViewParms) =
     | true -> 0.f
     | _ ->
 
-    let p = Vector3 (0.f, abs radius, -distance)
+    let p = vec3 (0.f, abs radius, -distance)
 
     let inline f i = 
         p.X * view.ProjectionMatrix.[0, i] +

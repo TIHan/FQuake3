@@ -36,9 +36,9 @@ module PlayerState =
         let mutable native = NativePtr.read ptr
 
         {
-            Origin = Vector3.ofNativePtr &&native.origin;
-            Velocity = Vector3.ofNativePtr &&native.velocity;
-            ViewAngles = Vector3.ofNativePtr &&native.viewangles
+            Origin = Vec3.ofNativePtr &&native.origin;
+            Velocity = Vec3.ofNativePtr &&native.velocity;
+            ViewAngles = Vec3.ofNativePtr &&native.viewangles
         }
 
 module Snapshot =
@@ -63,7 +63,7 @@ module CGame =
             LandChange = native.landChange;
             LandTime = native.landTime;
             Refdef = Refdef.ofNativePtr &&native.refdef;
-            RefdefViewAngles = Vector3.ofNativePtr &&native.refdefViewAngles
+            RefdefViewAngles = Vec3.ofNativePtr &&native.refdefViewAngles
             BobCycle = native.bobcycle;
             BobFractionSin = native.bobfracsin;
             XYSpeed = native.xyspeed;

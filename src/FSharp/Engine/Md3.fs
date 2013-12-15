@@ -54,7 +54,7 @@ type Md3Header = {
 /// Md3Frame
 type Md3Frame = {
     Bounds: Bounds;
-    LocalOrigin: Vector3;
+    LocalOrigin: vec3;
     Radius: single;
     Name: string }
 
@@ -62,7 +62,7 @@ type Md3Frame = {
 /// Md3Tag
 type Md3Tag = {
     Name: string;
-    Origin: Vector3;
+    Origin: vec3;
     Axis: Axis }
 
 /// Md3
