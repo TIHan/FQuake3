@@ -110,14 +110,14 @@ int R_CullLocalBox (vec3_t bounds[2])
 #else
 	MObject *result;
 
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalBox", 4, {
-		__args [0] = m_object_as_arg (qm_of_bounds (bounds));
-		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
-		__args [2] = m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum));
-		__args [3] = m_object_as_arg (qm_of_cvar (r_nocull));
-	}, result);
+	m_invoke_new ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalBox", result,
+		m_object_as_arg (qm_of_bounds (bounds)),
+		m_object_as_arg (qm_of_orientationr (&tr.or)),
+		m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum)),
+		m_object_as_arg (qm_of_cvar (r_nocull))
+	);
 
-	return *(gint*)m_object_unbox (result);
+	return m_ub (result, gint);
 #endif
 }
 

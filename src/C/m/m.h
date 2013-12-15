@@ -90,6 +90,8 @@ m_gchandle_get_target (guint32 handle);
 void
 m_gchandle_free(guint32 handle);
 
+#define m_ub(obj,type) *(type*)m_object_unbox (obj)
+
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
 { \
 	static MMethod *method; \
@@ -102,11 +104,21 @@ m_gchandle_free(guint32 handle);
 { \
 	gpointer __args[argc]; \
 	MMethod *cache; \
+	\
+	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
+	\
+	arg_assignment \
+	\
+	o = m_method_invoke (cache, __args); \
+} \
+
+#define m_invoke_new(assembly_name,name_space,static_class_name,method_name,o,...) \
+{ \
+	gpointer __args[] = { __VA_ARGS__ }; \
+\
+	MMethod *cache; \
 \
 	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
-\
-	arg_assignment \
-\
 	o = m_method_invoke (cache, __args); \
 } \
 
