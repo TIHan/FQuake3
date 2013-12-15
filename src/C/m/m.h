@@ -88,29 +88,26 @@ MObject *
 m_gchandle_get_target (guint32 handle);
 
 void
-m_gchandle_free (guint32 handle);
+m_gchandle_free(guint32 handle);
 
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
 { \
-	if (!o) \
-		o = m_method(assembly_name, name_space, static_class_name, method_name); \
+	static MMethod *method; \
+	if (!method) \
+		method = m_method (assembly_name, name_space, static_class_name, method_name); \
+	o = method; \
 } \
 
-#define m_method_invoke_args(method,argc,arg_assignment,o) \
+#define m_invoke(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 { \
 	gpointer __args[argc]; \
+	MMethod *cache; \
+\
+	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
 \
 	arg_assignment \
 \
-	o = m_method_invoke(method, __args); \
-} \
-
-#define m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
-{ \
-	static MMethod *cache; \
-	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
-\
-	m_method_invoke_args (cache, argc, arg_assignment, o); \
+	o = m_method_invoke (cache, __args); \
 } \
 
 #endif /* __M_H__ */

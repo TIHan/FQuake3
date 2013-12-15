@@ -37,7 +37,7 @@ static const gchar* Assembly = name \
 static const gchar* Namespace = name \
 
 #define qm_invoke(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
-m_invoke_method_args_cache(assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
+m_invoke (assembly_name,name_space,static_class_name,method_name,argc,arg_assignment,o) \
 
 #define of_invoke(static_class_name,method_name,arg) \
 { \
