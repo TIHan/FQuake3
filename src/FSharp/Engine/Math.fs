@@ -394,9 +394,9 @@ type Quaternion =
 
     member inline q.Conjugate with get () = quat (q.W, -q.X, -q.Y, -q.Z)
 
-    member inline q.Length with get () = sqrt <| Quaternion.Dot (q, q)
+    member inline q.Length with get () = sqrt <| quat.Dot (q, q)
 
-    static member inline (*) (q1: Quaternion, q2: Quaternion) =
+    static member inline (*) (q1: quat, q2: quat) =
         quat (
             (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z),
             (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y),
@@ -410,7 +410,7 @@ type Quaternion =
     /// then multiply by the passed quat's conjugate (inverse)
     /// then multiply by the passed quat
     /// create vector based on result quat's x,y,z
-    static member inline (*) (q: Quaternion, v) =
+    static member inline (*) (q: quat, v) =
         let vl = 1.f / Vec3.length v
         let vq = quat (0.f, v.X * vl, v.Y * vl, v.Z * vl)
         let result = q * (vq * q.Conjugate)
@@ -421,13 +421,13 @@ and quat = Quaternion
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Quat =
-    let inline dot (q1: Quaternion) (q2: Quaternion) = Quaternion.Dot (q1, q2)
+    let inline dot q1 q2 = quat.Dot (q1, q2)
 
-    let inline conjugate (q: Quaternion) = q.Conjugate
+    let inline conjugate (q: quat) = q.Conjugate
 
-    let inline length (q: Quaternion) = q.Length
+    let inline length (q: quat) = q.Length
 
-    let inline normalize (q: Quaternion) =
+    let inline normalize (q: quat) =
         let ``1 / length`` = 1.f / length q
         quat (
             (q.W * ``1 / length``),
