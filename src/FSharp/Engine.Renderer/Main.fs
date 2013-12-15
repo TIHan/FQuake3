@@ -51,12 +51,12 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 
     // transform into world space
     let inline transform i =
-        let v = vec3 (bounds.[i &&& 1].X, bounds.[(i >>> 1) &&& 1].Y, bounds.[(i >>> 2) &&& 1].Z)
+        let v = vec3 (bounds.[i &&& 1].x, bounds.[(i >>> 1) &&& 1].y, bounds.[(i >>> 2) &&& 1].z)
 
         orientation.Origin
-        |> Vec3.multiplyAdd v.X orientation.Axis.[0]
-        |> Vec3.multiplyAdd v.Y orientation.Axis.[1]
-        |> Vec3.multiplyAdd v.Z orientation.Axis.[2]
+        |> Vec3.multiplyAdd v.x orientation.Axis.[0]
+        |> Vec3.multiplyAdd v.y orientation.Axis.[1]
+        |> Vec3.multiplyAdd v.z orientation.Axis.[2]
 
     let rec checkFrustumPlane (frust: Plane) front back isFront n =
         match n with
@@ -163,8 +163,8 @@ let cullLocalPointAndRadius (point: vec3) (radius: single) (orientation: Orienta
 [<Pure>]
 let transformModelToClip (source: vec3) (modelMatrix: mat4) (projectionMatrix: mat4) =
     let inline calculateEye i =
-        (source.X * modelMatrix.[0, i]) + (source.Y * modelMatrix.[1, i]) +
-        (source.Z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
+        (source.x * modelMatrix.[0, i]) + (source.y * modelMatrix.[1, i]) +
+        (source.z * modelMatrix.[2, i]) + (1.f * modelMatrix.[3, i])
           
     let eye =
         vec4 (
@@ -173,8 +173,8 @@ let transformModelToClip (source: vec3) (modelMatrix: mat4) (projectionMatrix: m
         )
 
     let inline calculateDestination i =
-        (eye.X * projectionMatrix.[0, i]) + (eye.Y * projectionMatrix.[1, i]) +
-        (eye.Z * projectionMatrix.[2, i]) + (eye.W * projectionMatrix.[3, i])
+        (eye.x * projectionMatrix.[0, i]) + (eye.y * projectionMatrix.[1, i]) +
+        (eye.z * projectionMatrix.[2, i]) + (eye.w * projectionMatrix.[3, i])
 
     (eye,
         vec4 (
@@ -191,17 +191,17 @@ let transformModelToClip (source: vec3) (modelMatrix: mat4) (projectionMatrix: m
 let transformClipToWindow (clip: vec4) (view: ViewParms) =
     let normalized =
         vec4 (
-            (clip.X / clip.W),
-            (clip.Y / clip.W),
-            ((clip.Z + clip.W) / (2.f * clip.W)),
+            (clip.x / clip.w),
+            (clip.y / clip.w),
+            ((clip.z + clip.w) / (2.f * clip.w)),
             0.f
         )
 
     let window =
         vec4 (
-            (truncate ((0.5f * (1.0f + normalized.X) * (single view.ViewportWidth)) + 0.5f)),
-            (truncate ((0.5f * (1.0f + normalized.Y) * (single view.ViewportHeight)) + 0.5f)),
-            normalized.Z,
+            (truncate ((0.5f * (1.0f + normalized.x) * (single view.ViewportWidth)) + 0.5f)),
+            (truncate ((0.5f * (1.0f + normalized.y) * (single view.ViewportHeight)) + 0.5f)),
+            normalized.z,
             0.f
         )
 
@@ -233,7 +233,7 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
             axis.[0].[0], axis.[0].[1], axis.[0].[2], 0.f,
             axis.[1].[0], axis.[1].[1], axis.[1].[2], 0.f,
             axis.[2].[0], axis.[2].[1], axis.[2].[2], 0.f,
-            origin.X, origin.Y, origin.Z, 1.f)
+            origin.x, origin.y, origin.z, 1.f)
 
     // calculate the viewer origin in the model's space
     // needed for fog, specular, and environment mapping
@@ -244,7 +244,7 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
         match entity.HasNonNormalizedAxes with
         | true ->
             // TODO: Is it ok to compare the single like this?
-            match Vec3.length axis.X with
+            match Vec3.length axis.x with
             | 0.f -> 0.f
             | axisLength ->
                 1.0f / axisLength
@@ -483,7 +483,7 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
 [<Pure>]
 let transformAxisOfNormal (normal: vec3) (axis: Axis) =
     let y = Vec3.perpendicular normal
-    Axis.create normal y (Vec3.cross normal y)
+    Axis (normal, y, Vec3.cross normal y)
 
 /// Tries to find the closest portal entity based on a plane.
 [<Pure>]
@@ -504,7 +504,7 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     match entity.OldOrigin = entity.Origin with
     | true ->
         let origin = plane.Normal * plane.Distance
-        let axis = surface.Axis.Set (X = Vec3.zero - surface.Axis.X)
+        let axis = surface.Axis.Set (x = Vec3.zero - surface.Axis.x)
 
         (
             true,
@@ -516,13 +516,13 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     // project the origin onto the surface plane to get
     // an origin point we can rotate around
     let distance = (Vec3.dot entity.Origin plane.Normal) - plane.Distance
-    let surface = { surface with Origin = Vec3.multiplyAdd -distance surface.Axis.X entity.Origin }
+    let surface = { surface with Origin = Vec3.multiplyAdd -distance surface.Axis.x entity.Origin }
 
     // now get the camera origin and orientation
     let camera =
         { camera with
             Origin = entity.OldOrigin;
-            Axis = entity.Axis.Set (X = Vec3.zero - entity.Axis.X, Y = Vec3.zero - entity.Axis.Y);
+            Axis = entity.Axis.Set (x = Vec3.zero - entity.Axis.x, y = Vec3.zero - entity.Axis.y);
         }
 
     // optionally rotate and if a speed is specified
@@ -539,13 +539,13 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
     // We know the angle should be in degrees.
     let angle = angle * 1.f<deg>
 
-    let y = Transform.rotateAroundPoint camera.Axis.Y camera.Axis.X angle
+    let y = Transform.rotateAroundPoint camera.Axis.y camera.Axis.x angle
 
     (
         false,
         surface,
         { camera with 
-            Axis = camera.Axis.Set (Y = y, Z = Vec3.cross camera.Axis.X y)
+            Axis = camera.Axis.Set (y = y, z = Vec3.cross camera.Axis.x y)
         }
     )
 

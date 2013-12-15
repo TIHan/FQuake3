@@ -44,37 +44,31 @@ module Constants =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Axis =
-    val X : vec3
-    val Y : vec3
-    val Z : vec3
+    val x : vec3
+    val y : vec3
+    val z : vec3
 
-    new (x, y, z) = { X = x; Y = y; Z = z }
-
-    static member inline Create (x, y, z) =
-        Axis (x, y, z)
+    new (x, y, z) = { x = x; y = y; z = z }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
+            | 0 -> this.x | 1 -> this.y | 2 -> this.z
             | _ -> raise <| IndexOutOfRangeException ()
 
-    member inline this.Set (?X: vec3, ?Y: vec3, ?Z: vec3) =
-        Axis.Create (
-            (match X with | Some x -> x | None -> this.X),
-            (match Y with | Some y -> y | None -> this.Y),
-            (match Z with | Some z -> z | None -> this.Z)
+    member inline this.Set (?x: vec3, ?y: vec3, ?z: vec3) =
+        Axis (
+            (match x with | Some x -> x | None -> this.x),
+            (match y with | Some y -> y | None -> this.y),
+            (match z with | Some z -> z | None -> this.z)
         )
 
 /// Axis Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Axis =
-    let inline create x y z =
-        Axis.Create (x, y, z)
-
-    let zero =      create Vec3.zero Vec3.zero Vec3.zero
-    let identity =  create Vec3.right Vec3.up Vec3.forward
+    let zero =      Axis (Vec3.zero, Vec3.zero, Vec3.zero)
+    let identity =  Axis (Vec3.right, Vec3.up, Vec3.forward)
 
 /// <summary>
 /// Based on Q3: cvar_t

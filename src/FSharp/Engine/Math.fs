@@ -92,58 +92,58 @@ module Vec2 =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector3 =
-    val X : single
-    val Y : single
-    val Z : single
+    val x : single
+    val y : single
+    val z : single
 
-    new (x, y, z) = { X = x; Y = y; Z = z }
-    new (x) = { X = x; Y = x; Z = x }
+    new (x, y, z) = { x = x; y = y; z = z }
+    new (x) = { x = x; y = x; z = x }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
+            | 0 -> this.x | 1 -> this.y | 2 -> this.z
             | _ -> raise <| IndexOutOfRangeException ()
 
     member inline this.Set (?x: single, ?y: single, ?z: single) =
         vec3 (
-            (match x with | Some x -> x | None -> this.X),
-            (match y with | Some y -> y | None -> this.Y),
-            (match z with | Some z -> z | None -> this.Z)
+            (match x with | Some x -> x | None -> this.x),
+            (match y with | Some y -> y | None -> this.y),
+            (match z with | Some z -> z | None -> this.z)
         )
 
     static member inline Abs (v: vec3) =
-        vec3 (abs v.X, abs v.Y, abs v.Z)
+        vec3 (abs v.x, abs v.y, abs v.z)
 
     static member inline Truncate (v: vec3) =
-        vec3 (truncate v.X, truncate v.Y, truncate v.Z)
+        vec3 (truncate v.x, truncate v.y, truncate v.z)
 
     static member inline Floor (v: vec3) =
-        vec3 (floor v.X, floor v.Y, floor v.Z)
+        vec3 (floor v.x, floor v.y, floor v.z)
 
     static member inline (*) (v1: vec3, v2: vec3) =
-        vec3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+        vec3 (v1.x * v2.x, v1.y * v2.y, v1.z * v2.z)
 
     static member inline (/) (v1: vec3, v2: vec3) =
-        vec3 (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
+        vec3 (v1.x / v2.x, v1.y / v2.y, v1.z / v2.z)
 
     static member inline (+) (v1: vec3, v2: vec3) =
-        vec3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
+        vec3 (v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
 
     static member inline (-) (v1: vec3, v2: vec3) =
-        vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+        vec3 (v1.x - v2.x, v1.y - v2.y, v1.z - v2.z)
 
     static member inline (*) (v: vec3, s) =
-        vec3 (v.X * s, v.Y * s, v.Z * s)
+        vec3 (v.x * s, v.y * s, v.z * s)
 
     static member inline (/) (v: vec3, s) =
-        vec3 (v.X / s, v.Y / s, v.Z / s)
+        vec3 (v.x / s, v.y / s, v.z / s)
 
     static member inline (+) (v: vec3, s) =
-        vec3 (v.X + s, v.Y + s, v.Z + s)
+        vec3 (v.x + s, v.y + s, v.z + s)
 
     static member inline (-) (v: vec3, s) =
-        vec3 (v.X - s, v.Y - s, v.Z - s)
+        vec3 (v.x - s, v.y - s, v.z - s)
 
     static member inline (*) (s, v) =
         v * s
@@ -168,38 +168,38 @@ module Vec3 =
     let forward =   vec3 (0.f, 0.f, 1.f)
 
     let inline minDimension (v: vec3) =
-        match v.X < v.Y with
+        match v.x < v.y with
         | true ->
-            match v.X < v.Z with
+            match v.x < v.z with
             | true -> 0
             | _ -> 2
         | _ ->
-            match v.Y < v.Z with
+            match v.y < v.z with
             | true -> 1
             | _ -> 2
         
     let inline multiplyAdd s (v1: vec3) (v2: vec3) =
-        vec3 (s * v1.X + v2.X, s * v1.Y + v2.Y, s * v1.Z + v2.Z) 
+        vec3 (s * v1.x + v2.x, s * v1.y + v2.y, s * v1.z + v2.z) 
 
     let inline dot (v1: vec3) (v2: vec3) =
-        v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z
+        v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 
     let inline cross (v1: vec3) (v2: vec3) =
         vec3 (
-            v1.Y * v2.Z - v1.Z * v2.Y,
-            v1.Z * v2.X - v1.X * v2.Z,
-            v1.X * v2.Y - v1.Y * v2.X
+            v1.y * v2.z - v1.z * v2.y,
+            v1.z * v2.x - v1.x * v2.z,
+            v1.x * v2.y - v1.y * v2.x
         )
 
     let inline lengthSquared (v: vec3) =
-        v.X * v.X + v.Y * v.Y + v.Z * v.Z
+        v.x * v.x + v.y * v.y + v.z * v.z
 
     let inline length v =
         sqrt <| lengthSquared v
 
     let inline normalize v =
         let length = 1.f / length v
-        vec3 (v.X * length, v.Y * length, v.Z * length)
+        vec3 (v.x * length, v.y * length, v.z * length)
 
     let inline perpendicular v =
         let uv =
@@ -211,33 +211,33 @@ module Vec3 =
         cross v vn
 
     let inline lerp (v1: vec3) (v2: vec3) (t: single) =
-        vec3 (Math.lerp v1.X v2.X t, Math.lerp v1.Y v2.Y t, Math.lerp v1.Z v2.Z t)
+        vec3 (Math.lerp v1.x v2.x t, Math.lerp v1.y v2.y t, Math.lerp v1.z v2.z t)
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Vector4 =
-    val X : single
-    val Y : single
-    val Z : single
-    val W : single
+    val x : single
+    val y : single
+    val z : single
+    val w : single
 
-    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
-    new (x) = { X = x; Y = x; Z = x; W = x }
+    new (x, y, z, w) = { x = x; y = y; z = z; w = w }
+    new (x) = { x = x; y = x; z = x; w = x }
     
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
+            | 0 -> this.x | 1 -> this.y | 2 -> this.z | 3 -> this.w
             | _ -> raise <| IndexOutOfRangeException ()
 
     static member inline (*) (v1: vec4, v2: vec4) =
-        vec4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
+        vec4 (v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w)
         
     static member inline (+) (v1: vec4, v2: vec4) =
-        vec4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
+        vec4 (v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w)
 
     static member inline (-) (v1: vec4, v2: vec4) =
-        vec4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W) 
+        vec4 (v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w) 
 and vec4 = Vector4 
 
 [<RequireQualifiedAccess>]
@@ -246,7 +246,7 @@ module Vec4 =
     let zero = vec4 (0.f)
 
     let inline dot (v1: vec4) (v2:vec4) =
-        v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
+        v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -344,26 +344,26 @@ module Mat4 =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
-    val W : single
-    val X : single
-    val Y : single
-    val Z : single
+    val w : single
+    val x : single
+    val y : single
+    val z : single
 
-    new (w, x, y, z) = { W = w; X = x; Y = y; Z = z }
+    new (w, x, y, z) = { w = w; x = x; y = y; z = z }
         
     static member inline Dot (q1: quat, q2: quat) =
-        q1.X * q2.X + q1.Y * q2.Y + q1.Z * q2.Z + q1.W * q2.W
+        q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w
 
-    member inline q.Conjugate with get () = quat (q.W, -q.X, -q.Y, -q.Z)
+    member inline q.Conjugate with get () = quat (q.w, -q.x, -q.y, -q.z)
 
     member inline q.Length with get () = sqrt <| quat.Dot (q, q)
 
     static member inline (*) (q1: quat, q2: quat) =
         quat (
-            (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z),
-            (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y),
-            (q1.W * q2.Y + q1.Y * q2.W + q1.Z * q2.X - q1.X * q2.Z),
-            (q1.W * q2.Z + q1.Z * q2.W + q1.X * q2.Y - q1.Y * q2.X)
+            (q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z),
+            (q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y),
+            (q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z),
+            (q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x)
         )
 
     /// Steps:
@@ -374,10 +374,10 @@ type Quaternion =
     /// create vector based on result quat's x,y,z
     static member inline (*) (q: quat, v) =
         let vl = 1.f / Vec3.length v
-        let vq = quat (0.f, v.X * vl, v.Y * vl, v.Z * vl)
+        let vq = quat (0.f, v.x * vl, v.y * vl, v.z * vl)
         let result = q * (vq * q.Conjugate)
 
-        vec3 (result.X, result.Y, result.Z)
+        vec3 (result.x, result.y, result.z)
 and quat = Quaternion
 
 [<RequireQualifiedAccess>]
@@ -392,10 +392,10 @@ module Quat =
     let inline normalize (q: quat) =
         let ``1 / length`` = 1.f / length q
         quat (
-            (q.W * ``1 / length``),
-            (q.X * ``1 / length``),
-            (q.Y * ``1 / length``),
-            (q.Z * ``1 / length``)
+            (q.w * ``1 / length``),
+            (q.x * ``1 / length``),
+            (q.y * ``1 / length``),
+            (q.z * ``1 / length``)
         )
 
     let inline ofEulerDegrees (v: vec3) =
@@ -427,9 +427,9 @@ module Quat =
 
         quat (
             (cos angle),
-            (axis.X * sinAngle),
-            (axis.Y * sinAngle),
-            (axis.Z * sinAngle)
+            (axis.x * sinAngle),
+            (axis.y * sinAngle),
+            (axis.z * sinAngle)
         )
 
 [<RequireQualifiedAccess>]

@@ -43,28 +43,28 @@ let calculateWeaponPosition (cg: CGame) =
     // gun angles from bobbing
     let angles =
         vec3 (
-            (angles.X + (cg.XYSpeed * cg.BobFractionSin * 0.005f)), // PITCH
-            (angles.Y + (scale * cg.BobFractionSin * 0.01f)), // YAW
-            (angles.Z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
+            (angles.x + (cg.XYSpeed * cg.BobFractionSin * 0.005f)), // PITCH
+            (angles.y + (scale * cg.BobFractionSin * 0.01f)), // YAW
+            (angles.z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
         )
         
     let originZ =
         // drop the weapon when landing
         match cg.DeltaLandTime with
         | x when x < Constants.LandDeflectTime ->
-            origin.Z + (cg.LandChange * 0.25f * (single x / single Constants.LandDeflectTime))
+            origin.z + (cg.LandChange * 0.25f * (single x / single Constants.LandDeflectTime))
         | x when x < Constants.LandDeflectTime + Constants.LandReturnTime ->
-            origin.Z + (cg.LandChange * 0.25f * single (Constants.LandDeflectTime + Constants.LandReturnTime - x) / single Constants.LandReturnTime)
-        | _ -> origin.Z
+            origin.z + (cg.LandChange * 0.25f * single (Constants.LandDeflectTime + Constants.LandReturnTime - x) / single Constants.LandReturnTime)
+        | _ -> origin.z
 
     // idle drift
     let scale = cg.XYSpeed + 40.f
     let fractionSin = sin <| single cg.Time * 0.001f
     let angles =
         vec3 (
-            (angles.X + (scale * fractionSin * 0.01f)), // PITCH
-            (angles.Y + (scale * fractionSin * 0.01f)), // YAW
-            (angles.Z + (scale * fractionSin * 0.01f)) // ROLL
+            (angles.x + (scale * fractionSin * 0.01f)), // PITCH
+            (angles.y + (scale * fractionSin * 0.01f)), // YAW
+            (angles.z + (scale * fractionSin * 0.01f)) // ROLL
         )
 
     (origin.Set (z = originZ), angles)
