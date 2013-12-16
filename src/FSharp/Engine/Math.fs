@@ -41,6 +41,14 @@ module Math =
         
     let inline lerp x y t = x + (y - x) * t
 
+[<AutoOpen>]
+module Operators =
+    let inline clamp x min max =
+        match x with
+        | _ when x < min -> min
+        | _ when x > max -> max
+        | _ -> x
+
 /// Single with Units of Measure
 type single<[<Measure>] 'Measure> = float32<'Measure>
 
@@ -179,7 +187,7 @@ module Vec3 =
             | _ -> 2
         
     let inline multiplyAdd s (v1: vec3) (v2: vec3) =
-        vec3 (s * v1.x + v2.x, s * v1.y + v2.y, s * v1.z + v2.z) 
+        vec3 (s * v1.x + v2.x, s * v1.y + v2.y, s * v1.z + v2.z)
 
     let inline dot (v1: vec3) (v2: vec3) =
         v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
@@ -188,8 +196,7 @@ module Vec3 =
         vec3 (
             v1.y * v2.z - v1.z * v2.y,
             v1.z * v2.x - v1.x * v2.z,
-            v1.x * v2.y - v1.y * v2.x
-        )
+            v1.x * v2.y - v1.y * v2.x)
 
     let inline lengthSquared (v: vec3) =
         v.x * v.x + v.y * v.y + v.z * v.z

@@ -47,6 +47,18 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
     let v = vec3 (f 0, f 1, f 2)
     let pos = floor v
     let frac = v - pos
+    let pos = 
+        LightGridBounds (
+            clamp (int pos.x) 0 (lightGrid.Bounds.x - 1),
+            clamp (int pos.y) 0 (lightGrid.Bounds.y - 1),
+            clamp (int pos.z) 0 (lightGrid.Bounds.z - 1))
+
+    // trilerp the light value
+    let gridStepX = 8
+    let gridStepY = 8 * lightGrid.Bounds.x
+    let gridStepZ = 8 * lightGrid.Bounds.x * lightGrid.Bounds.y
+    let gridIndex = (pos.x * gridStepX) + (pos.y * gridStepY) + (pos.z * gridStepZ)
+
     // TODO:
     ()
 

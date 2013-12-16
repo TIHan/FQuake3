@@ -663,10 +663,10 @@ module Bsp =
 
 module LightGridBounds =
     let ofNativePtr (ptr: nativeptr<int>) =
-        {
-        Bounds1 = NativePtr.get ptr 0
-        Bounds2 = NativePtr.get ptr 1
-        Bounds3 = NativePtr.get ptr 2 }
+        LightGridBounds (
+            NativePtr.get ptr 0,
+            NativePtr.get ptr 1,
+            NativePtr.get ptr 2)
 
 module LightGrid =
     let ofNativePtr (ptr: nativeptr<world_t>) =

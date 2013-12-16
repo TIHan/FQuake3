@@ -1081,15 +1081,20 @@ type Fog =
         Surface: vec4;
     }
 
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type LightGridBounds =
-    { Bounds1: int; Bounds2: int; Bounds3: int }
+    val x : int
+    val y : int
+    val z : int
+
+    new (x, y, z) = { x = x; y = y; z = z }
+    new (x: vec3) = { x = int x.x; y = int x.y; z = int x.z }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.Bounds1
-            | 1 -> this.Bounds2
-            | 2 -> this.Bounds3
+            | 0 -> this.x | 1 -> this.y | 2 -> this.z
             | _ -> raise <| IndexOutOfRangeException ()
 
 /// LightGrid
