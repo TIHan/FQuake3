@@ -59,6 +59,13 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
     let gridStepZ = 8 * lightGrid.Bounds.x * lightGrid.Bounds.y
     let gridIndex = (pos.x * gridStepX) + (pos.y * gridStepY) + (pos.z * gridStepZ)
 
+    let inline gridStep i =
+        match i with
+        | 0 -> gridStepX
+        | 1 -> gridStepY
+        | 2 -> gridStepZ
+        | _ -> raise <| System.ArgumentOutOfRangeException ()
+            
     // TODO:
     ()
 
