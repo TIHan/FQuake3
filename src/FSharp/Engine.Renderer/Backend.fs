@@ -239,7 +239,7 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
     let backend = { backend with IsProjection2D = false }
 
     // set the modelview matrix for the viewer
-    setViewportAndScissor backend
+    setViewportAndScissor backend |> ignore
 
     // ensures that depth writes are enabled for the depth clear
     let glState = GL.state (uint32 GL.GLS.Default) glState

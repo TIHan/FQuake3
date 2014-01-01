@@ -65,6 +65,16 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
         | 1 -> gridStepY
         | 2 -> gridStepZ
         | _ -> raise <| System.ArgumentOutOfRangeException ()
+
+    let rec calculateFactor i factor gridIndex n =
+        match n with
+        | 3 -> factor, gridIndex
+        | _ ->
+            match (i &&& (1 <<< n)) <> 0 with
+            | true ->
+                calculateFactor i (factor * frac.[n]) (gridIndex + gridStep n) (n + 1)
+            | _ ->
+                calculateFactor i (factor * (1.f - frac.[n])) gridIndex (n + 1)
             
     // TODO:
     ()
