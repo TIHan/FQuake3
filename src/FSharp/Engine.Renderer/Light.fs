@@ -67,23 +67,23 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
         | 2 -> gridStepZ
         | _ -> raise <| System.ArgumentOutOfRangeException ()
 
-    let rec calculateFactor i factor gridIndex n =
+    let rec calculateFactor i factor dataIndex n =
         match n with
-        | 3 -> factor, gridIndex
+        | 3 -> factor, dataIndex
         | _ ->
             match (i &&& (1 <<< n)) <> 0 with
             | true ->
-                calculateFactor i (factor * frac.[n]) (gridIndex + gridStep n) (n + 1)
+                calculateFactor i (factor * frac.[n]) (dataIndex + gridStep n) (n + 1)
             | _ ->
-                calculateFactor i (factor * (1.f - frac.[n])) gridIndex (n + 1)
+                calculateFactor i (factor * (1.f - frac.[n])) dataIndex (n + 1)
             
     let rec calculateTotalFactor totalFactor direction rentity n =
         match n with
         | 8 -> totalFactor, direction, rentity
         | _ ->
-            let factor, gridIndex = calculateFactor n 1.f gridIndex 0
+            let factor, dataIndex = calculateFactor n 1.f gridIndex 0
 
-            match lightGrid.Data.[gridIndex] + lightGrid.Data.[gridIndex + 1] + lightGrid.Data.[gridIndex + 2] with
+            match lightGrid.Data.[dataIndex] + lightGrid.Data.[dataIndex + 1] + lightGrid.Data.[dataIndex + 2] with
             // ignore samples in walls
             | 0uy ->
                 calculateTotalFactor totalFactor direction rentity (n + 1)
@@ -91,29 +91,29 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 
             let ambientLight =
                 vec3 (
-                    single <| lightGrid.Data.[gridIndex],
-                    single <| lightGrid.Data.[gridIndex + 1],
-                    single <| lightGrid.Data.[gridIndex + 2])
+                    single <| lightGrid.Data.[dataIndex],
+                    single <| lightGrid.Data.[dataIndex + 1],
+                    single <| lightGrid.Data.[dataIndex + 2])
 
             let directedLight =
                 vec3 (
-                    single <| lightGrid.Data.[gridIndex + 3],
-                    single <| lightGrid.Data.[gridIndex + 4],
-                    single <| lightGrid.Data.[gridIndex + 5])
+                    single <| lightGrid.Data.[dataIndex + 3],
+                    single <| lightGrid.Data.[dataIndex + 4],
+                    single <| lightGrid.Data.[dataIndex + 5])
 
             let rentity = 
                 { rentity with
                     AmbientLight = rentity.AmbientLight + ambientLight * factor
                     DirectedLight = rentity.DirectedLight + directedLight * factor }
 
-            let long = single lightGrid.Data.[gridIndex + 6]
-            let lat = single lightGrid.Data.[gridIndex + 7]
+            let phi = single lightGrid.Data.[dataIndex + 6]
+            let theta = single lightGrid.Data.[dataIndex + 7]
 
             let normal =
                 vec3 (
-                    cos lat * sin long,
-                    sin lat * sin long,
-                    cos long)
+                    cos theta * sin phi,
+                    sin theta * sin phi,
+                    cos theta)
             
             let direction = Vec3.multiplyAdd factor normal direction
 
@@ -138,7 +138,7 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
     { rentity with
         AmbientLight = rentity.AmbientLight * r_ambientScale.Value
         DirectedLight = rentity.DirectedLight * r_directedScale.Value
-        LightDirection = direction }
+        LightDirection = Vec3.normalize direction }
 
 
 /// Based on Q3: R_SetupEntityLighting
