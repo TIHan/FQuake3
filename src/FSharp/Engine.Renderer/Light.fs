@@ -30,7 +30,7 @@ open Engine.Renderer.Core
 
 /// Based on Q3: setupEntityLightingGrid
 /// SetupEntityLightingGrid
-let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
+let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) =
     let entity = rentity.Entity
 
     let lightOrigin =
@@ -76,8 +76,63 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) =
             | _ ->
                 calculateFactor i (factor * (1.f - frac.[n])) gridIndex (n + 1)
             
-    // TODO:
-    ()
+    let rec calculateTotalFactor totalFactor direction rentity n =
+        match n with
+        | 8 -> totalFactor, direction, rentity
+        | _ ->
+            let factor, gridIndex = calculateFactor n 1.f gridIndex 0
+
+            match lightGrid.Data.[gridIndex] + lightGrid.Data.[gridIndex + 1] + lightGrid.Data.[gridIndex + 2] with
+            // ignore samples in walls
+            | 0uy ->
+                calculateTotalFactor totalFactor direction rentity (n + 1)
+            | _ ->
+
+            let ambientLight =
+                vec3 (
+                    single <| lightGrid.Data.[gridIndex],
+                    single <| lightGrid.Data.[gridIndex + 1],
+                    single <| lightGrid.Data.[gridIndex + 2])
+
+            let directedLight =
+                vec3 (
+                    single <| lightGrid.Data.[gridIndex + 3],
+                    single <| lightGrid.Data.[gridIndex + 4],
+                    single <| lightGrid.Data.[gridIndex + 5])
+
+            let rentity = 
+                { rentity with
+                    AmbientLight = rentity.AmbientLight + ambientLight * factor
+                    DirectedLight = rentity.DirectedLight + directedLight * factor }
+
+            let long = single lightGrid.Data.[gridIndex + 6]
+            let lat = single lightGrid.Data.[gridIndex + 7]
+
+            let normal =
+                vec3 (
+                    cos lat * sin long,
+                    sin lat * sin long,
+                    cos long)
+            
+            let direction = Vec3.multiplyAdd factor normal direction
+
+            calculateTotalFactor (totalFactor + factor) direction rentity (n + 1)
+
+    let totalFactor, direction, rentity = calculateTotalFactor 0.f Vec3.zero rentity 0
+
+    let rentity =
+        match totalFactor > 0.f && totalFactor < 0.99f with
+        | false -> rentity
+        | _ ->
+            let factor = 1.f / totalFactor
+            { rentity with 
+                AmbientLight = rentity.AmbientLight * factor 
+                DirectedLight = rentity.DirectedLight * factor }
+
+    { rentity with
+        AmbientLight = rentity.AmbientLight * r_ambientScale.Value
+        DirectedLight = rentity.DirectedLight * r_directedScale.Value
+        LightDirection = direction }
 
 
 /// Based on Q3: R_SetupEntityLighting
