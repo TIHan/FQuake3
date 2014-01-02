@@ -38,9 +38,11 @@ define_mapping_prototype (orientation, orientation_t*);
 define_mapping_prototype (plane, cplane_t*);
 define_mapping_prototype (surface, surfaceType_t*);
 define_mapping_prototype (draw_surf, drawSurf_t*);
+define_mapping_prototype (tr_ref_entity, trRefEntity_t*);
 define_mapping_prototype (tr_globals, trGlobals_t*);
 define_mapping_prototype (tr_back_end_state, backEndState_t*);
 define_mapping_prototype (gl_state, glstate_t*);
 define_mapping_prototype (model, model_t*);
+define_mapping_prototype (light_grid, world_t*);
 
 #endif /* __QM_RENDERER_H__ */

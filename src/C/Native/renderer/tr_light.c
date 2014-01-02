@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_light.c
 
 #include "tr_local.h"
+#include "../qm_renderer.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 #define	DLIGHT_AT_RADIUS		16
 // at the edge of a dlight's influence, this amount of light will be added
@@ -124,6 +126,7 @@ R_SetupEntityLightingGrid
 =================
 */
 static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
+#if 1
 	vec3_t	lightOrigin;
 	int		pos[3];
 	int		i, j;
@@ -239,6 +242,17 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 	VectorScale( ent->directedLight, r_directedScale->value, ent->directedLight );
 
 	VectorNormalize2( direction, ent->lightDir );
+#else
+	MObject *result;
+
+	m_invoke_new ("Engine.Renderer", "Engine.Renderer", "Light", "setupEntityLightingGrid", result,
+		m_object_as_arg (qm_of_tr_ref_entity (ent)),
+		m_object_as_arg (qm_of_light_grid (tr.world)),
+		m_object_as_arg (qm_of_cvar (r_ambientScale)),
+		m_object_as_arg (qm_of_cvar (r_directedScale)))
+
+	qm_to_tr_ref_entity(result, &ent);
+#endif
 }
 
 
