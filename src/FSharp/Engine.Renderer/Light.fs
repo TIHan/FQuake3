@@ -106,14 +106,29 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
                     AmbientLight = rentity.AmbientLight + ambientLight * factor
                     DirectedLight = rentity.DirectedLight + directedLight * factor }
 
-            let long = single lightGrid.Data.[dataIndex + 6]
-            let lat = single lightGrid.Data.[dataIndex + 7]
+            let long = single lightGrid.Data.[dataIndex + 6] * 4.f
+
+            let lat = single lightGrid.Data.[dataIndex + 7] * 4.f
+
+            // FIXME: this is aweful - fix this sutpid garbage
+            let sin x = 
+                x * 360.f / 1023.f
+                |> (*) 1.f<deg>
+                |> Deg.toRad
+                |> (*) 1.f</rad>
+                |> sin
+            
+            // FIXME: this is aweful - fix this sutpid garbage
+            let cos x =
+                (int x + 256) &&& 1023
+                |> single
+                |> sin
 
             let normal =
                 vec3 (
                     cos lat * sin long,
                     sin lat * sin long,
-                    cos lat)
+                    cos long)
             
             let direction = Vec3.multiplyAdd factor normal direction
 
