@@ -654,12 +654,10 @@ module Shader =
 
 module Bsp =
     // this will be used to prevent major copying
-    let mutable private lightGridData = Unchecked.defaultof<byte list>
+    let mutable lightGridData = Unchecked.defaultof<byte array>
 
     let setLightGridData (size: int) (ptr: nativeptr<byte>) =
-        lightGridData <- NativePtr.toList size ptr
-
-    let getLightGridData () = lightGridData
+        lightGridData <- NativePtr.toArray size ptr
 
 module LightGridBounds =
     let ofNativePtr (ptr: nativeptr<int>) =
@@ -677,7 +675,7 @@ module LightGrid =
         Size = Vec3.ofNativePtr &&native.lightGridSize;
         InverseSize = Vec3.ofNativePtr &&native.lightGridInverseSize;
         Bounds = LightGridBounds.ofNativePtr &&native.lightGridBounds;
-        Data = Bsp.getLightGridData () }
+        Data = Bsp.lightGridData }
 
 // TODO: This will need more work over time.
 module Renderer =

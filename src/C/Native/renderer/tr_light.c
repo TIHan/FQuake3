@@ -126,7 +126,7 @@ R_SetupEntityLightingGrid
 =================
 */
 static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
-#if 1
+#if 0
 	vec3_t	lightOrigin;
 	int		pos[3];
 	int		i, j;

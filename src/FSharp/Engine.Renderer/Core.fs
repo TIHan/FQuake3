@@ -1103,7 +1103,7 @@ type LightGrid = {
     Size: vec3;
     InverseSize: vec3;
     Bounds: LightGridBounds;
-    Data: byte list }
+    Data: byte array } // TODO: We need an immutable array.
 
 /// Based on Q3: world_t
 /// World
