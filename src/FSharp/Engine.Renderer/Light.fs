@@ -106,14 +106,14 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
                     AmbientLight = rentity.AmbientLight + ambientLight * factor
                     DirectedLight = rentity.DirectedLight + directedLight * factor }
 
-            let phi = single lightGrid.Data.[dataIndex + 6]
-            let theta = single lightGrid.Data.[dataIndex + 7]
+            let long = single lightGrid.Data.[dataIndex + 6]
+            let lat = single lightGrid.Data.[dataIndex + 7]
 
             let normal =
                 vec3 (
-                    cos theta * sin phi,
-                    sin theta * sin phi,
-                    cos theta)
+                    cos lat * sin long,
+                    sin lat * sin long,
+                    cos lat)
             
             let direction = Vec3.multiplyAdd factor normal direction
 
