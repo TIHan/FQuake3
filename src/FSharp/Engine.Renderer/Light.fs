@@ -40,13 +40,14 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
         // multi-part models can be lit identically
         | true -> entity.LightingOrigin
         | _ -> entity.Origin
-        |> (-) lightGrid.Origin
+        - lightGrid.Origin
 
     let inline f i = lightOrigin.[i] * lightGrid.InverseSize.[i]
 
     let v = vec3 (f 0, f 1, f 2)
     let pos = floor v
     let frac = v - pos
+
     let pos = 
         LightGridBounds (
             clamp (int pos.x) 0 (lightGrid.Bounds.x - 1),
@@ -118,7 +119,12 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 
             calculateTotalFactor (totalFactor + factor) direction rentity (n + 1)
 
-    let totalFactor, direction, rentity = calculateTotalFactor 0.f Vec3.zero rentity 0
+    let totalFactor, direction, rentity =
+        calculateTotalFactor
+            0.f
+            Vec3.zero
+            { rentity with AmbientLight = Vec3.zero; DirectedLight = Vec3.zero }
+            0
 
     let rentity =
         match totalFactor > 0.f && totalFactor < 0.99f with
