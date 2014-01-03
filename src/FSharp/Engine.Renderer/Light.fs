@@ -107,7 +107,6 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
                     DirectedLight = rentity.DirectedLight + directedLight * factor }
 
             let long = single lightGrid.Data.[dataIndex + 6] * 4.f
-
             let lat = single lightGrid.Data.[dataIndex + 7] * 4.f
 
             // FIXME: this is aweful - fix this sutpid garbage
@@ -161,7 +160,7 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 ///
 /// Calculates all the lighting values that will be used
 /// by the Calc_* functions
-let setupEntityLighting (rentity: TrRefEntity) =
+let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection: vec3) (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) =
     // lighting calculations
     match rentity.IsLightingCalculated with
     | true -> rentity
@@ -181,5 +180,83 @@ let setupEntityLighting (rentity: TrRefEntity) =
         | true -> entity.LightingOrigin
         | _ -> entity.Origin
 
-    // TODO:
-    rentity
+    let rentity =
+        // if NOWORLDMODEL, only use dynamic lights (menu system, etc)
+        match refdef.RdFlags.HasFlag RdFlags.NoWorldModel with
+        | false when lightGrid.Data.Length <> 0 ->
+            setupEntityLightingGrid rentity lightGrid r_ambientScale r_directedScale
+        | _ ->
+            { rentity with
+                AmbientLight = vec3 (identityLight * 150.f)
+                DirectedLight = vec3 (identityLight * 150.f)
+                LightDirection = sunDirection }
+
+    // bonus items and view weapons have a fixed minimum add
+    let rentity =
+        { rentity with
+            // give everything a minimum light add
+            AmbientLight = rentity.AmbientLight + (identityLight * 32.f) }
+
+    //
+    // modify the light by dynamic lights
+    //
+    let dlightLength = Vec3.length rentity.DirectedLight
+    let lightDirection = rentity.LightDirection * dlightLength
+
+    let directedLight, lightDirection =
+        refdef.Dlights
+        |> List.fold (fun (directedLight, lightDirection) x ->
+            let power = Dlight.AtRadius * (x.Radius * x.Radius)
+            let direction = (x.Origin - lightOrigin)
+            let length = 
+                direction
+                |> Vec3.normalize
+                |> Vec3.length
+                |> function
+                | y when y < Dlight.MinRadius -> Dlight.MinRadius
+                | y -> y
+            
+            let length = power / (length * length)
+
+            Vec3.multiplyAdd length x.Color directedLight,
+            Vec3.multiplyAdd length direction lightDirection) (rentity.DirectedLight, lightDirection)
+
+    let identityLightByte = identityLight * 255.f
+
+    let clampAmbient x =
+        match x > identityLightByte with
+        | true -> identityLightByte
+        | _ -> x
+
+    let rentity =
+        { rentity with
+            AmbientLight =
+                vec3 (
+                    clampAmbient rentity.AmbientLight.x,
+                    clampAmbient rentity.AmbientLight.y,
+                    clampAmbient rentity.AmbientLight.z) }
+
+// TODO:
+(*
+	if ( r_debugLight->integer ) {
+		LogLight( ent );
+	}
+*)
+
+// TODO:
+(*
+	// save out the byte packet version
+	((byte * )&ent->ambientLightInt)[0] = myftol( ent->ambientLight[0] );
+	((byte * )&ent->ambientLightInt)[1] = myftol( ent->ambientLight[1] );
+	((byte * )&ent->ambientLightInt)[2] = myftol( ent->ambientLight[2] );
+	((byte * )&ent->ambientLightInt)[3] = 0xff;
+*)
+
+    // transform the direction to local space
+    let normal = Vec3.normalize lightDirection
+    { rentity with
+        LightDirection =
+            vec3 (
+                Vec3.dot normal entity.Axis.x,
+                Vec3.dot normal entity.Axis.y,
+                Vec3.dot normal entity.Axis.z) }

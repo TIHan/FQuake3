@@ -368,7 +368,7 @@ type TrRefEntity = {
         DirectedLight: vec3; }
 
 /// Based on Q3: dlight_t
-/// Dlight
+/// Dlight - Dyanmic Light
 type Dlight = {
         Origin: vec3;
 
@@ -381,6 +381,15 @@ type Dlight = {
 
         /// texture detail is lost tho when the lightmap is dark
         Additive: int; }
+
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Dlight =
+    [<Literal>]
+    let AtRadius = 16.f
+
+    [<Literal>]
+    let MinRadius = 16.f
 
 /// <summary>
 /// Based on Q3: drawVert_t
