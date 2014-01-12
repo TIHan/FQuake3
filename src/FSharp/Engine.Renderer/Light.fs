@@ -30,6 +30,7 @@ open Engine.Renderer.Core
 
 /// Based on Q3: setupEntityLightingGrid
 /// SetupEntityLightingGrid
+[<Pure>]
 let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) =
     let entity = rentity.Entity
 
@@ -191,7 +192,7 @@ let logLight (rentity: TrRefEntity) =
 ///
 /// Calculates all the lighting values that will be used
 /// by the Calc_* functions
-let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection: vec3) (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) =
+let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection: vec3) (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) (r_debugLight: Cvar) =
     // lighting calculations
     match rentity.IsLightingCalculated with
     | true -> rentity
@@ -267,21 +268,12 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
                     clampAmbient rentity.AmbientLight.y,
                     clampAmbient rentity.AmbientLight.z) }
 
-// TODO:
-(*
-	if ( r_debugLight->integer ) {
-		LogLight( ent );
-	}
-*)
+    // impure function call for logLight
+    if r_debugLight.Integer <> 0 then
+        logLight rentity
 
-// TODO:
-(*
-	// save out the byte packet version
-	((byte * )&ent->ambientLightInt)[0] = myftol( ent->ambientLight[0] );
-	((byte * )&ent->ambientLightInt)[1] = myftol( ent->ambientLight[1] );
-	((byte * )&ent->ambientLightInt)[2] = myftol( ent->ambientLight[2] );
-	((byte * )&ent->ambientLightInt)[3] = 0xff;
-*)
+    // save out the byte packet version
+    let rentity = TrRefEntity.calculateAmbientLightPacket rentity
 
     // transform the direction to local space
     let normal = Vec3.normalize lightDirection

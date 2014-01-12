@@ -367,6 +367,19 @@ type TrRefEntity = {
         AmbientLightInt: int;
         DirectedLight: vec3; }
 
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module TrRefEntity =
+    let calculateAmbientLightPacket rentity =
+        let mutable ambientLightInt = 0
+        let ptr : nativeptr<byte> = &&ambientLightInt |> NativePtr.toNativePtr
+
+        NativePtr.set ptr 0 <| byte rentity.AmbientLight.x
+        NativePtr.set ptr 1 <| byte rentity.AmbientLight.y
+        NativePtr.set ptr 1 <| byte rentity.AmbientLight.z
+
+        { rentity with AmbientLightInt = ambientLightInt }
+
 /// Based on Q3: dlight_t
 /// Dlight - Dyanmic Light
 type Dlight = {
