@@ -155,6 +155,37 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
         LightDirection = Vec3.normalize direction }
 
 
+/// Based on Q3: LogLight
+/// LogLight
+/// note: internal
+let logLight (rentity: TrRefEntity) =
+    match rentity.Entity.RenderFx <> RenderFxFlags.FirstPerson with
+    | _ -> ()
+    | _ ->
+
+    let ambientLight = rentity.AmbientLight
+    let directedLight = rentity.DirectedLight
+
+    let max1 =
+        if ambientLight.y > ambientLight.x then
+            ambientLight.y
+        elif ambientLight.z > ambientLight.x then
+            ambientLight.z
+        else
+            ambientLight.x
+
+    let max2 =
+        if directedLight.y > directedLight.x then
+            directedLight.y
+        elif directedLight.z > directedLight.x then
+            directedLight.z
+        else
+            directedLight.x
+
+    // impurity
+    printfn "amb:%f  dir:%f" max1 max2
+
+
 /// Based on Q3: R_SetupEntityLighting
 /// SetupEntityLighting
 ///
