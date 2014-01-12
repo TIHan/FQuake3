@@ -44,5 +44,6 @@ define_mapping_prototype (tr_back_end_state, backEndState_t*);
 define_mapping_prototype (gl_state, glstate_t*);
 define_mapping_prototype (model, model_t*);
 define_mapping_prototype (light_grid, world_t*);
+define_mapping_prototype (tr_ref_def, trRefdef_t*);
 
 #endif /* __QM_RENDERER_H__ */

@@ -43,3 +43,4 @@ define_mapping (tr_back_end_state, backEndState_t*, "Backend");
 define_mapping (gl_state, glstate_t*, "GLState");
 define_mapping (model, model_t*, "Model");
 define_mapping (light_grid, world_t*, "LightGrid");
+define_mapping (tr_ref_def, trRefdef_t*, "TrRefdef");

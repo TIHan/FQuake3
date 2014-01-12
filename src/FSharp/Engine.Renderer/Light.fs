@@ -30,7 +30,7 @@ open Engine.Renderer.Core
 
 /// Based on Q3: setupEntityLightingGrid
 /// SetupEntityLightingGrid
-[<Pure>]
+/// impure due to lightgrid data being a .net array
 let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) =
     let entity = rentity.Entity
 
@@ -160,8 +160,9 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 /// LogLight
 /// note: internal
 let logLight (rentity: TrRefEntity) =
-    match rentity.Entity.RenderFx <> RenderFxFlags.FirstPerson with
-    | _ -> ()
+    // TODO: This is kinda of hacky.
+    match int (rentity.Entity.RenderFx &&& RenderFxFlags.FirstPerson) <> 0 with
+    | false -> ()
     | _ ->
 
     let ambientLight = rentity.AmbientLight
@@ -192,7 +193,8 @@ let logLight (rentity: TrRefEntity) =
 ///
 /// Calculates all the lighting values that will be used
 /// by the Calc_* functions
-let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection: vec3) (rentity: TrRefEntity) (lightGrid: LightGrid) (r_ambientScale: Cvar) (r_directedScale: Cvar) (r_debugLight: Cvar) =
+/// impure due to loglight and lightgrid data being a .net array
+let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection: vec3) (rentity: TrRefEntity) (lightGrid: LightGrid option) (r_ambientScale: Cvar) (r_directedScale: Cvar) (r_debugLight: Cvar) =
     // lighting calculations
     match rentity.IsLightingCalculated with
     | true -> rentity
@@ -214,9 +216,10 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
 
     let rentity =
         // if NOWORLDMODEL, only use dynamic lights (menu system, etc)
+        // FIXME: This is kinda of hacky using the light grid here.
         match refdef.RdFlags.HasFlag RdFlags.NoWorldModel with
-        | false when lightGrid.Data.Length <> 0 ->
-            setupEntityLightingGrid rentity lightGrid r_ambientScale r_directedScale
+        | false when lightGrid.IsSome && lightGrid.Value.Data.Length <> 0 ->
+            setupEntityLightingGrid rentity lightGrid.Value r_ambientScale r_directedScale
         | _ ->
             { rentity with
                 AmbientLight = vec3 (identityLight * 150.f)

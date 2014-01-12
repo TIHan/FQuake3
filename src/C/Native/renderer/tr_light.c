@@ -294,6 +294,7 @@ by the Calc_* functions
 =================
 */
 void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
+#if 0
 	int				i;
 	dlight_t		*dl;
 	float			power;
@@ -383,6 +384,21 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	ent->lightDir[0] = DotProduct( lightDir, ent->e.axis[0] );
 	ent->lightDir[1] = DotProduct( lightDir, ent->e.axis[1] );
 	ent->lightDir[2] = DotProduct( lightDir, ent->e.axis[2] );
+#else
+	MObject *res;
+
+	m_invoke_new("Engine.Renderer", "Engine.Renderer", "Light", "setupEntityLighting", res,
+		m_object_as_arg(qm_of_tr_ref_def(refdef)),
+		&tr.identityLight,
+		m_object_as_arg(qm_of_vec3(tr.sunDirection)),
+		m_object_as_arg(qm_of_tr_ref_entity(ent)),
+		m_object_as_arg(qm_option_of_light_grid(tr.world)),
+		m_object_as_arg(qm_of_cvar(r_ambientScale)),
+		m_object_as_arg(qm_of_cvar(r_directedScale)),
+		m_object_as_arg(qm_of_cvar(r_debugLight)))
+
+	qm_to_tr_ref_entity(res, &ent);
+#endif
 }
 
 /*

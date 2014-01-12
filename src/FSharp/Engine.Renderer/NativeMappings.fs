@@ -654,7 +654,7 @@ module Shader =
 
 module Bsp =
     // this will be used to prevent major copying
-    let mutable lightGridData = Unchecked.defaultof<byte array>
+    let mutable lightGridData : byte array = [||]
 
     let setLightGridData (size: int) (ptr: nativeptr<byte>) =
         lightGridData <- NativePtr.toArray size ptr
@@ -676,6 +676,33 @@ module LightGrid =
         InverseSize = Vec3.ofNativePtr &&native.lightGridInverseSize;
         Bounds = LightGridBounds.ofNativePtr &&native.lightGridBounds;
         Data = Bsp.lightGridData }
+
+    let optionOfNativePtr (ptr: nativeptr<world_t>) = 
+        Option.ofNativePtr ofNativePtr ptr
+
+// TODO: Not finished.
+module World =
+    let ofNativePtr (ptr: nativeptr<world_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Name = NativePtr.toStringAnsi &&native.name.value
+        BaseName = NativePtr.toStringAnsi &&native.baseName.value
+        DataSize = native.dataSize
+        Shaders = []
+        BModels = []
+        Planes = []
+        Nodes = []
+        Surfaces = []
+        MarkSurfaces = []
+        Fogs = []
+        LightGrid = LightGrid.ofNativePtr ptr
+        ClusterCount = native.numClusters
+        ClusterByteCount = native.clusterBytes
+        Vis = []
+        NoVis = []
+        EntityString = NativePtr.toStringAnsi native.entityString
+        EntityParsePoint = NativePtr.toStringAnsi native.entityParsePoint }
 
 // TODO: This will need more work over time.
 module Renderer =

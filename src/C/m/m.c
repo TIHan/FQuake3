@@ -234,8 +234,14 @@ m_string (const gchar* text)
 gpointer
 m_object_as_arg (MObject *obj)
 {
-	MonoClass *klass = mono_object_get_class((MonoObject*)obj);
-	MonoType *type = mono_class_get_type (klass);
+	MonoClass *klass;
+	MonoType *type;
+
+	if (!obj)
+		return NULL;
+
+	klass = mono_object_get_class((MonoObject*)obj);
+	type = mono_class_get_type(klass);
 
 	if (mono_type_is_struct (type)) 
 	{

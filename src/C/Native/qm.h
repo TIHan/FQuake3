@@ -58,6 +58,10 @@ m_invoke (assembly_name,name_space,static_class_name,method_name,argc,arg_assign
 MObject * \
 qm_of_##name## (type ptr); \
 
+#define define_option_of_prototype(name,type) \
+MObject * \
+qm_option_of_##name## (type ptr); \
+
 #define define_to_prototype(name,type) \
 void \
 qm_to_##name## (MObject *obj, type ptr); \
@@ -70,9 +74,22 @@ qm_to_of_struct_##name## (MObject *obj, type ptr); \
 MObject * \
 qm_of_##name## (type ptr) \
 { \
-	to_invoke (managed_name, "ofNativePtr", 1, { \
+	MObject *result; \
+	qm_invoke(Assembly, Namespace, managed_name, "ofNativePtr", 1, { \
+	__args[0] = ptr; \
+	}, result); \
+	return result; \
+} \
+
+#define define_option_of(name,type,managed_name) \
+MObject * \
+qm_option_of_##name## (type ptr) \
+{ \
+	MObject *result; \
+	qm_invoke(Assembly, Namespace, managed_name, "optionOfNativePtr", 1, { \
 		__args[0] = ptr; \
-	}); \
+	}, result); \
+	return result; \
 } \
 
 #define define_to(name,type,managed_name) \
@@ -97,11 +114,13 @@ qm_to_of_struct_##name## (MObject *obj, type ptr) \
 
 #define define_mapping_prototype(name,type) \
 	define_of_prototype(name,type) \
+	define_option_of_prototype(name,type) \
 	define_to_prototype(name,type) \
 	define_to_of_struct_prototype(name,type,managed_name) \
 
 #define define_mapping(name,type,managed_name) \
 	define_of(name,type,managed_name) \
+	define_option_of(name,type,managed_name) \
 	define_to(name,type,managed_name) \
 	define_to_of_struct(name,type,managed_name) \
 
