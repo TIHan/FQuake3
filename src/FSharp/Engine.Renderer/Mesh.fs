@@ -173,7 +173,9 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
 
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces
-let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_nocull: Cvar) (r: Renderer) =
+let addMd3Surfaces (rentity: TrRefEntity) (r: Renderer) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_nocull: Cvar) (r_shadows: Cvar) =
+    let entity = rentity.Entity
+
     // don't add third_person objects if not in a portal
     let isPersonalModel =
         entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
@@ -213,6 +215,10 @@ let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_n
 
     let frame = validateFrame frame
     let oldFrame = validateFrame oldFrame
+
+    //
+    // compute LOD
+    //
     let lod = computeLod entity model r_lodscale r_lodbias r
     let md3 = if lod > 0 then model.Md3Lods.[lod - 1] else model.Md3
     
@@ -220,11 +226,17 @@ let addMd3Surfaces (entity: RefEntity) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_n
     // cull the entire model if merged bounding box of both frames
     // is outside the view frustum.
     //
-    let cull,r' = cullModelByFrames md3.Frames.[frame] md3.Frames.[oldFrame] entity r_nocull r
+    let cull, r' = cullModelByFrames md3.Frames.[frame] md3.Frames.[oldFrame] entity r_nocull r
 
     match cull = ClipType.Out with
     | true -> r'
     | _ ->
 
-    // TODO:
+    //
+    // set up lighting now that we know we aren't culled
+    //
+    //let rentity =
+        //if isPersonalModel || (r_shadows.Integer > 1) then
+            //Light.setupEntityLighting r.Refdef 
+    // TODO:  
     r'
