@@ -160,8 +160,7 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 /// LogLight
 /// note: internal
 let logLight (rentity: TrRefEntity) =
-    // TODO: This is kinda of hacky.
-    match int (rentity.Entity.RenderFx &&& RenderFxFlags.FirstPerson) <> 0 with
+    match rentity.Entity.RenderFx.HasFlag RenderFxFlags.FirstPerson with
     | false -> ()
     | _ ->
 
@@ -185,7 +184,7 @@ let logLight (rentity: TrRefEntity) =
             directedLight.x
 
     // impurity
-    printfn "amb:%f  dir:%f" max1 max2
+    printfn "amb:%i  dir:%i" (int max1) (int max2)
 
 
 /// Based on Q3: R_SetupEntityLighting

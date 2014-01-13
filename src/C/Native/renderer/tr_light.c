@@ -245,7 +245,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 #else
 	MObject *result;
 
-	m_invoke_new ("Engine.Renderer", "Engine.Renderer", "Light", "setupEntityLightingGrid", result,
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Light, setupEntityLightingGrid, result,
 		m_object_as_arg (qm_of_tr_ref_entity (ent)),
 		m_object_as_arg (qm_of_light_grid (tr.world)),
 		m_object_as_arg (qm_of_cvar (r_ambientScale)),
@@ -262,6 +262,7 @@ LogLight
 ===============
 */
 static void LogLight( trRefEntity_t *ent ) {
+#if 0
 	int	max1, max2;
 
 	if ( !(ent->e.renderfx & RF_FIRST_PERSON ) ) {
@@ -283,6 +284,12 @@ static void LogLight( trRefEntity_t *ent ) {
 	}
 
 	ri.Printf( PRINT_ALL, "amb:%i  dir:%i\n", max1, max2 );
+#else
+	MObject *res;
+
+	m_invoke_new(Engine.Renderer, Engine.Renderer, Light, logLight, res,
+		m_object_as_arg(qm_of_tr_ref_entity(ent)))
+#endif
 }
 
 /*
@@ -294,7 +301,7 @@ by the Calc_* functions
 =================
 */
 void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
-#if 0
+#if 1
 	int				i;
 	dlight_t		*dl;
 	float			power;
@@ -387,7 +394,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 #else
 	MObject *res;
 
-	m_invoke_new("Engine.Renderer", "Engine.Renderer", "Light", "setupEntityLighting", res,
+	m_invoke_new(Engine.Renderer, Engine.Renderer, Light, setupEntityLighting, res,
 		m_object_as_arg(qm_of_tr_ref_def(refdef)),
 		&tr.identityLight,
 		m_object_as_arg(qm_of_vec3(tr.sunDirection)),

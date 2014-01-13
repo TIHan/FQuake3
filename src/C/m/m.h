@@ -118,7 +118,7 @@ m_gchandle_free(guint32 handle);
 \
 	MMethod *cache; \
 \
-	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
+	m_method_cache (#assembly_name, #name_space, #static_class_name, #method_name, cache); \
 	o = m_method_invoke (cache, __args); \
 } \
 

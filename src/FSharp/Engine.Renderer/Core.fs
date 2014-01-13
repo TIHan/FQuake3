@@ -267,7 +267,7 @@ type RenderFxFlags =
     | ThirdPerson = 2
 
     /// only draw through eyes (view weapon, damage blood blob) 
-    | FirstPerson = 3
+    | FirstPerson = 4
 
     /// for view weapon Z crunching
     | DepthHack = 8
