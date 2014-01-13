@@ -90,7 +90,7 @@ R_CullModel
 =============
 */
 static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
-#if 1
+#if 0
 	vec3_t		bounds[2];
 	md3Frame_t	*oldFrame, *newFrame;
 	int			i;
@@ -173,18 +173,17 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 	md3Frame_t* newFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.frame;
 	md3Frame_t* oldFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.oldframe;
 	trGlobals_t* _tr = &tr;
-	MObject m_tuple;
+	MObject *res;
 
-	qm_invoke("Engine.Renderer", "Engine.Renderer", "Mesh", "cullModelByFrames", 5, {
-		__args[0] = m_object_as_arg (qm_of_md3_frame (newFrame));
-		__args[1] = m_object_as_arg (qm_of_md3_frame (oldFrame));
-		__args[2] = m_object_as_arg (qm_of_ref_entity (&ent->e));
-		__args[3] = m_object_as_arg (qm_of_cvar (r_nocull));
-		__args[4] = m_object_as_arg (qm_of_tr_globals (&tr));
-	}, m_tuple);
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModelByFrames, res,
+		m_object_as_arg (qm_of_md3_frame (newFrame)),
+		m_object_as_arg (qm_of_md3_frame (oldFrame)),
+		m_object_as_arg (qm_of_ref_entity (&ent->e)),
+		m_object_as_arg (qm_of_cvar (r_nocull)),
+		m_object_as_arg (qm_of_tr_globals (&tr)))
 
-	qm_to_tr_globals (m_object_get_property (m_tuple, "Item2"), &_tr);
-	return (gint)m_object_unbox (m_object_get_property(m_tuple, "Item1"));
+	qm_to_tr_globals (m_object_get_property (res, "Item2"), &_tr);
+	return (gint)m_object_unbox (m_object_get_property(res, "Item1"));
 #endif
 }
 
@@ -196,7 +195,7 @@ R_ComputeLOD
 =================
 */
 int R_ComputeLOD( trRefEntity_t *ent ) {
-#if 1
+#if 0
 	float radius;
 	float flod, lodscale;
 	float projectedRadius;
@@ -253,17 +252,16 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 
 	return lod;
 #else
-	MObject m_result;
+	MObject *res;
 
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Mesh", "computeLod", 5, {
-		__args [0] = m_object_as_arg (qm_of_ref_entity (ent));
-		__args [1] = m_object_as_arg (qm_of_model (tr.currentModel));
-		__args [2] = m_object_as_arg (qm_of_cvar (r_lodscale));
-		__args [3] = m_object_as_arg (qm_of_cvar (r_lodbias));
-		__args [4] = m_object_as_arg (qm_of_tr_globals (&tr));
-	}, m_result);
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, computeLod, res,
+		m_object_as_arg (qm_of_ref_entity (ent)),
+		m_object_as_arg (qm_of_model (tr.currentModel)),
+		m_object_as_arg (qm_of_cvar (r_lodscale)),
+		m_object_as_arg (qm_of_cvar (r_lodbias)),
+		m_object_as_arg (qm_of_tr_globals (&tr)))
 
-	return *(gint*)m_object_unbox (m_result);
+	return *(gint*)m_object_unbox (res);
 #endif
 }
 
