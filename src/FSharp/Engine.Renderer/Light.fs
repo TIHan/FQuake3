@@ -234,17 +234,20 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
     //
     // modify the light by dynamic lights
     //
-    let dlightLength = Vec3.length rentity.DirectedLight
-    let lightDirection = rentity.LightDirection * dlightLength
+    let lightDirection = 
+        rentity.DirectedLight
+        |> Vec3.length 
+        |> (*) rentity.LightDirection
 
     let directedLight, lightDirection =
         refdef.Dlights
         |> List.fold (fun (directedLight, lightDirection) x ->
-            let power = Dlight.AtRadius * (x.Radius * x.Radius)
             let direction = (x.Origin - lightOrigin)
+            let normal = Vec3.normalize direction
+            let power = Dlight.AtRadius * (x.Radius * x.Radius)
+
             let length = 
                 direction
-                |> Vec3.normalize
                 |> Vec3.length
                 |> function
                 | y when y < Dlight.MinRadius -> Dlight.MinRadius
@@ -253,7 +256,7 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
             let length = power / (length * length)
 
             Vec3.multiplyAdd length x.Color directedLight,
-            Vec3.multiplyAdd length direction lightDirection) (rentity.DirectedLight, lightDirection)
+            Vec3.multiplyAdd length normal lightDirection) (rentity.DirectedLight, lightDirection)
 
     let identityLightByte = identityLight * 255.f
 
@@ -284,4 +287,5 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
             vec3 (
                 Vec3.dot normal entity.Axis.x,
                 Vec3.dot normal entity.Axis.y,
-                Vec3.dot normal entity.Axis.z) }
+                Vec3.dot normal entity.Axis.z)
+        DirectedLight = directedLight }

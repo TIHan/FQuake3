@@ -22,6 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module Engine.Renderer.Core
 
 #nowarn "9"
+#nowarn "51"
 
 open System
 open System.Security
@@ -376,7 +377,7 @@ module TrRefEntity =
 
         NativePtr.set ptr 0 <| byte rentity.AmbientLight.x
         NativePtr.set ptr 1 <| byte rentity.AmbientLight.y
-        NativePtr.set ptr 1 <| byte rentity.AmbientLight.z
+        NativePtr.set ptr 2 <| byte rentity.AmbientLight.z
 
         { rentity with AmbientLightInt = ambientLightInt }
 

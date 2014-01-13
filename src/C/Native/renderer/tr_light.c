@@ -301,7 +301,7 @@ by the Calc_* functions
 =================
 */
 void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
-#if 1
+#if 0
 	int				i;
 	dlight_t		*dl;
 	float			power;
