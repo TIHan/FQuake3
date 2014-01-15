@@ -510,13 +510,13 @@ type optimalStageIteratorFunc = delegate of unit -> unit
 [<StructLayout (LayoutKind.Explicit, Size = 64)>]
 type shader_t_name =
     [<FieldOffset (0)>]
-    val private value : sbyte
+    val mutable value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 128)>]
 type shader_t_shaderStates =
     [<FieldOffset (0)>]
-    val private value : int
+    val mutable value : int
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]

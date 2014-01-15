@@ -631,26 +631,74 @@ module Image =
 
         NativePtr.write ptr native
 
+module Skybox =
+    let inline ofNativePtr (ptr: nativeptr<image_t>) =
+        {
+        Image1 = Image.ofNativePtr (NativePtr.add ptr 0)
+        Image2 = Image.ofNativePtr (NativePtr.add ptr 1)
+        Image3 = Image.ofNativePtr (NativePtr.add ptr 2)
+        Image4 = Image.ofNativePtr (NativePtr.add ptr 3)
+        Image5 = Image.ofNativePtr (NativePtr.add ptr 4)
+        Image6 = Image.ofNativePtr (NativePtr.add ptr 5) }
 
-(* TODO: finish
-module Shader =
-    let inline ofNativePtr (ptr: nativeptr<shader_t>) =
+module SkyParms =
+    let inline ofNativePtr (ptr: nativeptr<skyParms_t>) =
         let mutable native = NativePtr.read ptr
 
         {
-            Name = NativePtr.toString &&native.name;
-            LightmapIndex = native.lightmapIndex;
-            Index = native.index;
-            SortedIndex = native.sortedIndex;
-            Sort = native.sort;
-            IsDefaultShader = Boolean.ofNativePtr &&native.defaultShader;
-            IsExplicitlyDefined = Boolean.ofNativePtr &&native.explicitlyDefined;
-            SurfaceFlags = native.surfaceFlags;
-            ContentFlags = native.contentFlags;
-            IsEntityMergable = Boolean.ofNativePtr &&native.entityMergable;
-            IsSky = Boolean.ofNativePtr &&native.isSky;
-        }
-*)
+        CloudHeight = native.cloudHeight
+        Outerbox = Option.ofNativePtr Skybox.ofNativePtr native.outerbox.value
+        Innerbox = Option.ofNativePtr Skybox.ofNativePtr native.innerbox.value }
+
+module FogParms =
+    let inline ofNativePtr (ptr: nativeptr<fogParms_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Color = Vec3.ofNativePtr &&native.color
+        DepthForOpaque = native.depthForOpaque }
+
+// TODO: NOT FINISHED!
+module Shader =
+    let rec ofNativePtr (ptr: nativeptr<shader_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Name = NativePtr.toStringAnsi &&native.name.value;
+        LightmapIndex = native.lightmapIndex;
+        Index = native.index;
+        SortedIndex = native.sortedIndex;
+        Sort = native.sort;
+        IsDefaultShader = Boolean.ofNativePtr &&native.defaultShader;
+        IsExplicitlyDefined = Boolean.ofNativePtr &&native.explicitlyDefined;
+        SurfaceFlags = native.surfaceFlags;
+        ContentFlags = native.contentFlags;
+        IsEntityMergable = Boolean.ofNativePtr &&native.entityMergable;
+        IsSky = Boolean.ofNativePtr &&native.isSky;
+        Sky = SkyParms.ofNativePtr &&native.sky;
+        Fog = FogParms.ofNativePtr &&native.fogParms;
+        PortalRange = native.portalRange;
+        MultitextureEnv = native.multitextureEnv;
+        CullType = enum<CullType> (int native.cullType);
+        HasPolygonOffset = Boolean.ofNativePtr &&native.polygonOffset;
+        HasNoMipMaps = Boolean.ofNativePtr &&native.noMipMaps;
+        HasNoPicMip = Boolean.ofNativePtr &&native.noPicMip;
+        FogPassType = enum<FogPassType> (int native.fogPass);
+        NeedsNormal = Boolean.ofNativePtr &&native.needsNormal;
+        NeedsSt1 = Boolean.ofNativePtr &&native.needsST1;
+        NeedsSt2 = Boolean.ofNativePtr &&native.needsST2;
+        NeedsColor = Boolean.ofNativePtr &&native.needsColor;
+        Deforms = []; // TODO:
+        Stages = []; // TODO:
+        ClampTime = native.clamptime;
+        TimeOffset = native.timeOffset;
+        CurrentShader = Option.ofNativePtr ofNativePtr native.currentShader;
+        ParentShader = Option.ofNativePtr ofNativePtr native.parentShader;
+        CurrentState = native.currentstate;
+        ExpireTime = int64 native.expireTime;
+        RemappedShader = Option.ofNativePtr ofNativePtr native.remappedShader;
+        ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value);
+        Next = Option.ofNativePtr ofNativePtr native.next }
 
 module Bsp =
     // this will be used to prevent major copying

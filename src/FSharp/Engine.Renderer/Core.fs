@@ -1018,10 +1018,6 @@ type Shader =
         /// current time offset for this shader
         TimeOffset: single;
 
-        // Is StateId a better name vs. numStates?
-        /// if non-zero this is a state shader
-        StateId: int;
-
         /// current state if this is a state shader
         CurrentShader: Shader option;
 
