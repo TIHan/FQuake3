@@ -754,6 +754,28 @@ module World =
 
 // TODO: This will need more work over time.
 module Renderer =
+    let sortShaders (ptr: nativeptr<trGlobals_t>) =
+        let mutable native = NativePtr.read ptr
+
+        let mutable shaders =
+            NativePtr.toArray native.numShaders &&native.shaders.value
+            |> Array.sortWith (fun xp yp -> 
+                let x = NativePtr.read xp
+                let y = NativePtr.read yp
+                if x.sort < y.sort then
+                    -1
+                else
+                    1)
+                       
+        for i = 0 to native.numShaders - 1 do
+            let mutable shader = NativePtr.read shaders.[i]
+            shader.sortedIndex <- i
+            NativePtr.write shaders.[i] shader
+
+            NativePtr.set (&&native.sortedShaders.value) i shaders.[i]
+
+        NativePtr.write ptr native
+
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
         let mutable native = NativePtr.read ptr
 

@@ -939,7 +939,7 @@ type trGlobals_t_images =
 [<StructLayout (LayoutKind.Explicit, Size = 65536)>]
 type trGlobals_t_shaders =
     [<FieldOffset (0)>]
-    val mutable shaders : nativeptr<shader_t>
+    val mutable value : nativeptr<shader_t>
 
 [<Struct>]
 [<StructLayout (LayoutKind.Explicit, Size = 4096)>]
