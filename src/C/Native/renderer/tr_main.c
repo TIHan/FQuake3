@@ -1471,7 +1471,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 32 bit value so it can be
 	// compared quickly during the qsorting process
-	tr.refdef.drawSurfs[index].sort = (shader->index << QSORT_SHADERNUM_SHIFT)
+	tr.refdef.drawSurfs[index].sort = (shader->_deprecated_sortedIndex << QSORT_SHADERNUM_SHIFT)
 		| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
@@ -1492,7 +1492,7 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 	*dlightMap = sort & 3;
 #else
 	*fogNum = (sort >> QSORT_FOGNUM_SHIFT) & 31;
-	*shader = tr.shaders[(sort >> QSORT_SHADERNUM_SHIFT) & (MAX_SHADERS - 1)];
+	*shader = tr._deprecated_sortedShaders[(sort >> QSORT_SHADERNUM_SHIFT) & (MAX_SHADERS - 1)];
 	*entityNum = (sort >> QSORT_ENTITYNUM_SHIFT) & 1023;
 	*dlightMap = sort & 3;
 #endif

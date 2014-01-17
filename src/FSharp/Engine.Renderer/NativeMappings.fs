@@ -775,10 +775,10 @@ module Renderer =
                        
         for i = 0 to native.numShaders - 1 do
             let mutable shader = NativePtr.read shaders.[i]
-            shader.index <- i
+            shader.sortedIndex <- i
             NativePtr.write shaders.[i] shader
 
-            NativePtr.set (&&native.shaders.value) i shaders.[i]
+            NativePtr.set (&&native.sortedShaders.value) i shaders.[i]
 
         NativePtr.write ptr native
 
