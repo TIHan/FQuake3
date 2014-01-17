@@ -1863,7 +1863,7 @@ static qboolean CollapseMultitexture( void ) {
 
 	return qtrue;
 }
-
+#if FQ3_SHADER_OLD_SORTING
 /*
 =============
 
@@ -1971,7 +1971,7 @@ static void SortNewShader( void ) {
 	newShader->sortedIndex = i+1;
 	tr.sortedShaders[i+1] = newShader;
 }
-
+#endif
 
 /*
 ====================
@@ -1979,6 +1979,7 @@ GeneratePermanentShader
 ====================
 */
 static shader_t *GeneratePermanentShader( void ) {
+#if FQ3_SHADER_OLD_SORTING
 	shader_t	*newShader;
 	int			i, b;
 	int			size, hash;
@@ -2027,6 +2028,61 @@ static shader_t *GeneratePermanentShader( void ) {
 	hashTable[hash] = newShader;
 
 	return newShader;
+#else
+	shader_t	*newShader;
+	int			i, b;
+	int			size, hash;
+
+	if (tr.numShaders == MAX_SHADERS) {
+		ri.Printf(PRINT_WARNING, "WARNING: GeneratePermanentShader - MAX_SHADERS hit\n");
+		return tr.defaultShader;
+	}
+
+	newShader = ri.Hunk_Alloc(sizeof(shader_t), h_low);
+
+	*newShader = shader;
+
+	if (shader.sort <= SS_OPAQUE) {
+		newShader->fogPass = FP_EQUAL;
+	}
+	else if (shader.contentFlags & CONTENTS_FOG) {
+		newShader->fogPass = FP_LE;
+	}
+
+	tr.shaders[tr.numShaders] = newShader;
+	newShader->index = tr.numShaders;
+
+	tr.sortedShaders[tr.numShaders] = newShader;
+	newShader->sortedIndex = tr.numShaders;
+
+	tr.numShaders++;
+
+	for (i = 0; i < newShader->numUnfoggedPasses; i++) {
+		if (!stages[i].active) {
+			break;
+		}
+		newShader->stages[i] = ri.Hunk_Alloc(sizeof(stages[i]), h_low);
+		*newShader->stages[i] = stages[i];
+
+		for (b = 0; b < NUM_TEXTURE_BUNDLES; b++) {
+			size = newShader->stages[i]->bundle[b].numTexMods * sizeof(texModInfo_t);
+			newShader->stages[i]->bundle[b].texMods = ri.Hunk_Alloc(size, h_low);
+			Com_Memcpy(newShader->stages[i]->bundle[b].texMods, stages[i].bundle[b].texMods, size);
+		}
+	}
+
+	{
+		MObject *res;
+		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortShaders, res,
+			&tr);
+	}
+
+	hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
+	newShader->next = hashTable[hash];
+	hashTable[hash] = newShader;
+
+	return newShader;
+#endif
 }
 
 /*

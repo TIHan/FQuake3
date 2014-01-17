@@ -764,8 +764,14 @@ module Renderer =
                 let y = NativePtr.read yp
                 if x.sort < y.sort then
                     -1
+                elif x.sort > y.sort then
+                    1
                 else
-                    1)
+                    // Portals need to be sorted by portalRange.
+                    if x.sort = 1.f && y.sort = 1.f && x.portalRange < y.portalRange then
+                        -1
+                    else
+                        0)
                        
         for i = 0 to native.numShaders - 1 do
             let mutable shader = NativePtr.read shaders.[i]
