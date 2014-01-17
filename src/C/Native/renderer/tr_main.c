@@ -1451,6 +1451,7 @@ R_AddDrawSurf
 */
 void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, 
 				   int fogIndex, int dlightMap ) {
+#if FQ3_SHADER_OLD_SORTING
 	int			index;
 
 	// instead of checking for overflow, we just mask the index
@@ -1462,6 +1463,19 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
+#else
+	int			index;
+
+	// instead of checking for overflow, we just mask the index
+	// so it wraps around
+	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
+	// the sort data is packed into a single 32 bit value so it can be
+	// compared quickly during the qsorting process
+	tr.refdef.drawSurfs[index].sort = (shader->index << QSORT_SHADERNUM_SHIFT)
+		| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
+	tr.refdef.drawSurfs[index].surface = surface;
+	tr.refdef.numDrawSurfs++;
+#endif
 }
 
 /*
@@ -1471,10 +1485,17 @@ R_DecomposeSort
 */
 void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap ) {
+#if FQ3_SHADER_OLD_SORTING
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = sort & 3;
+#else
+	*fogNum = (sort >> QSORT_FOGNUM_SHIFT) & 31;
+	*shader = tr.shaders[(sort >> QSORT_SHADERNUM_SHIFT) & (MAX_SHADERS - 1)];
+	*entityNum = (sort >> QSORT_ENTITYNUM_SHIFT) & 1023;
+	*dlightMap = sort & 3;
+#endif
 }
 
 /*

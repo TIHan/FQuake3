@@ -2052,9 +2052,6 @@ static shader_t *GeneratePermanentShader( void ) {
 	tr.shaders[tr.numShaders] = newShader;
 	newShader->index = tr.numShaders;
 
-	tr.sortedShaders[tr.numShaders] = newShader;
-	newShader->sortedIndex = tr.numShaders;
-
 	tr.numShaders++;
 
 	for (i = 0; i < newShader->numUnfoggedPasses; i++) {
@@ -2842,6 +2839,7 @@ A second parameter will cause it to print in sorted order
 ===============
 */
 void	R_ShaderList_f (void) {
+#if FQ3_SHADER_OLD_SORTING
 	int			i;
 	int			count;
 	shader_t	*shader;
@@ -2899,6 +2897,71 @@ void	R_ShaderList_f (void) {
 	}
 	ri.Printf (PRINT_ALL, "%i total shaders\n", count);
 	ri.Printf (PRINT_ALL, "------------------\n");
+#else
+	int			i;
+	int			count;
+	shader_t	*shader;
+
+	ri.Printf(PRINT_ALL, "-----------------------\n");
+
+	count = 0;
+	for (i = 0; i < tr.numShaders; i++) {
+		shader = tr.shaders[i];
+
+		ri.Printf(PRINT_ALL, "%i ", shader->numUnfoggedPasses);
+
+		if (shader->lightmapIndex >= 0) {
+			ri.Printf(PRINT_ALL, "L ");
+		}
+		else {
+			ri.Printf(PRINT_ALL, "  ");
+		}
+		if (shader->multitextureEnv == GL_ADD) {
+			ri.Printf(PRINT_ALL, "MT(a) ");
+		}
+		else if (shader->multitextureEnv == GL_MODULATE) {
+			ri.Printf(PRINT_ALL, "MT(m) ");
+		}
+		else if (shader->multitextureEnv == GL_DECAL) {
+			ri.Printf(PRINT_ALL, "MT(d) ");
+		}
+		else {
+			ri.Printf(PRINT_ALL, "      ");
+		}
+		if (shader->explicitlyDefined) {
+			ri.Printf(PRINT_ALL, "E ");
+		}
+		else {
+			ri.Printf(PRINT_ALL, "  ");
+		}
+
+		if (shader->optimalStageIteratorFunc == RB_StageIteratorGeneric) {
+			ri.Printf(PRINT_ALL, "gen ");
+		}
+		else if (shader->optimalStageIteratorFunc == RB_StageIteratorSky) {
+			ri.Printf(PRINT_ALL, "sky ");
+		}
+		else if (shader->optimalStageIteratorFunc == RB_StageIteratorLightmappedMultitexture) {
+			ri.Printf(PRINT_ALL, "lmmt");
+		}
+		else if (shader->optimalStageIteratorFunc == RB_StageIteratorVertexLitTexture) {
+			ri.Printf(PRINT_ALL, "vlt ");
+		}
+		else {
+			ri.Printf(PRINT_ALL, "    ");
+		}
+
+		if (shader->defaultShader) {
+			ri.Printf(PRINT_ALL, ": %s (DEFAULTED)\n", shader->name);
+		}
+		else {
+			ri.Printf(PRINT_ALL, ": %s\n", shader->name);
+		}
+		count++;
+	}
+	ri.Printf(PRINT_ALL, "%i total shaders\n", count);
+	ri.Printf(PRINT_ALL, "------------------\n");
+#endif
 }
 
 

@@ -355,7 +355,11 @@ typedef struct shader_s {
 	int			lightmapIndex;			// for a shader to match, both name and lightmapIndex must match
 
 	int			index;					// this shader == tr.shaders[index]
+#if FQ3_SHADER_OLD_SORTING
 	int			sortedIndex;			// this shader == tr.sortedShaders[sortedIndex]
+#else
+	int			_deprecated_sortedIndex;
+#endif
 
 	float		sort;					// lower numbered shaders draw before higher numbered
 
@@ -946,7 +950,11 @@ typedef struct {
 	// lower indexed sortedShaders must be rendered first (opaque surfaces before translucent)
 	int						numShaders;
 	shader_t				*shaders[MAX_SHADERS];
+#if FQ3_SHADER_OLD_SORTING
 	shader_t				*sortedShaders[MAX_SHADERS];
+#else
+	shader_t				*_deprecated_sortedShaders[MAX_SHADERS];
+#endif
 
 	int						numSkins;
 	skin_t					*skins[MAX_SKINS];
