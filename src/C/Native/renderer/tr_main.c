@@ -1290,6 +1290,7 @@ void qsortFast (
     unsigned width
     )
 {
+#if FQ3_SHADER_OLD_SORTING
     char *lo, *hi;              /* ends of sub-array currently sorting */
     char *mid;                  /* points to middle of subarray */
     char *loguy, *higuy;        /* traveling pointers for partition step */
@@ -1439,6 +1440,13 @@ recurse:
     }
     else
         return;                 /* all subarrays done */
+#else
+	MObject *res;
+
+	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortDrawSurfaces, res,
+		&num,
+		base);
+#endif
 }
 
 

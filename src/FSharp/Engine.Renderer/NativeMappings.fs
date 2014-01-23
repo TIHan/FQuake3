@@ -782,6 +782,14 @@ module Renderer =
 
         NativePtr.write ptr native
 
+    let sortDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) =
+        let mutable surfs =
+            NativePtr.toArray size ptr
+            |> Array.sortBy (fun x -> x.sort) 
+
+        for i = 0 to size  - 1 do
+            NativePtr.set ptr i surfs.[i]
+
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
         let mutable native = NativePtr.read ptr
 
