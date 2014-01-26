@@ -538,6 +538,9 @@ typedef enum {
 } surfaceType_t;
 
 typedef struct drawSurf_s {
+#if !defined(FQ3_SHADER_OLD_SORTING)
+	int					shaderIndex;	// FQ3 needs this
+#endif
 	unsigned			sort;			// bit combination for fast compares
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;

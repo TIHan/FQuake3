@@ -251,6 +251,10 @@ type srfTriangles_t =
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type drawSurf_t =
+#if FQ3_SHADER_OLD_SORTING
+#else
+    val mutable shaderIndex : int
+#endif
     val mutable sort : uint32
     val mutable surface : nativeptr<surfaceType_t>
 
