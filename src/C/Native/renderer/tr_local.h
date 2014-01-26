@@ -540,6 +540,9 @@ typedef enum {
 typedef struct drawSurf_s {
 #if !defined(FQ3_SHADER_OLD_SORTING)
 	int					shaderIndex;	// FQ3 needs this
+	int					entityNum;		// FQ3
+	int					fogIndex;		// FQ3
+	int					dlightMap;		// FQ3
 #endif
 	unsigned			sort;			// bit combination for fast compares
 	surfaceType_t		*surface;		// any of surface*_t

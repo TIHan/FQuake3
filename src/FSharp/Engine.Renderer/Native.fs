@@ -254,6 +254,9 @@ type drawSurf_t =
 #if FQ3_SHADER_OLD_SORTING
 #else
     val mutable shaderIndex : int
+    val mutable entityNum : int
+    val mutable fogIndex : int
+    val mutable dlightMap : int
 #endif
     val mutable sort : uint32
     val mutable surface : nativeptr<surfaceType_t>

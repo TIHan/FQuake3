@@ -1472,17 +1472,18 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
 #else
-	int			index;
+	drawSurf_t *surf = &tr.refdef.drawSurfs[tr.refdef.numDrawSurfs & DRAWSURF_MASK];
 
-	// instead of checking for overflow, we just mask the index
-	// so it wraps around
-	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 32 bit value so it can be
 	// compared quickly during the qsorting process
-	tr.refdef.drawSurfs[index].sort = (shader->_deprecated_sortedIndex << QSORT_SHADERNUM_SHIFT)
+	surf->sort = (shader->_deprecated_sortedIndex << QSORT_SHADERNUM_SHIFT)
 		| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
-	tr.refdef.drawSurfs[index].surface = surface;
-	tr.refdef.drawSurfs[index].shaderIndex = shader->index;
+	surf->surface = surface;
+	surf->shaderIndex = shader->index;
+	surf->entityNum = tr.currentEntityNum;
+	surf->fogIndex = fogIndex;
+	surf->dlightMap = dlightMap;
+
 	tr.refdef.numDrawSurfs++;
 #endif
 }
