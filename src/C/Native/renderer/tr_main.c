@@ -1542,13 +1542,9 @@ recurse:
         goto recurse;           /* pop subarray from stack */
     }
     else
-        return;                 /* all subarrays done */
+		return;                 /* all subarrays done */
 #else
-	MObject *res;
-
-	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortDrawSurfaces, res,
-		&num,
-		base);
+	g_error ("qsortFast should not be called anymore.");
 #endif
 }
 
@@ -1681,7 +1677,13 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	}
 
 	// sort the drawsurfs by sort type, then orientation, then shader
-	qsortFast(drawSurfs, numDrawSurfs, sizeof(drawSurf_t));
+	{
+		MObject *res;
+
+		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortDrawSurfaces, res,
+			&numDrawSurfs,
+			drawSurfs);
+	}
 
 	// check for any pass through drawing, which
 	// may cause another view to be rendered first
