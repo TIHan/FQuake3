@@ -1479,7 +1479,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	surf->sort = (shader->_deprecated_sortedIndex << QSORT_SHADERNUM_SHIFT)
 		| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
 	surf->surface = surface;
-	surf->shaderIndex = shader->index;
+	surf->shaderIndex = shader->_deprecated_sortedIndex;
 	surf->entityNum = tr.currentEntityNum;
 	surf->fogIndex = fogIndex;
 	surf->dlightMap = dlightMap;

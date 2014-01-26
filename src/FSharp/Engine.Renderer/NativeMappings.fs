@@ -785,7 +785,10 @@ module Renderer =
     let sortDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) =
         let mutable surfs =
             NativePtr.toArray size ptr
-            |> Array.sortBy (fun x -> x.sort) 
+            |> Array.sortBy (fun x -> x.dlightMap)
+            |> Array.sortBy (fun x -> x.fogIndex)
+            |> Array.sortBy (fun x -> x.entityNum)
+            |> Array.sortBy (fun x -> x.shaderIndex)
 
         for i = 0 to size  - 1 do
             NativePtr.set ptr i surfs.[i]
