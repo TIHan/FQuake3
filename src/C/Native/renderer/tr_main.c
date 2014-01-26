@@ -1054,6 +1054,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 ** Determines if a surface is completely offscreen.
 */
 static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) {
+#if FQ3_SHADER_OLD_SORTING
 	float shortest = 100000000;
 	int entityNum;
 	int numTriangles;
@@ -1149,6 +1150,108 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	}
 
 	return qfalse;
+#else
+	float shortest = 100000000;
+	int entityNum;
+	int numTriangles;
+	shader_t *shader;
+	int		fogNum;
+	int dlighted;
+	vec4_t clip, eye;
+	int i;
+	unsigned int pointOr = 0;
+	unsigned int pointAnd = (unsigned int)~0;
+
+	if (glConfig.smpActive) {		// FIXME!  we can't do RB_BeginSurface/RB_EndSurface stuff with smp!
+		return qfalse;
+	}
+
+	R_RotateForViewer();
+
+	// surf info
+	entityNum = drawSurf->entityNum;
+	shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+	fogNum = drawSurf->fogIndex;
+	dlighted = drawSurf->dlightMap;
+
+	RB_BeginSurface(shader, fogNum);
+	rb_surfaceTable[*drawSurf->surface](drawSurf->surface);
+
+	assert(tess.numVertexes < 128);
+
+	for (i = 0; i < tess.numVertexes; i++)
+	{
+		int j;
+		unsigned int pointFlags = 0;
+
+		R_TransformModelToClip(tess.xyz[i], tr.or.modelMatrix, tr.viewParms.projectionMatrix, eye, clip);
+
+		for (j = 0; j < 3; j++)
+		{
+			if (clip[j] >= clip[3])
+			{
+				pointFlags |= (1 << (j * 2));
+			}
+			else if (clip[j] <= -clip[3])
+			{
+				pointFlags |= (1 << (j * 2 + 1));
+			}
+		}
+		pointAnd &= pointFlags;
+		pointOr |= pointFlags;
+	}
+
+	// trivially reject
+	if (pointAnd)
+	{
+		return qtrue;
+	}
+
+	// determine if this surface is backfaced and also determine the distance
+	// to the nearest vertex so we can cull based on portal range.  Culling
+	// based on vertex distance isn't 100% correct (we should be checking for
+	// range to the surface), but it's good enough for the types of portals
+	// we have in the game right now.
+	numTriangles = tess.numIndexes / 3;
+
+	for (i = 0; i < tess.numIndexes; i += 3)
+	{
+		vec3_t normal;
+		float dot;
+		float len;
+
+		VectorSubtract(tess.xyz[tess.indexes[i]], tr.viewParms.or.origin, normal);
+
+		len = VectorLengthSquared(normal);			// lose the sqrt
+		if (len < shortest)
+		{
+			shortest = len;
+		}
+
+		if ((dot = DotProduct(normal, tess.normal[tess.indexes[i]])) >= 0)
+		{
+			numTriangles--;
+		}
+	}
+	if (!numTriangles)
+	{
+		return qtrue;
+	}
+
+	// mirrors can early out at this point, since we don't do a fade over distance
+	// with them (although we could)
+	if (IsMirror(drawSurf, entityNum))
+	{
+		return qfalse;
+	}
+
+	if (shortest > (tess.shader->portalRange*tess.shader->portalRange))
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+#endif
 }
 
 /*
@@ -1262,7 +1365,7 @@ qsort replacement
    below value use insertion sort */
 
 #define CUTOFF 8            /* testing shows that this is good value */
-
+#if FQ3_SHADER_OLD_SORTING
 static void shortsort( drawSurf_t *lo, drawSurf_t *hi ) {
     drawSurf_t	*p, *max;
 	int			temp;
@@ -1278,7 +1381,7 @@ static void shortsort( drawSurf_t *lo, drawSurf_t *hi ) {
         hi--;
     }
 }
-
+#endif
 
 /* sort the array between lo and hi (inclusive)
 FIXME: this was lifted and modified from the microsoft lib source...
@@ -1474,10 +1577,6 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 #else
 	drawSurf_t *surf = &tr.refdef.drawSurfs[tr.refdef.numDrawSurfs & DRAWSURF_MASK];
 
-	// the sort data is packed into a single 32 bit value so it can be
-	// compared quickly during the qsorting process
-	surf->sort = (shader->_deprecated_sortedIndex << QSORT_SHADERNUM_SHIFT)
-		| tr.shiftedEntityNum | (fogIndex << QSORT_FOGNUM_SHIFT) | (int)dlightMap;
 	surf->surface = surface;
 	surf->shaderIndex = shader->_deprecated_sortedIndex;
 	surf->entityNum = tr.currentEntityNum;
@@ -1501,10 +1600,7 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = sort & 3;
 #else
-	*fogNum = (sort >> QSORT_FOGNUM_SHIFT) & 31;
-	*shader = tr._deprecated_sortedShaders[(sort >> QSORT_SHADERNUM_SHIFT) & (MAX_SHADERS - 1)];
-	*entityNum = (sort >> QSORT_ENTITYNUM_SHIFT) & 1023;
-	*dlightMap = sort & 3;
+	g_error ("R_DecomposeSort should not be called anymore.");
 #endif
 }
 
@@ -1514,6 +1610,7 @@ R_SortDrawSurfs
 =================
 */
 void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
+#if FQ3_SHADER_OLD_SORTING
 	shader_t		*shader;
 	int				fogNum;
 	int				entityNum;
@@ -1562,6 +1659,61 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	}
 
 	R_AddDrawSurfCmd( drawSurfs, numDrawSurfs );
+#else
+	shader_t		*shader;
+	int				fogNum;
+	int				entityNum;
+	int				dlighted;
+	int				i;
+
+	// it is possible for some views to not have any surfaces
+	if (numDrawSurfs < 1) {
+		// we still need to add it for hyperspace cases
+		R_AddDrawSurfCmd(drawSurfs, numDrawSurfs);
+		return;
+	}
+
+	// if we overflowed MAX_DRAWSURFS, the drawsurfs
+	// wrapped around in the buffer and we will be missing
+	// the first surfaces, not the last ones
+	if (numDrawSurfs > MAX_DRAWSURFS) {
+		numDrawSurfs = MAX_DRAWSURFS;
+	}
+
+	// sort the drawsurfs by sort type, then orientation, then shader
+	qsortFast(drawSurfs, numDrawSurfs, sizeof(drawSurf_t));
+
+	// check for any pass through drawing, which
+	// may cause another view to be rendered first
+	for (i = 0; i < numDrawSurfs; i++) {
+		drawSurf_t *drawSurf = &tr.refdef.drawSurfs[i];
+		// surf info
+		entityNum = drawSurf->entityNum;
+		shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+		fogNum = drawSurf->fogIndex;
+		dlighted = drawSurf->dlightMap;
+
+		if (shader->sort > SS_PORTAL) {
+			break;
+		}
+
+		// no shader should ever have this sort type
+		if (shader->sort == SS_BAD) {
+			ri.Error(ERR_DROP, "Shader '%s'with sort == SS_BAD", shader->name);
+		}
+
+		// if the mirror was completely clipped away, we may need to check another surface
+		if (R_MirrorViewBySurface((drawSurfs + i), entityNum)) {
+			// this is a debug option to see exactly what is being mirrored
+			if (r_portalOnly->integer) {
+				return;
+			}
+			break;		// only one mirror view at a time
+		}
+	}
+
+	R_AddDrawSurfCmd(drawSurfs, numDrawSurfs);
+#endif
 }
 
 /*

@@ -618,8 +618,3 @@ let isMirror (drawSurface: DrawSurface) (entityId: int) (r: Renderer) =
 // TODO:
 let addDrawSurface surface shader fogIndex dynamicLightMap (drawSurfaces: DrawSurface list) =
     surface :: drawSurfaces
-
-/// Based on Q3: R_DecomposeSort
-/// DecomposeSort
-let decomposeSort (sort: uint64) (sortedShaders: Shader list) =
-    ()

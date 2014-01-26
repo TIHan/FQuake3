@@ -545,6 +545,7 @@ RB_RenderDrawSurfList
 ==================
 */
 void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
+#if FQ3_SHADER_OLD_SORTING
 	shader_t		*shader, *oldShader;
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
@@ -695,6 +696,138 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 #ifdef __MACOS__
 	Sys_PumpEvents();		// crutch up the mac's limited buffer queue size
+#endif
+#else
+shader_t		*shader, *oldShader;
+int				fogNum, oldFogNum;
+int				entityNum, oldEntityNum;
+int				dlighted, oldDlighted;
+qboolean		depthRange, oldDepthRange;
+int				i;
+drawSurf_t		*drawSurf;
+int				oldSort;
+float			originalTime;
+
+// save original time for entity shader offsets
+originalTime = backEnd.refdef.floatTime;
+
+// clear the z buffer, set the modelview, etc
+RB_BeginDrawingView();
+
+// draw everything
+oldEntityNum = -1;
+backEnd.currentEntity = &tr.worldEntity;
+oldShader = NULL;
+oldFogNum = -1;
+oldDepthRange = qfalse;
+oldDlighted = qfalse;
+oldSort = -1;
+depthRange = qfalse;
+
+backEnd.pc.c_surfaces += numDrawSurfs;
+
+for (i = 0, drawSurf = drawSurfs; i < numDrawSurfs; i++, drawSurf++) {
+	// surf info
+	entityNum = drawSurf->entityNum;
+	shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+	fogNum = drawSurf->fogIndex;
+	dlighted = drawSurf->dlightMap;
+
+	//
+	// change the tess parameters if needed
+	// a "entityMergable" shader is a shader that can have surfaces from seperate
+	// entities merged into a single batch, like smoke and blood puff sprites
+	if (shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted
+		|| (entityNum != oldEntityNum && !shader->entityMergable)) {
+		if (oldShader != NULL) {
+			RB_EndSurface();
+		}
+		RB_BeginSurface(shader, fogNum);
+		oldShader = shader;
+		oldFogNum = fogNum;
+		oldDlighted = dlighted;
+	}
+
+	//
+	// change the modelview matrix if needed
+	//
+	if (entityNum != oldEntityNum) {
+		depthRange = qfalse;
+
+		if (entityNum != ENTITYNUM_WORLD) {
+			backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
+			backEnd.refdef.floatTime = originalTime - backEnd.currentEntity->e.shaderTime;
+			// we have to reset the shaderTime as well otherwise image animations start
+			// from the wrong frame
+			tess.shaderTime = backEnd.refdef.floatTime - tess.shader->timeOffset;
+
+			// set up the transformation matrix
+			R_RotateForEntity(backEnd.currentEntity, &backEnd.viewParms, &backEnd.or);
+
+			// set up the dynamic lighting if needed
+			if (backEnd.currentEntity->needDlights) {
+				R_TransformDlights(backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or);
+			}
+
+			if (backEnd.currentEntity->e.renderfx & RF_DEPTHHACK) {
+				// hack the depth range to prevent view model from poking into walls
+				depthRange = qtrue;
+			}
+		}
+		else {
+			backEnd.currentEntity = &tr.worldEntity;
+			backEnd.refdef.floatTime = originalTime;
+			backEnd.or = backEnd.viewParms.world;
+			// we have to reset the shaderTime as well otherwise image animations on
+			// the world (like water) continue with the wrong frame
+			tess.shaderTime = backEnd.refdef.floatTime - tess.shader->timeOffset;
+			R_TransformDlights(backEnd.refdef.num_dlights, backEnd.refdef.dlights, &backEnd.or);
+		}
+
+		qglLoadMatrixf(backEnd.or.modelMatrix);
+
+		//
+		// change depthrange if needed
+		//
+		if (oldDepthRange != depthRange) {
+			if (depthRange) {
+				qglDepthRange(0, 0.3);
+			}
+			else {
+				qglDepthRange(0, 1);
+			}
+			oldDepthRange = depthRange;
+		}
+
+		oldEntityNum = entityNum;
+	}
+
+	// add the triangles for this surface
+	rb_surfaceTable[*drawSurf->surface](drawSurf->surface);
+}
+
+backEnd.refdef.floatTime = originalTime;
+
+// draw the contents of the last shader batch
+if (oldShader != NULL) {
+	RB_EndSurface();
+}
+
+// go back to the world modelview matrix
+qglLoadMatrixf(backEnd.viewParms.world.modelMatrix);
+if (depthRange) {
+	qglDepthRange(0, 1);
+}
+
+#if 0
+RB_DrawSun();
+#endif
+// darken down any stencil shadows
+RB_ShadowFinish();
+
+// add light flares on lights that aren't obscured
+RB_RenderFlares();
+
 #endif
 }
 

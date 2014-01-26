@@ -543,8 +543,11 @@ typedef struct drawSurf_s {
 	int					entityNum;		// FQ3
 	int					fogIndex;		// FQ3
 	int					dlightMap;		// FQ3
-#endif
+
+	unsigned			_deprecated_sort;
+#else
 	unsigned			sort;			// bit combination for fast compares
+#endif
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
