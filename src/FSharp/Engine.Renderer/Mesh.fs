@@ -157,7 +157,7 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
 
     let frame = model.Md3.Frames.[entity.Frame]
     let radius = Bounds.radius frame.Bounds
-    //printfn "%i" r_lodbias.Integer
+
     let projectedRadius = projectRadius radius entity.Origin r.ViewParms
     match projectedRadius <> 0.f with
     | true ->
