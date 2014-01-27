@@ -782,6 +782,7 @@ module Renderer =
         let mutable native = NativePtr.read ptr
 
         {
+        World = Option.ofNativePtr World.ofNativePtr native.world
         CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity
         CurrentEntityId = native.currentEntityNum
         CurrentModel = Option.ofNativePtr Model.ofNativePtr native.currentModel
@@ -798,6 +799,7 @@ module Renderer =
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (r: Renderer) =
         let mutable native = NativePtr.read ptr
 
+        // TODO: Map World - Property World
         TrRefEntity.toNativeByPtr native.currentEntity r.CurrentEntity.Value
         native.currentEntityNum <- r.CurrentEntityId
         // TODO: Map Model - Property CurrentModel

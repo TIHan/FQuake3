@@ -173,6 +173,37 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
     |> (+) r_lodbias.Integer
     |> clampLod
 
+/// Based on Q3: R_ComputeFogNum
+/// FogId
+[<Pure>]
+let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
+    match r.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel with
+    | true -> 0
+    | _ ->
+
+    // FIXME: non-normalized axis issues
+    let frame = md3.Frames.[entity.Frame]
+    let localOrigin = entity.Origin + frame.LocalOrigin
+
+    match r.World with
+    | None -> failwith "Renderer does not have a world."
+    | Some world ->
+
+    let v1 = localOrigin - frame.Radius
+    let v2 = localOrigin + frame.Radius
+
+    let fog =
+        world.Fogs.Tail
+        |> List.tryFindIndex (fun x ->
+            match (v1 >= x.Bounds.Mins, v2 <= x.Bounds.Maxs) with
+            | (true, _)
+            | (_, true) ->  false
+            | _ ->          true)
+
+    match fog with
+    | None -> 0
+    | Some x -> x
+
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces
 let addMd3Surfaces
@@ -252,5 +283,12 @@ let addMd3Surfaces
             Light.setupEntityLighting r.Refdef r.IdentityLight r.SunDirection rentity lightGrid r_ambientScale r_directedScale r_debugLight
         else
             rentity
+
+    //
+    // see if we are in a fog volume
+    //
+    let fogId = fogId md3 entity r
+
+
     // TODO:  
     r'

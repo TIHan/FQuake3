@@ -1300,6 +1300,7 @@ type BackendData =
 /// </summary>
 type Renderer =
     {
+        World: World option;
         CurrentEntity: TrRefEntity option;
         CurrentEntityId: int;
 
