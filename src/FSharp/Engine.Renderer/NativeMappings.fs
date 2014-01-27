@@ -754,14 +754,13 @@ module World =
 
 // TODO: This will need more work over time.
 module Renderer =
-    let sortShaders (ptr: nativeptr<trGlobals_t>) =
-        let mutable native = NativePtr.read ptr
-
-        let mutable shaders =
-            NativePtr.toArray native.numShaders &&native.shaders.value
-            |> Array.sortWith (fun xp yp -> 
-                let x = NativePtr.read xp
-                let y = NativePtr.read yp
+    let sortDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) (trPtr: nativeptr<trGlobals_t>) =
+        let trNative = NativePtr.read trPtr
+        let mutable surfs =
+            NativePtr.toArray size ptr
+                |> Array.sortWith (fun sx sy ->
+                let x = NativePtr.read <| NativePtr.get (&&trNative.shaders.value) sx.shaderIndex
+                let y = NativePtr.read <| NativePtr.get (&&trNative.shaders.value) sy.shaderIndex
                 if x.sort < y.sort then
                     -1
                 elif x.sort > y.sort then
@@ -771,26 +770,12 @@ module Renderer =
                     if x.sort = 1.f && y.sort = 1.f && x.portalRange < y.portalRange then
                         -1
                     else
-                        0)
-                       
-        for i = 0 to native.numShaders - 1 do
-            let mutable shader = NativePtr.read shaders.[i]
-            shader.sortedIndex <- i
-            NativePtr.write shaders.[i] shader
+                        let sxt = NativePtr.read sx.surface
+                        let syt = NativePtr.read sy.surface
+                        sxt.CompareTo(syt))
 
-            NativePtr.set (&&native.sortedShaders.value) i shaders.[i]
 
-        NativePtr.write ptr native
-
-    let sortDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) =
-        let mutable surfs =
-            NativePtr.toArray size ptr
-            |> Array.sortBy (fun x -> x.dlightMap)
-            |> Array.sortBy (fun x -> x.fogIndex)
-            |> Array.sortBy (fun x -> x.entityNum)
-            |> Array.sortBy (fun x -> x.shaderIndex)
-
-        for i = 0 to size  - 1 do
+        for i = 0 to size - 1 do
             NativePtr.set ptr i surfs.[i]
 
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =

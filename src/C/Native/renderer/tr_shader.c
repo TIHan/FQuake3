@@ -2068,12 +2068,6 @@ static shader_t *GeneratePermanentShader( void ) {
 		}
 	}
 
-	{
-		MObject *res;
-		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortShaders, res,
-			&tr);
-	}
-
 	hash = generateHashValue(newShader->name, FILE_HASH_SIZE);
 	newShader->next = hashTable[hash];
 	hashTable[hash] = newShader;

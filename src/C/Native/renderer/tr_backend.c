@@ -729,7 +729,7 @@ backEnd.pc.c_surfaces += numDrawSurfs;
 for (i = 0, drawSurf = drawSurfs; i < numDrawSurfs; i++, drawSurf++) {
 	// surf info
 	entityNum = drawSurf->entityNum;
-	shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+	shader = tr.shaders[drawSurf->shaderIndex];
 	fogNum = drawSurf->fogIndex;
 	dlighted = drawSurf->dlightMap;
 

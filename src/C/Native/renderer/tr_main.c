@@ -1170,7 +1170,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 
 	// surf info
 	entityNum = drawSurf->entityNum;
-	shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+	shader = tr.shaders[drawSurf->shaderIndex];
 	fogNum = drawSurf->fogIndex;
 	dlighted = drawSurf->dlightMap;
 
@@ -1574,7 +1574,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	drawSurf_t *surf = &tr.refdef.drawSurfs[tr.refdef.numDrawSurfs & DRAWSURF_MASK];
 
 	surf->surface = surface;
-	surf->shaderIndex = shader->_deprecated_sortedIndex;
+	surf->shaderIndex = shader->index;
 	surf->entityNum = tr.currentEntityNum;
 	surf->fogIndex = fogIndex;
 	surf->dlightMap = dlightMap;
@@ -1682,7 +1682,8 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 
 		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, sortDrawSurfaces, res,
 			&numDrawSurfs,
-			drawSurfs);
+			drawSurfs,
+			&tr);
 	}
 
 	// check for any pass through drawing, which
@@ -1691,7 +1692,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		drawSurf_t *drawSurf = &tr.refdef.drawSurfs[i];
 		// surf info
 		entityNum = drawSurf->entityNum;
-		shader = tr._deprecated_sortedShaders[drawSurf->shaderIndex];
+		shader = tr.shaders[drawSurf->shaderIndex];
 		fogNum = drawSurf->fogIndex;
 		dlighted = drawSurf->dlightMap;
 
