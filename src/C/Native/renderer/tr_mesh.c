@@ -170,17 +170,14 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 		return CULL_OUT;
 	}
 #else
-	md3Frame_t* newFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.frame;
-	md3Frame_t* oldFrame = (md3Frame_t*)((byte*)header + header->ofsFrames) + ent->e.oldframe;
 	trGlobals_t* _tr = &tr;
 	MObject *res;
 
-	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModelByFrames, res,
-		m_object_as_arg (qm_of_md3_frame (newFrame)),
-		m_object_as_arg (qm_of_md3_frame (oldFrame)),
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModel, res,
+		m_object_as_arg (qm_of_md3 (header)),
 		m_object_as_arg (qm_of_ref_entity (&ent->e)),
-		m_object_as_arg (qm_of_cvar (r_nocull)),
-		m_object_as_arg (qm_of_tr_globals (&tr)))
+		m_object_as_arg (qm_of_tr_globals (&tr)),
+		m_object_as_arg(qm_of_cvar(r_nocull)))
 
 	qm_to_tr_globals (m_object_get_property (res, "Item2"), &_tr);
 	return (gint)m_object_unbox (m_object_get_property(res, "Item1"));

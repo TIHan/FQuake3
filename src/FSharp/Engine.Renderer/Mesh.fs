@@ -98,7 +98,9 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
 /// CullModel
 /// Note: This is internal.
 [<Pure>]
-let cullModelByFrames (newFrame: Md3Frame) (oldFrame: Md3Frame) (entity: RefEntity) (r_nocull: Cvar) (r: Renderer) =
+let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
+    let newFrame = md3.Frames.[entity.Frame]
+    let oldFrame = md3.Frames.[entity.OldFrame]
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
     | true ->
@@ -236,7 +238,7 @@ let addMd3Surfaces
     // cull the entire model if merged bounding box of both frames
     // is outside the view frustum.
     //
-    let cull, r' = cullModelByFrames md3.Frames.[frame] md3.Frames.[oldFrame] entity r_nocull r
+    let cull, r' = cullModel md3 entity r r_nocull
 
     match cull = ClipType.Out with
     | true -> r'

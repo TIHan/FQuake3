@@ -37,3 +37,4 @@ define_mapping (cvar, cvar_t*, "Cvar");
 define_mapping (bounds, vec3_t*, "Bounds");
 define_mapping (axis, vec3_t*, "Axis");
 define_mapping (md3_frame, md3Frame_t*, "Md3Frame");
+define_mapping (md3, md3Header_t*, "Md3");

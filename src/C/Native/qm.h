@@ -132,5 +132,6 @@ define_mapping_prototype (cvar, cvar_t*);
 define_mapping_prototype (bounds, vec3_t*);
 define_mapping_prototype (axis, vec3_t*);
 define_mapping_prototype (md3_frame, md3Frame_t*);
+define_mapping_prototype (md3, md3Header_t*);
 
 #endif /* __QM_H__ */
