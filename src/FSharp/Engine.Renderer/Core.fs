@@ -1306,8 +1306,12 @@ type Renderer =
         CurrentModel: Model option;
 
         ViewParms: ViewParms;
+        IdentityLight: single;
+        IdentityLightByte: int;
         Refdef: TrRefdef;
         Orientation: OrientationR;
+        SunLight: vec3;
+        SunDirection: vec3;
 
         PerfCounters: FrontEndPerformanceCounters;
 

@@ -173,7 +173,17 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
 
 /// Based on Q3: R_AddMD3Surfaces
 /// AddMd3Surfaces
-let addMd3Surfaces (rentity: TrRefEntity) (r: Renderer) (r_lodscale: Cvar) (r_lodbias: Cvar) (r_nocull: Cvar) (r_shadows: Cvar) =
+let addMd3Surfaces
+    (rentity: TrRefEntity)
+    (lightGrid: LightGrid option)
+    (r: Renderer)
+    (r_lodscale: Cvar)
+    (r_lodbias: Cvar)
+    (r_nocull: Cvar)
+    (r_shadows: Cvar)
+    (r_ambientScale: Cvar)
+    (r_directedScale: Cvar) 
+    (r_debugLight: Cvar) =
     let entity = rentity.Entity
 
     // don't add third_person objects if not in a portal
@@ -235,8 +245,10 @@ let addMd3Surfaces (rentity: TrRefEntity) (r: Renderer) (r_lodscale: Cvar) (r_lo
     //
     // set up lighting now that we know we aren't culled
     //
-    //let rentity =
-        //if isPersonalModel || (r_shadows.Integer > 1) then
-            //Light.setupEntityLighting r.Refdef 
+    let rentity =
+        if isPersonalModel || (r_shadows.Integer > 1) then
+            Light.setupEntityLighting r.Refdef r.IdentityLight r.SunDirection rentity lightGrid r_ambientScale r_directedScale r_debugLight
+        else
+            rentity
     // TODO:  
     r'

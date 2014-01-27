@@ -782,15 +782,18 @@ module Renderer =
         let mutable native = NativePtr.read ptr
 
         {
-            CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity;
-            CurrentEntityId = native.currentEntityNum;
-            CurrentModel = Option.ofNativePtr Model.ofNativePtr native.currentModel;
-            ViewParms = ViewParms.ofNativePtr &&native.viewParms;
-            Refdef = TrRefdef.ofNativePtr &&native.refdef;
-            Orientation = OrientationR.ofNativePtr &&native.or';
-            PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc
-            //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
-        }
+        CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity
+        CurrentEntityId = native.currentEntityNum
+        CurrentModel = Option.ofNativePtr Model.ofNativePtr native.currentModel
+        ViewParms = ViewParms.ofNativePtr &&native.viewParms
+        IdentityLight = native.identityLight
+        IdentityLightByte = native.identityLightByte
+        Refdef = TrRefdef.ofNativePtr &&native.refdef
+        Orientation = OrientationR.ofNativePtr &&native.or'
+        SunLight = Vec3.ofNativePtr &&native.sunLight
+        SunDirection = Vec3.ofNativePtr &&native.sunDirection
+        PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc }
+        //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
 
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (r: Renderer) =
         let mutable native = NativePtr.read ptr
@@ -799,8 +802,12 @@ module Renderer =
         native.currentEntityNum <- r.CurrentEntityId
         // TODO: Map Model - Property CurrentModel
         ViewParms.toNativeByPtr &&native.viewParms r.ViewParms
+        native.identityLight <- r.IdentityLight
+        native.identityLightByte <- r.IdentityLightByte
         // TODO: Map TrRefDef - Property Refdef
         OrientationR.toNativeByPtr &&native.or' r.Orientation
+        Vec3.toNativeByPtr &&native.sunLight r.SunLight
+        Vec3.toNativeByPtr &&native.sunDirection r.SunDirection
         FrontEndPerformanceCounters.toNativeByPtr &&native.pc r.PerfCounters
 
         // Images - Special Handling
