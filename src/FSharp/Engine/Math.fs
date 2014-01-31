@@ -117,8 +117,7 @@ type Vector3 =
         vec3 (
             (match x with | Some x -> x | None -> this.x),
             (match y with | Some y -> y | None -> this.y),
-            (match z with | Some z -> z | None -> this.z)
-        )
+            (match z with | Some z -> z | None -> this.z))
 
     static member inline Abs (v: vec3) =
         vec3 (abs v.x, abs v.y, abs v.z)
@@ -128,6 +127,21 @@ type Vector3 =
 
     static member inline Floor (v: vec3) =
         vec3 (floor v.x, floor v.y, floor v.z)
+
+    static member inline op_Equality (v1: vec3, v2: vec3) =
+        v1.x = v2.x && v1.y = v2.y && v1.z = v2.z
+
+    static member inline op_GreaterThanOrEqual (v1: vec3, v2: vec3) =
+        v1.x >= v2.x && v1.y >= v2.y && v1.z >= v2.z
+
+    static member inline op_GreaterThan (v1: vec3, v2: vec3) =
+        v1.x > v2.x && v1.y > v2.y && v1.z > v2.z
+
+    static member inline op_LessThanOrEqual (v1: vec3, v2: vec3) =
+        v1.x <= v2.x && v1.y <= v2.y && v1.z <= v2.z
+
+    static member inline op_LessThan (v1: vec3, v2: vec3) =
+        v1.x < v2.x && v1.y < v2.y && v1.z < v2.z
 
     static member inline (*) (v1: vec3, v2: vec3) =
         vec3 (v1.x * v2.x, v1.y * v2.y, v1.z * v2.z)
