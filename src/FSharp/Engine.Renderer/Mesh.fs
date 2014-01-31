@@ -195,7 +195,7 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     let fog =
         world.Fogs.Tail
         |> List.tryFindIndex (fun x ->
-            v1 < x.Bounds.Mins && v2 > x.Bounds.Maxs)
+            v1 < x.Bounds.Maxs && v2 > x.Bounds.Mins)
 
     match fog with
     | None -> 0
