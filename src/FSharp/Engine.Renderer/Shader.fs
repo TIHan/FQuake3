@@ -72,7 +72,7 @@ let generateFileNameHashCode (filePath: string) =
 /// When a handle is passed in by another module, this range checks
 /// it and returns a valid (possibly default) shader_t to be used internally.
 let shaderById id (r: Renderer) =
-    ()
+    r.Shaders.[id]
 
 /// FIXME: We should never have global variables.
 let mutable globalRendererShaderState = Unchecked.defaultof<RendererShaderState>

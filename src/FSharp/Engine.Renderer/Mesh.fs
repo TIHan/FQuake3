@@ -27,6 +27,7 @@ open Engine.Core
 open Engine.Files
 open Engine.Math
 open Engine.Renderer.Core
+open Engine.Renderer.Shader
 
 /// Based on Q3: ProjectRadius
 /// ProjectRadius
@@ -285,6 +286,17 @@ let addMd3Surfaces
     // see if we are in a fog volume
     //
     let fogId = fogId md3 entity r
+
+//    let stuff =
+//        md3.Surfaces
+//        |> List.map (fun x ->
+//            let shader =
+//                match entity.CustomShaderHandle <> 0 with
+//                | true -> Shader.shaderById entity.CustomShaderHandle r
+//                | _ ->
+//
+//
+//        )
 
     // TODO:  
     r'

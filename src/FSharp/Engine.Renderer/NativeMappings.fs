@@ -378,13 +378,15 @@ module Surface =
         | _ -> raise <| Exception "Invalid Surface Type"          
 
 module DrawSurface =
-    let inline ofNativePtr (ptr: nativeptr<drawSurf_t>) =
+    let ofNativePtr (ptr: nativeptr<drawSurf_t>) =
         let mutable native = NativePtr.read ptr
 
         {
-            Sort = native.sort;
-            Surface = Surface.ofNativePtr native.surface;
-        }
+        Surface = Surface.ofNativePtr native.surface
+        ShaderId = native.shaderIndex
+        EntityId = native.entityNum
+        FogId = native.fogIndex
+        DynamicLightMap = native.dlightMap }
 
 module RefEntity =
     let inline ofNativePtr (ptr: nativeptr<refEntity_t>) =

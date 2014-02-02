@@ -61,10 +61,10 @@
     <Compile Include="Main.fs" />
     <Compile Include="Light.fs" />
     <Compile Include="image.fs" />
+    <Compile Include="Shader.fs" />
     <Compile Include="Mesh.fs" />
     <Compile Include="World.fs" />
     <Compile Include="Backend.fs" />
-    <Compile Include="Shader.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
     <None Include="packages.config" />

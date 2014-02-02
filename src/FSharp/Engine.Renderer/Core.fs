@@ -585,15 +585,14 @@ type Surface =
     | Entity                            // beams, rails, lightning, etc that can be determined by entity
     | DisplayList of SurfaceDisplayList
 
-/// <summary>
 /// Based on Q3: drawSurf_t
 /// DrawSurface
-/// </summary>
-type DrawSurface =
-    {
-        Sort: uint32;       // bit combination for fast compares
-        Surface : Surface
-    }
+type DrawSurface = {
+    Surface : Surface
+    ShaderId: int
+    EntityId: int
+    FogId: int
+    DynamicLightMap: int }
 
 /// <summary>
 /// Based on Q3: RDF_NOWORLDMODEL, RDF_HYPERSPACE
