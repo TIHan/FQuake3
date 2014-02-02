@@ -26,6 +26,7 @@ open System.Diagnostics.Contracts
 open Engine.Core
 open Engine.Math
 open Engine.Renderer.Core
+open Engine.Renderer.Shader
 
 let flipMatrix =
     // convert from our coordinate system (looking down X)
@@ -616,7 +617,7 @@ let isMirror (drawSurface: DrawSurface) (entityId: int) (r: Renderer) =
 /// Based on Q3: R_AddDrawSurf
 /// AddDrawSurface
 [<Pure>]
-let addDrawSurface surface shaderId entityId fogId dynamicLightMap (drawSurfaces: DrawSurface list) =
+let addDrawSurface surface shaderId entityId fogId dynamicLightMap (r: Renderer) =
     let drawSurface =
         {
         DrawSurface.Surface = surface
@@ -625,4 +626,50 @@ let addDrawSurface surface shaderId entityId fogId dynamicLightMap (drawSurfaces
         FogId = fogId
         DynamicLightMap = dynamicLightMap }
 
-    drawSurface :: drawSurfaces
+    { r with Refdef = { r.Refdef with DrawSurfaces = drawSurface :: r.Refdef.DrawSurfaces } }
+
+/// AddEntitySurface
+/// TODO: Not finished.
+let addEntitySurface (rentity: TrRefEntity) (r: Renderer) =
+    let rentity = { rentity with NeedDlights = false }
+
+    //
+    // the weapon model must be handled special --
+    // we don't want the hacked weapon position showing in 
+    // mirrors, because the true body position will already be drawn
+    //
+    match rentity.Entity.RenderFx.HasFlag RenderFxFlags.FirstPerson with
+    | true -> rentity
+    | _ ->
+
+    match rentity.Entity.Type with
+    | RefEntityType.PortalSurface -> rentity
+    | RefEntityType.Sprite
+    | RefEntityType.Beam
+    | RefEntityType.Lightning
+    | RefEntityType.RailCore
+    | RefEntityType.RailRings ->
+        // self blood sprites, talk balloons, etc should not be drawn in the primary
+        // view.  We can't just do this check for all entities, because md3
+        // entities may still want to cast shadows from them
+        match rentity.Entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson && not r.ViewParms.IsPortal with
+        | true -> rentity
+        | _ ->
+
+        let shader = shaderById rentity.Entity.CustomShaderHandle
+        rentity
+    | _ -> rentity
+
+/// Based on Q3: R_AddEntitySurfaces
+/// AddEntitySurfaces
+/// TODO: Not finished.
+let addEntitySurfaces (r: Renderer) (r_drawentities: Cvar) =
+    match r_drawentities.Integer = 0 with
+    | true -> r
+    | _ ->
+
+    let entities =
+        r.Refdef.Entities
+        |> List.map (fun x -> addEntitySurface x r)
+
+    { r with Refdef = { r.Refdef with Entities = entities } }

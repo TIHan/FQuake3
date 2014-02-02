@@ -58,10 +58,10 @@
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
     <Compile Include="Core.fs" />
-    <Compile Include="Main.fs" />
     <Compile Include="Light.fs" />
     <Compile Include="image.fs" />
     <Compile Include="Shader.fs" />
+    <Compile Include="Main.fs" />
     <Compile Include="Mesh.fs" />
     <Compile Include="World.fs" />
     <Compile Include="Backend.fs" />
