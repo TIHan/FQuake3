@@ -66,6 +66,14 @@ module RendererShaderState =
 let generateFileNameHashCode (filePath: string) =
     filePath.GetHashCode ()
 
+/// Based on Q3: R_GetShaderByHandle
+/// ShaderById
+///
+/// When a handle is passed in by another module, this range checks
+/// it and returns a valid (possibly default) shader_t to be used internally.
+let shaderById id (r: Renderer) =
+    ()
+
 /// FIXME: We should never have global variables.
 let mutable globalRendererShaderState = Unchecked.defaultof<RendererShaderState>
 
