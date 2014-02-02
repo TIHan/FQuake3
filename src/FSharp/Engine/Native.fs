@@ -162,6 +162,12 @@ type md3Surface_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
+type md3Shader_t =
+    val mutable name : MAX_QPATH
+    val mutable shaderIndex : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
 type md3Triangle_t =
     val mutable indexes : int
     val private indexes1 : int
@@ -169,7 +175,7 @@ type md3Triangle_t =
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
-type md3St =
+type md3St_t =
     val mutable st : single
     val private st1 : single
 

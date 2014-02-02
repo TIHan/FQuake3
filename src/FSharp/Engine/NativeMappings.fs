@@ -220,6 +220,29 @@ module Md3Frame =
             Name = NativePtr.toStringAnsi &&native.name;
         }
 
+module Md3Shader =
+    let ofNativePtr (ptr: nativeptr<md3Shader_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Name = NativePtr.toStringAnsi &&native.name
+        ShaderId = native.shaderIndex }
+
+module Md3Surface =
+    let ofNativePtr (ptr: nativeptr<md3Surface_t>) =
+        let mutable native = NativePtr.read ptr
+
+        let mutable bytePtr : nativeptr<byte> = NativePtr.toNativePtr ptr
+        let mutable shaderPtr : nativeptr<md3Shader_t> =
+            NativePtr.add bytePtr native.ofsShaders
+            |> NativePtr.toNativePtr
+
+        {
+        Id = native.ident
+        Name = NativePtr.toStringAnsi &&native.name
+        Flags = native.flags
+        Shaders = List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr }
+
 module Md3Header =
     let ofNativePtr (ptr: nativeptr<md3Header_t>) =
         let mutable native = NativePtr.read ptr
@@ -246,10 +269,14 @@ module Md3 =
         let mutable framePtr : nativeptr<md3Frame_t> =
             NativePtr.add bytePtr native.ofsFrames
             |> NativePtr.toNativePtr
+        let mutable surfacePtr : nativeptr<md3Surface_t> =
+            NativePtr.add bytePtr native.ofsSurfaces
+            |> NativePtr.toNativePtr
 
         {
         Header = Md3Header.ofNativePtr ptr;
-        Frames = List.ofNativePtrArrayMap native.numFrames Md3Frame.ofNativePtr framePtr }
+        Frames = List.ofNativePtrArrayMap native.numFrames Md3Frame.ofNativePtr framePtr
+        Surfaces = List.ofNativePtrArrayMap native.numSurfaces Md3Surface.ofNativePtr surfacePtr }
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
