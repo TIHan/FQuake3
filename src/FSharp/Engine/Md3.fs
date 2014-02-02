@@ -65,6 +65,21 @@ type Md3Tag = {
     Origin: vec3;
     Axis: Axis }
 
+/// Based on Q3: md3Shader_t
+/// Md3Shader
+type Md3Shader = {
+    Name: string
+    ShaderId: int }
+
+/// Based on Q3: md3Surface_t
+/// Md3Surface
+/// TODO: Not finished.
+type Md3Surface = {
+    Id: int
+    Name: string
+    Flags: int
+    Shaders: Md3Shader list }
+
 /// Md3
 type Md3 = {
     Header: Md3Header;

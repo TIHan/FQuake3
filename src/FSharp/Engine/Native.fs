@@ -124,7 +124,7 @@ type msg_t =
 [<StructLayout (LayoutKind.Explicit, Size = 16)>]
 type md3Frame_t_name =
     [<FieldOffset (0)>]
-    val mutable name : sbyte
+    val mutable value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
@@ -136,18 +136,50 @@ type md3Frame_t =
     val mutable name : md3Frame_t_name
 
 [<Struct>]
-[<StructLayout (LayoutKind.Explicit)>]
-type md3Tag_t_name =
-    [<FieldOffset (0)>]
-    val mutable name : sbyte
-
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type md3Tag_t =
-    val mutable name : md3Tag_t_name
+    val mutable name : MAX_QPATH
     val mutable origin : vec3_t
     val mutable axis : vec3_t
     val private axis1 : vec3_t
+    val private axis2 : vec3_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3Surface_t =
+    val mutable ident : int
+    val mutable name : MAX_QPATH
+    val mutable flags : int
+    val mutable numFrames : int
+    val mutable numShaders : int
+    val mutable numVerts : int
+    val mutable numTriangles : int
+    val mutable ofsTriangles : int
+    val mutable ofsShaders : int
+    val mutable ofsSt : int
+    val mutable ofsXyzNormals : int
+    val mutable ofsend : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3Triangle_t =
+    val mutable indexes : int
+    val private indexes1 : int
+    val private indexes2 : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3St =
+    val mutable st : single
+    val private st1 : single
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type md3XyzNormal_t =
+    val mutable xyz : int16
+    val private xyz1 : int16
+    val private xyz2 : int16
+    val mutable normal : int16
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
