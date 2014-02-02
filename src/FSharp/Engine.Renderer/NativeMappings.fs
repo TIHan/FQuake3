@@ -700,6 +700,22 @@ module Shader =
         ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value);
         Next = Option.ofNativePtr ofNativePtr native.next }
 
+module SkinSurface =
+    let ofNativePtr (ptr: nativeptr<skinSurface_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Name = NativePtr.toStringAnsi &&native.name 
+        Shader = Option.ofNativePtr Shader.ofNativePtr native.shader }
+
+module Skin =
+    let ofNativeptr (ptr: nativeptr<skin_t>) =
+        let mutable native = NativePtr.read ptr
+
+        {
+        Skin.Name = NativePtr.toStringAnsi &&native.name
+        Surfaces = List.ofNativePtrArrayMap native.numSurfaces SkinSurface.ofNativePtr native.surfaces.surfaces }
+
 module Bsp =
     // this will be used to prevent major copying
     let mutable lightGridData : byte array = [||]

@@ -225,7 +225,7 @@ let addMd3Surfaces
 
     let model =
         match r.CurrentModel with
-        | None -> raise <| Exception "Current model does not exist."
+        | None -> failwith "Current model does not exist."
         | Some x -> x
 
     let frameCount = model.Md3.Header.FrameCount
@@ -285,7 +285,6 @@ let addMd3Surfaces
     // see if we are in a fog volume
     //
     let fogId = fogId md3 entity r
-
 
     // TODO:  
     r'

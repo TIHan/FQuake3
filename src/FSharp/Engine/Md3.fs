@@ -61,8 +61,8 @@ type Md3Frame = {
 /// Based on Q3: md3Tag_t
 /// Md3Tag
 type Md3Tag = {
-    Name: string;
-    Origin: vec3;
+    Name: string
+    Origin: vec3
     Axis: Axis }
 
 /// Based on Q3: md3Shader_t

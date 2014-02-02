@@ -1083,22 +1083,30 @@ type MNode = {
 
         MarkSurfaces: MSurface list }
 
-/// <summary>
+/// Based on Q3: skinSurface_t
+/// SkinSurface
+type SkinSurface = {
+    Name: string
+    Shader: Shader option }
+
+/// Based on Q3: skin_t
+/// Skin
+type Skin = {
+    Name: string
+    Surfaces: SkinSurface list }
+
 /// Based on Q3: fog_t
 /// Fog
-/// </summary>
-type Fog =
-    {
-        OriginalBrushId: int;
-        Bounds: Bounds;
-        Color: Rgba;                    // in packed byte format
-        TextureCoordinateScale: single; // texture coordinate vector scales
-        Parms: FogParms;
+type Fog = {
+    OriginalBrushId: int
+    Bounds: Bounds
+    Color: Rgba                    // in packed byte format
+    TextureCoordinateScale: single // texture coordinate vector scales
+    Parms: FogParms
 
-        // for clipping distance in fog when outside
-        HasSurface: bool;
-        Surface: vec4;
-    }
+    // for clipping distance in fog when outside
+    HasSurface: bool
+    Surface: vec4 }
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
