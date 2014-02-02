@@ -512,7 +512,7 @@ module Dlight =
         }
 
 module TrRefdef =
-    let inline ofNativePtr (ptr: nativeptr<trRefdef_t>) =
+    let ofNativePtr (ptr: nativeptr<trRefdef_t>) =
         let mutable native = NativePtr.read ptr
 
         {
@@ -526,7 +526,7 @@ module TrRefdef =
             RdFlags = enum<RdFlags> (native.rdflags);
 
             AreaMask = ByteString.ofNativePtr 32 &&native.areamask;
-            HasAreaMaskModified = native.areamaskModified;
+            HasAreaMaskModified = Boolean.ofNativePtr &&native.areamaskModified;
 
             FloatTime = native.floatTime;
             Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text; // FIXME: This isn't right.
@@ -536,8 +536,28 @@ module TrRefdef =
             DrawSurfaces = List.ofNativePtrArrayMap native.numDrawSurfs (fun x -> DrawSurface.ofNativePtr x) native.drawSurfs;
         }
 
+    let toNativeByPtr (ptr: nativeptr<trRefdef_t>) (value: TrRefdef) =
+        let mutable native = NativePtr.read ptr
+
+        native.x <- value.X
+        native.y <- value.Y
+        native.width <- value.Width
+        native.height <- value.Height
+        Vec3.toNativeByPtr &&native.vieworg value.ViewOrigin
+        Axis.toNativeByPtr &&native.viewaxis value.ViewAxis
+        native.time <- value.Time
+        native.rdflags <- int value.RdFlags
+        // TODO: Map AreaMask
+        native.areamaskModified <- Boolean.toNative value.HasAreaMaskModified
+        native.floatTime <- value.FloatTime
+        // TODO: Map Text
+        // TODO: Map Entities
+        // TODO: Map Dlights
+        // TODO: Map Polys
+        // TODO: Map DrawSurfaces
+
 module FrontEndPerformanceCounters =
-    let inline ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
+    let ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
         let mutable native = NativePtr.read ptr
 
         {
@@ -550,7 +570,7 @@ module FrontEndPerformanceCounters =
             DynamicLightSurfacesCulled = native.c_dlightSurfacesCulled
         }
 
-    let inline toNativeByPtr (ptr: nativeptr<frontEndCounters_t>) (value: FrontEndPerformanceCounters) =
+    let toNativeByPtr (ptr: nativeptr<frontEndCounters_t>) (value: FrontEndPerformanceCounters) =
         let mutable native = NativePtr.read ptr
 
         native.c_sphere_cull_patch_in <- value.SpherePatch.CullIn
@@ -825,7 +845,7 @@ module Renderer =
         ViewParms.toNativeByPtr &&native.viewParms r.ViewParms
         native.identityLight <- r.IdentityLight
         native.identityLightByte <- r.IdentityLightByte
-        // TODO: Map TrRefDef - Property Refdef
+        TrRefdef.toNativeByPtr &&native.refdef r.Refdef
         OrientationR.toNativeByPtr &&native.or' r.Orientation
         Vec3.toNativeByPtr &&native.sunLight r.SunLight
         Vec3.toNativeByPtr &&native.sunDirection r.SunDirection

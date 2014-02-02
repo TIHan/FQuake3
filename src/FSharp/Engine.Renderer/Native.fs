@@ -815,7 +815,7 @@ type trRefdef_t =
     val private areamask30 : byte
     val private areamask31 : byte
 
-    val mutable areamaskModified : bool
+    val mutable areamaskModified : qboolean
     val mutable floatTime : single
     val mutable text : trRefdef_t_text
     val mutable num_entities : int
