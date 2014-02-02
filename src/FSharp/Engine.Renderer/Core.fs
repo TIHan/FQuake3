@@ -709,16 +709,11 @@ type Skybox =
             | 5 -> this.Image6
             | _ -> raise <| IndexOutOfRangeException ()
 
-/// <summary>
 /// Based on Q3: skyParms_t
 /// SkyParms
-/// </summary>
-type SkyParms =
-    {
-        CloudHeight: single;
-        Outerbox: Skybox option;
-        Innerbox: Skybox option;
-    }
+/// TODO: Finish, removed skybox fields for now.
+type SkyParms = {
+    CloudHeight: single }
 
 /// <summary>
 /// Based on Q3: fogParms_t
@@ -1018,24 +1013,14 @@ type Shader =
         /// current time offset for this shader
         TimeOffset: single;
 
-        /// current state if this is a state shader
-        CurrentShader: Shader option;
-
-        /// current state if this is a state shader
-        ParentShader: Shader option;
-
         /// current state index for cycle purposes
         CurrentState: int;
 
         /// time in milliseconds this expires
         ExpireTime: int64;
 
-        /// current shader this one is remapped too
-        RemappedShader: Shader option;
-
         /// index to valid shader states
         ShaderStates: int list;
-        Next: Shader option;
     }
 
 /// Based on Q3: msurface_t
@@ -1306,27 +1291,27 @@ type BackendData =
 /// TODO: Not finished.
 /// !!
 /// </summary>
-type Renderer =
-    {
-        World: World option;
-        CurrentEntity: TrRefEntity option;
-        CurrentEntityId: int;
+type Renderer = {
+    World: World option
+    CurrentEntity: TrRefEntity option
+    CurrentEntityId: int
 
-        CurrentModel: Model option;
+    CurrentModel: Model option
 
-        ViewParms: ViewParms;
-        IdentityLight: single;
-        IdentityLightByte: int;
-        Refdef: TrRefdef;
-        Orientation: OrientationR;
-        SunLight: vec3;
-        SunDirection: vec3;
+    ViewParms: ViewParms
+    IdentityLight: single
+    IdentityLightByte: int
+    Refdef: TrRefdef
+    Orientation: OrientationR
+    SunLight: vec3
+    SunDirection: vec3
 
-        PerfCounters: FrontEndPerformanceCounters;
+    PerfCounters: FrontEndPerformanceCounters
 
-       // Images: Image list;
-        // TODO:
-    }
+    // Images: Image list;
+    // TODO:
+
+    Shaders: Shader list }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Renderer =

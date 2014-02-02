@@ -314,15 +314,9 @@ type trRefEntity_t =
     val mutable directedLight : vec3_t
 
 [<Struct>]
-[<StructLayout (LayoutKind.Explicit, Size = 64)>]
-type image_t_imgName =
-    [<FieldOffset (0)>]
-    val mutable value : sbyte
-
-[<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type image_t =
-    val mutable imgName : image_t_imgName
+    val mutable imgName : MAX_QPATH
     val mutable width : int
     val mutable height : int
     val mutable uploadWidth : int

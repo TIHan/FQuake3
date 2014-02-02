@@ -646,9 +646,7 @@ module SkyParms =
         let mutable native = NativePtr.read ptr
 
         {
-        CloudHeight = native.cloudHeight
-        Outerbox = Option.ofNativePtr Skybox.ofNativePtr native.outerbox.value
-        Innerbox = Option.ofNativePtr Skybox.ofNativePtr native.innerbox.value }
+        CloudHeight = native.cloudHeight }
 
 module FogParms =
     let inline ofNativePtr (ptr: nativeptr<fogParms_t>) =
@@ -692,13 +690,9 @@ module Shader =
         Stages = []; // TODO:
         ClampTime = native.clamptime;
         TimeOffset = native.timeOffset;
-        CurrentShader = Option.ofNativePtr ofNativePtr native.currentShader;
-        ParentShader = Option.ofNativePtr ofNativePtr native.parentShader;
         CurrentState = native.currentstate;
         ExpireTime = int64 native.expireTime;
-        RemappedShader = Option.ofNativePtr ofNativePtr native.remappedShader;
-        ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value);
-        Next = Option.ofNativePtr ofNativePtr native.next }
+        ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value); }
 
 module SkinSurface =
     let ofNativePtr (ptr: nativeptr<skinSurface_t>) =
@@ -809,7 +803,8 @@ module Renderer =
         Orientation = OrientationR.ofNativePtr &&native.or'
         SunLight = Vec3.ofNativePtr &&native.sunLight
         SunDirection = Vec3.ofNativePtr &&native.sunDirection
-        PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc }
+        PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc
+        Shaders = List.ofNativePtrArrayMap native.numShaders Shader.ofNativePtr native.shaders.value }
         //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
 
     let inline toNativeByPtr (ptr: nativeptr<trGlobals_t>) (r: Renderer) =
