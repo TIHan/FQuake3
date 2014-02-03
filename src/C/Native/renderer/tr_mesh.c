@@ -439,6 +439,7 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	}
 #else
 	MObject *res;
+	MObject *unit;
 	trGlobals_t *_tr = &tr;
 
 	m_invoke_new(Engine.Renderer, Engine.Renderer, Mesh, addMd3Surfaces, res,
@@ -453,7 +454,9 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 		m_object_as_arg(qm_of_cvar(r_directedScale)),
 		m_object_as_arg(qm_of_cvar(r_debugLight)))
 
-		qm_to_tr_globals(res, &_tr);
+	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, TrRefdef, setCanMapToDrawSurfaces, unit, NULL);
+
+	qm_to_tr_globals(res, &_tr);
 #endif
 }
 

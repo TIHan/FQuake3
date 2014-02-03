@@ -530,6 +530,17 @@ module Dlight =
         }
 
 module TrRefdef =
+
+    let mutable canMapToDrawSurfaces = false
+
+    let setCanMapToDrawSurfaces () = canMapToDrawSurfaces <- true
+
+    let tryMapToDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) (value: DrawSurface list) =
+        match canMapToDrawSurfaces with
+        | false -> ()
+        | _ ->
+        canMapToDrawSurfaces <- true
+        
     let ofNativePtr (ptr: nativeptr<trRefdef_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -572,7 +583,8 @@ module TrRefdef =
         // TODO: Map Entities
         // TODO: Map Dlights
         // TODO: Map Polys
-        // TODO: Map DrawSurfaces
+       
+        tryMapToDrawSurfaces native.numDrawSurfs native.drawSurfs value.DrawSurfaces
 
 module FrontEndPerformanceCounters =
     let ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
