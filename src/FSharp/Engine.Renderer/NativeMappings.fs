@@ -385,6 +385,9 @@ module Surface =
         | _ -> failwith "not implemented"         
 
 module DrawSurface =
+    let mutable surfaceTypeMd3 = Unchecked.defaultof<nativeptr<surfaceType_t>>
+    let setSurfaceTypeMd3 x = surfaceTypeMd3 <- x
+
     let ofNativePtr (ptr: nativeptr<drawSurf_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -398,6 +401,7 @@ module DrawSurface =
     let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
         let mutable native = NativePtr.read ptr
 
+        native.surface <- surfaceTypeMd3
         Surface.toNativeByPtr native.surface value.Surface
         native.shaderIndex <- value.ShaderId
         native.entityNum <- value.EntityId
@@ -530,15 +534,18 @@ module Dlight =
         }
 
 module TrRefdef =
-
     let mutable canMapToDrawSurfaces = false
-
     let setCanMapToDrawSurfaces () = canMapToDrawSurfaces <- true
 
-    let tryMapToDrawSurfaces (size: int) (ptr: nativeptr<drawSurf_t>) (value: DrawSurface list) =
+    let tryMapToDrawSurfaces (native: trRefdef_t) (value: TrRefdef) =
         match canMapToDrawSurfaces with
         | false -> ()
         | _ ->
+
+        for i = native.numDrawSurfs to value.DrawSurfaces.Length - 1 do
+            let drawSurface = value.DrawSurfaces.[i]
+            DrawSurface.toNativeByPtr (NativePtr.add native.drawSurfs i) drawSurface
+
         canMapToDrawSurfaces <- true
         
     let ofNativePtr (ptr: nativeptr<trRefdef_t>) =
@@ -584,7 +591,9 @@ module TrRefdef =
         // TODO: Map Dlights
         // TODO: Map Polys
        
-        tryMapToDrawSurfaces native.numDrawSurfs native.drawSurfs value.DrawSurfaces
+        tryMapToDrawSurfaces native value
+
+        NativePtr.write ptr native
 
 module FrontEndPerformanceCounters =
     let ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
