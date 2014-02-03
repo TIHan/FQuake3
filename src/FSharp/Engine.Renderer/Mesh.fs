@@ -204,6 +204,10 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
 
 /// FindShaderIdByMd3surface
 let findShaderIdByMd3Surface (entity: RefEntity) (surface: Md3Surface) (r: Renderer) =
+    match entity.CustomShaderHandle <> 0 with
+    | true -> entity.CustomShaderHandle
+    |_ ->
+
     r.DefaultShaderId
 
 /// Based on Q3: R_AddMD3Surfaces
@@ -295,7 +299,7 @@ let addMd3Surfaces
         md3.Surfaces
         |> List.map (fun x ->
             {
-            DrawSurface.Surface = Surface.Md3
+            DrawSurface.Surface = Surface.Md3 x
             DrawSurface.ShaderId = findShaderIdByMd3Surface entity x r
             EntityId = r.CurrentEntityId
             FogId = fogId

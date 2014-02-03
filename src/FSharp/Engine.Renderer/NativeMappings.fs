@@ -366,7 +366,7 @@ module Surface =
         | surfaceType_t.SF_POLY ->
             let ptr = NativePtr.ofNativeInt<srfPoly_t> <| NativePtr.toNativeInt ptr
             ofNativePtrPoly ptr
-        | surfaceType_t.SF_MD3 -> Md3
+        | surfaceType_t.SF_MD3 -> failwith "Md3 not supported here."
         | surfaceType_t.SF_MD4 -> Md4
         | surfaceType_t.SF_FLARE ->
             let ptr = NativePtr.ofNativeInt<srfFlare_t> <| NativePtr.toNativeInt ptr
@@ -380,14 +380,11 @@ module Surface =
         
     let toNativeByPtr (ptr: nativeptr<surfaceType_t>) (value: Surface) =
         match value with
-        | Md3 ->
+        | Md3 surface ->
             NativePtr.write ptr surfaceType_t.SF_MD3
         | _ -> failwith "not implemented"         
 
 module DrawSurface =
-    let mutable surfaceTypeMd3 = Unchecked.defaultof<nativeptr<surfaceType_t>>
-    let setSurfaceTypeMd3 x = surfaceTypeMd3 <- x
-
     let ofNativePtr (ptr: nativeptr<drawSurf_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -401,7 +398,6 @@ module DrawSurface =
     let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
         let mutable native = NativePtr.read ptr
 
-        native.surface <- surfaceTypeMd3
         Surface.toNativeByPtr native.surface value.Surface
         native.shaderIndex <- value.ShaderId
         native.entityNum <- value.EntityId
@@ -537,16 +533,21 @@ module TrRefdef =
     let mutable canMapToDrawSurfaces = false
     let setCanMapToDrawSurfaces () = canMapToDrawSurfaces <- true
 
-    let tryMapToDrawSurfaces (native: trRefdef_t) (value: TrRefdef) =
+    let tryMapToDrawSurfaces (ptr: nativeptr<trRefdef_t>) (value: TrRefdef) =
         match canMapToDrawSurfaces with
         | false -> ()
         | _ ->
+        let mutable native = NativePtr.read ptr
 
         for i = native.numDrawSurfs to value.DrawSurfaces.Length - 1 do
             let drawSurface = value.DrawSurfaces.[i]
             DrawSurface.toNativeByPtr (NativePtr.add native.drawSurfs i) drawSurface
 
-        canMapToDrawSurfaces <- true
+        native.numDrawSurfs <- value.DrawSurfaces.Length
+
+        canMapToDrawSurfaces <- false
+
+        NativePtr.write ptr native
         
     let ofNativePtr (ptr: nativeptr<trRefdef_t>) =
         let mutable native = NativePtr.read ptr
@@ -591,7 +592,7 @@ module TrRefdef =
         // TODO: Map Dlights
         // TODO: Map Polys
        
-        tryMapToDrawSurfaces native value
+        tryMapToDrawSurfaces &&native value
 
         NativePtr.write ptr native
 

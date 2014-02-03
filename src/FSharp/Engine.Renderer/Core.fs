@@ -579,7 +579,7 @@ type Surface =
     | Grid of SurfaceGridMesh
     | Triangles of SurfaceTriangles
     | Poly of SurfacePoly
-    | Md3
+    | Md3 of Md3Surface
     | Md4
     | Flare of SurfaceFlare
     | Entity                            // beams, rails, lightning, etc that can be determined by entity

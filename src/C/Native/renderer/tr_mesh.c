@@ -308,7 +308,6 @@ R_AddMD3Surfaces
 extern	cvar_t	*r_ambientScale; // FQ3
 extern	cvar_t	*r_directedScale; // FQ3
 extern	cvar_t	*r_debugLight; // FQ3
-surfaceType_t	surface_type_md3 = SF_MD3; // fq3
 void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 #if 0
 	int				i;
@@ -455,9 +454,8 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 		m_object_as_arg(qm_of_cvar(r_directedScale)),
 		m_object_as_arg(qm_of_cvar(r_debugLight)))
 
-	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, TrRefdef, setCanMapToDrawSurfaces, unit, NULL);
-	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, DrawSurface, setSurfaceTypeMd3, unit,
-		&surface_type_md3)
+	//m_invoke_new(Engine.Renderer, Engine.Renderer.Native, TrRefdef, setCanMapToDrawSurfaces, unit, NULL);
+
 	qm_to_tr_globals(res, &_tr);
 #endif
 }
