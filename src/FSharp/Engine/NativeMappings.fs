@@ -241,7 +241,33 @@ module Md3Surface =
         Id = native.ident
         Name = NativePtr.toStringAnsi &&native.name
         Flags = native.flags
-        Shaders = List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr }
+        Shaders = List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr
+        FrameCount = native.numFrames
+        VertexCount = native.numVerts
+        TriangleCount = native.numTriangles
+        OffsetTriangles = native.ofsTriangles
+        OffsetShaders = native.ofsShaders
+        OffsetSt = native.ofsSt
+        OffsetXyzNormals = native.ofsXyzNormals
+        OffsetEnd = native.ofsend }
+
+    let toNativeByPtr (ptr: nativeptr<md3Surface_t>) (value: Md3Surface) =
+        let mutable native = NativePtr.read ptr
+
+        native.ident <- 6 // SF_MD3
+        native.name <- String.toStructure value.Name
+        native.flags <- value.Flags
+        native.numShaders <- value.Shaders.Length
+        native.numFrames <- value.FrameCount
+        native.numVerts <- value.VertexCount
+        native.numTriangles <- value.TriangleCount
+        native.ofsTriangles <- value.OffsetTriangles
+        native.ofsShaders <- value.OffsetShaders
+        native.ofsSt <- value.OffsetSt
+        native.ofsXyzNormals <- value.OffsetXyzNormals
+        native.ofsend <- value.OffsetEnd
+
+        NativePtr.write ptr native
 
 module Md3Header =
     let ofNativePtr (ptr: nativeptr<md3Header_t>) =

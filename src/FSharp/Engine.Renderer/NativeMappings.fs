@@ -32,6 +32,7 @@ open Engine.Math
 open Engine.NativeInterop
 open Engine.Native
 open Engine.Renderer.Core
+open Engine.Files
 
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
@@ -348,6 +349,10 @@ module Surface =
         }
         |> Flare
 
+    let ofNativePtrMd3 (ptr: nativeptr<md3Surface_t>) =
+        Md3Surface.ofNativePtr ptr
+        |> Md3
+
     let inline ofNativePtr (ptr: nativeptr<surfaceType_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -366,7 +371,9 @@ module Surface =
         | surfaceType_t.SF_POLY ->
             let ptr = NativePtr.ofNativeInt<srfPoly_t> <| NativePtr.toNativeInt ptr
             ofNativePtrPoly ptr
-        | surfaceType_t.SF_MD3 -> failwith "Md3 not supported here."
+        | surfaceType_t.SF_MD3 -> 
+            let ptr = NativePtr.toNativePtr ptr
+            ofNativePtrMd3 ptr
         | surfaceType_t.SF_MD4 -> Md4
         | surfaceType_t.SF_FLARE ->
             let ptr = NativePtr.ofNativeInt<srfFlare_t> <| NativePtr.toNativeInt ptr
@@ -375,14 +382,14 @@ module Surface =
         | surfaceType_t.SF_DISPLAY_LIST ->
             let ptr = NativePtr.ofNativeInt<srfDisplayList_t> <| NativePtr.toNativeInt ptr
             ofNativePtrDisplayList ptr
-        | _ -> raise <| Exception "Invalid Surface Type" 
-        
+        | _ -> failwith "Invalid Surface Type" 
         
     let toNativeByPtr (ptr: nativeptr<surfaceType_t>) (value: Surface) =
         match value with
         | Md3 surface ->
-            NativePtr.write ptr surfaceType_t.SF_MD3
-        | _ -> failwith "not implemented"         
+            let ptr = NativePtr.toNativePtr ptr
+            Md3Surface.toNativeByPtr ptr surface
+        | _ -> failwith "Not implemented"         
 
 module DrawSurface =
     let ofNativePtr (ptr: nativeptr<drawSurf_t>) =

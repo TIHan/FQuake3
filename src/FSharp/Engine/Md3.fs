@@ -78,7 +78,15 @@ type Md3Surface = {
     Id: int
     Name: string
     Flags: int
-    Shaders: Md3Shader list }
+    Shaders: Md3Shader list
+    FrameCount: int
+    VertexCount: int
+    TriangleCount: int
+    OffsetTriangles: int
+    OffsetShaders: int
+    OffsetSt: int
+    OffsetXyzNormals: int
+    OffsetEnd: int }
 
 /// Md3
 type Md3 = {
