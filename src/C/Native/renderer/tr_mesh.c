@@ -442,6 +442,13 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	MObject *unit;
 	trGlobals_t *_tr = &tr;
 
+	int lod = R_ComputeLOD(ent);
+	md3Header_t *header = tr.currentModel->md3[lod];
+	int prevLen = tr.refdef.numDrawSurfs;
+	md3Surface_t *surface = 0;
+	int len;
+	int i;
+
 	m_invoke_new(Engine.Renderer, Engine.Renderer, Mesh, addMd3Surfaces, res,
 		m_object_as_arg(qm_of_tr_ref_entity(ent)),
 		m_object_as_arg(qm_option_of_light_grid(tr.world)),
@@ -454,9 +461,17 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 		m_object_as_arg(qm_of_cvar(r_directedScale)),
 		m_object_as_arg(qm_of_cvar(r_debugLight)))
 
-	//m_invoke_new(Engine.Renderer, Engine.Renderer.Native, TrRefdef, setCanMapToDrawSurfaces, unit, NULL);
+	m_invoke_new(Engine.Renderer, Engine.Renderer.Native, TrRefdef, setCanMapToDrawSurfaces, unit, NULL);
 
 	qm_to_tr_globals(res, &_tr);
+
+	len = tr.refdef.numDrawSurfs - prevLen;
+
+	surface = (md3Surface_t *)((byte *)header + header->ofsSurfaces);
+	for (i = 0; i < header->numSurfaces; i++) {
+		tr.refdef.drawSurfs[prevLen + i].surface = surface;
+		surface = (md3Surface_t *)((byte *)surface + surface->ofsEnd);
+	}
 #endif
 }
 

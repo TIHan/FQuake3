@@ -241,7 +241,8 @@ module Md3Surface =
         Id = native.ident
         Name = NativePtr.toStringAnsi &&native.name
         Flags = native.flags
-        Shaders = List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr
+        // FIXME
+        Shaders = []//List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr
         FrameCount = native.numFrames
         VertexCount = native.numVerts
         TriangleCount = native.numTriangles

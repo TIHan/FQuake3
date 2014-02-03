@@ -26,6 +26,9 @@ namespace Engine.Renderer.Native
 #nowarn "51"
 
 open System
+open System.Diagnostics
+open System.Security
+open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.Core
 open Engine.Math
@@ -405,7 +408,7 @@ module DrawSurface =
     let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
         let mutable native = NativePtr.read ptr
 
-        Surface.toNativeByPtr native.surface value.Surface
+        //Surface.toNativeByPtr native.surface value.Surface
         native.shaderIndex <- value.ShaderId
         native.entityNum <- value.EntityId
         native.fogIndex <- value.FogId
