@@ -388,12 +388,6 @@ module DrawSurface =
         FogId = native.fogIndex
         DynamicLightMap = native.dlightMap }
 
-    let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
-        let mutable native = NativePtr.read ptr
-
-        NativePtr.write ptr native
-        
-
 module RefEntity =
     let inline ofNativePtr (ptr: nativeptr<refEntity_t>) =
         let mutable native = NativePtr.read ptr
@@ -560,14 +554,7 @@ module TrRefdef =
         // TODO: Map Entities
         // TODO: Map Dlights
         // TODO: Map Polys
-
-        // This may or may not be good to do.
-        let drawSurfaceCount = value.DrawSurfaces.Length - native.numDrawSurfs
-        for i = 0 to drawSurfaceCount - 1 do
-            let surface = value.DrawSurfaces.[i]
-            DrawSurface.toNativeByPtr (NativePtr.add native.drawSurfs (i + native.numDrawSurfs)) surface
-        
-        native.numDrawSurfs <- value.DrawSurfaces.Length
+        // TODO: Map DrawSurfaces
 
         NativePtr.write ptr native
 
