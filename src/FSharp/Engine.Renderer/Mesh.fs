@@ -194,7 +194,7 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     let v2 = localOrigin + frame.Radius
 
     let fog =
-        world.Fogs.Tail
+        world.Fogs
         |> List.tryFindIndex (fun x ->
             v1 < x.Bounds.Maxs && v2 > x.Bounds.Mins)
 
