@@ -375,7 +375,14 @@ module Surface =
         | surfaceType_t.SF_DISPLAY_LIST ->
             let ptr = NativePtr.ofNativeInt<srfDisplayList_t> <| NativePtr.toNativeInt ptr
             ofNativePtrDisplayList ptr
-        | _ -> raise <| Exception "Invalid Surface Type"          
+        | _ -> raise <| Exception "Invalid Surface Type" 
+        
+        
+    let toNativeByPtr (ptr: nativeptr<surfaceType_t>) (value: Surface) =
+        match value with
+        | Md3 ->
+            NativePtr.write ptr surfaceType_t.SF_MD3
+        | _ -> failwith "not implemented"         
 
 module DrawSurface =
     let ofNativePtr (ptr: nativeptr<drawSurf_t>) =
@@ -387,6 +394,17 @@ module DrawSurface =
         EntityId = native.entityNum
         FogId = native.fogIndex
         DynamicLightMap = native.dlightMap }
+
+    let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
+        let mutable native = NativePtr.read ptr
+
+        Surface.toNativeByPtr native.surface value.Surface
+        native.shaderIndex <- value.ShaderId
+        native.entityNum <- value.EntityId
+        native.fogIndex <- value.FogId
+        native.dlightMap <- value.DynamicLightMap
+
+        NativePtr.write ptr native
 
 module RefEntity =
     let inline ofNativePtr (ptr: nativeptr<refEntity_t>) =
