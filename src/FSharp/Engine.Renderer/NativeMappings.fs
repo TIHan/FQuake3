@@ -850,6 +850,7 @@ module Renderer =
         SunLight = Vec3.ofNativePtr &&native.sunLight
         SunDirection = Vec3.ofNativePtr &&native.sunDirection
         PerfCounters = FrontEndPerformanceCounters.ofNativePtr &&native.pc
+        DefaultShaderId = (NativePtr.read<shader_t> native.defaultShader).index
         Shaders = List.ofNativePtrArrayMap native.numShaders Shader.ofNativePtr native.shaders.value }
         //Images = List.ofNativePtrArrayMap native.numImages (fun x -> Image.ofNativePtr x) native.images.value
 
@@ -872,6 +873,8 @@ module Renderer =
         // Images - Special Handling
         //List.toNativePtrArrayByPtr native.images.value Image.toNativeByPtr tr.Images
 
+        // TODO: Map DefaultShaderId
+        // TODO: Map Shaders
         NativePtr.write ptr native
 
     let mark (ptr: nativeptr<trGlobals_t>)  =

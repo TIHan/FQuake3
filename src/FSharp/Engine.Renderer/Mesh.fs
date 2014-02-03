@@ -287,16 +287,14 @@ let addMd3Surfaces
     //
     let fogId = fogId md3 entity r
 
-//    let stuff =
-//        md3.Surfaces
-//        |> List.map (fun x ->
-//            let shader =
-//                match entity.CustomShaderHandle <> 0 with
-//                | true -> Shader.shaderById entity.CustomShaderHandle r
-//                | _ ->
-//
-//
-//        )
+    let drawSurfaces =
+        md3.Surfaces
+        |> List.map (fun x ->
+            {
+            DrawSurface.Surface = Surface.Md3
+            DrawSurface.ShaderId = r.DefaultShaderId
+            EntityId = r.CurrentEntityId
+            FogId = fogId
+            DynamicLightMap = 0 })
 
-    // TODO:  
-    r'
+    { r with Refdef = { r.Refdef with DrawSurfaces = r.Refdef.DrawSurfaces @ drawSurfaces } }

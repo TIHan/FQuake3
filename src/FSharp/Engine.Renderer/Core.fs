@@ -1310,6 +1310,8 @@ type Renderer = {
     // Images: Image list;
     // TODO:
 
+    DefaultShaderId: int
+
     Shaders: Shader list }
 
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
