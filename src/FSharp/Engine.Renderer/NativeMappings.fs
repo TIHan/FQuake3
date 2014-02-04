@@ -37,6 +37,11 @@ open Engine.Native
 open Engine.Renderer.Core
 open Engine.Files
 
+module Native =
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    extern md3Surface_t *R_GetMd3Surface (int entityId, int lod, string surfaceName)
+
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         Axis (
@@ -407,6 +412,12 @@ module DrawSurface =
 
     let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
         let mutable native = NativePtr.read ptr
+
+        match value.Surface with
+        | Md3 surface -> ()
+            //printfn "%s" surface.Name
+            //Native.R_GetMd3Surface (value.EntityId, 0, surface.Name) |> ignore
+        | _ -> ()
 
         //Surface.toNativeByPtr native.surface value.Surface
         native.shaderIndex <- value.ShaderId

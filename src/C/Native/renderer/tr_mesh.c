@@ -308,6 +308,34 @@ R_AddMD3Surfaces
 extern	cvar_t	*r_ambientScale; // FQ3
 extern	cvar_t	*r_directedScale; // FQ3
 extern	cvar_t	*r_debugLight; // FQ3
+
+M_EXPORT md3Surface_t* M_DECL
+R_GetMd3Surface (gint entityId, gint lod, const gchar *surfaceName)
+{
+	int i;
+	trRefEntity_t *ent = &tr.refdef.entities[entityId];
+	if (ent == NULL) g_error("Bad entity.");
+	model_t *model = tr.models[ent->e.hModel];
+	if (model == NULL) g_error("Bad model.");
+	md3Header_t *header = model->md3[lod];
+	if (header == NULL) g_error("Bad header.");
+
+	md3Surface_t *surface = (md3Surface_t *)((byte *)header + header->ofsSurfaces);
+	if (g_strcmp0(surface->name, surfaceName) == 0)
+	{
+		return surface;
+	}
+	for (i = 0; i < header->numSurfaces; i++) {
+		surface = (md3Surface_t *)((byte *)surface + surface->ofsEnd);
+		if (g_strcmp0(surface->name, surfaceName) == 0)
+		{
+			return surface;
+		}
+	}
+
+	g_error("Can't find surface.");
+}
+
 void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 #if 0
 	int				i;

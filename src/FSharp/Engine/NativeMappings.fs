@@ -303,8 +303,7 @@ module Md3 =
         {
         Header = Md3Header.ofNativePtr ptr;
         Frames = List.ofNativePtrArrayMap native.numFrames Md3Frame.ofNativePtr framePtr
-        Surfaces = List.ofNativePtrArrayMap native.numSurfaces Md3Surface.ofNativePtr surfacePtr
-        LodId = native.lod }
+        Surfaces = List.ofNativePtrArrayMap native.numSurfaces Md3Surface.ofNativePtr surfacePtr }
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =

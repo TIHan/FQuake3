@@ -183,10 +183,6 @@ typedef struct {
 	int			ofsSurfaces;		// first surface, others follow
 
 	int			ofsEnd;				// end of file
-#if FQ3_OLD
-#else
-	int			lod; // FQ3
-#endif
 } md3Header_t;
 
 /*
