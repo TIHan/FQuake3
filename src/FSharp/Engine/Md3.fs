@@ -90,9 +90,10 @@ type Md3Surface = {
 
 /// Md3
 type Md3 = {
-    Header: Md3Header;
+    Header: Md3Header
     Frames: Md3Frame list
-    Surfaces: Md3Surface list }
+    Surfaces: Md3Surface list
+    LodId: int }
 
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]

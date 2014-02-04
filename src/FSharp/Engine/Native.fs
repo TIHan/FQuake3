@@ -202,6 +202,10 @@ type md3Header_t =
     val mutable ofsTags : int
     val mutable ofsSurfaces : int
     val mutable ofsEnd : int
+#if FQ3_OLD
+#else
+    val mutable lod : int
+#endif
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
