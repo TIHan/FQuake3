@@ -445,12 +445,6 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	int				fogNum;
 	qboolean		personalModel;
 
-	{ // mark
-		MObject *none;
-		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, mark, none,
-			&tr)
-	}
-
 	// don't add third_person objects if not in a portal
 	personalModel = (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal;
 
@@ -503,11 +497,6 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	// see if we are in a fog volume
 	//
 	fogNum = R_ComputeFogNum(header, ent);
-
-	{ // unmark
-		MObject *none;
-		m_invoke_new(Engine.Renderer, Engine.Renderer.Native, Renderer, unmark, none, NULL)
-	}
 
 	//
 	// draw all surfaces

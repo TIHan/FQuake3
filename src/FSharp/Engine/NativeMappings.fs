@@ -232,16 +232,10 @@ module Md3Surface =
     let ofNativePtr (ptr: nativeptr<md3Surface_t>) =
         let mutable native = NativePtr.read ptr
 
-        let mutable bytePtr : nativeptr<byte> = NativePtr.toNativePtr ptr
-        let mutable shaderPtr : nativeptr<md3Shader_t> =
-            NativePtr.add bytePtr native.ofsShaders
-            |> NativePtr.toNativePtr
-
         {
-        Id = native.ident
+        Md3Surface.Id = native.ident
         Name = NativePtr.toStringAnsi &&native.name
-        Flags = native.flags
-        Shaders = List.ofNativePtrArrayMap native.numShaders Md3Shader.ofNativePtr shaderPtr }
+        Flags = native.flags }
 
 module Md3Header =
     let ofNativePtr (ptr: nativeptr<md3Header_t>) =

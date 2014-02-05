@@ -77,8 +77,7 @@ type Md3Shader = {
 type Md3Surface = {
     Id: int
     Name: string
-    Flags: int
-    Shaders: Md3Shader list }
+    Flags: int }
 
 /// Md3
 type Md3 = {

@@ -828,13 +828,7 @@ module Renderer =
         for i = 0 to size - 1 do
             NativePtr.set ptr i surfs.[i]
 
-    let mutable state : Renderer option = None
-
     let inline ofNativePtr (ptr: nativeptr<trGlobals_t>) =
-        match state with
-        | Some x -> x
-        | _ ->
-
         let mutable native = NativePtr.read ptr
 
         {
@@ -873,12 +867,3 @@ module Renderer =
         //List.toNativePtrArrayByPtr native.images.value Image.toNativeByPtr tr.Images
 
         NativePtr.write ptr native
-
-    let mark (ptr: nativeptr<trGlobals_t>)  =
-        match state with
-        | Some _ -> failwith "Renderer already marked."
-        | _ ->
-        state <- Some <| ofNativePtr ptr
-
-    let unmark () =
-        state <- None
