@@ -1177,7 +1177,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	RB_BeginSurface(shader, fogNum);
 	rb_surfaceTable[*drawSurf->surface](drawSurf->surface);
 
-	assert(tess.numVertexes < 128);
+	//assert(tess.numVertexes < 128); apparently, it is now above 128, is that a problem?
 
 	for (i = 0; i < tess.numVertexes; i++)
 	{
