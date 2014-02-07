@@ -23,6 +23,8 @@ THE SOFTWARE.
 #include "m.h"
 
 #include <glib/gprintf.h>
+#include <mono/jit/jit.h>
+#include <mono/metadata/threads.h>
 #include <mono/metadata/mono-debug.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
@@ -162,7 +164,7 @@ m_method_invoke (MMethod *method, void **params)
 gpointer
 m_method_get_thunk (MMethod *method)
 {
-	return mono_method_get_unmanaged_thunk (method);
+	return mono_method_get_unmanaged_thunk ((MonoMethod*)method);
 }
 
 
