@@ -54,14 +54,17 @@ m_domain_free (MDomain *domain);
 void
 m_load_assembly (const gchar *name);
 
+void
+m_thread_attach ();
+
 MMethod *
 m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name);
 
 MObject *
 m_method_invoke (MMethod *method, gpointer *params);
 
-MObject *
-m_object (const gchar *assembly_name, const gchar *name_space, const gchar *struct_name, gint argc, gpointer *args);
+gpointer
+m_method_get_thunk (MMethod *method);
 
 MObject *
 m_object_get_property (MObject *obj, const gchar *property_name);
@@ -95,8 +98,8 @@ m_gchandle_free(guint32 handle);
 #define m_method_cache(assembly_name,name_space,static_class_name,method_name,o) \
 { \
 	static MMethod *method; \
-	if (!method) \
-		method = m_method (assembly_name, name_space, static_class_name, method_name); \
+if (!method) \
+	method = m_method(assembly_name, name_space, static_class_name, method_name); \
 	o = method; \
 } \
 
@@ -105,21 +108,21 @@ m_gchandle_free(guint32 handle);
 	gpointer __args[argc]; \
 	MMethod *cache; \
 	\
-	m_method_cache (assembly_name, name_space, static_class_name, method_name, cache); \
+	m_method_cache(assembly_name, name_space, static_class_name, method_name, cache); \
 	\
 	arg_assignment \
 	\
-	o = m_method_invoke (cache, __args); \
+	o = m_method_invoke(cache, __args); \
 } \
 
 #define m_invoke_new(assembly_name,name_space,static_class_name,method_name,o,...) \
 { \
 	gpointer __args[] = { __VA_ARGS__ }; \
-\
+	\
 	MMethod *cache; \
-\
-	m_method_cache (#assembly_name, #name_space, #static_class_name, #method_name, cache); \
-	o = m_method_invoke (cache, __args); \
+	\
+	m_method_cache(#assembly_name, #name_space, #static_class_name, #method_name, cache); \
+	o = m_method_invoke(cache, __args); \
 } \
 
 #endif /* __M_H__ */

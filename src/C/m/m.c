@@ -23,7 +23,6 @@ THE SOFTWARE.
 #include "m.h"
 
 #include <glib/gprintf.h>
-#include <mono/jit/jit.h>
 #include <mono/metadata/mono-debug.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
@@ -116,6 +115,13 @@ m_load_assembly (const gchar *name)
 }
 
 
+void
+m_thread_attach ()
+{
+	mono_thread_attach (mono_domain_get ());
+}
+
+
 MMethod *
 m_method (const gchar *assembly_name, const gchar *name_space, const gchar *static_class_name, const gchar *method_name)
 {
@@ -153,27 +159,10 @@ m_method_invoke (MMethod *method, void **params)
 }
 
 
-MObject *
-m_object (const gchar *assembly_name, const gchar *name_space, const gchar *name, gint argc, gpointer *args)
+gpointer
+m_method_get_thunk (MMethod *method)
 {
-	MonoAssembly *assembly = find_assembly (assembly_name);
-	MonoImage *image = image = mono_assembly_get_image (assembly);
-	MonoClass *klass = mono_class_from_name (image, name_space, name);
-	MonoObject *object = mono_object_new (mono_domain_get (), klass);
-	MonoMethod *ctor = mono_class_get_method_from_name (klass, ".ctor", argc);
-	MonoType *type = mono_class_get_type (klass);
-
-	if (!ctor)
-		g_error ("M: Unable to find constructor for type %s.\n", name);
-
-	if (mono_type_is_struct (type))
-	{
-		mono_runtime_invoke (ctor, mono_object_unbox (object), args, NULL);
-		return (MObject*)object;
-	}
-
-	mono_runtime_invoke (ctor, object, args, NULL);
-	return (MObject*)object;
+	return mono_method_get_unmanaged_thunk (method);
 }
 
 
