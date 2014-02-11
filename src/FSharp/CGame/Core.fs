@@ -22,7 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module CGame.Core
 
 open Engine.Core
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer.Core
 
 module Constants =

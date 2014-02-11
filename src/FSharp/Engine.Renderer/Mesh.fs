@@ -24,10 +24,11 @@ module Engine.Renderer.Mesh
 open System
 open System.Diagnostics.Contracts
 open Engine.Core
-open Engine.Files
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer.Core
 open Engine.Renderer.Shader
+open FQuake3.Math
+open FQuake3.Md3
 
 /// Based on Q3: ProjectRadius
 /// ProjectRadius
@@ -68,20 +69,14 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
 
     // calculate a bounding box in the current coordinate system
     let bounds =
-        {
-            Bounds.Mins =
-                vec3 (
+        Bounds (vec3 (
                     (calculateBounds 0 0),
                     (calculateBounds 0 1),
-                    (calculateBounds 0 2)
-                 );
-            Maxs =
+                    (calculateBounds 0 2)),
                 vec3 (
                     (calculateBounds 1 0),
                     (calculateBounds 1 1),
-                    (calculateBounds 1 2)
-                )
-        }
+                    (calculateBounds 1 2)))
 
     let clip = Main.cullLocalBox bounds r.Orientation r.ViewParms.Frustum r_nocull
     let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
@@ -196,7 +191,7 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     let fog =
         world.Fogs
         |> List.tryFindIndex (fun x ->
-            v1 < x.Bounds.Maxs && v2 > x.Bounds.Mins)
+            v1 < x.Bounds.maxs && v2 > x.Bounds.mins)
 
     match fog with
     | None -> 0

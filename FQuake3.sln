@@ -43,6 +43,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Launcher", "src\FSharp\Laun
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine.Renderer.Native", "src\C\Engine.Renderer.Native\Engine.Renderer.Native.vcxproj", "{A6A4CC8B-A6AC-4B93-AA5B-544FDA5D2E5E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FQuake3.Utils", "lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj", "{7B5C2CF5-8D69-4A78-99B4-4072052E972A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug TA|Any CPU = Debug TA|Any CPU
@@ -373,6 +375,26 @@ Global
 		{A6A4CC8B-A6AC-4B93-AA5B-544FDA5D2E5E}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{A6A4CC8B-A6AC-4B93-AA5B-544FDA5D2E5E}.Release|Win32.ActiveCfg = Release|Win32
 		{A6A4CC8B-A6AC-4B93-AA5B-544FDA5D2E5E}.Release|Win32.Build.0 = Release|Win32
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug TA|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug TA|Any CPU.Build.0 = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug TA|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug TA|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug TA|Win32.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release TA|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release TA|Any CPU.Build.0 = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release TA|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release TA|Mixed Platforms.Build.0 = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release TA|Win32.ActiveCfg = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -393,5 +415,6 @@ Global
 		{B80CAF20-14EE-49AD-8943-69862C05BE1D} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 		{30379412-E68E-4E67-831D-485254B79AD1} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 		{EF3B71F0-0FB3-4834-B5E8-B6001ADC18FB} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
+		{7B5C2CF5-8D69-4A78-99B4-4072052E972A} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 	EndGlobalSection
 EndGlobal

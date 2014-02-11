@@ -81,6 +81,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\..\..\lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj">
+      <Name>FQuake3.Utils</Name>
+      <Project>{7b5c2cf5-8d69-4a78-99b4-4072052e972a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Engine\Engine.fsproj">
       <Name>Engine</Name>
       <Project>{27c5b1d5-69d0-405d-804f-0656c73f5a90}</Project>

@@ -23,10 +23,11 @@ module Engine.Renderer.Main
 
 open System
 open System.Diagnostics.Contracts
+open FSharp.Game.Math
 open Engine.Core
-open Engine.Math
 open Engine.Renderer.Core
 open Engine.Renderer.Shader
+open FQuake3.Math
 
 let flipMatrix =
     // convert from our coordinate system (looking down X)

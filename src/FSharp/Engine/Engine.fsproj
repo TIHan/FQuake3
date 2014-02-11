@@ -63,7 +63,6 @@
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
     <Compile Include="NativeInterop.fs" />
-    <Compile Include="Math.fs" />
     <Compile Include="Option.fs" />
     <Compile Include="Core.fs" />
     <Compile Include="Control.fs" />
@@ -75,8 +74,6 @@
     <Compile Include="IO.fs" />
     <Compile Include="FileSystem.fs" />
     <Compile Include="System.fs" />
-    <Compile Include="Md3.fs" />
-    <Compile Include="Md4.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
     <None Include="packages.config" />
@@ -93,6 +90,13 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj">
+      <Name>FQuake3.Utils</Name>
+      <Project>{7b5c2cf5-8d69-4a78-99b4-4072052e972a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>

@@ -22,7 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module Engine.Renderer.Image
 
 open Engine.Core
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer.Core
 
 /// Based on Q3: R_GetSkinByHandle

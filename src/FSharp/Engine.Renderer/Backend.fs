@@ -31,7 +31,7 @@ open System.Diagnostics.Contracts
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open Engine.Core
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer.Core
 open Engine.NativeInterop
 open Engine.Control

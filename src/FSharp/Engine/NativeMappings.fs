@@ -30,12 +30,13 @@ open System.IO
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open FSharpx.Collections
+open FSharp.Game.Math
 open Engine.Core
 open Engine.Net
-open Engine.Files
-open Engine.Math
 open Engine.FileSystem
 open Engine.NativeInterop
+open FQuake3.Math
+open FQuake3.Md3
 
 module Boolean =
     let inline ofNativePtr (ptr: nativeptr<qboolean>) =
@@ -157,17 +158,16 @@ module Cvar =
 
 module Bounds =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
-        {
-            Mins = Vec3.ofNativePtr <| NativePtr.add ptr 0;
-            Maxs = Vec3.ofNativePtr <| NativePtr.add ptr 1;
-        }
+        Bounds (
+            Vec3.ofNativePtr <| NativePtr.add ptr 0,
+            Vec3.ofNativePtr <| NativePtr.add ptr 1)
 
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (bounds: Bounds) =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
 
-        Vec3.toNativeByPtr &&nativeX bounds.Mins
-        Vec3.toNativeByPtr &&nativeY bounds.Maxs
+        Vec3.toNativeByPtr &&nativeX bounds.mins
+        Vec3.toNativeByPtr &&nativeY bounds.maxs
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY
@@ -220,57 +220,10 @@ module Md3Frame =
             Name = NativePtr.toStringAnsi &&native.name;
         }
 
-module Md3Shader =
-    let ofNativePtr (ptr: nativeptr<md3Shader_t>) =
-        let mutable native = NativePtr.read ptr
-
-        {
-        Name = NativePtr.toStringAnsi &&native.name
-        ShaderId = native.shaderIndex }
-
-module Md3Surface =
-    let ofNativePtr (ptr: nativeptr<md3Surface_t>) =
-        let mutable native = NativePtr.read ptr
-
-        {
-        Md3Surface.Id = native.ident
-        Name = NativePtr.toStringAnsi &&native.name
-        Flags = native.flags }
-
-module Md3Header =
-    let ofNativePtr (ptr: nativeptr<md3Header_t>) =
-        let mutable native = NativePtr.read ptr
-
-        {
-        Id = native.ident;
-        Version = native.version;
-        Name = NativePtr.toStringAnsi &&native.name;
-        Flags = native.flags;
-        FrameCount = native.numFrames;
-        TagCount = native.numTags;
-        SurfaceCount = native.numSurfaces;
-        SkinCount = native.numSkins;
-        FrameOffset = native.ofsFrames;
-        TagOffset = native.ofsTags;
-        SurfaceOffset = native.numSurfaces;
-        EndOffset = native.ofsEnd }
-
 module Md3 =
-    let ofNativePtr (ptr: nativeptr<md3Header_t>) =
+    let inline ofNativePtr (ptr: nativeptr<md3Header_t>) =
         let mutable native = NativePtr.read ptr
-
-        let mutable bytePtr : nativeptr<byte> = NativePtr.toNativePtr ptr
-        let mutable framePtr : nativeptr<md3Frame_t> =
-            NativePtr.add bytePtr native.ofsFrames
-            |> NativePtr.toNativePtr
-        let mutable surfacePtr : nativeptr<md3Surface_t> =
-            NativePtr.add bytePtr native.ofsSurfaces
-            |> NativePtr.toNativePtr
-
-        {
-        Header = Md3Header.ofNativePtr ptr;
-        Frames = List.ofNativePtrArrayMap native.numFrames Md3Frame.ofNativePtr framePtr
-        Surfaces = List.ofNativePtrArrayMap native.numSurfaces Md3Surface.ofNativePtr surfacePtr }
+        failwith "md3 not mapped"
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =

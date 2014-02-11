@@ -22,7 +22,7 @@ Copyright (C) 1999-2005 Id Software, Inc.
 module CGame.Weapons
 
 open System.Diagnostics.Contracts
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer
 open CGame.Core
 

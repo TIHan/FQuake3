@@ -28,10 +28,11 @@ namespace Engine.Renderer.Native
 open System
 open Microsoft.FSharp.NativeInterop
 open Engine.Core
-open Engine.Math
+open FSharp.Game.Math
 open Engine.NativeInterop
 open Engine.Native
 open Engine.Renderer.Core
+open FQuake3.Math
 
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =

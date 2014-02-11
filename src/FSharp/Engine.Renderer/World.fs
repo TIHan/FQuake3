@@ -24,7 +24,7 @@ module Engine.Renderer.World
 open System
 open System.Diagnostics.Contracts
 open Engine.Core
-open Engine.Math
+open FSharp.Game.Math
 open Engine.Renderer.Core
 
 /// Based on Q3: R_CullTriSurf
