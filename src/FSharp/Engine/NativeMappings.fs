@@ -223,7 +223,9 @@ module Md3Frame =
 module Md3 =
     let inline ofNativePtr (ptr: nativeptr<md3Header_t>) =
         let mutable native = NativePtr.read ptr
-        failwith "md3 not mapped"
+        let bytes = Array.zeroCreate<byte> (native.ofsEnd + 1)
+        Marshal.Copy (NativePtr.toNativeInt ptr, bytes, 0, (native.ofsEnd + 1))
+        FQuake3.Utils.Md3.parseMd3 bytes
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =

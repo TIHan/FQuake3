@@ -70,7 +70,7 @@ let pvertex : Parser<Md3Vertex> =
     fun x y z zenith azimuth -> Md3Vertex (x, y, z, single zenith * ``2 * PI / 255``, single azimuth * ``2 * PI / 255``)
 
 let psurfaceHeader =
-    pipe13
+    pipe12
         (anyString 4)
         (anyString 64)
         anyInt32
@@ -82,9 +82,8 @@ let psurfaceHeader =
         anyInt32
         anyInt32
         anyInt32
-        anyInt32 
         anyInt32 <|
-    fun ident name flags frameCount shaderCount vertexCount triangleCount trianglesCount trianglesOffset shadersOffset stOffset verticesOffset endOffset ->
+    fun ident name flags frameCount shaderCount vertexCount triangleCount trianglesOffset shadersOffset stOffset verticesOffset endOffset ->
         {
         Ident = ident
         Name = name
@@ -108,15 +107,17 @@ let ptags count offset =
     parray count ptag |>> fun x -> x
 
 let psurfaces count offset =
-    skipAnyBytes offset >>= fun _ ->
+    skipAnyBytes offset >>.
     fun stream ->
-    Array.init count (fun _ ->
+    Array.init count (fun i ->
         let header = lookAhead psurfaceHeader stream
-        let shaders = lookAhead (skipAnyBytes header.ShadersOffset >>. parray header.ShaderCount pshader) stream
         let triangles = lookAhead (skipAnyBytes header.TrianglesOffset >>. parray header.TriangleCount ptriangle) stream
+        let shaders = lookAhead (skipAnyBytes header.ShadersOffset >>. parray header.ShaderCount pshader) stream
         let st = lookAhead (skipAnyBytes header.StOffset >>. parray header.VertexCount pst) stream
         let vertices = lookAhead (skipAnyBytes header.VerticesOffset >>. parray (header.VertexCount * header.FrameCount) pvertex) stream
 
+        if i + 1 <> count then
+            skipAnyBytes header.EndOffset stream |> ignore
         {
         Header = header
         Shaders = shaders

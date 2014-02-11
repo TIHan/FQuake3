@@ -55,7 +55,7 @@ type ByteStream (bytes: byte []) =
 
     member this.ReadString n = 
         let s : nativeptr<sbyte> = (NativePtr.ofNativeInt <| NativePtr.toNativeInt &&bytes.[position])
-        let result = String (s, position, n, Encoding.Unicode)
+        let result = String (s, 0, n)
         position <- position + n
         result
 
