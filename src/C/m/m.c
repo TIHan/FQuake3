@@ -74,7 +74,9 @@ get_method_desc (const gchar *name_space, const gchar *class_name, const gchar *
 MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename)
 {
+#if NDEBUG
 	const gchar *options[] = { "--llvm", "-O=all" };
+#endif
 
 	MDomain *domain;
 
@@ -219,7 +221,7 @@ m_string (const gchar* text)
 }
 
 //****************************
-// Object / Array / String Arg Specific
+// Object / String Arg Specific
 //****************************
 
 gpointer
