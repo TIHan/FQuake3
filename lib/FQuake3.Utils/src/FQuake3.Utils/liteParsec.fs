@@ -45,8 +45,9 @@ type ByteStream (bytes: byte []) =
     member this.Skip n = position <- position + n
 
     member this.ReadByte () =
+        let result = bytes.[position]
         position <- position + 1
-        bytes.[position]
+        result
 
     member this.ReadBytes n =
         let i = position

@@ -225,7 +225,7 @@ module Md3 =
         let mutable native = NativePtr.read ptr
         let bytes = Array.zeroCreate<byte> (native.ofsEnd + 1)
         Marshal.Copy (NativePtr.toNativeInt ptr, bytes, 0, (native.ofsEnd + 1))
-        FQuake3.Utils.Md3.parseMd3 bytes
+        FQuake3.Utils.Md3.parse bytes
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =
