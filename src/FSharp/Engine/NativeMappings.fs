@@ -38,6 +38,10 @@ open Engine.NativeInterop
 open FQuake3.Math
 open FQuake3.Md3
 
+/// Used to prevent massive copying of large imuutable data.
+module private Cache =
+    let mutable md3Map = Map.empty<int, Md3>
+
 module Boolean =
     let inline ofNativePtr (ptr: nativeptr<qboolean>) =
         let mutable native = NativePtr.read ptr
@@ -221,11 +225,20 @@ module Md3Frame =
         }
 
 module Md3 =
-    let inline ofNativePtr (ptr: nativeptr<md3Header_t>) =
+    let ofNativePtr (ptr: nativeptr<md3Header_t>) =
         let mutable native = NativePtr.read ptr
+
+        let hash = native.GetHashCode ()
+
+        match Map.tryFind hash Cache.md3Map with
+        | Some x -> x
+        | None ->
+
         let bytes = Array.zeroCreate<byte> (native.ofsEnd + 1)
         Marshal.Copy (NativePtr.toNativeInt ptr, bytes, 0, (native.ofsEnd + 1))
-        FQuake3.Utils.Md3.parse bytes
+        let md3 = FQuake3.Utils.Md3.parse bytes
+        Cache.md3Map <- Map.add hash md3 Cache.md3Map
+        md3
 
 module DirectoryInfo =
     let ofNativePtr (ptr: nativeptr<directory_t>) =

@@ -161,13 +161,14 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
     | true ->
         let lodscale = if r_lodscale.Value > 20.f then 20.f else r_lodscale.Value
         1.f - projectedRadius * lodscale
+        |> (*) <| single lodCount + 1.f
+        |> int
+        |> clampLod
     // object intersects near view plane, e.g. view weapon
-    | _ -> 0.f
-    |> (*) (single <| lodCount + 1)
-    |> int
-    |> clampLod
+    | _ -> 0
     |> (+) r_lodbias.Integer
     |> clampLod
+    |> int
 
 /// Based on Q3: R_ComputeFogNum
 /// FogId

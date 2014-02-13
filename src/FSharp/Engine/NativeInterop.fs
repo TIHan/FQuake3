@@ -24,6 +24,9 @@ module Engine.NativeInterop
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
+#nowarn "9"
+#nowarn "51"
+
 [<Literal>]
 let LibQuake3 = "quake3.dll"
 
@@ -52,6 +55,9 @@ let inline fixed2' (f: nativeptr<_> -> nativeptr<_> -> 'a) (a: obj) (b: obj) =
 
 /// NativePtr
 module NativePtr =
+    let inline toNativePtr x =
+        NativePtr.toNativeInt x |> NativePtr.ofNativeInt
+
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
 
@@ -63,9 +69,6 @@ module NativePtr =
 
     let inline toList (size: int) (x: nativeptr<'T>) =
         List.init size (fun i -> NativePtr.get x i)
-
-    let inline toNativePtr x =
-        NativePtr.toNativeInt x |> NativePtr.ofNativeInt
 
     let inline isValid x =
         NativePtr.toNativeInt x <> System.IntPtr.Zero
