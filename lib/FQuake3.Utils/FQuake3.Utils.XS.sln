@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils", "src\FQuake3.Utils\FQuake3.Utils.fsproj", "{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}"
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils", "src\FQuake3.Utils\FQuake3.Utils.XS.fsproj", "{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}"
+EndProject
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.Tests", "src\FQuake3.Utils.Tests\FQuake3.Utils.Tests.XS.fsproj", "{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,8 +15,12 @@ Global
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\FQuake3.Utils\FQuake3.Utils.fsproj
+		StartupItem = src\FQuake3.Utils\FQuake3.Utils.XS.fsproj
 	EndGlobalSection
 EndGlobal
