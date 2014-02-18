@@ -64,5 +64,8 @@ q3_ui___Win32_Debug
 build/
 winquake.res
 
+# FQuake3 Specific
+lib/FQuake3.Utils/src/FQuake3.Viewer/libFQ3Viewer.dylib
+
 # Erlang
 *.beam

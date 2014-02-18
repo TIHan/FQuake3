@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils", "src\FQuake3.Utils\FQuake3.Utils.XS.fsproj", "{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}"
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.XS", "src\FQuake3.Utils\FQuake3.Utils.XS.fsproj", "{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}"
 EndProject
-Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.Tests", "src\FQuake3.Utils.Tests\FQuake3.Utils.Tests.XS.fsproj", "{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}"
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.Tests.XS", "src\FQuake3.Utils.Tests\FQuake3.Utils.Tests.XS.fsproj", "{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}"
+EndProject
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Viewer", "src\FQuake3.Viewer\FQuake3.Viewer.fsproj", "{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,6 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -21,6 +27,6 @@ Global
 		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\FQuake3.Utils\FQuake3.Utils.XS.fsproj
+		StartupItem = src\FQuake3.Viewer\FQuake3.Viewer.fsproj
 	EndGlobalSection
 EndGlobal

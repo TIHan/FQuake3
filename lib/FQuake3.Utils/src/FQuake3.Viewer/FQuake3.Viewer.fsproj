@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>FQuake3.Utils</RootNamespace>
-    <AssemblyName>FQuake3.Utils</AssemblyName>
+    <ProjectGuid>{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>FQuake3.Viewer</RootNamespace>
+    <AssemblyName>FQuake3.Viewer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -19,7 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>
     </PlatformTarget>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,7 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>
     </PlatformTarget>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
     <Tailcalls>true</Tailcalls>
   </PropertyGroup>
   <ItemGroup>
@@ -39,25 +39,14 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" />
   <ItemGroup>
-    <Compile Include="liteParsec.fs">
-      <Link>liteParsec.fs</Link>
-    </Compile>
-    <Compile Include="math.fs">
-      <Link>math.fs</Link>
-    </Compile>
-    <Compile Include="fq3math.fs">
-      <Link>fq3math.fs</Link>
-    </Compile>
-    <Compile Include="md3.fs">
-      <Link>md3.fs</Link>
-    </Compile>
-    <Compile Include="internalMd3Parser.fs">
-      <Link>internalMd3Parser.fs</Link>
-    </Compile>
-    <Compile Include="md3Parser.fs">
-      <Link>md3Parser.fs</Link>
-    </Compile>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" />
+  <ItemGroup>
+    <None Include="FQuake3.Viewer.exe.config" />
+    <None Include="libFQ3Viewer.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
