@@ -34,6 +34,10 @@ open Engine.Native
 open Engine.Renderer.Core
 open FQuake3.Math
 
+/// Used to prevent massive copying of large immutable data.
+module private Cache =
+    let mutable shaderMap = Map.empty<int, Shader>
+
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         Axis (
@@ -702,38 +706,47 @@ module Shader =
     let rec ofNativePtr (ptr: nativeptr<shader_t>) =
         let mutable native = NativePtr.read ptr
 
-        {
-        Name = NativePtr.toStringAnsi &&native.name.value;
-        LightmapIndex = native.lightmapIndex;
-        Index = native.index;
-        SortedIndex = native.sortedIndex;
-        Sort = native.sort;
-        IsDefaultShader = Boolean.ofNativePtr &&native.defaultShader;
-        IsExplicitlyDefined = Boolean.ofNativePtr &&native.explicitlyDefined;
-        SurfaceFlags = native.surfaceFlags;
-        ContentFlags = native.contentFlags;
-        IsEntityMergable = Boolean.ofNativePtr &&native.entityMergable;
-        IsSky = Boolean.ofNativePtr &&native.isSky;
-        Sky = SkyParms.ofNativePtr &&native.sky;
-        Fog = FogParms.ofNativePtr &&native.fogParms;
-        PortalRange = native.portalRange;
-        MultitextureEnv = native.multitextureEnv;
-        CullType = enum<CullType> (int native.cullType);
-        HasPolygonOffset = Boolean.ofNativePtr &&native.polygonOffset;
-        HasNoMipMaps = Boolean.ofNativePtr &&native.noMipMaps;
-        HasNoPicMip = Boolean.ofNativePtr &&native.noPicMip;
-        FogPassType = enum<FogPassType> (int native.fogPass);
-        NeedsNormal = Boolean.ofNativePtr &&native.needsNormal;
-        NeedsSt1 = Boolean.ofNativePtr &&native.needsST1;
-        NeedsSt2 = Boolean.ofNativePtr &&native.needsST2;
-        NeedsColor = Boolean.ofNativePtr &&native.needsColor;
-        Deforms = []; // TODO:
-        Stages = []; // TODO:
-        ClampTime = native.clamptime;
-        TimeOffset = native.timeOffset;
-        CurrentState = native.currentstate;
-        ExpireTime = int64 native.expireTime;
-        ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value); }
+        let hash = native.index
+
+        match Map.tryFind hash Cache.shaderMap with
+        | Some x -> x
+        | None ->
+
+        let shader =
+            {
+            Name = NativePtr.toStringAnsi &&native.name.value;
+            LightmapIndex = native.lightmapIndex;
+            Index = native.index;
+            SortedIndex = native.sortedIndex;
+            Sort = native.sort;
+            IsDefaultShader = Boolean.ofNativePtr &&native.defaultShader;
+            IsExplicitlyDefined = Boolean.ofNativePtr &&native.explicitlyDefined;
+            SurfaceFlags = native.surfaceFlags;
+            ContentFlags = native.contentFlags;
+            IsEntityMergable = Boolean.ofNativePtr &&native.entityMergable;
+            IsSky = Boolean.ofNativePtr &&native.isSky;
+            Sky = SkyParms.ofNativePtr &&native.sky;
+            Fog = FogParms.ofNativePtr &&native.fogParms;
+            PortalRange = native.portalRange;
+            MultitextureEnv = native.multitextureEnv;
+            CullType = enum<CullType> (int native.cullType);
+            HasPolygonOffset = Boolean.ofNativePtr &&native.polygonOffset;
+            HasNoMipMaps = Boolean.ofNativePtr &&native.noMipMaps;
+            HasNoPicMip = Boolean.ofNativePtr &&native.noPicMip;
+            FogPassType = enum<FogPassType> (int native.fogPass);
+            NeedsNormal = Boolean.ofNativePtr &&native.needsNormal;
+            NeedsSt1 = Boolean.ofNativePtr &&native.needsST1;
+            NeedsSt2 = Boolean.ofNativePtr &&native.needsST2;
+            NeedsColor = Boolean.ofNativePtr &&native.needsColor;
+            Deforms = []; // TODO:
+            Stages = []; // TODO:
+            ClampTime = native.clamptime;
+            TimeOffset = native.timeOffset;
+            CurrentState = native.currentstate;
+            ExpireTime = int64 native.expireTime;
+            ShaderStates = NativePtr.toList 32 (&&native.shaderStates.value); }
+        Cache.shaderMap <- Map.add hash shader Cache.shaderMap
+        shader
 
 module SkinSurface =
     let ofNativePtr (ptr: nativeptr<skinSurface_t>) =

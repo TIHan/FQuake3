@@ -38,7 +38,7 @@ open Engine.NativeInterop
 open FQuake3.Math
 open FQuake3.Md3
 
-/// Used to prevent massive copying of large imuutable data.
+/// Used to prevent massive copying of large immutable data.
 module private Cache =
     let mutable md3Map = Map.empty<int, Md3>
 
@@ -234,8 +234,8 @@ module Md3 =
         | Some x -> x
         | None ->
 
-        let bytes = Array.zeroCreate<byte> (native.ofsEnd + 1)
-        Marshal.Copy (NativePtr.toNativeInt ptr, bytes, 0, (native.ofsEnd + 1))
+        let bytes = Array.zeroCreate<byte> native.ofsEnd
+        Marshal.Copy (NativePtr.toNativeInt ptr, bytes, 0, native.ofsEnd)
         let md3 = FQuake3.Utils.Md3.parse bytes
         Cache.md3Map <- Map.add hash md3 Cache.md3Map
         md3
