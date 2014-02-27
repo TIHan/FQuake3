@@ -50,10 +50,31 @@ app_init (const char *title)
 APP_EXPORT int APP_DECL
 app_exit (app_t *app)
 {
-  	SDL_GL_DeleteContext (app->gl_context);  
-  	SDL_DestroyWindow (app->window);
-  	SDL_Quit ();
-  	return 0;
+	SDL_GL_DeleteContext (app->gl_context);  
+	SDL_DestroyWindow (app->window);
+	SDL_Quit ();
+	return 0;
+}
+
+APP_EXPORT void APP_DECL
+app_clear_window (app_t *app)
+{
+	glClear (GL_COLOR_BUFFER_BIT);
+	SDL_GL_SwapWindow (app->window);
+}
+
+// Loop
+APP_EXPORT void APP_DECL
+app_loop (app_t *app, void (*callback)(void))
+{
+	SDL_Event e;
+
+	while (e.type != SDL_KEYDOWN && e.type != SDL_QUIT)
+  	{
+		SDL_PollEvent (&e);
+
+		callback ();
+	}
 }
 
 // Start app loop
@@ -135,13 +156,3 @@ app_loop (app_t *app)
   	}
 }
 */
-// Main
-//int main (int argc, char *argv[])
-//{  
-	//app_t *app = app_init ();
-
-	//app_loop (app);
-
-	//return app_exit (app);	
-//}
-
