@@ -39,7 +39,7 @@ open FQuake3.Md3
 
 /// Used to prevent massive copying of large immutable data.
 module private Cache =
-    let mutable md3Map = Map.empty<int, Md3>
+    let mutable md3Map = Map.empty<nativeint, Md3>
 
 module Boolean =
     let inline ofNativePtr (ptr: nativeptr<qboolean>) =
@@ -223,7 +223,7 @@ module Md3 =
     let ofNativePtr (ptr: nativeptr<md3Header_t>) =
         let mutable native = NativePtr.read ptr
 
-        let hash = native.GetHashCode ()
+        let hash = NativePtr.toNativeInt ptr
 
         match Map.tryFind hash Cache.md3Map with
         | Some x -> x

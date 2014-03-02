@@ -36,7 +36,7 @@ open FQuake3.Math
 
 /// Used to prevent massive copying of large immutable data.
 module private Cache =
-    let mutable shaderMap = Map.empty<int, Shader>
+    let mutable shaderMap = Map.empty<nativeint, Shader>
 
 module Axis =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
@@ -706,7 +706,7 @@ module Shader =
     let rec ofNativePtr (ptr: nativeptr<shader_t>) =
         let mutable native = NativePtr.read ptr
 
-        let hash = native.index
+        let hash = NativePtr.toNativeInt ptr
 
         match Map.tryFind hash Cache.shaderMap with
         | Some x -> x
