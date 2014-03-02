@@ -29,7 +29,6 @@ open System.Security
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open FSharp.Game.Math
-open FSharpx.Collections
 open Engine.Core
 open Engine.Control
 open Engine.NativeInterop
@@ -623,11 +622,11 @@ type TrRefdef =
         RdFlags: RdFlags;
 
         // 1 bits will prevent the associated area from rendering at all
-        AreaMask: ByteString;
+        AreaMask: byte seq;
         HasAreaMaskModified: bool;  // qtrue if areamask changed since last scene
 
         FloatTime: single;          // tr.refdef.time / 1000.0
-        Text: string list;
+        Text: string;
         Entities: TrRefEntity list;
         Dlights: Dlight list;
         Polys: Surface list;

@@ -28,7 +28,6 @@ open System.Net
 open System.Net.Sockets
 open System.Security
 open System.Runtime.InteropServices
-open FSharpx.Collections
 open Engine.NativeInterop
 
 module private Native =
@@ -43,7 +42,7 @@ type Message =
         IsAllowedOverflow: bool;    // if false, do a Com_Error
         IsOverflowed: bool;         // set to true if the buffer size failed (with allowoverflow set)
         IsOutOfBand: bool;          // set to true if the buffer size failed (with allowoverflow set)
-        Data: ByteString;
+        Data: byte seq;
         MaxSize: int;
         ReadCount: int;
         Bit: int;                   // for bitwise reads and writes

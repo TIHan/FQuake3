@@ -548,11 +548,11 @@ module TrRefdef =
             Time = native.time;
             RdFlags = enum<RdFlags> (native.rdflags);
 
-            AreaMask = ByteString.ofNativePtr 32 &&native.areamask;
+            AreaMask = Seq.ofNativePtrArray 32 &&native.areamask
             HasAreaMaskModified = Boolean.ofNativePtr &&native.areamaskModified;
 
             FloatTime = native.floatTime;
-            Text = List.ofNativePtrArrayMap 8 (fun x -> "") &&native.text; // FIXME: This isn't right.
+            Text = String (NativePtr.toNativePtr<_, sbyte> &&native.text, 0, 256)
             Entities = List.ofNativePtrArrayMap native.num_entities (fun x -> TrRefEntity.ofNativePtr x) native.enities;
             Dlights = List.ofNativePtrArrayMap native.num_delights (fun x -> Dlight.ofNativePtr x) native.dlights;
             Polys = List.ofNativePtrArrayMap native.numPolys (fun x -> Surface.ofNativePtrPoly x) native.polys;

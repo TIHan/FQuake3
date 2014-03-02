@@ -764,7 +764,7 @@ type model_t =
 [<StructLayout (LayoutKind.Explicit, Size = 256)>]
 type trRefdef_t_text =
     [<FieldOffset (0)>]
-    val mutable text : sbyte
+    val mutable value : sbyte
 
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]

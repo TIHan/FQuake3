@@ -29,7 +29,6 @@ open System
 open System.IO
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
-open FSharpx.Collections
 open FSharp.Game.Math
 open Engine.Core
 open Engine.Net
@@ -176,10 +175,6 @@ module Bounds =
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY
 
-module ByteString =
-    let inline ofNativePtr (size: int) (nativePtr: nativeptr<byte>) =
-        ByteString.create <| NativePtr.toArray size nativePtr
-
 module Message =
     let inline ofNativePtr (ptr: nativeptr<msg_t>) =
         let mutable native = NativePtr.read ptr
@@ -188,7 +183,7 @@ module Message =
             IsAllowedOverflow = Boolean.ofNativePtr &&native.allowoverflow;
             IsOverflowed = Boolean.ofNativePtr &&native.overflowed;
             IsOutOfBand = Boolean.ofNativePtr &&native.oob;
-            Data = ByteString.ofNativePtr native.cursize native.data;
+            Data = Seq.ofNativePtrArray native.cursize native.data;
             MaxSize = native.maxsize;
             ReadCount = native.readcount;
             Bit = native.bit;

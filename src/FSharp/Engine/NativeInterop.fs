@@ -55,8 +55,8 @@ let inline fixed2' (f: nativeptr<_> -> nativeptr<_> -> 'a) (a: obj) (b: obj) =
 
 /// NativePtr
 module NativePtr =
-    let inline toNativePtr x =
-        NativePtr.toNativeInt x |> NativePtr.ofNativeInt
+    let inline toNativePtr<'a, 'b when 'a : unmanaged and 'b : unmanaged> (x: nativeptr<'a>) : nativeptr<'b> =
+        NativePtr.toNativeInt x |> NativePtr.ofNativeInt<'b>
 
     let inline toStructure<'T,'U when 'T : struct and 'U : unmanaged> (x: nativeptr<'U>) =
         System.Runtime.InteropServices.Marshal.PtrToStructure (NativePtr.toNativeInt x, typeof<'T>) :?> 'T
@@ -97,19 +97,18 @@ module String =
 /// List
 module List =
     let inline ofNativePtrArray<'T when 'T : unmanaged> size (x: nativeptr<'T>) =
-        List.init size (fun i ->
-            NativePtr.get x i
-        )
+        List.init size (fun i -> NativePtr.get x i)
 
     let inline ofNativePtrArrayMap<'T, 'U when 'T : unmanaged> size (f: nativeptr<'T> -> 'U) (x: nativeptr<'T>) =
-        List.init size (fun i ->
-            f <| NativePtr.add x i
-        )
+        List.init size (fun i -> f <| NativePtr.add x i)
 
     let inline toNativePtrArrayByPtr<'T, 'U when 'T : unmanaged> (ptr: nativeptr<'T>) (f: nativeptr<'T> -> 'U -> unit) (value: 'U list) =
-        List.iteri (fun i x ->
-            f (NativePtr.add ptr i) x
-        ) value
+        List.iteri (fun i x -> f (NativePtr.add ptr i) x) value
+
+/// Seq
+module Seq =
+    let inline ofNativePtrArray<'T when 'T : unmanaged> size (x: nativeptr<'T>) =
+        Seq.init size (fun i -> NativePtr.get x i)
 
 /// Option
 module Option =
