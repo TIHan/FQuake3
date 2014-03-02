@@ -1571,6 +1571,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
 #else
+# if 1
 	drawSurf_t *surf = &tr.refdef.drawSurfs[tr.refdef.numDrawSurfs & DRAWSURF_MASK];
 
 	surf->surface = surface;
@@ -1580,6 +1581,21 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	surf->dlightMap = dlightMap;
 
 	tr.refdef.numDrawSurfs++;
+# else
+	MObject *result;
+	trRefdef_t *_refdef = &tr.refdef;
+	drawSurf_t *surf = &tr.refdef.drawSurfs[tr.refdef.numDrawSurfs & DRAWSURF_MASK];
+	int bah = (int)surf;
+	m_invoke_new(Engine.Renderer, Engine.Renderer, Main, addDrawSurface, result,
+		&bah,
+		&shader->index,
+		&tr.currentEntityNum,
+		&fogIndex,
+		&dlightMap,
+		m_object_as_arg (qm_of_tr_ref_def(&tr.refdef)));
+
+	qm_to_tr_ref_def(result, &_refdef);
+# endif
 #endif
 }
 

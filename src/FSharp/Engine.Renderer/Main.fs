@@ -618,7 +618,7 @@ let isMirror (surface: Surface) (entityId: int) (r: Renderer) =
 /// Based on Q3: R_AddDrawSurf
 /// AddDrawSurface
 [<Pure>]
-let addDrawSurface surfaceId shaderId entityId fogId dynamicLightMap (r: Renderer) =
+let addDrawSurface surfaceId shaderId entityId fogId dynamicLightMap (refdef: TrRefdef) =
     let drawSurface =
         {
         SurfaceId = surfaceId
@@ -627,7 +627,7 @@ let addDrawSurface surfaceId shaderId entityId fogId dynamicLightMap (r: Rendere
         FogId = fogId
         DynamicLightMap = dynamicLightMap }
 
-    { r with Refdef = { r.Refdef with DrawSurfaces = drawSurface :: r.Refdef.DrawSurfaces } }
+    { refdef with DrawSurfaces = refdef.DrawSurfaces @ [drawSurface] }
 
 /// AddEntitySurface
 /// TODO: Not finished.

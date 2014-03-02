@@ -393,8 +393,11 @@ module DrawSurface =
     let ofNativePtr (ptr: nativeptr<drawSurf_t>) =
         let mutable native = NativePtr.read ptr
 
+        let surfacePtr = NativePtr.toNativeInt native.surface
+        let surfaceId = surfacePtr.ToInt32 ()
+
         {
-        SurfaceId = (NativePtr.toNativeInt native.surface).ToInt32 ()
+        SurfaceId = surfaceId
         ShaderId = native.shaderIndex
         EntityId = native.entityNum
         FogId = native.fogIndex
@@ -404,7 +407,7 @@ module DrawSurface =
         let mutable native = NativePtr.read ptr
 
         // The surfaceId is really the pointer in the unmanaged world.
-        native.surface <- NativePtr.ofNativeInt <| nativeint (value.ShaderId)
+        native.surface <- NativePtr.ofNativeInt <| nativeint (value.SurfaceId)
         native.shaderIndex <- value.ShaderId
         native.entityNum <- value.EntityId
         native.fogIndex <- value.FogId
@@ -578,7 +581,12 @@ module TrRefdef =
         // TODO: Map Entities
         // TODO: Map Dlights
         // TODO: Map Polys
-        // TODO: Map DrawSurfaces
+        native.numDrawSurfs <- value.DrawSurfaces.Length
+        
+        for i = 0 to value.DrawSurfaces.Length - 1 do
+            DrawSurface.toNativeByPtr (NativePtr.add native.drawSurfs i) value.DrawSurfaces.[i]
+
+        NativePtr.write ptr native
 
 module FrontEndPerformanceCounters =
     let ofNativePtr (ptr: nativeptr<frontEndCounters_t>) =
