@@ -73,22 +73,8 @@ type Address =
     }
 
 module Net =
-    let mutable isUsingErlang = false
-
     let Init () =
         Native.NET_Init ()
-
-#if ERLANG
-        isUsingErlang <- ErlNet.tryInit ()
-
-        Command.Add ("erl_ping") (fun () -> 
-            match ErlNet.ping () with
-            | true ->
-                printfn "Pong"
-            | _ ->
-                ()
-        )
-#endif
 
     /// Based on Q3: NET_IPSocket
     /// Socket
