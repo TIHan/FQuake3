@@ -447,8 +447,8 @@ let planeForSurface (surface: Surface) (plane: Plane) =
 /// create plane axis for the portal we are seeing
 /// </summary>
 [<Pure>]
-let createPlaneAxis (drawSurface: DrawSurface) =
-    planeForSurface drawSurface.Surface Plane.zero
+let createPlaneAxis (surface: Surface) =
+    planeForSurface surface Plane.zero
 
 /// <summary>
 /// rotate the plane if necessary
@@ -559,15 +559,15 @@ let calculatePortalOrientation (entity: RefEntity) (plane: Plane) (surface: Orie
 ///
 /// Returns true if it should be mirrored
 [<Pure>]
-let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: Orientation) (camera: Orientation) (pvsOrigin: vec3) (r: Renderer) =
+let getPortalOrientations (surface: Surface) (entityId: int) (surfaceOr: Orientation) (cameraOr: Orientation) (pvsOrigin: vec3) (r: Renderer) =
     // create plane axis for the portal we are seeing
-    let originalPlane = createPlaneAxis drawSurface
+    let originalPlane = createPlaneAxis surface
 
     // rotate the plane if necessary
     match tryRotatePlane originalPlane entityId r with
     | (originalPlane, plane, tr) ->
 
-    let surface = { surface with Axis = transformAxisOfNormal plane.Normal surface.Axis }
+    let surfaceOr = { surfaceOr with Axis = transformAxisOfNormal plane.Normal surfaceOr.Axis }
 
     // locate the portal entity closest to this plane.
     // origin will be the origin of the portal, origin2 will be
@@ -584,10 +584,10 @@ let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: O
         // portal surface entity, so we don't want to print anything here...
 
         //ri.Printf( PRINT_ALL, "Portal surface without a portal entity\n" );
-        (false, false, surface, camera, pvsOrigin, tr)
+        (false, false, surfaceOr, cameraOr, pvsOrigin, tr)
     | Some e ->
 
-    match calculatePortalOrientation e.Entity plane surface camera tr.Refdef with
+    match calculatePortalOrientation e.Entity plane surfaceOr cameraOr tr.Refdef with
     | (isMirror, surface, camera) ->
     (true, isMirror, surface, camera, e.Entity.OldOrigin, tr)
 
@@ -595,9 +595,9 @@ let getPortalOrientations (drawSurface: DrawSurface) (entityId: int) (surface: O
 /// IsMirror
 /// Note: this is internal
 [<Pure>]
-let isMirror (drawSurface: DrawSurface) (entityId: int) (r: Renderer) =
+let isMirror (surface: Surface) (entityId: int) (r: Renderer) =
     // create plane axis for the portal we are seeing
-    let originalPlane = createPlaneAxis drawSurface
+    let originalPlane = createPlaneAxis surface
 
     // rotate the plane if necessary
     match tryRotatePlane originalPlane entityId r with
@@ -618,11 +618,11 @@ let isMirror (drawSurface: DrawSurface) (entityId: int) (r: Renderer) =
 /// Based on Q3: R_AddDrawSurf
 /// AddDrawSurface
 [<Pure>]
-let addDrawSurface surface shaderId entityId fogId dynamicLightMap (r: Renderer) =
+let addDrawSurface surfaceId shaderId entityId fogId dynamicLightMap (r: Renderer) =
     let drawSurface =
         {
-        DrawSurface.Surface = surface
-        DrawSurface.ShaderId = shaderId
+        SurfaceId = surfaceId
+        ShaderId = shaderId
         EntityId = entityId
         FogId = fogId
         DynamicLightMap = dynamicLightMap }

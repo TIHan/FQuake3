@@ -588,7 +588,7 @@ type Surface =
 /// Based on Q3: drawSurf_t
 /// DrawSurface
 type DrawSurface = {
-    Surface : Surface
+    SurfaceId : int
     ShaderId: int
     EntityId: int
     FogId: int

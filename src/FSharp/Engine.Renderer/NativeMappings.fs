@@ -394,7 +394,7 @@ module DrawSurface =
         let mutable native = NativePtr.read ptr
 
         {
-        Surface = Surface.ofNativePtr native.surface
+        SurfaceId = (NativePtr.toNativeInt native.surface).ToInt32 ()
         ShaderId = native.shaderIndex
         EntityId = native.entityNum
         FogId = native.fogIndex
@@ -403,7 +403,8 @@ module DrawSurface =
     let toNativeByPtr (ptr: nativeptr<drawSurf_t>) (value: DrawSurface) =
         let mutable native = NativePtr.read ptr
 
-        Surface.toNativeByPtr native.surface value.Surface
+        // The surfaceId is really the pointer in the unmanaged world.
+        native.surface <- NativePtr.ofNativeInt <| nativeint (value.ShaderId)
         native.shaderIndex <- value.ShaderId
         native.entityNum <- value.EntityId
         native.fogIndex <- value.FogId

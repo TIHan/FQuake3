@@ -950,7 +950,7 @@ qboolean R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	qboolean retval;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "getPortalOrientations", 6, {
-		__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
+		__args [0] = m_object_as_arg (qm_of_surface (drawSurf->surface));
 		__args [1] = &entityNum;
 		__args [2] = m_object_as_arg (qm_of_orientation (surface));
 		__args [3] = m_object_as_arg (qm_of_orientation (camera));
@@ -1037,7 +1037,7 @@ static qboolean IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	qboolean retval;
 
 	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "isMirror", 3, {
-		__args [0] = m_object_as_arg (qm_of_draw_surf (drawSurf));
+		__args [0] = m_object_as_arg (qm_of_surface (drawSurf->surface));
 		__args [1] = &entityNum;
 		__args [2] = m_object_as_arg (qm_of_tr_globals (&tr));
 	}, tuple);
