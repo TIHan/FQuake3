@@ -40,9 +40,6 @@ main (int argc, char *argv[])
 	// Load Core
 	m_load_assembly ("FSharp.Core.dll");
 
-	// Load Extension Core
-	m_load_assembly ("FSharpx.Core.dll");
-
 	// Load Utils
 	m_load_assembly ("FQuake3.Utils.dll");
 
