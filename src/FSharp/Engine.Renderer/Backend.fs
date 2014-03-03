@@ -287,3 +287,28 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
         HasSkyRenderedThisView = false
         IsHyperspace = false
     }
+
+/// Based on Q3: RB_BeginSurface
+/// RB_BeginSurface
+///
+/// We must set some things up before beginning any tesselation,
+/// because a surface may be forced to perform a RB_End due
+/// to overflow.
+/// TODO: Finish.
+let beginSurface (shader: Shader) (fogId: int) =
+    ()
+
+/// Based on Q3: RB_RenderDrawSurfList
+/// RenderDrawSurfaces
+/// TODO: Finish.
+let renderDrawSurfaces (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar) (r_fastsky: Cvar) (glState: GLState) (backend: Backend) (rentity: TrRefEntity) (drawSurfaces: DrawSurface list) =
+    // save original time for entity shader offsets
+    let originalTime = backend.Refdef.FloatTime
+
+    // clear the z buffer, set the modelview, etc
+    let glState, backend = beginDrawingView r_finish r_measureOverdraw r_shadows r_fastsky glState backend
+
+    let backend = { backend with CurrentEntity = Some rentity }
+
+
+    ()

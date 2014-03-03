@@ -70,7 +70,7 @@ type Md3Vertex =
 
     new (x, y, z, lat, lng) = { x = x; y = y; z = z; lat = lat; lng = lng }
 
-/// Md3SurfaceData
+/// Md3SurfaceHeader
 type Md3SurfaceHeader = {
     Ident: string
     Name: string
@@ -85,7 +85,7 @@ type Md3SurfaceHeader = {
     VerticesOffset: int
     EndOffset: int }
 
-/// Md3SurfaceData
+/// Md3Surface
 type Md3Surface = {
     Header: Md3SurfaceHeader
     Shaders: Md3Shader []
@@ -93,7 +93,7 @@ type Md3Surface = {
     St: Md3St []
     Vertices: Md3Vertex [] }
 
-/// Md3Data
+/// Md3
 type Md3 = {
     Header: Md3Header
     Frames: Md3Frame []

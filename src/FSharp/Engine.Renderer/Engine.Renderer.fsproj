@@ -62,6 +62,7 @@
     <Compile Include="image.fs" />
     <Compile Include="Shader.fs" />
     <Compile Include="Main.fs" />
+    <Compile Include="surface.fs" />
     <Compile Include="Mesh.fs" />
     <Compile Include="World.fs" />
     <Compile Include="Backend.fs" />

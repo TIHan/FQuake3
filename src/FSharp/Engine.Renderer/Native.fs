@@ -846,6 +846,97 @@ type frontEndCounters_t =
     val mutable c_dlightSurfaces : int
     val mutable c_dlightSurfacesCulled : int
 
+type glIndex_t = uint32
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4)>]
+type color4ub_t =
+    [<FieldOffset (0)>]
+    val mutable value : byte
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4000)>]
+type stageVars_t_colors =
+    [<FieldOffset (0)>]
+    val mutable value : color4ub_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 8000)>]
+type stageVars_t_texcoords =
+    [<FieldOffset (0)>]
+    val mutable value : vec2_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type stageVars_t =
+    val mutable colors : stageVars_t_colors
+    val mutable texcoords : stageVars_t_texcoords
+    val private texcoords1 : stageVars_t_texcoords
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 24000)>]
+type shaderCommands_t_indexes =
+    [<FieldOffset (0)>]
+    val mutable value : glIndex_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 16000)>]
+type shaderCommands_t_xyz =
+    [<FieldOffset (0)>]
+    val mutable value : vec4_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 16000)>]
+type shaderCommands_t_normal =
+    [<FieldOffset (0)>]
+    val mutable value : vec4_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 8000)>]
+type shaderCommands_t_texCoords =
+    [<FieldOffset (0)>]
+    val mutable value : vec2_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4000)>]
+type shaderCommands_t_vertexColors =
+    [<FieldOffset (0)>]
+    val mutable value : color4ub_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4000)>]
+type shaderCommands_t_vertexDlightBits =
+    [<FieldOffset (0)>]
+    val mutable value : int
+
+[<Struct>]
+[<StructLayout (LayoutKind.Explicit, Size = 4000)>]
+type shaderCommands_t_constantColor255 =
+    [<FieldOffset (0)>]
+    val mutable value : color4ub_t
+
+[<Struct>]
+[<StructLayout (LayoutKind.Sequential)>]
+type shaderCommands_t =
+    val mutable indexes : shaderCommands_t_indexes
+    val mutable xyz : shaderCommands_t_xyz
+    val mutable normal : shaderCommands_t_normal
+    val mutable texCoords : shaderCommands_t_texCoords
+    val private texCoords1 : shaderCommands_t_texCoords
+    val mutable vertexColors : shaderCommands_t_vertexColors
+    val mutable vertexDlightBits : shaderCommands_t_vertexDlightBits
+    val mutable svars : stageVars_t
+    val mutable constantColor255 : shaderCommands_t_constantColor255
+    val mutable shader : nativeptr<shader_t>
+    val mutable shaderTime : single
+    val mutable fogNum : int
+    val mutable dlightBits : int
+    val mutable numIndexes : int
+    val mutable numVertexes : int
+    val mutable numPasses : int
+    val mutable currentStageIteratorFunc : nativeint
+    val mutable xstages : nativeptr<nativeptr<shaderStage_t>>
+
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type backEndCounters_t =
