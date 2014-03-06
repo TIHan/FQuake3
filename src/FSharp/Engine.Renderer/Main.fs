@@ -92,7 +92,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
     match checkFrustumPlanes 0 true 0 with
     | (_, false) -> ClipType.Out // all points were behind one of the planes
     | (0, _) -> ClipType.In // completely inside frustum
-    | _ -> ClipType.In // partially clipped
+    | _ -> ClipType.Clip // partially clipped
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius
