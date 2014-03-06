@@ -169,8 +169,8 @@ module Bounds =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
 
-        Vec3.toNativeByPtr &&nativeX bounds.mins
-        Vec3.toNativeByPtr &&nativeY bounds.maxs
+        Vec3.toNativeByPtr &&nativeX bounds.min
+        Vec3.toNativeByPtr &&nativeY bounds.max
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY

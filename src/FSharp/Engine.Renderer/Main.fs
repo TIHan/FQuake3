@@ -38,8 +38,14 @@ let flipMatrix =
         0.f,  1.f,  0.f, 0.f,
         0.f,  0.f,  0.f, 1.f)
 
-[<Literal>]
-let private TransformSize = 8
+/// <summary>
+/// Based on Q3: R_LocalPointToWorld
+/// LocalPointToWorld
+/// </summary>
+[<Pure>]
+let localPointToWorld (local: vec3) (orientation: OrientationR) =
+    let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
+    vec3 (f 0, f 1, f 2)
 
 /// <summary>
 /// Based on Q3: R_CullLocalBox
@@ -53,16 +59,12 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 
     // transform into world space
     let inline transform i =
-        let v = vec3 (bounds.[i &&& 1].x, bounds.[(i >>> 1) &&& 1].y, bounds.[(i >>> 2) &&& 1].z)
-
-        orientation.Origin
-        |> Vec3.multiplyAdd v.x orientation.Axis.[0]
-        |> Vec3.multiplyAdd v.y orientation.Axis.[1]
-        |> Vec3.multiplyAdd v.z orientation.Axis.[2]
+        let v = Bounds.corner i bounds
+        localPointToWorld v orientation
 
     let rec checkFrustumPlane (frust: Plane) front back isFront n =
         match n with
-        | TransformSize -> (front, back)
+        | Bounds.cornerCount -> (front, back)
         | _ ->
         match isFront with
         | true -> (front, back)
@@ -90,7 +92,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
     match checkFrustumPlanes 0 true 0 with
     | (_, false) -> ClipType.Out // all points were behind one of the planes
     | (0, _) -> ClipType.In // completely inside frustum
-    | _ -> ClipType.Clip // partially clipped
+    | _ -> ClipType.In // partially clipped
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius
@@ -121,15 +123,6 @@ let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocu
     | (_, true) -> ClipType.Out // all points were behind one of the planes
     | (true, _) -> ClipType.Clip // partially clipped
     | _ -> ClipType.In // completely inside frustum
-
-/// <summary>
-/// Based on Q3: R_LocalPointToWorld
-/// LocalPointToWorld
-/// </summary>
-[<Pure>]
-let localPointToWorld (local: vec3) (orientation: OrientationR) =
-    let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
-    vec3 (f 0, f 1, f 2)
 
 /// <summary>
 /// Based on Q3: R_LocalNormalToWorld
