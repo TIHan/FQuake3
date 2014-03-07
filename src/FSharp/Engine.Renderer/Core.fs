@@ -142,19 +142,18 @@ type OrientationR =
 /// </summary>
 type Plane =
     {
-        Normal: vec3;
-        Distance: single;
+    Normal: vec3;
+    Distance: single;
 
-        /// <summary>
-        /// for fast side tests: 0,1,2 = axial, 3 = nonaxial
-        /// </summary>
-        Type: PlaneType;
+    /// <summary>
+    /// for fast side tests: 0,1,2 = axial, 3 = nonaxial
+    /// </summary>
+    Type: PlaneType;
 
-        /// <summary>
-        /// signx + (signy<<1) + (signz<<2), used as lookup during collision
-        /// </summary>
-        SignBits: byte;
-    }
+    /// <summary>
+    /// signx + (signy<<1) + (signz<<2), used as lookup during collision
+    /// </summary>
+    SignBits: byte }
 
     /// <summary>
     /// Based on Q3: SetPlaneSignBits
@@ -174,6 +173,8 @@ module Plane =
     let zero = { Normal = Vec3.zero; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
     let calculateSignBits (plane: Plane) =
         Plane.CalculateSignBits plane.Normal
+
+    let inline side point plane = Vec3.dot point plane.Normal > plane.Distance
 
     /// <summary>
     /// Based on Q3: PlaneFromPoints
@@ -217,13 +218,6 @@ type Frustum =
 module Frustum =
     [<Literal>]
     let planeCount = 4
-
-    let fold (f: 'State -> Plane -> 'State) (state: 'State) (frustum: Frustum) =
-        state
-        |> f <| frustum.[0]
-        |> f <| frustum.[1]
-        |> f <| frustum.[2]
-        |> f <| frustum.[3]
 
 /// <summary>
 /// Based on Q3: viewParms_t

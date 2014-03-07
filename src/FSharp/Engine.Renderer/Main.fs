@@ -57,28 +57,38 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
     | true -> Cull.Clip
     | _ ->
 
-    let corners = 
-        Bounds.corners bounds
-        // transform into world space
-        |> List.map (fun x -> localPointToWorld x orientation)
+    let bounds =
+        Bounds (
+            localPointToWorld bounds.min orientation,
+            localPointToWorld bounds.max orientation)
 
-    frustum
-    |> Frustum.fold (fun cull plane ->
+    let rec cullBox cull = function
+        | Frustum.planeCount -> cull
+        | n ->
+
         match cull with
-        | Cull.Clip
         | Cull.Out -> cull
         | _ ->
 
-        let distances =
-            corners
-            |> List.filter (fun x -> Vec3.dot x plane.Normal > plane.Distance)
-        match distances.Length with
-        // completely inside frustum
-        | x when x = corners.Length -> Cull.In
-        // all points were behind one of the planes
-        | 0 -> Cull.Out
-        // partially clipped
-        | _ -> Cull.Clip ) Cull.In
+        let plane = frustum.[n]
+
+        let inline findv (v1: vec3) (v2: vec3) =
+            let inline f i = if plane.Normal.[i] >= 0.f then v1.[i] else v2.[i]
+            vec3 (f 0, f 1, f 2)
+
+        let pv = findv bounds.max bounds.min
+        let nv = findv bounds.min bounds.max
+
+        let cull =
+            match Plane.side pv plane with
+            | true ->
+                match Plane.side nv plane with
+                | true -> cull
+                | _ -> Cull.Clip // partially clipped
+            | _ -> Cull.Out // all points were behind one of the planes
+        cullBox cull (n + 1)
+
+    cullBox Cull.In 0
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius
