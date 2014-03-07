@@ -216,7 +216,7 @@ type Frustum =
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Frustum =
     [<Literal>]
-    let size = 4
+    let planeCount = 4
 
 /// <summary>
 /// Based on Q3: viewParms_t

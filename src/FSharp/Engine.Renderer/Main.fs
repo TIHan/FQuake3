@@ -77,7 +77,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 
     let rec checkFrustumPlanes anyBack isFront n =
         match n with
-        | Frustum.size -> (anyBack, isFront)
+        | Frustum.planeCount -> (anyBack, isFront)
         | _ ->
         match isFront with
         | false -> (anyBack, isFront)
@@ -106,7 +106,7 @@ let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocu
 
     let rec checkFrustumPlanes mightBeClipped canCullOut n =
         match n with
-        | Frustum.size -> (mightBeClipped, canCullOut)
+        | Frustum.planeCount -> (mightBeClipped, canCullOut)
         | _ ->
         match canCullOut with
         | true -> (mightBeClipped, canCullOut)

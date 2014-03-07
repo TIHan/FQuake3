@@ -204,7 +204,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 R_LocalNormalToWorld
 
 =================
-*        /
+*/
 void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 #if 0
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0];
