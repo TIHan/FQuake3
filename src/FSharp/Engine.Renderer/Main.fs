@@ -57,12 +57,10 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
     | true -> Cull.Clip
     | _ ->
 
-    // transform into world space
-    let inline transform i =
-        let v = Bounds.corner i bounds
-        localPointToWorld v orientation
-
-    let corners = Bounds.corners bounds
+    let corners = 
+        Bounds.corners bounds
+        // transform into world space
+        |> List.map (fun x -> localPointToWorld x orientation)
 
     frustum
     |> Frustum.fold (fun clip plane ->
