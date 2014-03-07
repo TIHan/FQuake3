@@ -50,6 +50,9 @@ type Bounds =
             | 0 -> this.min | 1 -> this.max
             | _ -> raise <| IndexOutOfRangeException ()
 
+    override this.ToString () =
+        sprintf "{\nmin: %A\nmax: %A\n}" this.min this.max
+
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Bounds =

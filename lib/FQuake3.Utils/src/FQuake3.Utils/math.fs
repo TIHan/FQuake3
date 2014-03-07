@@ -120,6 +120,9 @@ type Vector3 =
             (match y with | Some y -> y | None -> this.y),
             (match z with | Some z -> z | None -> this.z))
 
+    override this.ToString () =
+        sprintf "{ x: %A y: %A z: %A }" this.x this.y this.z
+
     static member inline Abs (v: vec3) =
         vec3 (abs v.x, abs v.y, abs v.z)
 
