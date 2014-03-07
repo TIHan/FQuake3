@@ -299,7 +299,7 @@ let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: Orien
     // set far clipping planes dynamically
     let rec calculateFarthestCornerDistance distance acc =
         match acc with
-        | TransformSize -> distance
+        | Bounds.cornerCount -> distance
         | _ ->
             
         let x = if (acc &&& 1) <> 0 then visibilityBounds.[0].[0] else visibilityBounds.[1].[0]
