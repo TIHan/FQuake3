@@ -62,7 +62,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
         let v = Bounds.corner i bounds
         localPointToWorld v orientation
 
-    let corners = List.init Bounds.cornerCount transform
+    let corners = Bounds.corners bounds
 
     frustum
     |> Frustum.fold (fun clip plane ->
@@ -75,7 +75,8 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
             corners
             |> List.filter (fun x -> Vec3.dot x plane.Normal > plane.Distance)
         match distances.Length with
-        | Bounds.cornerCount -> Cull.In // completely inside frustum
+        // completely inside frustum
+        | x when x = corners.Length -> Cull.In
         // all points were behind one of the planes
         | 0 -> Cull.Out
         // partially clipped

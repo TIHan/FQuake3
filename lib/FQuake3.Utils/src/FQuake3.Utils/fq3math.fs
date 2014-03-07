@@ -58,6 +58,17 @@ module Bounds =
 
     let inline corner i (bounds: Bounds) =
         vec3 (bounds.[i &&& 1].x, bounds.[(i >>> 1) &&& 1].y, bounds.[(i >>> 2) &&& 1].z)
+
+    let inline corners (bounds: Bounds) =
+            [
+            vec3 (bounds.min.x, bounds.max.y, bounds.max.z)
+            vec3 (bounds.max.x, bounds.max.y, bounds.max.z)
+            vec3 (bounds.max.x, bounds.min.y, bounds.max.z)
+            vec3 (bounds.min.x, bounds.min.y, bounds.max.z)
+            vec3 (bounds.min.x, bounds.max.y, bounds.min.z)
+            vec3 (bounds.max.x, bounds.max.y, bounds.min.z)
+            vec3 (bounds.max.x, bounds.min.y, bounds.min.z)
+            vec3 (bounds.min.x, bounds.min.y, bounds.min.z)]    
         
     let radius (bounds: Bounds) =
         let inline f i =
