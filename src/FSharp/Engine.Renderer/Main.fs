@@ -54,7 +54,7 @@ let localPointToWorld (local: vec3) (orientation: OrientationR) =
 [<Pure>]
 let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
     match r_nocull.Integer = 1 with
-    | true -> ClipType.Clip
+    | true -> Cull.Clip
     | _ ->
 
     // transform into world space
@@ -65,21 +65,21 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
     let corners = List.init Bounds.cornerCount transform
 
     frustum
-    |> Frustum.fold (fun x plane ->
-        match x with
-        | ClipType.Clip
-        | ClipType.Out -> x
+    |> Frustum.fold (fun clip plane ->
+        match clip with
+        | Cull.Clip
+        | Cull.Out -> clip
         | _ ->
-            let distances =
-                corners
-                |> List.map (fun x -> Vec3.dot x plane.Normal)
-                |> List.filter (fun x -> x > plane.Distance)
-            match distances.Length with
-            | Bounds.cornerCount -> ClipType.In // completely inside frustum
-            // all points were behind one of the planes
-            | 0 -> ClipType.Out
-            // partially clipped
-            | _ -> ClipType.Clip ) ClipType.In
+
+        let distances =
+            corners
+            |> List.filter (fun x -> Vec3.dot x plane.Normal > plane.Distance)
+        match distances.Length with
+        | Bounds.cornerCount -> Cull.In // completely inside frustum
+        // all points were behind one of the planes
+        | 0 -> Cull.Out
+        // partially clipped
+        | _ -> Cull.Clip ) Cull.In
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius
@@ -88,7 +88,7 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
 [<Pure>]
 let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocull: Cvar) =
     match r_nocull.Integer = 1 with
-    | true -> ClipType.Clip
+    | true -> Cull.Clip
     | _ ->
 
     let rec checkFrustumPlanes mightBeClipped canCullOut n =
@@ -107,9 +107,9 @@ let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocu
         | _ -> checkFrustumPlanes mightBeClipped false (n + 1)
 
     match checkFrustumPlanes false false 0 with
-    | (_, true) -> ClipType.Out // all points were behind one of the planes
-    | (true, _) -> ClipType.Clip // partially clipped
-    | _ -> ClipType.In // completely inside frustum
+    | (_, true) -> Cull.Out // all points were behind one of the planes
+    | (true, _) -> Cull.Clip // partially clipped
+    | _ -> Cull.In // completely inside frustum
 
 /// <summary>
 /// Based on Q3: R_LocalNormalToWorld

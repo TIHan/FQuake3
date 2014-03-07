@@ -83,12 +83,12 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
     let r' = { r with PerfCounters = perfCounters }
 
     match clip with
-    | ClipType.In ->
-        (ClipType.In, r')
-    | ClipType.Clip ->
-        (ClipType.Clip, r')
+    | Cull.In ->
+        (Cull.In, r')
+    | Cull.Clip ->
+        (Cull.Clip, r')
     | _ ->
-        (ClipType.Out, r')
+        (Cull.Out, r')
 
 /// Based on Q3: R_CullModel
 /// CullModel
@@ -108,10 +108,10 @@ let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
             let r' = { r with PerfCounters = perfCounters }
 
             match sphereCull with
-            | ClipType.Out ->
-                (ClipType.Out, r')
-            | ClipType.In ->
-                (ClipType.In, r')
+            | Cull.Out ->
+                (Cull.Out, r')
+            | Cull.In ->
+                (Cull.In, r')
             | _ ->
                 calculateCullLocalBox newFrame oldFrame r_nocull r'
         | _ ->
@@ -126,10 +126,10 @@ let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
                 let r' = { r with PerfCounters = perfCounters }
 
                 match sphereCull with
-                | ClipType.Out ->
-                    (ClipType.Out, r')
-                | ClipType.In ->
-                    (ClipType.In, r')
+                | Cull.Out ->
+                    (Cull.Out, r')
+                | Cull.In ->
+                    (Cull.In, r')
                 | _ ->
                     calculateCullLocalBox newFrame oldFrame r_nocull r'
             | _ ->
@@ -265,7 +265,7 @@ let addMd3Surfaces
     //
     let cull, r' = cullModel md3 entity r r_nocull
 
-    match cull = ClipType.Out with
+    match cull = Cull.Out with
     | true -> r'
     | _ ->
 

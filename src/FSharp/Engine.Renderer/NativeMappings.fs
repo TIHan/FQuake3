@@ -593,10 +593,10 @@ module FrontEndPerformanceCounters =
         let mutable native = NativePtr.read ptr
 
         {
-            SpherePatch = { CullIn = native.c_sphere_cull_patch_in; CullClip = native.c_sphere_cull_patch_clip; CullOut = native.c_sphere_cull_patch_out };
-            BoxPatch = { CullIn = native.c_box_cull_patch_in; CullClip = native.c_box_cull_patch_clip; CullOut = native.c_box_cull_patch_out };
-            SphereMd3 = { CullIn = native.c_sphere_cull_md3_in; CullClip = native.c_sphere_cull_md3_clip; CullOut = native.c_sphere_cull_md3_out };
-            BoxMd3 = { CullIn = native.c_box_cull_md3_in; CullClip = native.c_box_cull_md3_clip; CullOut = native.c_box_cull_md3_out };
+            SpherePatch = { In = native.c_sphere_cull_patch_in; Clip = native.c_sphere_cull_patch_clip; Out = native.c_sphere_cull_patch_out };
+            BoxPatch = { In = native.c_box_cull_patch_in; Clip = native.c_box_cull_patch_clip; Out = native.c_box_cull_patch_out };
+            SphereMd3 = { In = native.c_sphere_cull_md3_in; Clip = native.c_sphere_cull_md3_clip; Out = native.c_sphere_cull_md3_out };
+            BoxMd3 = { In = native.c_box_cull_md3_in; Clip = native.c_box_cull_md3_clip; Out = native.c_box_cull_md3_out };
             Leafs = native.c_leafs;
             DynamicLightSurfaces = native.c_dlightSurfaces;
             DynamicLightSurfacesCulled = native.c_dlightSurfacesCulled
@@ -605,18 +605,18 @@ module FrontEndPerformanceCounters =
     let toNativeByPtr (ptr: nativeptr<frontEndCounters_t>) (value: FrontEndPerformanceCounters) =
         let mutable native = NativePtr.read ptr
 
-        native.c_sphere_cull_patch_in <- value.SpherePatch.CullIn
-        native.c_sphere_cull_patch_clip <- value.SpherePatch.CullClip
-        native.c_sphere_cull_patch_out <- value.SpherePatch.CullOut
-        native.c_box_cull_patch_in <- value.BoxPatch.CullIn
-        native.c_box_cull_patch_clip <- value.BoxPatch.CullClip
-        native.c_box_cull_patch_out <- value.BoxPatch.CullOut
-        native.c_sphere_cull_md3_in <- value.SphereMd3.CullIn
-        native.c_sphere_cull_md3_clip <- value.SphereMd3.CullClip
-        native.c_sphere_cull_md3_out <- value.SphereMd3.CullOut
-        native.c_box_cull_md3_in <- value.BoxMd3.CullIn
-        native.c_box_cull_md3_clip <- value.BoxMd3.CullClip
-        native.c_box_cull_md3_out <- value.BoxMd3.CullOut
+        native.c_sphere_cull_patch_in <- value.SpherePatch.In
+        native.c_sphere_cull_patch_clip <- value.SpherePatch.Clip
+        native.c_sphere_cull_patch_out <- value.SpherePatch.Out
+        native.c_box_cull_patch_in <- value.BoxPatch.In
+        native.c_box_cull_patch_clip <- value.BoxPatch.Clip
+        native.c_box_cull_patch_out <- value.BoxPatch.Out
+        native.c_sphere_cull_md3_in <- value.SphereMd3.In
+        native.c_sphere_cull_md3_clip <- value.SphereMd3.Clip
+        native.c_sphere_cull_md3_out <- value.SphereMd3.Out
+        native.c_box_cull_md3_in <- value.BoxMd3.In
+        native.c_box_cull_md3_clip <- value.BoxMd3.Clip
+        native.c_box_cull_md3_out <- value.BoxMd3.Out
         native.c_leafs <- value.Leafs
         native.c_dlightSurfaces <- value.DynamicLightSurfaces
         native.c_dlightSurfacesCulled <- value.DynamicLightSurfacesCulled

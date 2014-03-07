@@ -81,8 +81,8 @@ type GLState =
     }
 
 /// Based on Q3: CULL_IN, CULL_CLIP, CULL_OUT
-/// ClipType
-type ClipType =
+/// Cull
+type Cull =
     /// completely unclipped
     | In = 0
     /// clipped by one or more planes
@@ -1185,22 +1185,22 @@ type Refdef =
         // TODO:
     }
 
-/// ClippingPerformanceCounters
-type ClippingPerformanceCounters =
+/// CullingPerformanceCounters
+type CullingPerformanceCounters =
     {
-        CullIn: int;
-        CullClip: int;
-        CullOut: int;
+        In: int;
+        Clip: int;
+        Out: int;
     }
 
 /// Based on Q3: frontEndCounters_t
 /// FrontEndPerformanceCounters
 type FrontEndPerformanceCounters =
     {
-        SpherePatch: ClippingPerformanceCounters;
-        BoxPatch: ClippingPerformanceCounters;
-        SphereMd3: ClippingPerformanceCounters;
-        BoxMd3: ClippingPerformanceCounters;
+        SpherePatch: CullingPerformanceCounters;
+        BoxPatch: CullingPerformanceCounters;
+        SphereMd3: CullingPerformanceCounters;
+        BoxMd3: CullingPerformanceCounters;
 
         Leafs: int;
         DynamicLightSurfaces: int
@@ -1209,26 +1209,26 @@ type FrontEndPerformanceCounters =
 
 [<RequireQualifiedAccess>]
 module PerfCounter =
-    let increment (clipType: ClipType) (clipCounters: ClippingPerformanceCounters) =
-        match clipType with
-            | ClipType.In ->
-                { clipCounters with CullIn = clipCounters.CullIn + 1 }
-            | ClipType.Clip ->
-                { clipCounters with CullClip = clipCounters.CullClip + 1 }
+    let increment (cull: Cull) (cullCounters: CullingPerformanceCounters) =
+        match cull with
+            | Cull.In ->
+                { cullCounters with In = cullCounters.In + 1 }
+            | Cull.Clip ->
+                { cullCounters with Clip = cullCounters.Clip + 1 }
             | _ ->
-                { clipCounters with CullOut = clipCounters.CullOut + 1 }
+                { cullCounters with Out = cullCounters.Out + 1 }
 
-    let incrementSpherePatch (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
-        { perfCounters with SpherePatch = increment clipType perfCounters.SpherePatch }
+    let incrementSpherePatch (cull: Cull) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with SpherePatch = increment cull perfCounters.SpherePatch }
 
-    let incrementBoxPatch (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
-        { perfCounters with BoxPatch = increment clipType perfCounters.BoxPatch }
+    let incrementBoxPatch (cull: Cull) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with BoxPatch = increment cull perfCounters.BoxPatch }
 
-    let incrementSphereMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
-        { perfCounters with SphereMd3 = increment clipType perfCounters.SphereMd3 }
+    let incrementSphereMd3 (cull: Cull) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with SphereMd3 = increment cull perfCounters.SphereMd3 }
 
-    let incrementBoxMd3 (clipType: ClipType) (perfCounters: FrontEndPerformanceCounters) =
-        { perfCounters with BoxMd3 = increment clipType perfCounters.BoxMd3 }
+    let incrementBoxMd3 (cull: Cull) (perfCounters: FrontEndPerformanceCounters) =
+        { perfCounters with BoxMd3 = increment cull perfCounters.BoxMd3 }
 
 /// Based on Q3: backEndState_t
 /// Backend
