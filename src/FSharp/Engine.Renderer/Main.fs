@@ -122,15 +122,6 @@ let localNormalToWorld (local: vec3) (orientation: OrientationR) =
     vec3 (f 0, f 1, f 2)
 
 /// <summary>
-/// Based on Q3: R_WorldToLocal
-/// WorldToLocal
-/// </summary>
-[<Pure>]
-let worldToLocal (world: vec3) (orientation: OrientationR) =
-    let inline f i = Vec3.dot world orientation.Axis.[i]
-    vec3 (f 0, f 1, f 2)
-
-/// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
 /// CullLocalPointAndRadius
 /// </summary>

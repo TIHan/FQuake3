@@ -247,30 +247,6 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world)
 }
 
 /*
-=================
-R_WorldToLocal
-
-=================
-*/
-void R_WorldToLocal (vec3_t world, vec3_t local)
-{
-#if 0
-	local[0] = DotProduct(world, tr.or.axis[0]);
-	local[1] = DotProduct(world, tr.or.axis[1]);
-	local[2] = DotProduct(world, tr.or.axis[2]);
-#else
-	MObject *result;
-
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "worldToLocal", 2, {
-		__args [0] = m_object_as_arg (qm_of_vec3 (local));
-		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
-	}, result);
-
-	qm_to_vec3 (result, local);
-#endif
-}
-
-/*
 ==========================
 R_TransformModelToClip
 
