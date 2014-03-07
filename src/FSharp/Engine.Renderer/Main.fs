@@ -63,10 +63,10 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
         |> List.map (fun x -> localPointToWorld x orientation)
 
     frustum
-    |> Frustum.fold (fun clip plane ->
-        match clip with
+    |> Frustum.fold (fun cull plane ->
+        match cull with
         | Cull.Clip
-        | Cull.Out -> clip
+        | Cull.Out -> cull
         | _ ->
 
         let distances =
