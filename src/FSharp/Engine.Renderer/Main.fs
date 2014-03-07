@@ -62,37 +62,24 @@ let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum)
         let v = Bounds.corner i bounds
         localPointToWorld v orientation
 
-    let rec checkFrustumPlane (frust: Plane) front back isFront n =
-        match n with
-        | Bounds.cornerCount -> (front, back)
-        | _ ->
-        match isFront with
-        | true -> (front, back)
-        | _ ->
-            let distance = Vec3.dot (transform n) frust.Normal
+    let corners = List.init Bounds.cornerCount transform
 
-            match distance > frust.Distance with
-            | true -> checkFrustumPlane frust 1 back (back = 1) (n + 1)
-            | _ -> checkFrustumPlane frust front 1 false (n + 1)
-
-    let rec checkFrustumPlanes anyBack isFront n =
-        match n with
-        | Frustum.planeCount -> (anyBack, isFront)
+    frustum
+    |> Frustum.fold (fun x plane ->
+        match x with
+        | ClipType.Clip
+        | ClipType.Out -> x
         | _ ->
-        match isFront with
-        | false -> (anyBack, isFront)
-        | _ ->
-            let frust = frustum.[n]
-
-            match checkFrustumPlane frust 0 0 false 0 with
-            | (front, back) ->
-                checkFrustumPlanes (anyBack ||| back) (front = 1) (n + 1)
-
-    // check against frustum planes
-    match checkFrustumPlanes 0 true 0 with
-    | (_, false) -> ClipType.Out // all points were behind one of the planes
-    | (0, _) -> ClipType.In // completely inside frustum
-    | _ -> ClipType.Clip // partially clipped
+            let distances =
+                corners
+                |> List.map (fun x -> Vec3.dot x plane.Normal)
+                |> List.filter (fun x -> x > plane.Distance)
+            match distances.Length with
+            | Bounds.cornerCount -> ClipType.In // completely inside frustum
+            // all points were behind one of the planes
+            | 0 -> ClipType.Out
+            // partially clipped
+            | _ -> ClipType.Clip ) ClipType.In
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius

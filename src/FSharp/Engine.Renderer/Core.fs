@@ -218,6 +218,13 @@ module Frustum =
     [<Literal>]
     let planeCount = 4
 
+    let fold (f: 'State -> Plane -> 'State) (state: 'State) (frustum: Frustum) =
+        state
+        |> f <| frustum.[0]
+        |> f <| frustum.[1]
+        |> f <| frustum.[2]
+        |> f <| frustum.[3]
+
 /// <summary>
 /// Based on Q3: viewParms_t
 /// ViewParms
