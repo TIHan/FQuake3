@@ -25,6 +25,7 @@ namespace FSharp.Game.Math
 #nowarn "9"
 
 open System
+open System.Collections.Generic
 open System.Runtime.InteropServices
 
 /// Math Module
@@ -304,6 +305,12 @@ type Matrix3 =
         m11 = m11; m12 = m12; m13 = m13;
         m21 = m21; m22 = m22; m23 = m23;
         m31 = m31; m32 = m32; m33 = m33 }
+
+    new (x) =
+        {
+        m11 = x; m12 = x; m13 = x;
+        m21 = x; m22 = x; m23 = x;
+        m31 = x; m32 = x; m33 = x }
     
     member inline this.Item
             with get (i, j) =
@@ -333,6 +340,13 @@ type Matrix4 =
         m21 = m21; m22 = m22; m23 = m23; m24 = m24;
         m31 = m31; m32 = m32; m33 = m33; m34 = m34;
         m41 = m41; m42 = m42; m43 = m43; m44 = m44 }
+
+    new (x) =
+        {
+        m11 = x; m12 = x; m13 = x; m14 = x;
+        m21 = x; m22 = x; m23 = x; m24 = x;
+        m31 = x; m32 = x; m33 = x; m34 = x;
+        m41 = x; m42 = x; m43 = x; m44 = x }
     
     member inline this.Item
             with get (i, j) =
@@ -342,6 +356,15 @@ type Matrix4 =
                 | (2, 0) -> this.m31 | (2, 1) -> this.m32 | (2, 2) -> this.m33 | (2, 3) -> this.m34
                 | (3, 0) -> this.m41 | (3, 1) -> this.m42 | (3, 2) -> this.m43 | (3, 3) -> this.m44
                 | _ -> raise <| IndexOutOfRangeException ()
+    
+    override this.ToString () =
+        let inline f x y z w = sprintf "\t %f\t %f\t %f\t %f\n" x y z w
+        sprintf
+            "{\n%s%s%s%s}"
+            (f this.m11 this.m12 this.m13 this.m14)
+            (f this.m21 this.m22 this.m23 this.m24)
+            (f this.m31 this.m32 this.m33 this.m34)
+            (f this.m41 this.m42 this.m43 this.m44)     
 
 #if DEBUG
     static member (*) (m1: mat4, m2: mat4) =
@@ -353,8 +376,7 @@ type Matrix4 =
             f 0 0, f 0 1, f 0 2, f 0 3,
             f 1 0, f 1 1, f 1 2, f 1 3,
             f 2 0, f 2 1, f 2 2, f 2 3,
-            f 3 0, f 3 1, f 3 2, f 3 3
-        )
+            f 3 0, f 3 1, f 3 2, f 3 3)
 and mat4 = Matrix4
 
 [<RequireQualifiedAccess>]
@@ -384,8 +406,7 @@ type Quaternion =
             (q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z),
             (q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y),
             (q1.w * q2.y + q1.y * q2.w + q1.z * q2.x - q1.x * q2.z),
-            (q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x)
-        )
+            (q1.w * q2.z + q1.z * q2.w + q1.x * q2.y - q1.y * q2.x))
 
     /// Steps:
     /// normalize vector
@@ -416,8 +437,7 @@ module Quat =
             (q.w * ``1 / length``),
             (q.x * ``1 / length``),
             (q.y * ``1 / length``),
-            (q.z * ``1 / length``)
-        )
+            (q.z * ``1 / length``))
 
     let inline ofEulerDegrees (v: vec3) =
         let pitch = Math.``PI / 360`` * v.[0]
@@ -439,8 +459,7 @@ module Quat =
             (cosRoll * cosPitchYaw + sinRoll * sinPitchYaw),
             (sinRoll * cosPitchYaw - cosRoll * sinPitchYaw),
             (cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw),
-            (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw)
-        )
+            (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw))
 
     let inline ofAxisAngle (axis: vec3) (angle: single<rad>) =
         let angle = angle * 0.5f</rad>
@@ -450,8 +469,7 @@ module Quat =
             (cos angle),
             (axis.x * sinAngle),
             (axis.y * sinAngle),
-            (axis.z * sinAngle)
-        )
+            (axis.z * sinAngle))
 
 [<RequireQualifiedAccess>]
 module Transform =

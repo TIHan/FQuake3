@@ -7,6 +7,8 @@ Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.Tests.XS", "s
 EndProject
 Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Viewer", "src\FQuake3.Viewer\FQuake3.Viewer.fsproj", "{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}"
 EndProject
+Project("{4925A630-B079-445d-BCD4-3A9C94FE9307}") = "FQuake3.Utils.Benchmark", "src\FQuake3.Utils.Benchmark\FQuake3.Utils.Benchmark.fsproj", "{95278D8B-EAEF-4F6C-B59F-5A333C928D9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C0ADD1C-F767-4AF4-ACA3-AF5A561335C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95278D8B-EAEF-4F6C-B59F-5A333C928D9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95278D8B-EAEF-4F6C-B59F-5A333C928D9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95278D8B-EAEF-4F6C-B59F-5A333C928D9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95278D8B-EAEF-4F6C-B59F-5A333C928D9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\FQuake3.Viewer\FQuake3.Viewer.fsproj
