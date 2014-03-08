@@ -39,22 +39,42 @@ let mutable calculateWeaponPositionFsx : CGame -> (vec3 * vec3) = fun _ -> (Vec3
 let mutable compiledOnce = false
 let mutable cdate = Unchecked.defaultof<DateTime>
 let scs = SimpleSourceCodeServices ()
+
 [<Pure>]
-let calculateWeaponPosition (cg: CGame) = 
+let calculateWeaponPosition (cg: CGame) =
+
     let date = File.GetLastWriteTime ("weapons.fsx")
     if compiledOnce = false || cdate <> date then
         cdate <- date
         compiledOnce <- true
 
         async {
+
             let asm = Assembly.GetExecutingAssembly ()
-            let errors, _, fsxAsm =
-                scs.CompileToDynamicAssembly ([|"-o"; "weapons.dll"; "-a"; "weapons.fsx"; "-r"; asm.Location|], None)
+            let _, _, fsxAsm =
+
+                scs.CompileToDynamicAssembly (
+                    [|
+                    "-o"; "weapons.dll";
+                    "-a"; "weapons.fsx"; 
+                    "-r"; asm.Location|], None)
+
             match fsxAsm with
             | None -> failwith "no assembly"
             | Some x ->
-            let typ = x.GetType ("CGame.Weapons")
-            calculateWeaponPositionFsx <- fun cg -> typ.InvokeMember ("calculateWeaponPosition", BindingFlags.InvokeMethod ||| BindingFlags.Public ||| BindingFlags.Static, null, null, [|cg|]) :?> (vec3 * vec3)
+            let weaponsModule = x.GetType ("CGame.Weapons")
+
+            calculateWeaponPositionFsx <- 
+                fun cg -> 
+                weaponsModule.InvokeMember (
+                    "calculateWeaponPosition", 
+                    BindingFlags.InvokeMethod ||| 
+                    BindingFlags.Public ||| 
+                    BindingFlags.Static, 
+                    null, 
+                    null, 
+                    [|cg|]) :?> (vec3 * vec3)
+
         }
         |> Async.Start
         
