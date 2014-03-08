@@ -35,10 +35,14 @@ open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
 
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
-let mutable calculateWeaponPositionFsx : CGame -> (vec3 * vec3) = fun _ -> (Vec3.zero, Vec3.zero)
+
+let mutable 
+    calculateWeaponPositionFsx 
+    : CGame -> (vec3 * vec3) = 
+        fun _ -> (Vec3.zero, Vec3.zero)
+
 let mutable compiledOnce = false
 let mutable cdate = Unchecked.defaultof<DateTime>
-let scs = SimpleSourceCodeServices ()
 
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
@@ -51,8 +55,9 @@ let calculateWeaponPosition (cg: CGame) =
         async {
 
             let asm = Assembly.GetExecutingAssembly ()
-            let _, _, fsxAsm =
+            let scs = SimpleSourceCodeServices ()
 
+            let _, _, fsxAsm =
                 scs.CompileToDynamicAssembly (
                     [|
                     "-o"; "weapons.dll";
@@ -62,6 +67,7 @@ let calculateWeaponPosition (cg: CGame) =
             match fsxAsm with
             | None -> failwith "no assembly"
             | Some x ->
+
             let weaponsModule = x.GetType ("CGame.Weapons")
 
             calculateWeaponPositionFsx <- 
