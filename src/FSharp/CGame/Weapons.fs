@@ -21,50 +21,41 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 module CGame.Weapons
 
+open System
+open System.IO
+open System.Reflection
 open System.Diagnostics.Contracts
 open FSharp.Game.Math
 open Engine.Renderer
 open CGame.Core
 
+open Microsoft.FSharp.Core.CompilerServices
+open Microsoft.FSharp.Compiler
+open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
+
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
 let mutable calculateWeaponPositionFsx : CGame -> (vec3 * vec3) = fun _ -> (Vec3.zero, Vec3.zero)
+let mutable compiledOnce = false
+let mutable cdate = Unchecked.defaultof<DateTime>
+let scs = SimpleSourceCodeServices ()
 [<Pure>]
-let calculateWeaponPosition (cg: CGame) =
-    let origin = cg.Refdef.ViewOrigin
-    let angles = cg.RefdefViewAngles
+let calculateWeaponPosition (cg: CGame) = 
+    let date = File.GetLastWriteTime ("weapons.fsx")
+    if compiledOnce = false || cdate <> date then
+        cdate <- date
+        compiledOnce <- true
 
-    // on odd legs, invert some angles
-    let scale =
-        match cg.BobCycle &&& 1 with
-        | 0 -> -cg.XYSpeed
-        | _ -> cg.XYSpeed
-
-    // gun angles from bobbing
-    let angles =
-        vec3 (
-            (angles.x + (cg.XYSpeed * cg.BobFractionSin * 0.005f)), // PITCH
-            (angles.y + (scale * cg.BobFractionSin * 0.01f)), // YAW
-            (angles.z + (scale * cg.BobFractionSin * 0.005f)) // ROLL
-        )
+        async {
+            let asm = Assembly.GetExecutingAssembly ()
+            let errors, _, fsxAsm =
+                scs.CompileToDynamicAssembly ([|"-o"; "weapons.dll"; "-a"; "weapons.fsx"; "-r"; asm.Location|], None)
+            match fsxAsm with
+            | None -> failwith "no assembly"
+            | Some x ->
+            let typ = x.GetType ("CGame.Weapons")
+            calculateWeaponPositionFsx <- fun cg -> typ.InvokeMember ("calculateWeaponPosition", BindingFlags.InvokeMethod ||| BindingFlags.Public ||| BindingFlags.Static, null, null, [|cg|]) :?> (vec3 * vec3)
+        }
+        |> Async.Start
         
-    let originZ =
-        // drop the weapon when landing
-        match cg.DeltaLandTime with
-        | x when x < Constants.LandDeflectTime ->
-            origin.z + (cg.LandChange * 0.25f * (single x / single Constants.LandDeflectTime))
-        | x when x < Constants.LandDeflectTime + Constants.LandReturnTime ->
-            origin.z + (cg.LandChange * 0.25f * single (Constants.LandDeflectTime + Constants.LandReturnTime - x) / single Constants.LandReturnTime)
-        | _ -> origin.z
-
-    // idle drift
-    let scale = cg.XYSpeed + 40.f
-    let fractionSin = sin <| single cg.Time * 0.001f
-    let angles =
-        vec3 (
-            (angles.x + (scale * fractionSin * 0.01f)), // PITCH
-            (angles.y + (scale * fractionSin * 0.01f)), // YAW
-            (angles.z + (scale * fractionSin * 0.01f)) // ROLL
-        )
-
-    (origin.Set (z = originZ), angles)
+    calculateWeaponPositionFsx cg

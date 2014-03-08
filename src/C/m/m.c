@@ -75,7 +75,7 @@ MDomain*
 m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *filename)
 {
 #if NDEBUG
-	const gchar *options[] = { "--llvm", "-O=all" };
+	//const gchar *options[] = { "--llvm", "-O=all" };
 #endif
 
 	MDomain *domain;
@@ -84,7 +84,7 @@ m_domain_new (const gchar *assembly_dir, const gchar *config_dir, const gchar *f
 	domain = (MDomain*)mono_jit_init (filename);
 
 #if NDEBUG
-	mono_jit_parse_options(2, (gchar**)options);
+	//mono_jit_parse_options(2, (gchar**)options);
 #endif
 	return domain;
 }
