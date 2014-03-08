@@ -305,6 +305,11 @@ R_AddMD3Surfaces
 
 =================
 */
+extern cvar_t *r_lodbias;
+extern cvar_t *r_shadows;
+extern cvar_t *r_ambientScale;
+extern cvar_t *r_directedScale;
+extern cvar_t *r_debugLight;
 void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 #if 0
 	int				i;
@@ -435,6 +440,7 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 		surface = (md3Surface_t *)( (byte *)surface + surface->ofsEnd );
 	}
 #else
+# if 1
 	int				i;
 	md3Header_t		*header = 0;
 	md3Surface_t	*surface = 0;
@@ -565,6 +571,24 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 
 		surface = (md3Surface_t *)((byte *)surface + surface->ofsEnd);
 	}
+# else
+	trGlobals_t *_tr = &tr;
+	MObject *result;
+
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, addMd3Surfaces, result,
+		m_object_as_arg (qm_of_tr_ref_entity (ent)),
+		m_object_as_arg (qm_option_of_light_grid (tr.world)),
+		m_object_as_arg (qm_of_tr_globals (&tr)),
+		m_object_as_arg (qm_of_cvar (r_lodscale)),
+		m_object_as_arg (qm_of_cvar (r_lodbias)),
+		m_object_as_arg (qm_of_cvar (r_nocull)),
+		m_object_as_arg (qm_of_cvar (r_shadows)),
+		m_object_as_arg (qm_of_cvar (r_ambientScale)),
+		m_object_as_arg (qm_of_cvar (r_directedScale)),
+		m_object_as_arg (qm_of_cvar (r_debugLight)));
+
+	qm_to_tr_globals (result, &_tr);
+# endif
 #endif
 }
 
