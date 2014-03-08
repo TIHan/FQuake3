@@ -113,8 +113,6 @@ type Orientation =
 /// <summary>
 /// Based on Q3: orientationr_t
 /// OrientationR
-///
-/// Note: Should this be a record type? It is over 64 bytes, don't know for sure.
 /// </summary>
 type OrientationR =
     {

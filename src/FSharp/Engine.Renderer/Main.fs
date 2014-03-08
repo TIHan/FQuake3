@@ -38,29 +38,11 @@ let flipMatrix =
         0.f,  1.f,  0.f, 0.f,
         0.f,  0.f,  0.f, 1.f)
 
-/// <summary>
-/// Based on Q3: R_LocalPointToWorld
-/// LocalPointToWorld
-/// </summary>
-[<Pure>]
-let localPointToWorld (local: vec3) (orientation: OrientationR) =
-    let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
-    vec3 (f 0, f 1, f 2)
-
-/// <summary>
-/// Based on Q3: R_CullLocalBox
-/// CullLocalBox
-/// </summary>
-[<Pure>]
-let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+/// CullBox
+let cullBox (bounds: Bounds) (frustum: Frustum) (r_nocull: Cvar) =
     match r_nocull.Integer = 1 with
     | true -> Cull.Clip
     | _ ->
-
-    let bounds =
-        Bounds (
-            localPointToWorld bounds.min orientation,
-            localPointToWorld bounds.max orientation)
 
     let rec cullBox cull = function
         | Frustum.planeCount -> cull
@@ -121,6 +103,15 @@ let cullPointAndRadius (point: vec3) (radius: single) (frustum: Frustum) (r_nocu
     | _ -> Cull.In // completely inside frustum
 
 /// <summary>
+/// Based on Q3: R_LocalPointToWorld
+/// LocalPointToWorld
+/// </summary>
+[<Pure>]
+let localPointToWorld (local: vec3) (orientation: OrientationR) =
+    let inline f i = Vec3.dot local orientation.Axis.[i] + orientation.Origin.[i]
+    vec3 (f 0, f 1, f 2)
+
+/// <summary>
 /// Based on Q3: R_LocalNormalToWorld
 /// LocalNormalToWorld
 /// </summary>
@@ -130,13 +121,25 @@ let localNormalToWorld (local: vec3) (orientation: OrientationR) =
     vec3 (f 0, f 1, f 2)
 
 /// <summary>
+/// Based on Q3: R_CullLocalBox
+/// CullLocalBox
+/// </summary>
+[<Pure>]
+let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+    let bounds' =
+        Bounds (
+            localPointToWorld bounds.min orientation,
+            localPointToWorld bounds.max orientation)
+    cullBox bounds' frustum r_nocull
+
+/// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
 /// CullLocalPointAndRadius
 /// </summary>
 [<Pure>]
 let cullLocalPointAndRadius (point: vec3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
-    let transformed = localPointToWorld point orientation
-    cullPointAndRadius transformed radius frustum r_nocull
+    let point' = localPointToWorld point orientation
+    cullPointAndRadius point' radius frustum r_nocull
 
 /// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
