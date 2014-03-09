@@ -44,33 +44,37 @@ let cullBox (bounds: Bounds) (frustum: Frustum) (r_nocull: Cvar) =
     | true -> Cull.Clip
     | _ ->
 
-    let rec cullBox cull = function
-        | Frustum.planeCount -> cull
-        | n ->
-
-        match cull with
-        | Cull.Out -> cull
+    let rec checkFrustumPlane (frust: Plane) front back isFront n =
+        match n with
+        | Bounds.cornerCount -> (front, back)
         | _ ->
+        match isFront with
+        | true -> (front, back)
+        | _ ->
+            let distance = Vec3.dot (Bounds.corner n bounds) frust.Normal
 
-        let plane = frustum.[n]
+            match distance > frust.Distance with
+            | true -> checkFrustumPlane frust 1 back (back = 1) (n + 1)
+            | _ -> checkFrustumPlane frust front 1 false (n + 1)
 
-        let inline findv (v1: vec3) (v2: vec3) =
-            let inline f i = if plane.Normal.[i] >= 0.f then v1.[i] else v2.[i]
-            vec3 (f 0, f 1, f 2)
+    let rec checkFrustumPlanes anyBack isFront n =
+        match n with
+        | Frustum.planeCount -> (anyBack, isFront)
+        | _ ->
+        match isFront with
+        | false -> (anyBack, isFront)
+        | _ ->
+            let frust = frustum.[n]
 
-        let pv = findv bounds.max bounds.min
-        let nv = findv bounds.min bounds.max
+            match checkFrustumPlane frust 0 0 false 0 with
+            | (front, back) ->
+                checkFrustumPlanes (anyBack ||| back) (front = 1) (n + 1)
 
-        let cull =
-            match Plane.side pv plane with
-            | true ->
-                match Plane.side nv plane with
-                | true -> cull
-                | _ -> Cull.Clip // partially clipped
-            | _ -> Cull.Out // all points were behind one of the planes
-        cullBox cull (n + 1)
-
-    cullBox Cull.In 0
+    // check against frustum planes
+    match checkFrustumPlanes 0 true 0 with
+    | (_, false) -> Cull.Out // all points were behind one of the planes
+    | (0, _) -> Cull.In // completely inside frustum
+    | _ -> Cull.Clip // partially clipped
 
 /// <summary>
 /// Based on Q3: R_CullPointAndRadius
@@ -126,10 +130,13 @@ let localNormalToWorld (local: vec3) (orientation: OrientationR) =
 /// </summary>
 [<Pure>]
 let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+    let transform (v: vec3) =
+        orientation.Origin
+        |> Vec3.multiplyAdd v.x orientation.Axis.[0]
+        |> Vec3.multiplyAdd v.y orientation.Axis.[1]
+        |> Vec3.multiplyAdd v.z orientation.Axis.[2]
     let bounds' =
-        Bounds (
-            localPointToWorld bounds.min orientation,
-            localPointToWorld bounds.max orientation)
+        Bounds (transform bounds.min, transform bounds.max)
     cullBox bounds' frustum r_nocull
 
 /// <summary>
