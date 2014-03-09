@@ -35,68 +35,40 @@ open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
 open Microsoft.FSharp.Compiler.Interactive.Shell
 
 // Intialize output and input streams
-let sbOut = new Text.StringBuilder()
-let sbErr = new Text.StringBuilder()
-let inStream = new StringReader("")
-let outStream = new StringWriter(sbOut)
-let errStream = new StringWriter(sbErr)
+let sbOut = new Text.StringBuilder ()
+let sbErr = new Text.StringBuilder ()
+let inStream = new StringReader ("")
+let outStream = new StringWriter (sbOut)
+let errStream = new StringWriter (sbErr)
 
 // Build command line arguments & start FSI session
 let argv = [| "fsi.exe" |]
 let allArgs = Array.append argv [|"--noninteractive"|]
 
-let fsiConfig = FsiEvaluationSession.GetDefaultConfiguration()
-let fsiSession = FsiEvaluationSession(fsiConfig, allArgs, inStream, outStream, errStream) 
+let fsiConfig =
+    FsiEvaluationSession.GetDefaultConfiguration ()
+let fsiSession =
+    FsiEvaluationSession (
+        fsiConfig,
+        allArgs,
+        inStream,
+        outStream,
+        errStream) 
 
 let mutable 
     calculateWeaponPositionFsx 
     : CGame -> (vec3 * vec3) = 
         fun _ -> (Vec3.zero, Vec3.zero)
 
-let mutable compiledOnce = false
-let mutable cdate = Unchecked.defaultof<DateTime>
+let mutable prevTime = Unchecked.defaultof<DateTime>
 
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
+    let time = File.GetLastWriteTime ("weapons.fsx")
 
-    let date = File.GetLastWriteTime ("weapons.fsx")
-    if compiledOnce = false || cdate <> date then
-        cdate <- date
-        compiledOnce <- true
-
+    if prevTime <> time then
+        prevTime <- time
+        printfn "Evaluating weapons.fsx"
         fsiSession.EvalScript "weapons.fsx"
-(*
-        async {
-
-            let asm = Assembly.GetExecutingAssembly ()
-            let scs = SimpleSourceCodeServices ()
-
-            let _, _, fsxAsm =
-                scs.CompileToDynamicAssembly (
-                    [|
-                    "-o"; "weapons.dll";
-                    "-a"; "weapons.fsx"; 
-                    "-r"; asm.Location|], None)
-
-            match fsxAsm with
-            | None -> failwith "no assembly"
-            | Some x ->
-
-            let weaponsModule = x.GetType ("CGame.Weapons")
-
-            calculateWeaponPositionFsx <- 
-                fun cg -> 
-                weaponsModule.InvokeMember (
-                    "calculateWeaponPosition", 
-                    BindingFlags.InvokeMethod ||| 
-                    BindingFlags.Public ||| 
-                    BindingFlags.Static, 
-                    null, 
-                    null, 
-                    [|cg|]) :?> (vec3 * vec3)
-
-        }
-        |> Async.Start
-*)
         
     calculateWeaponPositionFsx cg
