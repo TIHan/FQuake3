@@ -59,12 +59,11 @@
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
     <Compile Include="Core.fs" />
-    <Compile Include="Weapons.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
-    <None Include="weapons.fsx">
+    <Compile Include="weapons.fsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

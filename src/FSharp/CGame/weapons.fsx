@@ -19,20 +19,32 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
+#if INTERACTIVE
 #r "FQuake3.Utils.dll"
 #r "Engine.dll"
 #r "Engine.Renderer.dll"
 #r "CGame.dll"
+#else
+module CGame.Weapons
+#endif
 
 open System.Diagnostics.Contracts
 open FSharp.Game.Math
 open Engine.Renderer
 open CGame.Core
 
+#if INTERACTIVE
+#else
+let mutable calculateWeaponPositionFsx
+    : CGame -> (vec3 * vec3) =
+        fun _ -> (Vec3.zero, Vec3.zero)
+#endif
+
 /// Based on Q3: CG_CalculateWeaponPosition
 /// CalculateWeaponPosition
 [<Pure>]
 let calculateWeaponPosition (cg: CGame) =
+#if INTERACTIVE
     let origin = cg.Refdef.ViewOrigin
     let angles = cg.RefdefViewAngles
 
@@ -70,6 +82,11 @@ let calculateWeaponPosition (cg: CGame) =
         )
 
     (origin.Set (z = originZ), angles)
+#else
+    calculateWeaponPositionFsx cg
+#endif
 
-CGame.Weapons.calculateWeaponPositionFsx 
+#if INTERACTIVE
+CGame.Weapons.calculateWeaponPositionFsx
     <- calculateWeaponPosition
+#endif
