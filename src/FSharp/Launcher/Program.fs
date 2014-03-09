@@ -30,23 +30,20 @@ let fsiSession =
 
 [<EntryPoint>]
 let main argv = 
-    async {
 
+    async {
         let prevTime = 
             ref Unchecked.defaultof<DateTime>
 
         while true do
-            do! Async.Sleep (10)
+            do! Async.Sleep 10
 
             let time = File.GetLastWriteTime "weapons.fsx"
-            match prevTime.contents <> time with
-            | false -> ()
-            | _ ->
-            prevTime.contents <- time
 
-            printfn "Evaluating weapons.fsx"
-            fsiSession.EvalScript ("weapons.fsx")
-    }
+            if prevTime.contents <> time then
+                prevTime.contents <- time
+                printfn "Evaluating weapons.fsx"
+                fsiSession.EvalScript "weapons.fsx" }
     |> Async.Start
 
     System.Start ()
