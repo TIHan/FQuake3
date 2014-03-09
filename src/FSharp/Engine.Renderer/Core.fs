@@ -127,8 +127,8 @@ type OrientationR =
         Axis : Axis;
 
         /// <summary>
-        /// viewParms->or.origin in local coordinates
-        /// FIXME: This directly points to viewParms orientation origin? Yuck.
+        /// View->or.origin in local coordinates
+        /// FIXME: This directly points to View orientation origin? Yuck.
         /// </summary>
         ViewOrigin: vec3;
         ModelMatrix: mat4;
@@ -219,29 +219,34 @@ module Frustum =
 
 /// <summary>
 /// Based on Q3: viewParms_t
-/// ViewParms
+/// View
 /// </summary>
-type ViewParms =
+type View =
     {
-        Orientation: OrientationR;
-        World: OrientationR;
-        PvsOrigin: vec3;         // may be different than or.origin for portals
-        IsPortal: bool;             // true if this view is through a portal
-        IsMirror: bool;             // the portal is a mirror, invert the face culling
-        FrameSceneId: int;          // copied from tr.frameSceneNum
-        FrameCount: int;            // copied from tr.frameCount
-        PortalPlane: Plane;         // clip anything behind this if mirroring
-        ViewportX: int;
-        ViewportY: int;
-        ViewportWidth: int;
-        ViewportHeight: int;
-        FovX: single;
-        FovY: single;
-        ProjectionMatrix: mat4;
-        Frustum: Frustum;
-        VisibilityBounds: Bounds;
-        ZFar: single;
-    }
+    Orientation: OrientationR
+    World: OrientationR
+    /// may be different than or.origin for portals
+    PvsOrigin: vec3
+    /// true if this view is through a portal
+    IsPortal: bool
+    /// the portal is a mirror, invert the face culling
+    IsMirror: bool
+    /// copied from tr.frameSceneNum
+    FrameSceneId: int
+    /// copied from tr.frameCount
+    FrameCount: int
+    /// clip anything behind this if mirroring
+    PortalPlane: Plane
+    ViewportX: int
+    ViewportY: int
+    ViewportWidth: int
+    ViewportHeight: int
+    FovX: single
+    FovY: single
+    ProjectionMatrix: mat4
+    Frustum: Frustum
+    VisibilityBounds: Bounds
+    ZFar: single }
 
 /// Based on Q3: refEntityType_t
 /// RefEntityType
@@ -1231,7 +1236,7 @@ module PerfCounter =
 type Backend =
     {
         Refdef: TrRefdef;
-        View: ViewParms;
+        View: View;
         Orientation: OrientationR;
         // TODO: backEndCounters_t  pc;
         IsHyperspace: bool;
@@ -1296,7 +1301,7 @@ type Renderer = {
 
     CurrentModel: Model option
 
-    ViewParms: ViewParms
+    View: View
     IdentityLight: single
     IdentityLightByte: int
     Refdef: TrRefdef

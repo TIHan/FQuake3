@@ -180,7 +180,7 @@ let transformModelToClip (source: vec3) (modelMatrix: mat4) (projectionMatrix: m
 /// TransformClipToWindow
 /// </summary>
 [<Pure>]
-let transformClipToWindow (clip: vec4) (view: ViewParms) =
+let transformClipToWindow (clip: vec4) (view: View) =
     let normalized =
         vec4 (
             (clip.x / clip.w),
@@ -207,14 +207,14 @@ let myGLMultMatrix (a: mat4) (b: mat4) =
 /// Based on Q3: R_RotateForEntity
 /// RotateForEntity
 ///
-/// Generates an orientation for an entity and viewParms
+/// Generates an orientation for an entity and View
 /// Does NOT produce any GL calls
 /// Called by both the front end and the back end
 /// </summary>
 [<Pure>]
-let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
+let rotateForEntity (view: View) (entity: RefEntity) =
     match entity.Type <> RefEntityType.Model with
-    | true -> viewParms.World
+    | true -> view.World
     | _ ->
 
     let axis = entity.Axis
@@ -229,7 +229,7 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
 
     // calculate the viewer origin in the model's space
     // needed for fog, specular, and environment mapping
-    let delta = viewParms.Orientation.Origin - origin
+    let delta = view.Orientation.Origin - origin
 
     // compensate for scale in the axes if necessary
     let axisLength =
@@ -248,7 +248,7 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
         Origin = origin;
         Axis = axis;
         ViewOrigin = vec3 (calculateOrigin 0, calculateOrigin 1, calculateOrigin 2);
-        ModelMatrix = glMatrix * viewParms.World.ModelMatrix;
+        ModelMatrix = glMatrix * view.World.ModelMatrix;
     }
 
 /// <summary>
@@ -258,10 +258,10 @@ let rotateForEntity (viewParms: ViewParms) (entity: RefEntity) =
 /// Sets up the modelview matrix for a given viewParm
 /// </summary>
 [<Pure>]
-let rotateForViewer (viewParms: ViewParms) =
+let rotateForViewer (view: View) =
     // transform by the camera placement
-    let origin = viewParms.Orientation.Origin
-    let axis = viewParms.Orientation.Axis
+    let origin = view.Orientation.Origin
+    let axis = view.Orientation.Axis
 
     let viewerMatrix =
         mat4 (
@@ -315,7 +315,7 @@ let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: Orien
 /// SetupProjection
 /// </summary>
 [<Pure>]
-let setupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: single) (fovY: single) =
+let setupProjection (zNear: single) (rdFlags: RdFlags) (view: View) (fovX: single) (fovY: single) =
     // dynamically compute far clip plane distance
     let zFar = setFarClip rdFlags view.VisibilityBounds view.Orientation
 
@@ -345,7 +345,7 @@ let setupProjection (zNear: single) (rdFlags: RdFlags) (view: ViewParms) (fovX: 
 /// Setup that culling frustum planes for the current view
 /// </summary>
 [<Pure>]
-let setupFrustum (view: ViewParms) =
+let setupFrustum (view: View) =
     let xAngle = view.FovX / 180.f * Math.PI * 0.5f
     let xs = sin xAngle
     let xc = cos xAngle
@@ -455,7 +455,7 @@ let tryRotatePlane (originalPlane: Plane) (entityId: int) (r: Renderer) =
     | Some (trEntity) ->
 
     // get the orientation of the entity
-    let orientation = rotateForEntity tr.ViewParms trEntity.Entity
+    let orientation = rotateForEntity tr.View trEntity.Entity
 
     // rotate the plane, but keep the non-rotated version for matching
     // against the portalSurface entities
@@ -643,7 +643,7 @@ let addEntitySurface (rentity: TrRefEntity) (r: Renderer) =
         // self blood sprites, talk balloons, etc should not be drawn in the primary
         // view.  We can't just do this check for all entities, because md3
         // entities may still want to cast shadows from them
-        match rentity.Entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson && not r.ViewParms.IsPortal with
+        match rentity.Entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson && not r.View.IsPortal with
         | true -> rentity
         | _ ->
 
