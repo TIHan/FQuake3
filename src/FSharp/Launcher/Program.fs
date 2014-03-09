@@ -43,7 +43,10 @@ let main argv =
             if prevTime.contents <> time then
                 prevTime.contents <- time
                 printfn "Evaluating weapons.fsx"
-                fsiSession.EvalScript "weapons.fsx" }
+                try
+                    fsiSession.EvalScript "weapons.fsx"
+                with
+                | ex -> () }
     |> Async.Start
 
     System.Start ()
