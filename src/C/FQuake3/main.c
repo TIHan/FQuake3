@@ -10,7 +10,6 @@ static GOptionEntry option_entries[] =
 	{ NULL }
 };
 
-#define EXEC_FSI 0
 /*
 ==================
 main
@@ -31,11 +30,7 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
-#if EXEC_FSI
-	domain = m_domain_new (mono_lib, mono_etc, "Fsi.exe");
-#else
 	domain = m_domain_new (mono_lib, mono_etc, "Launcher.exe");
-#endif
 
 	// Load Core
 	m_load_assembly ("FSharp.Core.dll");
@@ -52,11 +47,7 @@ main (int argc, char *argv[])
 	// Load CGame (temporary)
 	m_load_assembly ("CGame.dll");
 
-#if EXEC_FSI
-	m_domain_exec (domain, "Fsi.exe", argc, argv);
-#else
 	m_domain_exec (domain, "Launcher.exe", argc, argv);
-#endif
 
 	// Free Domain
 	m_domain_free (domain);
