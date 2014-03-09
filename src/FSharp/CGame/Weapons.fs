@@ -27,48 +27,13 @@ open System.Reflection
 open System.Diagnostics.Contracts
 open FSharp.Game.Math
 open Engine.Renderer
-open CGame.Core
-
-open Microsoft.FSharp.Core.CompilerServices
-open Microsoft.FSharp.Compiler
-open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
-open Microsoft.FSharp.Compiler.Interactive.Shell
-
-// Intialize output and input streams
-let sbOut = new Text.StringBuilder ()
-let sbErr = new Text.StringBuilder ()
-let inStream = new StringReader ("")
-let outStream = new StringWriter (sbOut)
-let errStream = new StringWriter (sbErr)
-
-// Build command line arguments & start FSI session
-let argv = [| "fsi.exe" |]
-let allArgs = Array.append argv [|"--noninteractive"|]
-
-let fsiConfig =
-    FsiEvaluationSession.GetDefaultConfiguration ()
-let fsiSession =
-    FsiEvaluationSession (
-        fsiConfig,
-        allArgs,
-        inStream,
-        outStream,
-        errStream) 
+open CGame.Core 
 
 let mutable 
     calculateWeaponPositionFsx 
     : CGame -> (vec3 * vec3) = 
         fun _ -> (Vec3.zero, Vec3.zero)
 
-let mutable prevTime = Unchecked.defaultof<DateTime>
-
 [<Pure>]
-let calculateWeaponPosition (cg: CGame) =
-    let time = File.GetLastWriteTime ("weapons.fsx")
-
-    if prevTime <> time then
-        prevTime <- time
-        printfn "Evaluating weapons.fsx"
-        fsiSession.EvalScript "weapons.fsx"
-        
+let calculateWeaponPosition (cg: CGame) = 
     calculateWeaponPositionFsx cg

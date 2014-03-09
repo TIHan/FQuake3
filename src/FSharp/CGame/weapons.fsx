@@ -21,8 +21,8 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 #r "FQuake3.Utils.dll"
 #r "Engine.dll"
-#r "build/Engine.Renderer.dll"
-#r "build/CGame.dll"
+#r "Engine.Renderer.dll"
+#r "CGame.dll"
 
 open System.Diagnostics.Contracts
 open FSharp.Game.Math
