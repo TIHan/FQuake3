@@ -32,9 +32,21 @@ open CGame.Core
 open Microsoft.FSharp.Core.CompilerServices
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
+open Microsoft.FSharp.Compiler.Interactive.Shell
 
-/// Based on Q3: CG_CalculateWeaponPosition
-/// CalculateWeaponPosition
+// Intialize output and input streams
+let sbOut = new Text.StringBuilder()
+let sbErr = new Text.StringBuilder()
+let inStream = new StringReader("")
+let outStream = new StringWriter(sbOut)
+let errStream = new StringWriter(sbErr)
+
+// Build command line arguments & start FSI session
+let argv = [| "fsi.exe" |]
+let allArgs = Array.append argv [|"--noninteractive"|]
+
+let fsiConfig = FsiEvaluationSession.GetDefaultConfiguration()
+let fsiSession = FsiEvaluationSession(fsiConfig, allArgs, inStream, outStream, errStream) 
 
 let mutable 
     calculateWeaponPositionFsx 
@@ -52,6 +64,8 @@ let calculateWeaponPosition (cg: CGame) =
         cdate <- date
         compiledOnce <- true
 
+        fsiSession.EvalScript "weapons.fsx"
+(*
         async {
 
             let asm = Assembly.GetExecutingAssembly ()
@@ -83,5 +97,6 @@ let calculateWeaponPosition (cg: CGame) =
 
         }
         |> Async.Start
+*)
         
     calculateWeaponPositionFsx cg
