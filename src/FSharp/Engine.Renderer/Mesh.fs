@@ -33,7 +33,7 @@ open FQuake3.Md3
 /// Based on Q3: ProjectRadius
 /// ProjectRadius
 [<Pure>]
-let projectRadius radius location (view: ViewParms) =
+let projectRadius radius location (view: View) =
     let axis = view.Orientation.Axis
     let origin = view.Orientation.Origin
 
@@ -78,7 +78,7 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
                     (calculateBounds 1 1),
                     (calculateBounds 1 2)))
 
-    let clip = Main.cullLocalBox bounds r.Orientation r.ViewParms.Frustum r_nocull
+    let clip = Main.cullLocalBox bounds r.Orientation r.View.Frustum r_nocull
     let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
     let r' = { r with PerfCounters = perfCounters }
 
@@ -100,7 +100,7 @@ let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
     | true ->
-        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius r.Orientation r.ViewParms.Frustum r_nocull
+        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius r.Orientation r.View.Frustum r_nocull
 
         match entity.Frame = entity.OldFrame with
         | true ->
@@ -118,7 +118,7 @@ let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
             let sphereCullB =
                 match newFrame = oldFrame with
                 | true -> sphereCull
-                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius r.Orientation r.ViewParms.Frustum r_nocull
+                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius r.Orientation r.View.Frustum r_nocull
                 
             match sphereCull = sphereCullB with
             | true ->
@@ -156,7 +156,7 @@ let computeLod (entity: RefEntity) (model: Model) (r_lodscale: Cvar) (r_lodbias:
     let frame = model.Md3.Frames.[entity.Frame]
     let radius = Bounds.radius frame.Bounds
 
-    let projectedRadius = projectRadius radius entity.Origin r.ViewParms
+    let projectedRadius = projectRadius radius entity.Origin r.View
     match projectedRadius <> 0.f with
     | true ->
         let lodscale = if r_lodscale.Value > 20.f then 20.f else r_lodscale.Value
@@ -216,7 +216,7 @@ let addMd3Surfaces
     // don't add third_person objects if not in a portal
     let isPersonalModel =
         entity.RenderFx.HasFlag RenderFxFlags.ThirdPerson
-        && not r.ViewParms.IsPortal
+        && not r.View.IsPortal
 
     let canWrapFrames = entity.RenderFx.HasFlag RenderFxFlags.WrapFrames
 

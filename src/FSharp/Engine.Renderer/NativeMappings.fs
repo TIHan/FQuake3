@@ -171,7 +171,7 @@ module Model =
         Md3 = Md3.ofNativePtr native.md3
         Md3Lods = List.ofNativePtrArrayMap (native.numLods - 1) (fun x -> Md3.ofNativePtr <| NativePtr.read x) &&native.md3 }
 
-module ViewParms =
+module View =
     let inline ofNativePtr (ptr: nativeptr<viewParms_t>) =
         let mutable native = NativePtr.read ptr
 
@@ -196,7 +196,7 @@ module ViewParms =
             ZFar = native.zFar;
         }
 
-    let inline toNativeByPtr (ptr: nativeptr<viewParms_t>) (view: ViewParms) =
+    let inline toNativeByPtr (ptr: nativeptr<viewParms_t>) (view: View) =
         let mutable native = NativePtr.read ptr
         
         OrientationR.toNativeByPtr &&native.or' view.Orientation
@@ -629,7 +629,7 @@ module Backend =
 
         {
             Refdef = TrRefdef.ofNativePtr &&native.refdef;
-            View = ViewParms.ofNativePtr &&native.viewParms;
+            View = View.ofNativePtr &&native.viewParms;
             Orientation = OrientationR.ofNativePtr &&native.or';
             IsHyperspace = Boolean.ofNativePtr &&native.isHyperspace;
             CurrentEntity = Option.ofNativePtr (fun x -> TrRefEntity.ofNativePtr x) native.currentEntity;
@@ -859,7 +859,7 @@ module Renderer =
         CurrentEntity = Option.ofNativePtr TrRefEntity.ofNativePtr native.currentEntity
         CurrentEntityId = native.currentEntityNum
         CurrentModel = Option.ofNativePtr Model.ofNativePtr native.currentModel
-        ViewParms = ViewParms.ofNativePtr &&native.viewParms
+        View = View.ofNativePtr &&native.viewParms
         IdentityLight = native.identityLight
         IdentityLightByte = native.identityLightByte
         Refdef = TrRefdef.ofNativePtr &&native.refdef
@@ -877,7 +877,7 @@ module Renderer =
         TrRefEntity.toNativeByPtr native.currentEntity r.CurrentEntity.Value
         native.currentEntityNum <- r.CurrentEntityId
         // TODO: Map Model - Property CurrentModel
-        ViewParms.toNativeByPtr &&native.viewParms r.ViewParms
+        View.toNativeByPtr &&native.viewParms r.View
         native.identityLight <- r.IdentityLight
         native.identityLightByte <- r.IdentityLightByte
         TrRefdef.toNativeByPtr &&native.refdef r.Refdef
