@@ -28,6 +28,12 @@ type Axis =
             (match y with | Some y -> y | None -> this.y),
             (match z with | Some z -> z | None -> this.z))
 
+    static member inline (*) (v: vec3, m: Axis) =
+        vec3 (
+            v.x * m.x.x + v.y * m.y.x + v.z * m.z.x,
+            v.x * m.x.y + v.y * m.y.y + v.z * m.z.y,
+            v.x * m.x.z + v.y * m.y.z + v.z * m.z.z)
+
 /// Axis Module
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]

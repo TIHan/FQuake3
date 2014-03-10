@@ -63,6 +63,7 @@ let projectRadius radius location (view: View) =
 [<Pure>]
 let cullModel (r_nocull: Cvar) (frustum: Frustum) (entity: RefEntity) (md3: Md3) =
     let frame = md3.Frames.[entity.Frame]
+    let origin = entity.Origin
 
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
@@ -70,7 +71,9 @@ let cullModel (r_nocull: Cvar) (frustum: Frustum) (entity: RefEntity) (md3: Md3)
         let point = frame.LocalOrigin + entity.Origin
         Main.cullPointAndRadius point frame.Radius frustum r_nocull
     | _ ->
-        let bounds = Bounds (frame.Bounds.min + entity.Origin, frame.Bounds.max + entity.Origin)
+        let axis = entity.Axis
+        let bounds = Bounds (frame.Bounds.min * axis + origin, frame.Bounds.max * axis + origin)
+
         Main.cullBox bounds frustum r_nocull
 
 /// Based on Q3: R_ComputeLOD
