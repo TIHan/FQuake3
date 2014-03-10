@@ -125,30 +125,6 @@ let localNormalToWorld (local: vec3) (orientation: OrientationR) =
     vec3 (f 0, f 1, f 2)
 
 /// <summary>
-/// Based on Q3: R_CullLocalBox
-/// CullLocalBox
-/// </summary>
-[<Pure>]
-let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
-    let transform (v: vec3) =
-        orientation.Origin
-        |> Vec3.multiplyAdd v.x orientation.Axis.[0]
-        |> Vec3.multiplyAdd v.y orientation.Axis.[1]
-        |> Vec3.multiplyAdd v.z orientation.Axis.[2]
-    let bounds' =
-        Bounds (transform bounds.min, transform bounds.max)
-    cullBox bounds' frustum r_nocull
-
-/// <summary>
-/// Based on Q3: R_CullLocalPointAndRadius
-/// CullLocalPointAndRadius
-/// </summary>
-[<Pure>]
-let cullLocalPointAndRadius (point: vec3) (radius: single) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
-    let point' = localPointToWorld point orientation
-    cullPointAndRadius point' radius frustum r_nocull
-
-/// <summary>
 /// Based on Q3: R_CullLocalPointAndRadius
 /// TransformModelToClip
 /// </summary>

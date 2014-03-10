@@ -174,7 +174,6 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 
 	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModel, result,
 		m_object_as_arg(qm_of_cvar(r_nocull)),
-		m_object_as_arg(qm_of_orientationr(&tr.or)),
 		m_object_as_arg(qm_of_frustum(&tr.viewParms.frustum)),
 		m_object_as_arg (qm_of_ref_entity (&ent->e)),
 		m_object_as_arg(qm_of_md3(header)));

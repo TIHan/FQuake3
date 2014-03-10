@@ -110,9 +110,8 @@ int R_CullLocalBox (vec3_t bounds[2])
 #else
 	MObject *result;
 
-	m_invoke_new (Engine.Renderer, Engine.Renderer, Main, cullLocalBox, result,
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Main, cullBox, result,
 		m_object_as_arg (qm_of_bounds (bounds)),
-		m_object_as_arg (qm_of_orientationr (&tr.or)),
 		m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum)),
 		m_object_as_arg (qm_of_cvar (r_nocull))
 	);
@@ -135,10 +134,9 @@ int R_CullLocalPointAndRadius( vec3_t pt, float radius )
 #else
 	MObject *result;
 
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "cullLocalPointAndRadius", 5, {
+	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "cullPointAndRadius", 4, {
 		__args [0] = m_object_as_arg (qm_of_vec3 (pt));
 		__args [1] = &radius;
-		__args [2] = m_object_as_arg (qm_of_orientationr (&tr.or));
 		__args [3] = m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum));
 		__args [4] = m_object_as_arg (qm_of_cvar (r_nocull));
 	}, result);
@@ -211,14 +209,7 @@ void R_LocalNormalToWorld (vec3_t local, vec3_t world) {
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2];
 #else
-	MObject *result;
-
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "localNormalToWorld", 2, {
-		__args [0] = m_object_as_arg (qm_of_vec3 (local));
-		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
-	}, result);
-
-	qm_to_vec3 (result, world);
+	g_error ("R_LocalNormalToWorld should not be called.");
 #endif
 }
 
@@ -235,14 +226,7 @@ void R_LocalPointToWorld (vec3_t local, vec3_t world)
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
 #else
-	MObject *result;
-
-	qm_invoke ("Engine.Renderer", "Engine.Renderer", "Main", "localPointToWorld", 2, {
-		__args [0] = m_object_as_arg (qm_of_vec3 (local));
-		__args [1] = m_object_as_arg (qm_of_orientationr (&tr.or));
-	}, result);
-
-	qm_to_vec3 (result, world);
+	g_error("R_LocalPointToWorld should not be called.");
 #endif
 }
 

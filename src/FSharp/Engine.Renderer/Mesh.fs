@@ -61,13 +61,17 @@ let projectRadius radius location (view: View) =
 /// Based on Q3: R_CullModel
 /// CullModel
 [<Pure>]
-let cullModel (r_nocull: Cvar) (orientation: OrientationR) (frustum: Frustum) (entity: RefEntity) (md3: Md3) =
+let cullModel (r_nocull: Cvar) (frustum: Frustum) (entity: RefEntity) (md3: Md3) =
     let frame = md3.Frames.[entity.Frame]
 
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
-    | true -> Main.cullLocalPointAndRadius frame.LocalOrigin frame.Radius orientation frustum r_nocull
-    | _ -> Main.cullLocalBox frame.Bounds orientation frustum r_nocull
+    | true ->
+        let point = frame.LocalOrigin + entity.Origin
+        Main.cullPointAndRadius point frame.Radius frustum r_nocull
+    | _ ->
+        let bounds = Bounds (frame.Bounds.min + entity.Origin, frame.Bounds.max + entity.Origin)
+        Main.cullBox bounds frustum r_nocull
 
 /// Based on Q3: R_ComputeLOD
 /// ComputeLod
@@ -195,7 +199,7 @@ let addMd3Surfaces
     // cull the entire model if merged bounding box of both frames
     // is outside the view frustum.
     //
-    let cull = cullModel r_nocull r.Orientation r.View.Frustum entity md3
+    let cull = cullModel r_nocull r.View.Frustum entity md3
 
     match cull = Cull.Out with
     | true -> r
