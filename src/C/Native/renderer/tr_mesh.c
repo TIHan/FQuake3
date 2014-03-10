@@ -170,17 +170,16 @@ static int R_CullModel( md3Header_t *header, trRefEntity_t *ent ) {
 		return CULL_OUT;
 	}
 #else
-	trGlobals_t* _tr = &tr;
-	MObject *res;
+	MObject *result;
 
-	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModel, res,
-		m_object_as_arg (qm_of_md3 (header)),
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Mesh, cullModel, result,
+		m_object_as_arg(qm_of_cvar(r_nocull)),
+		m_object_as_arg(qm_of_orientationr(&tr.or)),
+		m_object_as_arg(qm_of_frustum(&tr.viewParms.frustum)),
 		m_object_as_arg (qm_of_ref_entity (&ent->e)),
-		m_object_as_arg (qm_of_tr_globals (&tr)),
-		m_object_as_arg(qm_of_cvar(r_nocull)))
+		m_object_as_arg(qm_of_md3(header)));
 
-	qm_to_tr_globals (m_object_get_property (res, "Item2"), &_tr);
-	return *(gint*)m_object_unbox (m_object_get_property(res, "Item1"));
+	return *(gint*)m_object_unbox (result);
 #endif
 }
 

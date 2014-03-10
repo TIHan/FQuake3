@@ -58,84 +58,16 @@ let projectRadius radius location (view: View) =
     | true -> 1.f
     | _ -> pr
 
-
-/// CalculateCullLocalBox
-[<Pure>]
-let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: Cvar) (r: Renderer) =
-    let inline calculateBounds i j =
-        match oldFrame.Bounds.[i].[j] < newFrame.Bounds.[i].[j] with
-        | true -> oldFrame.Bounds.[i].[j]
-        | _ -> newFrame.Bounds.[i].[j]
-
-    // calculate a bounding box in the current coordinate system
-    let bounds =
-        Bounds (vec3 (
-                    (calculateBounds 0 0),
-                    (calculateBounds 0 1),
-                    (calculateBounds 0 2)),
-                vec3 (
-                    (calculateBounds 1 0),
-                    (calculateBounds 1 1),
-                    (calculateBounds 1 2)))
-
-    let clip = Main.cullLocalBox bounds r.Orientation r.View.Frustum r_nocull
-    let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
-    let r' = { r with PerfCounters = perfCounters }
-
-    match clip with
-    | Cull.In ->
-        (Cull.In, r')
-    | Cull.Clip ->
-        (Cull.Clip, r')
-    | _ ->
-        (Cull.Out, r')
-
 /// Based on Q3: R_CullModel
 /// CullModel
-/// Note: This is internal.
 [<Pure>]
-let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
-    let newFrame = md3.Frames.[entity.Frame]
-    let oldFrame = md3.Frames.[entity.OldFrame]
+let cullModel (r_nocull: Cvar) (orientation: OrientationR) (frustum: Frustum) (entity: RefEntity) (md3: Md3) =
+    let frame = md3.Frames.[entity.Frame]
+
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
-    | true ->
-        let sphereCull = Main.cullLocalPointAndRadius newFrame.LocalOrigin newFrame.Radius r.Orientation r.View.Frustum r_nocull
-
-        match entity.Frame = entity.OldFrame with
-        | true ->
-            let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
-            let r' = { r with PerfCounters = perfCounters }
-
-            match sphereCull with
-            | Cull.Out ->
-                (Cull.Out, r')
-            | Cull.In ->
-                (Cull.In, r')
-            | _ ->
-                calculateCullLocalBox newFrame oldFrame r_nocull r'
-        | _ ->
-            let sphereCullB =
-                match newFrame = oldFrame with
-                | true -> sphereCull
-                | _ -> Main.cullLocalPointAndRadius oldFrame.LocalOrigin oldFrame.Radius r.Orientation r.View.Frustum r_nocull
-                
-            match sphereCull = sphereCullB with
-            | true ->
-                let perfCounters = PerfCounter.incrementSphereMd3 sphereCull r.PerfCounters
-                let r' = { r with PerfCounters = perfCounters }
-
-                match sphereCull with
-                | Cull.Out ->
-                    (Cull.Out, r')
-                | Cull.In ->
-                    (Cull.In, r')
-                | _ ->
-                    calculateCullLocalBox newFrame oldFrame r_nocull r'
-            | _ ->
-                calculateCullLocalBox newFrame oldFrame r_nocull r
-    | _ ->
-        calculateCullLocalBox newFrame oldFrame r_nocull r
+    | true -> Main.cullLocalPointAndRadius frame.LocalOrigin frame.Radius orientation frustum r_nocull
+    | _ -> Main.cullLocalBox frame.Bounds orientation frustum r_nocull
 
 /// Based on Q3: R_ComputeLOD
 /// ComputeLod
@@ -263,10 +195,10 @@ let addMd3Surfaces
     // cull the entire model if merged bounding box of both frames
     // is outside the view frustum.
     //
-    let cull, r' = cullModel md3 entity r r_nocull
+    let cull = cullModel r_nocull r.Orientation r.View.Frustum entity md3
 
     match cull = Cull.Out with
-    | true -> r'
+    | true -> r
     | _ ->
 
     //
@@ -295,4 +227,4 @@ let addMd3Surfaces
 //        )
 
     // TODO:  
-    r'
+    r
