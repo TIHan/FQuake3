@@ -37,19 +37,23 @@ open Engine.NativeInterop
 
 module private Native =
     [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    [<DllImport (LibQuake3,
+        CallingConvention = DefaultCallingConvention)>]
     extern void Sys_CreateConsole ()
 
     [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    [<DllImport (LibQuake3,
+        CallingConvention = DefaultCallingConvention)>]
     extern void Sys_Milliseconds ()
 
     [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    [<DllImport (LibQuake3,
+        CallingConvention = DefaultCallingConvention)>]
     extern void Sys_InitStreamThread ()
 
     [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    [<DllImport (LibQuake3,
+        CallingConvention = DefaultCallingConvention)>]
     extern void Sys_ShowConsole (int level, bool quitOnClose)
 
 /// System

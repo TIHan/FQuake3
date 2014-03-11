@@ -74,12 +74,12 @@ module Vec2 =
         NativePtr.write ptr native  
 
 module Vec3 =
-    let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
+    let ofNativePtr (ptr: nativeptr<vec3_t>) =
         let mutable native = NativePtr.read ptr
 
         vec3 (native.value, native.value1, native.value2)
 
-    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: vec3) =
+    let toNativeByPtr (ptr: nativeptr<vec3_t>) (v: vec3) =
         let mutable native = NativePtr.read ptr
 
         native.value <- v.x

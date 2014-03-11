@@ -110,7 +110,8 @@ int R_CullLocalBox (vec3_t bounds[2])
 #else
 	MObject *result;
 
-	m_invoke_new (Engine.Renderer, Engine.Renderer, Main, cullLocalBox, result,
+	m_invoke_new (Engine.Renderer, Engine.Renderer, Main,
+			cullLocalBox, result,
 		m_object_as_arg (qm_of_bounds (bounds)),
 		m_object_as_arg (qm_of_orientationr (&tr.or)),
 		m_object_as_arg (qm_of_frustum (&tr.viewParms.frustum)),
