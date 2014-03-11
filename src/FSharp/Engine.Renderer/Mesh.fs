@@ -78,7 +78,13 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
                     (calculateBounds 1 1),
                     (calculateBounds 1 2)))
 
-    let clip = Main.cullLocalBox bounds r.Orientation r.View.Frustum r_nocull
+    let clip =
+        Main.cullLocalBox
+            bounds
+            r.Orientation
+            r.View.Frustum
+            r_nocull
+
     let perfCounters = PerfCounter.incrementBoxMd3 clip r.PerfCounters
     let r' = { r with PerfCounters = perfCounters }
 
@@ -94,7 +100,12 @@ let calculateCullLocalBox (newFrame: Md3Frame) (oldFrame: Md3Frame) (r_nocull: C
 /// CullModel
 /// Note: This is internal.
 [<Pure>]
-let cullModel (md3: Md3) (entity: RefEntity) (r: Renderer) (r_nocull: Cvar) =
+let cullModel
+        (md3: Md3)
+        (entity: RefEntity)
+        (r: Renderer)
+        (r_nocull: Cvar) =
+
     let newFrame = md3.Frames.[entity.Frame]
     let oldFrame = md3.Frames.[entity.OldFrame]
     // cull bounding sphere ONLY if this is not an upscaled entity

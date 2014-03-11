@@ -129,12 +129,18 @@ let localNormalToWorld (local: vec3) (orientation: OrientationR) =
 /// CullLocalBox
 /// </summary>
 [<Pure>]
-let cullLocalBox (bounds: Bounds) (orientation: OrientationR) (frustum: Frustum) (r_nocull: Cvar) =
+let cullLocalBox
+        (bounds: Bounds)
+        (orientation: OrientationR)
+        (frustum: Frustum)
+        (r_nocull: Cvar) =
+
     let transform (v: vec3) =
         orientation.Origin
         |> Vec3.multiplyAdd v.x orientation.Axis.[0]
         |> Vec3.multiplyAdd v.y orientation.Axis.[1]
         |> Vec3.multiplyAdd v.z orientation.Axis.[2]
+
     let bounds' =
         Bounds (transform bounds.min, transform bounds.max)
     cullBox bounds' frustum r_nocull
