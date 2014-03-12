@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // cg_players.c -- handle the media and animation for player entities
 #include "cg_local.h"
+#include "../qm_cgame.h" // IMPORTANT: Temporary
+#include "../qm.h" // IMPORTANT: Temporary
 
 char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*death1.wav",
@@ -2559,6 +2561,17 @@ void CG_Player( centity_t *cent ) {
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
+
+	{
+		MObject *result;
+
+		qm_invoke ("CGame", "CGame", "Players", "scaleHead", 2, {
+			__args[0] = m_object_as_arg (qm_of_axis(head.axis));
+			__args[1] = m_object_as_arg (qm_of_cg (&cg));
+		}, result);
+
+		qm_to_axis (result, &head.axis);
+	}
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
 

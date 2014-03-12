@@ -159,6 +159,26 @@ module Cvar =
             Integer = native.integer;
         }
 
+module Axis =
+    let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
+        Axis (
+            (Vec3.ofNativePtr <| NativePtr.add ptr 0),
+            (Vec3.ofNativePtr <| NativePtr.add ptr 1),
+            (Vec3.ofNativePtr <| NativePtr.add ptr 2))
+
+    let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (axis: Axis) =
+        let mutable nativeX = NativePtr.get ptr 0
+        let mutable nativeY = NativePtr.get ptr 1
+        let mutable nativeZ = NativePtr.get ptr 2
+
+        Vec3.toNativeByPtr &&nativeX axis.x
+        Vec3.toNativeByPtr &&nativeY axis.y
+        Vec3.toNativeByPtr &&nativeZ axis.z
+
+        NativePtr.set ptr 0 nativeX
+        NativePtr.set ptr 1 nativeY
+        NativePtr.set ptr 2 nativeZ
+
 module Bounds =
     let inline ofNativePtr (ptr: nativeptr<vec3_t>) =
         Bounds (
