@@ -31,3 +31,8 @@ let scaleHead (axis: Axis) (cg: CGame) =
 CGame.Players.scaleHeadFsx
     <- scaleHead
 #endif
+
+#if INTERACTIVE
+#else
+let sprites () = 0 //Shader.shaderIdFsharp
+#endif

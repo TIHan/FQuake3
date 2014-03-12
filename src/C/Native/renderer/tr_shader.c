@@ -2781,7 +2781,7 @@ RE_RegisterShaderNoMip
 For menu graphics that should never be picmiped
 ====================
 */
-qhandle_t RE_RegisterShaderNoMip( const char *name ) {
+M_EXPORT qhandle_t M_DECL RE_RegisterShaderNoMip( const char *name ) {
 	shader_t	*sh;
 
 	if ( strlen( name ) >= MAX_QPATH ) {

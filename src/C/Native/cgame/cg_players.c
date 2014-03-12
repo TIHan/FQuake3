@@ -1931,6 +1931,17 @@ Float sprites over the player's head
 static void CG_PlayerSprites( centity_t *cent ) {
 	int		team;
 
+	{
+		MObject *result;
+		qm_invoke("CGame", "CGame", "Players", "sprites", 1, {}, result);
+		gint shaderId = m_ub (result, gint);
+
+		if (shaderId == 0) return;
+
+		CG_PlayerFloatSprite(cent, shaderId);
+		return;
+	}
+
 	if ( cent->currentState.eFlags & EF_CONNECTION ) {
 		CG_PlayerFloatSprite( cent, cgs.media.connectionShader );
 		return;
