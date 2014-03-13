@@ -89,8 +89,6 @@ let shaderById id (r: Renderer) =
 let mutable globalRendererShaderState = Unchecked.defaultof<RendererShaderState>
 
 let mutable shaderIdDon = 0
-let mutable shaderIdFsharp = 0
-let mutable shaderIdThomas = 0
 
 /// Based on Q3: R_InitShaders
 /// Init
@@ -103,8 +101,6 @@ let init () =
     Native.ScanAndLoadShaderFiles ()
     Native.CreateExternalShaders ()
 
-    shaderIdDon <- registerShaderNoMip "don.tga"
-    shaderIdFsharp <- registerShaderNoMip "fsharp.tga"
-    shaderIdThomas <- registerShaderNoMip "thomas.tga"
+    shaderIdDon <- registerShaderNoMip "don"
 
     ()
