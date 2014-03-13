@@ -1916,6 +1916,18 @@ static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader ) {
 	ent.shaderRGBA[1] = 255;
 	ent.shaderRGBA[2] = 255;
 	ent.shaderRGBA[3] = 255;
+
+	{
+		MObject *result;
+		clientInfo_t *ci = &cgs.clientinfo[cent->currentState.clientNum];
+		qm_invoke("CGame", "CGame", "Players", "floatSpriteOrigin", 3, {
+			__args [0] = m_object_as_arg(qm_of_vec3(ent.origin));
+			__args [1] = m_object_as_arg(qm_of_vec3(cent->lerpOrigin));
+		}, result);
+
+		qm_to_vec3(result, ent.origin);
+	}
+
 	trap_R_AddRefEntityToScene( &ent );
 }
 
@@ -2576,9 +2588,10 @@ void CG_Player( centity_t *cent ) {
 	{
 		MObject *result;
 
-		qm_invoke ("CGame", "CGame", "Players", "scaleHead", 2, {
+		qm_invoke ("CGame", "CGame", "Players", "scaleHead", 3, {
 			__args[0] = m_object_as_arg (qm_of_axis(head.axis));
-			__args[1] = m_object_as_arg (qm_of_cg (&cg));
+			__args[1] = m_object_as_arg (qm_of_vec3(head.origin));
+			__args[2] = m_object_as_arg (qm_of_cg (&cg));
 		}, result);
 
 		qm_to_axis (result, &head.axis);

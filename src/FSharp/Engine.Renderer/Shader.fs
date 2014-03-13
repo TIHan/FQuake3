@@ -45,6 +45,10 @@ module private Native =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
+    extern int RE_RegisterShader (string name)
+
+    [<SuppressUnmanagedCodeSecurity>]
+    [<DllImport (LibQuake3, CallingConvention = DefaultCallingConvention)>]
     extern int RE_RegisterShaderNoMip (string name)
 
 /// RendererShaderState
@@ -63,6 +67,7 @@ module RendererShaderState =
         }
 
 let registerShaderNoMip name = Native.RE_RegisterShaderNoMip name
+let registerShader name = Native.RE_RegisterShader name
 
 /// Based on Q3: generateHashValue
 /// generateFileNameHashCode
@@ -101,4 +106,5 @@ let init () =
     shaderIdDon <- registerShaderNoMip "don.tga"
     shaderIdFsharp <- registerShaderNoMip "fsharp.tga"
     shaderIdThomas <- registerShaderNoMip "thomas.tga"
+
     ()

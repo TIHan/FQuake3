@@ -2751,7 +2751,7 @@ This should really only be used for explicit shaders, because there is no
 way to ask for different implicit lighting modes (vertex, lightmap, etc)
 ====================
 */
-qhandle_t RE_RegisterShader( const char *name ) {
+M_EXPORT qhandle_t M_DECL RE_RegisterShader( const char *name ) {
 	shader_t	*sh;
 
 	if ( strlen( name ) >= MAX_QPATH ) {

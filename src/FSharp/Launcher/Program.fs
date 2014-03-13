@@ -29,7 +29,9 @@ let fsiSession =
         errStream)
 
 [<EntryPoint>]
-let main argv = 
+let main argv =
+    let lockObj = obj ()
+
     async {
         let prevTime = 
             ref Unchecked.defaultof<DateTime>
@@ -43,9 +45,10 @@ let main argv =
                 prevTime.contents <- time
                 printfn "Evaluating weapons.fsx"
                 try
+                    lock lockObj <| fun _ ->
                     fsiSession.EvalScript "weapons.fsx"
                 with
-                | ex -> () }
+                | ex -> printfn "%s" ex.Message }
     |> Async.Start
 
     async {
@@ -61,9 +64,10 @@ let main argv =
                 prevTime.contents <- time
                 printfn "Evaluating players.fsx"
                 try
+                    lock lockObj <| fun _ ->
                     fsiSession.EvalScript "players.fsx"
                 with
-                | ex -> () }
+                | ex -> printfn "%s" ex.Message }
     |> Async.Start
 
     System.Start ()

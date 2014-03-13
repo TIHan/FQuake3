@@ -980,6 +980,10 @@ static void CG_AddCEntity( centity_t *cent ) {
 		CG_TeamBase( cent );
 		break;
 	}
+
+	if (cent->currentState.eType == ET_PLAYER) {
+
+	}
 }
 
 /*
