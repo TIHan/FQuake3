@@ -1917,18 +1917,41 @@ static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader ) {
 	ent.shaderRGBA[2] = 255;
 	ent.shaderRGBA[3] = 255;
 
-	{
-		MObject *result;
-		clientInfo_t *ci = &cgs.clientinfo[cent->currentState.clientNum];
-		qm_invoke("CGame", "CGame", "Players", "floatSpriteOrigin", 3, {
-			__args [0] = m_object_as_arg(qm_of_vec3(ent.origin));
-			__args [1] = m_object_as_arg(qm_of_vec3(cent->lerpOrigin));
-		}, result);
+	trap_R_AddRefEntityToScene( &ent );
+}
 
-		qm_to_vec3(result, ent.origin);
+
+/*
+===============
+CG_PlayerFloatSprite
+
+Float a sprite over the player's head
+===============
+*/
+static void CG_PlayerFloatSpritePosition(centity_t *cent, qhandle_t shader, vec3_t pos) {
+	int				rf;
+	refEntity_t		ent;
+
+	if (cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson) {
+		rf = RF_THIRD_PERSON;		// only show in mirrors
+	}
+	else {
+		rf = 0;
 	}
 
-	trap_R_AddRefEntityToScene( &ent );
+	memset(&ent, 0, sizeof(ent));
+	VectorCopy(cent->lerpOrigin, ent.origin);
+	VectorCopy(pos, ent.origin);
+	ent.reType = RT_SPRITE;
+	ent.customShader = shader;
+	ent.radius = 10;
+	ent.renderfx = rf;
+	ent.shaderRGBA[0] = 255;
+	ent.shaderRGBA[1] = 255;
+	ent.shaderRGBA[2] = 255;
+	ent.shaderRGBA[3] = 255;
+
+	trap_R_AddRefEntityToScene(&ent);
 }
 
 
@@ -1943,16 +1966,7 @@ Float sprites over the player's head
 static void CG_PlayerSprites( centity_t *cent ) {
 	int		team;
 
-	{
-		MObject *result;
-		qm_invoke("CGame", "CGame", "Players", "sprites", 1, {}, result);
-		gint shaderId = m_ub (result, gint);
-
-		if (shaderId == 0) return;
-
-		CG_PlayerFloatSprite(cent, shaderId);
-		return;
-	}
+	return;
 
 	if ( cent->currentState.eFlags & EF_CONNECTION ) {
 		CG_PlayerFloatSprite( cent, cgs.media.connectionShader );
@@ -2588,12 +2602,20 @@ void CG_Player( centity_t *cent ) {
 	{
 		MObject *result;
 
-		qm_invoke ("CGame", "CGame", "Players", "scaleHead", 2, {
-			__args[0] = m_object_as_arg (qm_of_axis(head.axis));
-			__args[1] = m_object_as_arg (qm_of_cg (&cg));
+		qm_invoke ("CGame", "CGame", "Players", "headTransform", 3, {
+			__args[0] = m_object_as_arg(qm_of_vec3(head.origin));
+			__args[1] = m_object_as_arg (qm_of_axis(head.axis));
+			__args[2] = m_object_as_arg (qm_of_cg (&cg));
 		}, result);
 
-		qm_to_axis (result, &head.axis);
+		gint shaderId = m_ub(m_object_get_property(result, "Item1"), gint);
+		qm_to_vec3(m_object_get_property(result, "Item2"), &head.origin);
+		qm_to_axis(m_object_get_property(result, "Item3"), &head.axis);
+
+		if (shaderId != 0)
+		{
+			CG_PlayerFloatSpritePosition(cent, shaderId, head.origin);
+		}
 	}
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );

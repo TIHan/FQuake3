@@ -15,38 +15,19 @@ open FQuake3.Math
 
 #if INTERACTIVE
 #else
-let mutable scaleHeadFsx
-    : Axis -> CGame -> Axis =
-        fun axis _ -> axis
-
-let mutable spritesFsx : unit -> int =
-    fun _ -> 0
+let mutable headTransformFsx
+    : vec3 -> Axis -> CGame -> (int * vec3 * Axis) =
+        fun origin axis _ -> (0, origin, axis)
 #endif
 
-let scaleHead (axis: Axis) (cg: CGame) =
+let headTransform (origin: vec3) (axis: Axis) (cg: CGame) =
 #if INTERACTIVE
-    axis
+    (0, origin, axis)
 #else
-    scaleHeadFsx axis cg
-#endif
-
-let sprites () =
-#if INTERACTIVE
-    0
-#else
-    spritesFsx ()
+    headTransformFsx origin axis cg
 #endif
 
 #if INTERACTIVE
-CGame.Players.scaleHeadFsx
-    <- scaleHead
-
-CGame.Players.spritesFsx
-    <- sprites
-#endif
-
-#if INTERACTIVE
-#else
-let floatSpriteOrigin (spriteOrigin: vec3) (entOrigin: vec3) =
-    spriteOrigin.Set (z = spriteOrigin.z - 10.f)
+CGame.Players.headTransformFsx
+    <- headTransform
 #endif
