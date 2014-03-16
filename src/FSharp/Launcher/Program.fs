@@ -49,7 +49,7 @@ let main argv =
                     fsiSession.EvalScript "weapons.fsx"
                 with
                 | ex -> printfn "%s" ex.Message }
-    |> Async.Start
+    |> Async.StartImmediate
 
     async {
         let prevTime = 
@@ -68,7 +68,7 @@ let main argv =
                     fsiSession.EvalScript "players.fsx"
                 with
                 | ex -> printfn "%s" ex.Message }
-    |> Async.Start
+    |> Async.StartImmediate
 
     System.Start ()
     0
