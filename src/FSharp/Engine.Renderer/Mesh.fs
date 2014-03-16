@@ -62,17 +62,22 @@ let projectRadius radius location (view: View) =
 /// CullModel
 [<Pure>]
 let cullModel (r_nocull: Cvar) (frustum: Frustum) (entity: RefEntity) (md3: Md3) =
-    let frame = md3.Frames.[entity.Frame]
+    // Handling old frames due to interpolation
+    let frame, oldFrame = md3.Frames.[entity.Frame], md3.Frames.[entity.OldFrame]
     let origin = entity.Origin
 
     // cull bounding sphere ONLY if this is not an upscaled entity
     match not entity.HasNonNormalizedAxes with
     | true ->
-        let point = frame.LocalOrigin + entity.Origin
-        Main.cullPointAndRadius point frame.Radius frustum r_nocull
+        let point = frame.LocalOrigin + origin
+        let radius = frame.Radius
+
+        Main.cullPointAndRadius point radius frustum r_nocull
     | _ ->
         let axis = entity.Axis
-        let bounds = Bounds (frame.Bounds.min * axis + origin, frame.Bounds.max * axis + origin)
+        let min = if oldFrame.Bounds.min < frame.Bounds.min then oldFrame.Bounds.min else frame.Bounds.min
+        let max = if oldFrame.Bounds.max > frame.Bounds.max then oldFrame.Bounds.max else frame.Bounds.max
+        let bounds = Bounds (min * axis + origin, max * axis + origin)
 
         Main.cullBox bounds frustum r_nocull
 
