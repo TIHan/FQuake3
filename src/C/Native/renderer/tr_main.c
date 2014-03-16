@@ -221,7 +221,7 @@ R_LocalPointToWorld
 */
 void R_LocalPointToWorld (vec3_t local, vec3_t world)
 {
-#if 0
+#if 1
 	world[0] = local[0] * tr.or.axis[0][0] + local[1] * tr.or.axis[1][0] + local[2] * tr.or.axis[2][0] + tr.or.origin[0];
 	world[1] = local[0] * tr.or.axis[0][1] + local[1] * tr.or.axis[1][1] + local[2] * tr.or.axis[2][1] + tr.or.origin[1];
 	world[2] = local[0] * tr.or.axis[0][2] + local[1] * tr.or.axis[1][2] + local[2] * tr.or.axis[2][2] + tr.or.origin[2];
@@ -1855,6 +1855,86 @@ void R_DebugGraphics( void ) {
 	ri.CM_DrawDebugSurface( R_DebugPolygon );
 }
 
+// FQ3
+void R_DebugBounds()
+{
+	// the render thread can't make callbacks to the main thread
+	R_SyncRenderThread();
+
+	GL_Bind(tr.whiteImage);
+	GL_Cull(CT_FRONT_SIDED);
+
+	for (int i = 0; i < tr.refdef.num_entities; ++i)
+	{
+		trRefEntity_t *ent = &tr.refdef.entities[i];
+
+		if (ent->e.renderfx & RF_THIRD_PERSON)
+			continue;
+
+		model_t *model = R_GetModelByHandle(ent->e.hModel);
+
+		if (model->type == MOD_MESH)
+		{
+			md3Header_t *header = model->md3[0];
+			md3Frame_t *newFrame = (md3Frame_t *)((byte *)header + header->ofsFrames) + ent->e.frame;
+			md3Frame_t *oldFrame = (md3Frame_t *)((byte *)header + header->ofsFrames) + ent->e.oldframe;
+
+			R_RotateForEntity(ent, &tr.viewParms, &tr.or);
+
+			vec3_t bounds[2];
+
+			for (int i = 0; i < 3; i++) {
+				bounds[0][i] = oldFrame->bounds[0][i] < newFrame->bounds[0][i] ? oldFrame->bounds[0][i] : newFrame->bounds[0][i];
+				bounds[1][i] = oldFrame->bounds[1][i] > newFrame->bounds[1][i] ? oldFrame->bounds[1][i] : newFrame->bounds[1][i];
+			}
+
+			vec3_t transformed[8];
+			for (int j = 0; j < 8; j++) {
+				vec3_t v;
+				v[0] = bounds[j & 1][0];
+				v[1] = bounds[(j >> 1) & 1][1];
+				v[2] = bounds[(j >> 2) & 1][2];
+
+				R_LocalPointToWorld(v, transformed[j]);
+			}
+
+			// draw wireframe outline
+			GL_State(GLS_POLYMODE_LINE | GLS_DEPTHMASK_TRUE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE);
+			qglDepthRange(0, 0);
+			qglColor3f(1, 1, 1);
+
+			qglBegin(GL_LINE_LOOP);
+
+			qglVertex3fv(transformed[0]);
+			qglVertex3fv(transformed[2]);
+			qglVertex3fv(transformed[6]);
+			qglVertex3fv(transformed[4]);
+
+			qglEnd();
+
+			qglBegin(GL_LINE_LOOP);
+
+			qglVertex3fv(transformed[1]);
+			qglVertex3fv(transformed[3]);
+			qglVertex3fv(transformed[7]);
+			qglVertex3fv(transformed[5]);
+
+			qglEnd();
+
+			qglBegin(GL_LINES);
+
+			for (int j = 0; j < 8; ++j)
+			{
+				qglVertex3fv(transformed[j]);
+			}
+
+			qglEnd();
+
+			qglDepthRange(0, 1);
+		}
+	}
+}
+
 
 /*
 ================
@@ -1892,6 +1972,7 @@ void R_RenderView (viewParms_t *parms) {
 
 	// draw main system development information (surface outlines, etc)
 	R_DebugGraphics();
+	R_DebugBounds();
 }
 
 
