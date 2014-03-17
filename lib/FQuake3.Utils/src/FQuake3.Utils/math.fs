@@ -178,10 +178,10 @@ type Vector3 =
         v / s
 
     static member inline (+) (s, v) =
-        v / s
+        v + s
 
     static member inline (-) (s, v) =
-        v / s
+        v - s
 and vec3 = Vector3
 
 [<RequireQualifiedAccess>]
@@ -192,6 +192,9 @@ module Vec3 =
     let right =     vec3 (1.f, 0.f, 0.f)
     let up =        vec3 (0.f, 1.f, 0.f)
     let forward =   vec3 (0.f, 0.f, 1.f)
+    let left =      vec3 (-1.f, 0.f,  0.f)
+    let down =      vec3 (0.f, -1.f,  0.f)
+    let back =      vec3 (0.f,  0.f, -1.f)
 
     let inline minDimension (v: vec3) =
         match v.x < v.y with
@@ -226,6 +229,7 @@ module Vec3 =
         let length = 1.f / length v
         vec3 (v.x * length, v.y * length, v.z * length)
 
+    // FIXME: This is kinda of all hacky t begin with.
     let inline perpendicular v =
         let uv =
             match abs v |> minDimension with
@@ -233,7 +237,10 @@ module Vec3 =
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
         let vn = normalize uv
-        cross v vn
+        let result = cross v vn
+        match v.y < 0.f with
+        | true -> -1.f * result
+        | _ -> result
 
     let inline lerp (v1: vec3) (v2: vec3) (t: single) =
         vec3 (Math.lerp v1.x v2.x t, Math.lerp v1.y v2.y t, Math.lerp v1.z v2.z t)
@@ -396,6 +403,7 @@ type Quaternion =
     val z : single
 
     new (w, x, y, z) = { w = w; x = x; y = y; z = z }
+    new (w, v: vec3) = { w = w; x = v.x; y = v.y; z = v.z }
         
     static member inline Dot (q1: quat, q2: quat) =
         q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w
@@ -418,11 +426,8 @@ type Quaternion =
     /// then multiply by the passed quat
     /// create vector based on result quat's x,y,z
     static member inline (*) (q: quat, v) =
-        let vl = 1.f / Vec3.length v
-        let vq = quat (0.f, v.x * vl, v.y * vl, v.z * vl)
-        let result = q * (vq * q.Conjugate)
-
-        vec3 (result.x, result.y, result.z)
+        let q' = q * (quat (0.f, Vec3.normalize v) * q.Conjugate)
+        vec3 (q'.x, q'.y, q'.z)
 and quat = Quaternion
 
 [<RequireQualifiedAccess>]
@@ -465,14 +470,12 @@ module Quat =
             (cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw))
 
     let inline ofAxisAngle (axis: vec3) (angle: single<rad>) =
-        let angle = angle * 0.5f</rad>
-        let sinAngle = sin angle
+        let angle' = angle * 0.5f</rad>
 
         quat (
-            (cos angle),
-            (axis.x * sinAngle),
-            (axis.y * sinAngle),
-            (axis.z * sinAngle))
+            (cos angle'),
+            (sin angle' * Vec3.normalize axis))
+        |> normalize
 
 [<RequireQualifiedAccess>]
 module Transform =
