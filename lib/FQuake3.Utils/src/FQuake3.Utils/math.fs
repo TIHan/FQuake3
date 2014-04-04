@@ -101,15 +101,7 @@ module Vec2 =
 
 [<AutoOpen>]
 module Vector3f =
-    [<Struct>]
-    [<StructLayout (LayoutKind.Sequential)>]
-    type Vector3 =
-        val X : single
-        val Y : single
-        val Z : single
-
-        new (x, y, z) = { X = x; Y = y; Z = z }
-        new (x) = { X = x; Y = x; Z = x }
+    type Vector3f with
 
         member inline this.Item
             with get (i) =
@@ -159,9 +151,6 @@ module Vector3f =
         static member inline (-) (v1: vec3, v2: vec3) =
             vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
-        static member inline (*) (v: vec3, s) =
-            vec3 (v.X * s, v.Y * s, v.Z * s)
-
         static member inline (/) (v: vec3, s) =
             vec3 (v.X / s, v.Y / s, v.Z / s)
 
@@ -171,9 +160,6 @@ module Vector3f =
         static member inline (-) (v: vec3, s) =
             vec3 (v.X - s, v.Y - s, v.Z - s)
 
-        static member inline (*) (s, v) =
-            v * s
-
         static member inline (/) (s, v) =
             v / s
 
@@ -182,7 +168,7 @@ module Vector3f =
 
         static member inline (-) (s, v) =
             v - s
-    and vec3 = Vector3
+    and vec3 = Vector3f
 
 open Vector3f
 

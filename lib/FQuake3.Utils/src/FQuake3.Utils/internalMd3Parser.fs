@@ -6,10 +6,17 @@ open FQuake3.Md3
 open FQuake3.Math
 
 let anyVec2 : Parser<vec2> =
-    fun stream -> stream.Read<vec2> ()
+    fun stream ->
+        vec2 (
+            stream.Read<single> (),
+            stream.Read<single> ())
 
 let anyVec3 : Parser<vec3> =
-    fun stream -> stream.Read<vec3> ()
+    fun stream ->
+        vec3 (
+            stream.Read<single> (),
+            stream.Read<single> (),
+            stream.Read<single> ())
 
 let pframe =
     pipe5 anyVec3 anyVec3 anyVec3 anySingle (anyString 16) <|
