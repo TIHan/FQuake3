@@ -50,15 +50,15 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
 
     let pos = 
         LightGridBounds (
-            clamp (int pos.x) 0 (lightGrid.Bounds.x - 1),
-            clamp (int pos.y) 0 (lightGrid.Bounds.y - 1),
-            clamp (int pos.z) 0 (lightGrid.Bounds.z - 1))
+            clamp (int pos.X) 0 (lightGrid.Bounds.X - 1),
+            clamp (int pos.Y) 0 (lightGrid.Bounds.Y - 1),
+            clamp (int pos.Z) 0 (lightGrid.Bounds.Z - 1))
 
     // trilerp the light value
     let gridStepX = 8
-    let gridStepY = 8 * lightGrid.Bounds.x
-    let gridStepZ = 8 * lightGrid.Bounds.x * lightGrid.Bounds.y
-    let gridIndex = (pos.x * gridStepX) + (pos.y * gridStepY) + (pos.z * gridStepZ)
+    let gridStepY = 8 * lightGrid.Bounds.X
+    let gridStepZ = 8 * lightGrid.Bounds.X * lightGrid.Bounds.Y
+    let gridIndex = (pos.X * gridStepX) + (pos.Y * gridStepY) + (pos.Z * gridStepZ)
 
     let inline gridStep i =
         match i with
@@ -167,20 +167,20 @@ let logLight (rentity: TrRefEntity) =
     let directedLight = rentity.DirectedLight
 
     let max1 =
-        if ambientLight.y > ambientLight.x then
-            ambientLight.y
-        elif ambientLight.z > ambientLight.x then
-            ambientLight.z
+        if ambientLight.Y > ambientLight.X then
+            ambientLight.Y
+        elif ambientLight.Z > ambientLight.X then
+            ambientLight.Z
         else
-            ambientLight.x
+            ambientLight.X
 
     let max2 =
-        if directedLight.y > directedLight.x then
-            directedLight.y
-        elif directedLight.z > directedLight.x then
-            directedLight.z
+        if directedLight.Y > directedLight.X then
+            directedLight.Y
+        elif directedLight.Z > directedLight.X then
+            directedLight.Z
         else
-            directedLight.x
+            directedLight.X
 
     // impurity
     printfn "amb:%i  dir:%i" (int max1) (int max2)
@@ -268,9 +268,9 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
         { rentity with
             AmbientLight =
                 vec3 (
-                    clampAmbient rentity.AmbientLight.x,
-                    clampAmbient rentity.AmbientLight.y,
-                    clampAmbient rentity.AmbientLight.z) }
+                    clampAmbient rentity.AmbientLight.X,
+                    clampAmbient rentity.AmbientLight.Y,
+                    clampAmbient rentity.AmbientLight.Z) }
 
     // impure function call for logLight
     if r_debugLight.Integer <> 0 then
@@ -284,7 +284,7 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
     { rentity with
         LightDirection =
             vec3 (
-                Vec3.dot normal entity.Axis.x,
-                Vec3.dot normal entity.Axis.y,
-                Vec3.dot normal entity.Axis.z)
+                Vec3.dot normal entity.Axis.X,
+                Vec3.dot normal entity.Axis.Y,
+                Vec3.dot normal entity.Axis.Z)
         DirectedLight = directedLight }

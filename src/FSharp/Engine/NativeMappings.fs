@@ -68,8 +68,8 @@ module Vec2 =
     let inline toNativeByPtr (ptr: nativeptr<vec2_t>) (v: vec2) =
         let mutable native = NativePtr.read ptr
 
-        native.value <- v.x
-        native.value1 <- v.y
+        native.value <- v.X
+        native.value1 <- v.Y
 
         NativePtr.write ptr native  
 
@@ -82,9 +82,9 @@ module Vec3 =
     let inline toNativeByPtr (ptr: nativeptr<vec3_t>) (v: vec3) =
         let mutable native = NativePtr.read ptr
 
-        native.value <- v.x
-        native.value1 <- v.y
-        native.value2 <- v.z
+        native.value <- v.X
+        native.value1 <- v.Y
+        native.value2 <- v.Z
 
         NativePtr.write ptr native   
         
@@ -97,10 +97,10 @@ module Vec4 =
     let inline toNativeByPtr (ptr: nativeptr<vec4_t>) (v: vec4) =
         let mutable native = NativePtr.read ptr
 
-        native.value <- v.x
-        native.value1 <- v.y
-        native.value2 <- v.z
-        native.value3 <- v.w
+        native.value <- v.X
+        native.value1 <- v.Y
+        native.value2 <- v.Z
+        native.value3 <- v.W
 
         NativePtr.write ptr native  
 
@@ -169,8 +169,8 @@ module Bounds =
         let mutable nativeX = NativePtr.get ptr 0
         let mutable nativeY = NativePtr.get ptr 1
 
-        Vec3.toNativeByPtr &&nativeX bounds.min
-        Vec3.toNativeByPtr &&nativeY bounds.max
+        Vec3.toNativeByPtr &&nativeX bounds.Min
+        Vec3.toNativeByPtr &&nativeY bounds.Max
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY

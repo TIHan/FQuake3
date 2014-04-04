@@ -37,8 +37,8 @@ let projectRadius radius location (view: View) =
     let axis = view.Orientation.Axis
     let origin = view.Orientation.Origin
 
-    let c = Vec3.dot axis.x origin
-    let distance = Vec3.dot axis.x location - c
+    let c = Vec3.dot axis.X origin
+    let distance = Vec3.dot axis.X location - c
 
     match distance <= 0.f with
     | true -> 0.f
@@ -47,9 +47,9 @@ let projectRadius radius location (view: View) =
     let p = vec3 (0.f, abs radius, -distance)
 
     let inline f i = 
-        p.x * view.ProjectionMatrix.[0, i] +
-        p.y * view.ProjectionMatrix.[1, i] +
-        p.z * view.ProjectionMatrix.[2, i] +
+        p.X * view.ProjectionMatrix.[0, i] +
+        p.Y * view.ProjectionMatrix.[1, i] +
+        p.Z * view.ProjectionMatrix.[2, i] +
         view.ProjectionMatrix.[3, i]
 
     let pr = f 1 / f 3
@@ -192,7 +192,7 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     let fog =
         world.Fogs
         |> List.tryFindIndex (fun x ->
-            v1 < x.Bounds.max && v2 > x.Bounds.min)
+            v1 < x.Bounds.Max && v2 > x.Bounds.Min)
 
     match fog with
     | None -> 0

@@ -379,9 +379,9 @@ module TrRefEntity =
         let mutable ambientLightInt = 0
         let ptr : nativeptr<byte> = &&ambientLightInt |> NativePtr.toNativePtr
 
-        NativePtr.set ptr 0 <| byte rentity.AmbientLight.x
-        NativePtr.set ptr 1 <| byte rentity.AmbientLight.y
-        NativePtr.set ptr 2 <| byte rentity.AmbientLight.z
+        NativePtr.set ptr 0 <| byte rentity.AmbientLight.X
+        NativePtr.set ptr 1 <| byte rentity.AmbientLight.Y
+        NativePtr.set ptr 2 <| byte rentity.AmbientLight.Z
 
         { rentity with AmbientLightInt = ambientLightInt }
 
@@ -1099,17 +1099,17 @@ type Fog = {
 [<Struct>]
 [<StructLayout (LayoutKind.Sequential)>]
 type LightGridBounds =
-    val x : int
-    val y : int
-    val z : int
+    val X : int
+    val Y : int
+    val Z : int
 
-    new (x, y, z) = { x = x; y = y; z = z }
-    new (x: vec3) = { x = int x.x; y = int x.y; z = int x.z }
+    new (x, y, z) = { X = x; Y = y; Z = z }
+    new (x: vec3) = { X = int x.X; Y = int x.Y; Z = int x.Z }
 
     member inline this.Item
         with get (i) =
             match i with
-            | 0 -> this.x | 1 -> this.y | 2 -> this.z
+            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
             | _ -> raise <| IndexOutOfRangeException ()
 
 /// LightGrid

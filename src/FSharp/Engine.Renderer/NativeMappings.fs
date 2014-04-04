@@ -50,9 +50,9 @@ module Axis =
         let mutable nativeY = NativePtr.get ptr 1
         let mutable nativeZ = NativePtr.get ptr 2
 
-        Vec3.toNativeByPtr &&nativeX axis.x
-        Vec3.toNativeByPtr &&nativeY axis.y
-        Vec3.toNativeByPtr &&nativeZ axis.z
+        Vec3.toNativeByPtr &&nativeX axis.X
+        Vec3.toNativeByPtr &&nativeY axis.Y
+        Vec3.toNativeByPtr &&nativeZ axis.Z
 
         NativePtr.set ptr 0 nativeX
         NativePtr.set ptr 1 nativeY
