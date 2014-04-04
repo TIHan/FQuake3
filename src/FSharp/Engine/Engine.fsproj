@@ -61,6 +61,10 @@
     <PostBuildEvent>"$(TargetDir)..\lib\Mono\bin\mono.exe" "$(TargetDir)..\lib\Mono\lib\mono\4.5\pdb2mdb.exe" "$(TargetDir)$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="NativeInterop.fs" />
     <Compile Include="Option.fs" />
@@ -75,6 +79,7 @@
     <Compile Include="System.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -84,18 +89,16 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Simd.1.0.1-beta\lib\portable-net45+win8\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <ProjectReference Include="..\..\..\lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj">
       <Name>FQuake3.Utils</Name>
       <Project>{7b5c2cf5-8d69-4a78-99b4-4072052e972a}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -68,6 +68,7 @@
     <Compile Include="Backend.fs" />
     <Compile Include="Native.fs" />
     <Compile Include="NativeMappings.fs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -87,6 +88,10 @@
       <Project>{27c5b1d5-69d0-405d-804f-0656c73f5a90}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\..\..\packages\Microsoft.Bcl.Simd.1.0.1-beta\lib\portable-net45+win8\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

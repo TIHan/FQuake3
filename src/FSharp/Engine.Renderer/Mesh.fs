@@ -186,13 +186,13 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     | None -> failwith "Renderer does not have a world."
     | Some world ->
 
-    let v1 = localOrigin - frame.Radius
-    let v2 = localOrigin + frame.Radius
+    let v1 = vec3.op_Subtraction (localOrigin, frame.Radius)
+    let v2 = vec3.op_Addition (localOrigin, frame.Radius)
 
     let fog =
         world.Fogs
         |> List.tryFindIndex (fun x ->
-            v1 < x.Bounds.Max && v2 > x.Bounds.Min)
+            vec3.op_LessThan (v1, x.Bounds.Max) && vec3.op_GreaterThan (v2, x.Bounds.Min))
 
     match fog with
     | None -> 0

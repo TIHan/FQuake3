@@ -25,6 +25,7 @@ namespace FSharp.Game.Math
 #nowarn "9"
 
 open System
+open System.Numerics
 open System.Collections.Generic
 open System.Runtime.InteropServices
 
@@ -98,91 +99,92 @@ module Vec2 =
     let right = vec2 (1.f, 0.f)
     let up =    vec2 (0.f, 1.f)
 
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Vector3 =
-    val X : single
-    val Y : single
-    val Z : single
+[<AutoOpen>]
+module Vector3f =
+    [<Struct>]
+    [<StructLayout (LayoutKind.Sequential)>]
+    type Vector3 =
+        val X : single
+        val Y : single
+        val Z : single
 
-    new (x, y, z) = { X = x; Y = y; Z = z }
-    new (x) = { X = x; Y = x; Z = x }
+        new (x, y, z) = { X = x; Y = y; Z = z }
+        new (x) = { X = x; Y = x; Z = x }
 
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
-            | _ -> raise <| IndexOutOfRangeException ()
+        member inline this.Item
+            with get (i) =
+                match i with
+                | 0 -> this.X | 1 -> this.Y | 2 -> this.Z
+                | _ -> raise <| IndexOutOfRangeException ()
 
-    member inline this.Set (?x: single, ?y: single, ?z: single) =
-        vec3 (
-            (match x with | Some x -> x | None -> this.X),
-            (match y with | Some y -> y | None -> this.Y),
-            (match z with | Some z -> z | None -> this.Z))
+        member inline this.Set (?x: single, ?y: single, ?z: single) =
+            vec3 (
+                (match x with | Some x -> x | None -> this.X),
+                (match y with | Some y -> y | None -> this.Y),
+                (match z with | Some z -> z | None -> this.Z))
 
-    override this.ToString () =
-        sprintf "{ x: %A y: %A z: %A }" this.X this.Y this.Z
+        static member inline Abs (v: vec3) =
+            vec3 (abs v.X, abs v.Y, abs v.Z)
 
-    static member inline Abs (v: vec3) =
-        vec3 (abs v.X, abs v.Y, abs v.Z)
+        static member inline Truncate (v: vec3) =
+            vec3 (truncate v.X, truncate v.Y, truncate v.Z)
 
-    static member inline Truncate (v: vec3) =
-        vec3 (truncate v.X, truncate v.Y, truncate v.Z)
+        static member inline Floor (v: vec3) =
+            vec3 (floor v.X, floor v.Y, floor v.Z)
 
-    static member inline Floor (v: vec3) =
-        vec3 (floor v.X, floor v.Y, floor v.Z)
+        static member inline op_Equality (v1: vec3, v2: vec3) =
+            v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
 
-    static member inline op_Equality (v1: vec3, v2: vec3) =
-        v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
+        static member inline op_GreaterThanOrEqual (v1: vec3, v2: vec3) =
+            v1.X >= v2.X && v1.Y >= v2.Y && v1.Z >= v2.Z
 
-    static member inline op_GreaterThanOrEqual (v1: vec3, v2: vec3) =
-        v1.X >= v2.X && v1.Y >= v2.Y && v1.Z >= v2.Z
+        static member inline op_GreaterThan (v1: vec3, v2: vec3) =
+            v1.X > v2.X && v1.Y > v2.Y && v1.Z > v2.Z
 
-    static member inline op_GreaterThan (v1: vec3, v2: vec3) =
-        v1.X > v2.X && v1.Y > v2.Y && v1.Z > v2.Z
+        static member inline op_LessThanOrEqual (v1: vec3, v2: vec3) =
+            v1.X <= v2.X && v1.Y <= v2.Y && v1.Z <= v2.Z
 
-    static member inline op_LessThanOrEqual (v1: vec3, v2: vec3) =
-        v1.X <= v2.X && v1.Y <= v2.Y && v1.Z <= v2.Z
+        static member inline op_LessThan (v1: vec3, v2: vec3) =
+            v1.X < v2.X && v1.Y < v2.Y && v1.Z < v2.Z
 
-    static member inline op_LessThan (v1: vec3, v2: vec3) =
-        v1.X < v2.X && v1.Y < v2.Y && v1.Z < v2.Z
+        static member inline (*) (v1: vec3, v2: vec3) =
+            vec3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
 
-    static member inline (*) (v1: vec3, v2: vec3) =
-        vec3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
+        static member inline (/) (v1: vec3, v2: vec3) =
+            vec3 (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
 
-    static member inline (/) (v1: vec3, v2: vec3) =
-        vec3 (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
+        static member inline (+) (v1: vec3, v2: vec3) =
+            vec3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
 
-    static member inline (+) (v1: vec3, v2: vec3) =
-        vec3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
+        static member inline (-) (v1: vec3, v2: vec3) =
+            vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
 
-    static member inline (-) (v1: vec3, v2: vec3) =
-        vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
+        static member inline (*) (v: vec3, s) =
+            vec3 (v.X * s, v.Y * s, v.Z * s)
 
-    static member inline (*) (v: vec3, s) =
-        vec3 (v.X * s, v.Y * s, v.Z * s)
+        static member inline (/) (v: vec3, s) =
+            vec3 (v.X / s, v.Y / s, v.Z / s)
 
-    static member inline (/) (v: vec3, s) =
-        vec3 (v.X / s, v.Y / s, v.Z / s)
+        static member inline (+) (v: vec3, s) =
+            vec3 (v.X + s, v.Y + s, v.Z + s)
 
-    static member inline (+) (v: vec3, s) =
-        vec3 (v.X + s, v.Y + s, v.Z + s)
+        static member inline (-) (v: vec3, s) =
+            vec3 (v.X - s, v.Y - s, v.Z - s)
 
-    static member inline (-) (v: vec3, s) =
-        vec3 (v.X - s, v.Y - s, v.Z - s)
+        static member inline (*) (s, v) =
+            v * s
 
-    static member inline (*) (s, v) =
-        v * s
+        static member inline (/) (s, v) =
+            v / s
 
-    static member inline (/) (s, v) =
-        v / s
+        static member inline (+) (s, v) =
+            v + s
 
-    static member inline (+) (s, v) =
-        v + s
+        static member inline (-) (s, v) =
+            v - s
+    and vec3 = Vector3
 
-    static member inline (-) (s, v) =
-        v - s
-and vec3 = Vector3
+open Vector3f
 
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
@@ -232,7 +234,7 @@ module Vec3 =
     // FIXME: This is kinda of all hacky t begin with.
     let inline perpendicular v =
         let uv =
-            match abs v |> minDimension with
+            match vec3.Abs v |> minDimension with
             | 0 -> right | 1 -> up | 2 -> forward
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
