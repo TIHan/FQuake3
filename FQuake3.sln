@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "botlib", "src\C\Native\botlib\botlib.vcxproj", "{A410161F-AE9F-485D-A01F-5294891430A6}"
 EndProject
@@ -44,6 +44,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine.Renderer.Native", "src\C\Engine.Renderer.Native\Engine.Renderer.Native.vcxproj", "{A6A4CC8B-A6AC-4B93-AA5B-544FDA5D2E5E}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FQuake3.Utils", "lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj", "{7B5C2CF5-8D69-4A78-99B4-4072052E972A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Engine.Renderer.Native", "src\FSharp\Engine.Renderer.Native\Engine.Renderer.Native.fsproj", "{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -395,6 +397,26 @@ Global
 		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7B5C2CF5-8D69-4A78-99B4-4072052E972A}.Release|Win32.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug TA|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug TA|Any CPU.Build.0 = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug TA|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug TA|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug TA|Win32.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release TA|Any CPU.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release TA|Any CPU.Build.0 = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release TA|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release TA|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release TA|Win32.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -416,5 +438,6 @@ Global
 		{30379412-E68E-4E67-831D-485254B79AD1} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 		{EF3B71F0-0FB3-4834-B5E8-B6001ADC18FB} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 		{7B5C2CF5-8D69-4A78-99B4-4072052E972A} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
+		{CB386471-B9AE-4AB3-9FA3-D9B6E379711C} = {5097A845-B12C-4756-9E4D-2F88CF388B1F}
 	EndGlobalSection
 EndGlobal

@@ -71,6 +71,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Ferop">
+      <HintPath>..\..\..\lib\Ferop.dll</HintPath>
+    </Reference>
+    <Reference Include="Ferop.TypeProvider">
+      <HintPath>..\..\..\lib\Ferop.TypeProvider.dll</HintPath>
+    </Reference>
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
@@ -81,6 +87,11 @@
     <ProjectReference Include="..\..\..\lib\FQuake3.Utils\src\FQuake3.Utils\FQuake3.Utils.fsproj">
       <Name>FQuake3.Utils</Name>
       <Project>{7b5c2cf5-8d69-4a78-99b4-4072052e972a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Engine.Renderer.Native\Engine.Renderer.Native.fsproj">
+      <Name>Engine.Renderer.Native (FSharp\Engine.Renderer.Native)</Name>
+      <Project>{cb386471-b9ae-4ab3-9fa3-d9b6e379711c}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Engine\Engine.fsproj">

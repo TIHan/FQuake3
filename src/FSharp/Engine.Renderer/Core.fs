@@ -1324,11 +1324,7 @@ module Renderer =
         
 module Internal =
     [<Literal>]
-    let LibNative = "Engine.Renderer.Native.dll"
-
-    [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibNative)>]
-    extern void er_gl_depth_func (bool is_equal)
+    let LibNative = "__Engine.Renderer.Native.dll"
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]

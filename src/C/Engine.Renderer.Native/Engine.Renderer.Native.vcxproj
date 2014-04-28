@@ -42,11 +42,13 @@
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)\build\</OutDir>
     <IntDir>build\</IntDir>
+    <TargetName>__$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)\build\</OutDir>
     <IntDir>build\</IntDir>
+    <TargetName>__$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

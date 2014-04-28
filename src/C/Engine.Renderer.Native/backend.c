@@ -22,12 +22,6 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #include "backend.h"
 
 ER_EXPORT void ER_DECL
-er_gl_depth_func (GLboolean is_equal)
-{
-	glDepthFunc (is_equal == GL_TRUE ? GL_EQUAL : GL_LEQUAL);
-}
-
-ER_EXPORT void ER_DECL
 er_gl_enable_blend (GLbitfield src_bits, GLbitfield dst_bits)
 {
 	GLenum src_factor;

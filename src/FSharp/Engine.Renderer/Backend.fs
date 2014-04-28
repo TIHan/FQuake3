@@ -36,6 +36,11 @@ open Engine.Renderer.Core
 open Engine.NativeInterop
 open Engine.Control
 
+open Ferop.TypeProvider
+open Ferop
+
+type NativeBackend = FeropProvider<"Engine.Renderer.Native", "../../../build">
+
 [<RequireQualifiedAccess>]
 module GL =
     [<Struct>]
@@ -114,7 +119,7 @@ module GL =
         //
         if diff &&& uint32 GLS.DepthFuncEqual <> 0u then
             stateBits &&& uint32 GLS.DepthFuncEqual <> 0u
-            |> Internal.er_gl_depth_func
+            |> NativeBackend.Backend.glDepthFunc
 
         //
         // check blend bits
