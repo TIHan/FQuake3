@@ -19,66 +19,10 @@ Derivative of Quake III Arena source:
 Copyright (C) 1999-2005 Id Software, Inc.
 *)
 
-namespace Engine.Renderer.Native.Backend
+namespace Engine.Renderer.Native.FeropBackend
 
+open Engine.Renderer.Native
 open Ferop.Code
-
-[<Struct>]
-type Plane =
-    val X : double
-    val Y : double
-    val Z : double
-    val W : double
-
-    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
-
-module GLS =
-    type SrcBlend =
-        | None =                0x00000000
-        | Zero =                0x00000001
-        | One =                 0x00000002
-        | DstColor =            0x00000003
-        | OneMinusDstColor =    0x00000004
-        | SrcAlpha =            0x00000005
-        | OneMinusSrcAlpha =    0x00000006
-        | DstAlpha =            0x00000007
-        | OneMinusDstAlpha =    0x00000008
-        | AlphaSaturate =       0x00000009
-        | Bits =                0x0000000f
-
-    type DstBlend =
-        | None =                0x00000000
-        | Zero =                0x00000010
-        | One =                 0x00000020
-        | SrcColor =            0x00000030
-        | OneMinusSrcColor =    0x00000040
-        | SrcAlpha =            0x00000050
-        | OneMinusSrcAlpha =    0x00000060
-        | DstAlpha =            0x00000070
-        | OneMinusDstAlpha =    0x00000080
-        | Bits =                0x000000f0
-
-    [<Literal>]
-    let DepthMaskTrue =         0x00000100
-
-    [<Literal>]
-    let PolyModeLine =          0x00001000
-
-    [<Literal>]
-    let DepthTestDisable =      0x00010000
-
-    [<Literal>]
-    let DepthFuncEqual =        0x00020000
-
-    type ATest =
-        | None =                0x00000000
-        | Gt0 =                 0x10000000
-        | Lt80 =                0x20000000
-        | Ge80 =                0x40000000
-        | Bits =                0x70000000
-
-    [<Literal>]
-    let Default = DepthMaskTrue
 
 open GLS
 
@@ -86,7 +30,6 @@ open GLS
 [<Include ("<windows.h>")>]
 [<Include ("<gl/gl.h>")>]
 [<MsvcLibsWin ("opengl32.lib")>]
-[<MsvcIncludesWin ("")>]
 module Backend =
     let glDepthFunc (isEqual: bool) : unit =
         C """glDepthFunc (isEqual == GL_TRUE ? GL_EQUAL : GL_LEQUAL);"""
@@ -133,3 +76,77 @@ glBlendFunc (src_factor, dst_factor);
 
     let glPolygonMode (isLine: bool) : unit = 
         C """glPolygonMode (GL_FRONT_AND_BACK, isLine == GL_TRUE ? GL_LINE : GL_FILL);"""
+
+    let glDepthTest (willDisable: bool) : unit =
+        C """
+if (willDisable == GL_TRUE)
+{
+	glDisable (GL_DEPTH_TEST);
+}
+else
+{
+	glEnable (GL_DEPTH_TEST);
+}
+"""
+
+    let glEnableAlphaTest (alphaTest: ATest) : unit =
+        C """
+glEnable (GL_ALPHA_TEST);
+
+switch (alphaTest)
+{
+case Backend_ATest_Gt0: glAlphaFunc (GL_GREATER, 0.0f); break;
+case Backend_ATest_Lt80: glAlphaFunc (GL_LESS, 0.5f); break;
+case Backend_ATest_Ge80: glAlphaFunc (GL_GEQUAL, 0.5f); break;
+default: return; // shouldn't happen
+}
+"""
+
+    let glDisableAlphaTest () : unit = C """glDisable (GL_ALPHA_TEST);"""
+
+    let glHyperspaceClear (color: single) : unit =
+        C """
+glClearColor (color, color, color, 1.0f);
+glClear (GL_COLOR_BUFFER_BIT);
+"""
+
+    let glFinish () : unit = C """glFinish ();"""
+
+    let glGetClearBits (useStencilBuffer: bool) (useColorBuffer: bool) : uint32 =
+        C """
+// clear relevant buffers
+GLbitfield clear_bits = GL_DEPTH_BUFFER_BIT;
+
+clear_bits = useStencilBuffer ? clear_bits | GL_STENCIL_BUFFER_BIT : clear_bits;
+clear_bits = useColorBuffer ? clear_bits | GL_COLOR_BUFFER_BIT : clear_bits;
+
+return clear_bits;
+"""
+
+    let glClearWithColor (clearBits: uint32) (r: single) (g: single) (b: single) : unit =
+        C """
+glClearColor (r, g, b, 1.0f);
+glClear (clearBits);
+"""
+
+    let glClear (clearBits: uint32) : unit = C """glClear (clearBits);"""
+
+    let glEnableClipPlane (flipMatrix: nativeint) (plane: nativeint) : unit =
+        C """
+glLoadMatrixf ((GLfloat*)flipMatrix);
+glClipPlane (GL_CLIP_PLANE0, (GLdouble*)plane);
+glEnable (GL_CLIP_PLANE0);
+"""
+
+    let glDisableClipPlane () : unit = C """glDisable (GL_CLIP_PLANE0);"""
+
+    let glSetViewportAndScissor (projectionMatrix: nativeint) (viewportX: int) (viewportY: int) (viewportWidth: int) (viewportHeight: int) : unit =
+        C """
+glMatrixMode (GL_PROJECTION);
+glLoadMatrixf (projectionMatrix);
+glMatrixMode (GL_MODELVIEW);
+
+// set the window clipping
+glViewport (viewportX, viewportY, viewportWidth, viewportHeight);
+glScissor (viewportX, viewportY, viewportWidth, viewportHeight);
+"""

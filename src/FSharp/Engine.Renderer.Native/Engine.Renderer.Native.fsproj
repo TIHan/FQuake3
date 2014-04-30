@@ -45,6 +45,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="core.fs" />
     <Compile Include="backend.fs" />
   </ItemGroup>
   <PropertyGroup>

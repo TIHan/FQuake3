@@ -39,9 +39,8 @@ open Engine.Control
 open Ferop.TypeProvider
 open Ferop
 
-open Engine.Renderer.Native.Backend
-
-type NativeBackend = FeropProvider<"Engine.Renderer.Native", "../../../build">
+open Engine.Renderer.Native
+type Native = FeropProvider<"Engine.Renderer.Native", "../../../build">
 
 [<RequireQualifiedAccess>]
 module GL =
@@ -64,7 +63,7 @@ module GL =
         //
         if diff &&& uint32 GLS.DepthFuncEqual <> 0u then
             stateBits &&& uint32 GLS.DepthFuncEqual <> 0u
-            |> NativeBackend.Backend.glDepthFunc
+            |> Native.Backend.glDepthFunc
 
         //
         // check blend bits
@@ -74,30 +73,30 @@ module GL =
                 let srcBlend = enum<GLS.SrcBlend> (int (stateBits &&& uint32 GLS.SrcBlend.Bits))
                 let dstBlend = enum<GLS.DstBlend> (int (stateBits &&& uint32 GLS.DstBlend.Bits))
 
-                NativeBackend.Backend.glEnableBlend (srcBlend, dstBlend)
+                Native.Backend.glEnableBlend (srcBlend, dstBlend)
             else
-                NativeBackend.Backend.glDisableBlend ()
+                Native.Backend.glDisableBlend ()
 
         //
         // check depthmask
         //
         if diff &&& uint32 GLS.DepthMaskTrue <> 0u then
             stateBits &&& uint32 GLS.DepthMaskTrue <> 0u
-            |> NativeBackend.Backend.glDepthMask
+            |> Native.Backend.glDepthMask
         
         //
         // fill/line mode
         //
         if diff &&& uint32 GLS.PolyModeLine <> 0u then
             stateBits &&& uint32 GLS.PolyModeLine <> 0u
-            |> NativeBackend.Backend.glPolygonMode
+            |> Native.Backend.glPolygonMode
 
         //
         // depthtest
         //
         if diff &&& uint32 GLS.DepthTestDisable <> 0u then
             stateBits &&& uint32 GLS.DepthTestDisable <> 0u
-            |> Internal.er_gl_depth_test
+            |> Native.Backend.glDepthTest
 
         //
         // alpha test
@@ -105,28 +104,20 @@ module GL =
         if diff &&& uint32 GLS.ATest.Bits <> 0u then
             let atest = enum<GLS.ATest> (int (stateBits &&& uint32 GLS.ATest.Bits))
             match atest with
-            | GLS.ATest.None -> Internal.er_gl_disable_alpha_test ()
-            | GLS.ATest.Gt0
-            | GLS.ATest.Lt80
-            | GLS.ATest.Ge80 -> Internal.er_gl_enable_alpha_test <| uint32 atest
-            | _ ->
-                raise <| Exception "Invalid alpha test state bits."
+            | GLS.ATest.None -> Native.Backend.glDisableAlphaTest ()
+            | _ -> Native.Backend.glEnableAlphaTest atest
         
         { state with GLStateBits = stateBits }
 
 /// Based on Q3: SetViewportAndScissor
 /// SetViewportAndScissor
 /// Internal
-(*
 let setViewportAndScissor (backend: Backend) =
     let view = backend.View
-    fixed' (fun ptr -> 
-        Internal.er_gl_set_viewport_and_scissor (ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight)
-    ) view.ProjectionMatrix
-*)
-let setViewportAndScissor (backend: Backend) = io {
-    let view = backend.View
-    do! GL.setViewportAndScissor view.ProjectionMatrix view.ViewportX view.ViewportY view.ViewportWidth view.ViewportHeight }
+    
+    view.ProjectionMatrix
+    |> fixed' (fun (ptr: nativeptr<single>) -> 
+        Native.Backend.glSetViewportAndScissor (NativePtr.toNativeInt ptr, view.ViewportX, view.ViewportY, view.ViewportWidth, view.ViewportHeight))
 
 /// Based on Q3: RB_Hyperspace
 /// Hyperspace
@@ -136,14 +127,14 @@ let setViewportAndScissor (backend: Backend) = io {
 let hyperspace (backend: Backend) =
     let color = single (backend.Refdef.Time &&& 255) / 255.f
 
-    Internal.er_gl_hyperspace_clear color
+    Native.Backend.glHyperspaceClear color
     { backend with IsHyperspace = true }
 
 /// SyncGLState
 let private syncGLState (r_finish: Cvar) (state: GLState) =
     match r_finish.Integer with
     | 1 when not state.HasFinishCalled ->
-        Internal.er_gl_finish ()
+        Native.Backend.glFinish ()
         { state with HasFinishCalled = true }
     | 0 ->
         { state with HasFinishCalled = true }
@@ -171,16 +162,16 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
 
     let useStencilBuf = r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2
     let useColorBuf = r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel)
-    let clearBits = Internal.er_gl_get_clear_bits (useStencilBuf, useColorBuf)
+    let clearBits = Native.Backend.glGetClearBits (useStencilBuf, useColorBuf)
 
     if useColorBuf then
 #if DEBUG
-        Internal.er_gl_clear_with_color (clearBits, 0.8f, 0.7f, 0.4f) // FIXME: get color of sky
+        NativeBackend.Backend.glClearWithColor (clearBits, 0.8f, 0.7f, 0.4f) // FIXME: get color of sky
 #else
-        Internal.er_gl_clear_with_color (clearBits, 0.f, 0.f, 0.f) // FIXME: get color of sky
+        Native.Backend.glClearWithColor (clearBits, 0.f, 0.f, 0.f) // FIXME: get color of sky
 #endif
     else
-        Internal.er_gl_clear clearBits
+        Native.Backend.glClear clearBits
 
     match backend.Refdef.RdFlags.HasFlag RdFlags.Hyperspace with
     | true -> glState, hyperspace backend
@@ -199,11 +190,11 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
                 double <| Vec3.dot normal origin - distance
             )
 
-        fixed2' (fun ptr ptr2 ->
-            Internal.er_gl_enable_clip_plane (ptr, ptr2)
+        fixed2' (fun (ptr: nativeptr<single>) (ptr2: nativeptr<single>) ->
+            Native.Backend.glEnableClipPlane (NativePtr.toNativeInt ptr, NativePtr.toNativeInt ptr2)
         ) Main.flipMatrix plane
     else
-        Internal.er_gl_disable_clip_plane ()
+        Native.Backend.glDisableClipPlane ()
 
     // force face culling to set next time
     { glState with FaceCulling = -1 },
