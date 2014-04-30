@@ -39,68 +39,13 @@ open Engine.Control
 open Ferop.TypeProvider
 open Ferop
 
+open Engine.Renderer.Native.Backend
+
 type NativeBackend = FeropProvider<"Engine.Renderer.Native", "../../../build">
 
 [<RequireQualifiedAccess>]
 module GL =
-    [<Struct>]
-    [<StructLayout (LayoutKind.Sequential)>]
-    type Plane =
-        val X : double
-        val Y : double
-        val Z : double
-        val W : double
-
-        new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
-
-    [<RequireQualifiedAccess>]
-    module GLS =
-        type SrcBlend =
-            | None =                0x00000000
-            | Zero =                0x00000001
-            | One =                 0x00000002
-            | DstColor =            0x00000003
-            | OneMinusDstColor =    0x00000004
-            | SrcAlpha =            0x00000005
-            | OneMinusSrcAlpha =    0x00000006
-            | DstAlpha =            0x00000007
-            | OneMinusDstAlpha =    0x00000008
-            | AlphaSaturate =       0x00000009
-            | Bits =                0x0000000f
-
-        type DstBlend =
-            | None =                0x00000000
-            | Zero =                0x00000010
-            | One =                 0x00000020
-            | SrcColor =            0x00000030
-            | OneMinusSrcColor =    0x00000040
-            | SrcAlpha =            0x00000050
-            | OneMinusSrcAlpha =    0x00000060
-            | DstAlpha =            0x00000070
-            | OneMinusDstAlpha =    0x00000080
-            | Bits =                0x000000f0
-
-        [<Literal>]
-        let DepthMaskTrue =         0x00000100
-
-        [<Literal>]
-        let PolyModeLine =          0x00001000
-
-        [<Literal>]
-        let DepthTestDisable =      0x00010000
-
-        [<Literal>]
-        let DepthFuncEqual =        0x00020000
-
-        type ATest =
-            | None =                0x00000000
-            | Gt0 =                 0x10000000
-            | Lt80 =                0x20000000
-            | Ge80 =                0x40000000
-            | Bits =                0x70000000
-
-        [<Literal>]
-        let Default = DepthMaskTrue
+    open GLS
 
     /// Based on Q3: GL_State
     /// state
@@ -129,48 +74,23 @@ module GL =
                 let srcBlend = enum<GLS.SrcBlend> (int (stateBits &&& uint32 GLS.SrcBlend.Bits))
                 let dstBlend = enum<GLS.DstBlend> (int (stateBits &&& uint32 GLS.DstBlend.Bits))
 
-                let srcBits =
-                    match srcBlend with
-                    | GLS.SrcBlend.Zero
-                    | GLS.SrcBlend.One
-                    | GLS.SrcBlend.DstColor
-                    | GLS.SrcBlend.OneMinusDstColor
-                    | GLS.SrcBlend.SrcAlpha
-                    | GLS.SrcBlend.OneMinusSrcAlpha
-                    | GLS.SrcBlend.DstAlpha
-                    | GLS.SrcBlend.OneMinusDstAlpha
-                    | GLS.SrcBlend.AlphaSaturate -> uint32 srcBlend
-                    | _ -> raise <| Exception "Invalid src blend state bits."
-                
-                let dstBits =
-                    match dstBlend with
-                    | GLS.DstBlend.Zero
-                    | GLS.DstBlend.One
-                    | GLS.DstBlend.SrcColor
-                    | GLS.DstBlend.OneMinusSrcColor
-                    | GLS.DstBlend.SrcAlpha
-                    | GLS.DstBlend.OneMinusSrcAlpha
-                    | GLS.DstBlend.DstAlpha
-                    | GLS.DstBlend.OneMinusDstAlpha -> uint32 dstBlend
-                    | _ -> raise <| Exception "Invalid dst blend state bits."
-
-                Internal.er_gl_enable_blend (srcBits, dstBits)
+                NativeBackend.Backend.glEnableBlend (srcBlend, dstBlend)
             else
-                Internal.er_gl_disable_blend ()
+                NativeBackend.Backend.glDisableBlend ()
 
         //
         // check depthmask
         //
         if diff &&& uint32 GLS.DepthMaskTrue <> 0u then
             stateBits &&& uint32 GLS.DepthMaskTrue <> 0u
-            |> Internal.er_gl_depth_mask
+            |> NativeBackend.Backend.glDepthMask
         
         //
         // fill/line mode
         //
         if diff &&& uint32 GLS.PolyModeLine <> 0u then
             stateBits &&& uint32 GLS.PolyModeLine <> 0u
-            |> Internal.er_gl_polygon_mode
+            |> NativeBackend.Backend.glPolygonMode
 
         //
         // depthtest
@@ -247,7 +167,7 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
     setViewportAndScissor backend |> ignore
 
     // ensures that depth writes are enabled for the depth clear
-    let glState = GL.state (uint32 GL.GLS.Default) glState
+    let glState = GL.state (uint32 GLS.Default) glState
 
     let useStencilBuf = r_measureOverdraw.Integer <> 0 || r_shadows.Integer = 2
     let useColorBuf = r_fastsky.Integer <> 0 && not (backend.Refdef.RdFlags.HasFlag RdFlags.NoWorldModel)
@@ -272,7 +192,7 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
         let normal = backend.View.PortalPlane.Normal
         let distance = backend.View.PortalPlane.Distance
         let plane =
-            GL.Plane (
+            Plane (
                 double <| Vec3.dot axis.[0] normal,
                 double <| Vec3.dot axis.[1] normal,
                 double <| Vec3.dot axis.[2] normal,

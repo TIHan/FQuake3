@@ -1328,22 +1328,6 @@ module Internal =
 
     [<SuppressUnmanagedCodeSecurity>]
     [<DllImport (LibNative)>]
-    extern void er_gl_enable_blend (uint32 src_bits, uint32 dst_bits)
-
-    [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibNative)>]
-    extern void er_gl_disable_blend ()
-
-    [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibNative)>]
-    extern void er_gl_depth_mask (bool is_true)
-
-    [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibNative)>]
-    extern void er_gl_polygon_mode (bool is_line)
-
-    [<SuppressUnmanagedCodeSecurity>]
-    [<DllImport (LibNative)>]
     extern void er_gl_depth_test (bool will_disable)
 
     [<SuppressUnmanagedCodeSecurity>]

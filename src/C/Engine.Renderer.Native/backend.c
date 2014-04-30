@@ -22,61 +22,6 @@ Copyright(C) 1999 - 2005 Id Software, Inc.
 #include "backend.h"
 
 ER_EXPORT void ER_DECL
-er_gl_enable_blend (GLbitfield src_bits, GLbitfield dst_bits)
-{
-	GLenum src_factor;
-	GLenum dst_factor;
-
-	switch (src_bits)
-	{
-	case GLS_SRCBLEND_ZERO: src_factor =				GL_ZERO; break;
-	case GLS_SRCBLEND_ONE: src_factor =					GL_ONE; break;
-	case GLS_SRCBLEND_DST_COLOR: src_factor =			GL_DST_COLOR; break;
-	case GLS_SRCBLEND_ONE_MINUS_DST_COLOR: src_factor = GL_ONE_MINUS_DST_COLOR; break;
-	case GLS_SRCBLEND_SRC_ALPHA: src_factor =			GL_SRC_ALPHA; break;
-	case GLS_SRCBLEND_ONE_MINUS_SRC_ALPHA: src_factor = GL_ONE_MINUS_SRC_ALPHA; break;
-	case GLS_SRCBLEND_DST_ALPHA: src_factor =			GL_DST_ALPHA; break;
-	case GLS_SRCBLEND_ONE_MINUS_DST_ALPHA: src_factor = GL_ONE_MINUS_DST_ALPHA; break;
-	case GLS_SRCBLEND_ALPHA_SATURATE: src_factor =		GL_SRC_ALPHA_SATURATE; break;
-	default: return; // shouldn't happen
-	}
-
-	switch (dst_bits)
-	{
-	case GLS_DSTBLEND_ZERO: dst_factor =				GL_ZERO; break;
-	case GLS_DSTBLEND_ONE: dst_factor =					GL_ONE; break;
-	case GLS_DSTBLEND_SRC_COLOR: dst_factor =			GL_SRC_COLOR; break;
-	case GLS_DSTBLEND_ONE_MINUS_SRC_COLOR: dst_factor = GL_ONE_MINUS_SRC_COLOR; break;
-	case GLS_DSTBLEND_SRC_ALPHA: dst_factor =			GL_SRC_ALPHA; break;
-	case GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA: dst_factor = GL_ONE_MINUS_SRC_ALPHA; break;
-	case GLS_DSTBLEND_DST_ALPHA: dst_factor =			GL_DST_ALPHA; break;
-	case GLS_DSTBLEND_ONE_MINUS_DST_ALPHA: dst_factor = GL_ONE_MINUS_DST_ALPHA; break;
-	default: return; // shouldn't happen
-	}
-
-	glEnable (GL_BLEND);
-	glBlendFunc (src_factor, dst_factor);
-}
-
-ER_EXPORT void ER_DECL
-er_gl_disable_blend ()
-{
-	glDisable (GL_BLEND);
-}
-
-ER_EXPORT void ER_DECL
-er_gl_depth_mask (GLboolean is_true)
-{
-	glDepthMask (is_true);
-}
-
-ER_EXPORT void ER_DECL
-er_gl_polygon_mode (GLboolean is_line)
-{
-	glPolygonMode (GL_FRONT_AND_BACK, is_line == GL_TRUE ? GL_LINE : GL_FILL);
-}
-
-ER_EXPORT void ER_DECL
 er_gl_depth_test (GLboolean will_disable)
 {
 	if (will_disable == GL_TRUE)
