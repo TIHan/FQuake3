@@ -194,7 +194,8 @@ module Vec3 =
 
 [<RequireQualifiedAccess>]
 module Vec4 =
-    let zero = vec4 (0.f)
+    let zero =  vec4 (0.f)
+    let one =   vec4 (1.f)
 
     let inline dot (v1: vec4) (v2:vec4) =
         v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
@@ -207,6 +208,14 @@ type Matrix2 =
     new (m11, m12, m21, m22) = { 
         Row1 = vec2 (m11, m12)
         Row2 = vec2 (m21, m22) }
+
+    new (row1, row2) = {
+        Row1 = row1
+        Row2 = row2 }
+
+    new (value) = {
+        Row1 = vec2 value
+        Row2 = vec2 value }
 
     member inline this.M11 = this.Row1.X
     member inline this.M12 = this.Row1.Y
@@ -231,6 +240,11 @@ type Matrix3 =
         Row1 = vec3 (m11, m12, m13)
         Row2 = vec3 (m21, m22, m23)
         Row3 = vec3 (m31, m32, m33) }
+
+    new (row1, row2, row3) = {
+        Row1 = row1
+        Row2 = row2
+        Row3 = row3 }
 
     new (value) = {
         Row1 = vec3 value
@@ -269,6 +283,12 @@ type Matrix4 =
         Row3 = vec4 (m31, m32, m33, m34)
         Row4 = vec4 (m41, m42, m43, m44) }
 
+    new (row1, row2, row3, row4) = {
+        Row1 = row1
+        Row2 = row2
+        Row3 = row3
+        Row4 = row4 }
+
     new (value) = {
         Row1 = vec4 value
         Row2 = vec4 value
@@ -291,6 +311,11 @@ type Matrix4 =
     member inline this.M42 = this.Row4.Y
     member inline this.M43 = this.Row4.Z
     member inline this.M44 = this.Row4.W
+
+    member inline this.Column1 = vec4 (this.M11, this.M21, this.M31, this.M41)
+    member inline this.Column2 = vec4 (this.M12, this.M22, this.M32, this.M42)
+    member inline this.Column3 = vec4 (this.M13, this.M23, this.M33, this.M43)
+    member inline this.Column4 = vec4 (this.M14, this.M24, this.M34, this.M44)
     
     member inline this.Item
             with get (i, j) =
@@ -299,22 +324,9 @@ type Matrix4 =
                 | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23 | (1, 3) -> this.M24
                 | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33 | (2, 3) -> this.M34
                 | (3, 0) -> this.M41 | (3, 1) -> this.M42 | (3, 2) -> this.M43 | (3, 3) -> this.M44
-                | _ -> raise <| IndexOutOfRangeException ()
-    
-    override this.ToString () =
-        let inline f x y z w = sprintf "\t %f\t %f\t %f\t %f\n" x y z w
-        sprintf
-            "{\n%s%s%s%s}"
-            (f this.M11 this.M12 this.M13 this.M14)
-            (f this.M21 this.M22 this.M23 this.M24)
-            (f this.M31 this.M32 this.M33 this.M34)
-            (f this.M41 this.M42 this.M43 this.M44)     
+                | _ -> raise <| IndexOutOfRangeException ()    
 
-#if DEBUG
     static member (*) (m1: mat4, m2: mat4) =
-#else
-    static member inline (*) (m1: mat4, m2: mat4) =
-#endif
         let inline f i j = m1.[i, 0] * m2.[0, j] + m1.[i, 1] * m2.[1, j] + m1.[i, 2] * m2.[2, j] + m1.[i, 3] * m2.[3, j]
         mat4 (
             f 0 0, f 0 1, f 0 2, f 0 3,
@@ -338,11 +350,11 @@ type Quaternion =
     static member inline Dot (q1: quat, q2: quat) =
         q1.X * q2.X + q1.Y * q2.Y + q1.Z * q2.Z + q1.W * q2.W
 
-    member inline q.Conjugate with get () = quat (q.W, -q.X, -q.Y, -q.Z)
+    member inline this.Conjugate = quat (this.W, -this.X, -this.Y, -this.Z)
 
-    member inline q.Length with get () = sqrt <| quat.Dot (q, q)
+    member inline this.Length = sqrt <| quat.Dot (this, this)
 
-    static member inline (*) (q1: quat, q2: quat) =
+    static member (*) (q1: quat, q2: quat) =
         quat (
             (q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z),
             (q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y),
@@ -362,15 +374,21 @@ and quat = Quaternion
 
 [<RequireQualifiedAccess>]
 module Mat2 =
-    let zero = mat2 (0.f, 0.f, 0.f, 0.f)
+    let zero = mat2 (0.f)
 
 [<RequireQualifiedAccess>]
 module Mat3 =
-    let zero = mat3 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
+    let zero = mat3 (0.f)
 
 [<RequireQualifiedAccess>]
 module Mat4 =
-    let zero = mat4 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
+    let zero = mat4 (0.f)
+    let identity = 
+        mat4 (
+            1.f, 0.f, 0.f, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+            0.f, 0.f, 1.f, 0.f,
+            0.f, 0.f, 0.f, 1.f)
 
 [<RequireQualifiedAccess>]
 module Quat =
