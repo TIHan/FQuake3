@@ -23,6 +23,7 @@ x64
 *.user
 *.suo
 *.opensdf
+*.obj
 
 # Executable
 te-test

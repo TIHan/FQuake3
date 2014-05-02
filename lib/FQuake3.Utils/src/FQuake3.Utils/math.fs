@@ -99,20 +99,9 @@ module Vector3f =
                 (match y with | Some y -> y | None -> this.Y),
                 (match z with | Some z -> z | None -> this.Z))
 
-        static member inline op_Equality (v1: vec3, v2: vec3) =
-            v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
+        member inline this.LengthSquared = this.X * this.X + this.Y * this.Y + this.Z * this.Z
+        member inline this.Length =  sqrt this.LengthSquared
 
-        static member inline op_GreaterThanOrEqual (v1: vec3, v2: vec3) =
-            v1.X >= v2.X && v1.Y >= v2.Y && v1.Z >= v2.Z
-
-        static member inline op_GreaterThan (v1: vec3, v2: vec3) =
-            v1.X > v2.X && v1.Y > v2.Y && v1.Z > v2.Z
-
-        static member inline op_LessThanOrEqual (v1: vec3, v2: vec3) =
-            v1.X <= v2.X && v1.Y <= v2.Y && v1.Z <= v2.Z
-
-        static member inline op_LessThan (v1: vec3, v2: vec3) =
-            v1.X < v2.X && v1.Y < v2.Y && v1.Z < v2.Z
     and vec3 = Vector3f
 
 [<AutoOpen>]
@@ -135,6 +124,8 @@ module Vec2 =
     let one =   vec2 (1.f)
     let right = vec2 (1.f, 0.f)
     let up =    vec2 (0.f, 1.f)
+    let left =  vec2 (-1.f, 0.f)
+    let down =  vec2 (0.f, -1.f)
 
 [<RequireQualifiedAccess>]
 module Vec3 =
@@ -177,11 +168,9 @@ module Vec3 =
             v1.Z * v2.X - v1.X * v2.Z,
             v1.X * v2.Y - v1.Y * v2.X)
 
-    let inline lengthSquared (v: vec3) =
-        v.X * v.X + v.Y * v.Y + v.Z * v.Z
+    let inline lengthSquared (v: vec3) = v.LengthSquared
 
-    let inline length v =
-        sqrt <| lengthSquared v
+    let inline length (v: vec3) = v.Length
 
     let inline normalize v =
         let length = 1.f / length v
