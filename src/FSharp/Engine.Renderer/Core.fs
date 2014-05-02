@@ -186,7 +186,7 @@ module Plane =
         let cross = Vec3.cross d2 d1
         let normal = Vec3.normalize cross
         
-        match Vec3.length cross with
+        match Vec3.magnitude cross with
         | 0.f -> { Normal = normal; Distance = 0.f; Type = PlaneType.X; SignBits = 0uy }
         | _ -> { Normal = normal; Distance = Vec3.dot a normal; Type = PlaneType.X; SignBits = 0uy }
 

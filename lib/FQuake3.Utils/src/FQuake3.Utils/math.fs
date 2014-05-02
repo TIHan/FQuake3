@@ -99,8 +99,8 @@ module Vector3f =
                 (match y with | Some y -> y | None -> this.Y),
                 (match z with | Some z -> z | None -> this.Z))
 
-        member inline this.LengthSquared = this.X * this.X + this.Y * this.Y + this.Z * this.Z
-        member inline this.Length =  sqrt this.LengthSquared
+        member inline this.SquaredMagnitude = this.X * this.X + this.Y * this.Y + this.Z * this.Z
+        member inline this.Magnitude = sqrt this.SquaredMagnitude
 
     and vec3 = Vector3f
 
@@ -168,12 +168,12 @@ module Vec3 =
             v1.Z * v2.X - v1.X * v2.Z,
             v1.X * v2.Y - v1.Y * v2.X)
 
-    let inline lengthSquared (v: vec3) = v.LengthSquared
+    let inline squaredMagnitude (v: vec3) = v.SquaredMagnitude
 
-    let inline length (v: vec3) = v.Length
+    let inline magnitude (v: vec3) = v.Magnitude
 
     let inline normalize v =
-        let length = 1.f / length v
+        let length = 1.f / magnitude v
         vec3 (v.X * length, v.Y * length, v.Z * length)
 
     // FIXME: This is kinda of all hacky to begin with.
@@ -352,7 +352,7 @@ type Quaternion =
 
     member inline this.Conjugate = quat (this.W, -this.X, -this.Y, -this.Z)
 
-    member inline this.Length = sqrt <| quat.Dot (this, this)
+    member inline this.Magnitude = sqrt <| quat.Dot (this, this)
 
     static member (*) (q1: quat, q2: quat) =
         quat (
@@ -396,10 +396,10 @@ module Quat =
 
     let inline conjugate (q: quat) = q.Conjugate
 
-    let inline length (q: quat) = q.Length
+    let inline magnitude (q: quat) = q.Magnitude
 
     let inline normalize (q: quat) =
-        let ``1 / length`` = 1.f / length q
+        let ``1 / length`` = 1.f / magnitude q
         quat (
             (q.W * ``1 / length``),
             (q.X * ``1 / length``),

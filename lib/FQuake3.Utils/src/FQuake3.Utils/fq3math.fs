@@ -79,5 +79,5 @@ module Bounds =
             let b = abs bounds.Max.[i]
             if a > b then a else b
         
-        Vec3.length <| vec3 (f 0, f 1, f 2)
+        Vec3.magnitude <| vec3 (f 0, f 1, f 2)
 

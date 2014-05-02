@@ -236,7 +236,7 @@ let rotateForEntity (view: View) (entity: RefEntity) =
         match entity.HasNonNormalizedAxes with
         | true ->
             // TODO: Is it ok to compare the single like this?
-            match Vec3.length axis.X with
+            match Vec3.magnitude axis.X with
             | 0.f -> 0.f
             | axisLength ->
                 1.0f / axisLength
@@ -304,7 +304,7 @@ let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: Orien
         let z = if (acc &&& 4) <> 0 then visibilityBounds.[0].[2] else visibilityBounds.[1].[2]
 
         let v = vec3 (x, y, z)
-        let possibleDistance = Vec3.lengthSquared <| v - orientation.Origin
+        let possibleDistance = Vec3.squaredMagnitude <| v - orientation.Origin
 
         calculateFarthestCornerDistance (if possibleDistance > distance then possibleDistance else distance) (acc + 1)
 

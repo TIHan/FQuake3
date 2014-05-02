@@ -235,7 +235,7 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
     //
     let lightDirection = 
         rentity.DirectedLight
-        |> Vec3.length 
+        |> Vec3.magnitude 
         |> (*) rentity.LightDirection
 
     let directedLight, lightDirection =
@@ -247,7 +247,7 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
 
             let length = 
                 direction
-                |> Vec3.length
+                |> Vec3.magnitude
                 |> function
                 | y when y < Dlight.MinRadius -> Dlight.MinRadius
                 | y -> y
