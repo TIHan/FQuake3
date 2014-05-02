@@ -30,7 +30,6 @@ open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 open FSharp.Game.Math
 open Engine.Core
-open Engine.Control
 open Engine.NativeInterop
 open FQuake3.Math
 open FQuake3.Md3

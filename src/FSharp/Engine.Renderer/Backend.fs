@@ -34,7 +34,6 @@ open Engine.Core
 open FSharp.Game.Math
 open Engine.Renderer.Core
 open Engine.NativeInterop
-open Engine.Control
 
 open Ferop.TypeProvider
 open Ferop

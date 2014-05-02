@@ -69,7 +69,6 @@
     <Compile Include="NativeInterop.fs" />
     <Compile Include="Option.fs" />
     <Compile Include="Core.fs" />
-    <Compile Include="Control.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="Command.fs" />
