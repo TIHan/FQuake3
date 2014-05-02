@@ -186,8 +186,8 @@ let fogId (md3: Md3) (entity: RefEntity) (r: Renderer) =
     | None -> failwith "Renderer does not have a world."
     | Some world ->
 
-    let v1 = vec3.op_Subtraction (localOrigin, frame.Radius)
-    let v2 = vec3.op_Addition (localOrigin, frame.Radius)
+    let v1 = localOrigin - (frame.Radius * Vec3.one)
+    let v2 = localOrigin + (frame.Radius * Vec3.one)
 
     let fog =
         world.Fogs

@@ -45,7 +45,7 @@ let setupEntityLightingGrid (rentity: TrRefEntity) (lightGrid: LightGrid) (r_amb
     let inline f i = lightOrigin.[i] * lightGrid.InverseSize.[i]
 
     let v = vec3 (f 0, f 1, f 2)
-    let pos = vec3.Floor v
+    let pos = Vec3.floor v
     let frac = v - pos
 
     let pos = 
@@ -228,7 +228,7 @@ let setupEntityLighting (refdef: TrRefdef) (identityLight: single) (sunDirection
     let rentity =
         { rentity with
             // give everything a minimum light add
-            AmbientLight = vec3.op_Addition (rentity.AmbientLight, (identityLight * 32.f)) }
+            AmbientLight = rentity.AmbientLight + ((identityLight * 32.f) * Vec3.one) }
 
     //
     // modify the light by dynamic lights

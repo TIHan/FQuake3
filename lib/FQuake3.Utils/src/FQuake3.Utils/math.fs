@@ -99,15 +99,6 @@ module Vector3f =
                 (match y with | Some y -> y | None -> this.Y),
                 (match z with | Some z -> z | None -> this.Z))
 
-        static member inline Abs (v: vec3) =
-            vec3 (abs v.X, abs v.Y, abs v.Z)
-
-        static member inline Truncate (v: vec3) =
-            vec3 (truncate v.X, truncate v.Y, truncate v.Z)
-
-        static member inline Floor (v: vec3) =
-            vec3 (floor v.X, floor v.Y, floor v.Z)
-
         static member inline op_Equality (v1: vec3, v2: vec3) =
             v1.X = v2.X && v1.Y = v2.Y && v1.Z = v2.Z
 
@@ -122,36 +113,6 @@ module Vector3f =
 
         static member inline op_LessThan (v1: vec3, v2: vec3) =
             v1.X < v2.X && v1.Y < v2.Y && v1.Z < v2.Z
-
-        static member inline (*) (v1: vec3, v2: vec3) =
-            vec3 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z)
-
-        static member inline (/) (v1: vec3, v2: vec3) =
-            vec3 (v1.X / v2.X, v1.Y / v2.Y, v1.Z / v2.Z)
-
-        static member inline (+) (v1: vec3, v2: vec3) =
-            vec3 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z)
-
-        static member inline (-) (v1: vec3, v2: vec3) =
-            vec3 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z)
-
-        static member inline (/) (v: vec3, s) =
-            vec3 (v.X / s, v.Y / s, v.Z / s)
-
-        static member inline (+) (v: vec3, s) =
-            vec3 (v.X + s, v.Y + s, v.Z + s)
-
-        static member inline (-) (v: vec3, s) =
-            vec3 (v.X - s, v.Y - s, v.Z - s)
-
-        static member inline (/) (s, v) =
-            v / s
-
-        static member inline (+) (s, v) =
-            v + s
-
-        static member inline (-) (s, v) =
-            v - s
     and vec3 = Vector3f
 
 [<AutoOpen>]
@@ -185,6 +146,12 @@ module Vec3 =
     let left =      vec3 (-1.f, 0.f,  0.f)
     let down =      vec3 (0.f, -1.f,  0.f)
     let back =      vec3 (0.f,  0.f, -1.f)
+
+    let inline abs (v: vec3) = vec3 (abs v.X, abs v.Y, abs v.Z)
+
+    let inline truncate (v: vec3) = vec3 (truncate v.X, truncate v.Y, truncate v.Z)
+
+    let inline floor (v: vec3) = vec3 (floor v.X, floor v.Y, floor v.Z)
 
     // FIXME: hacky
     let inline minDimension (v: vec3) =
@@ -223,7 +190,7 @@ module Vec3 =
     // FIXME: This is kinda of all hacky to begin with.
     let inline perpendicular v =
         let uv =
-            match vec3.Abs v |> minDimension with
+            match abs v |> minDimension with
             | 0 -> right | 1 -> up | 2 -> forward
             | _ -> raise <| System.ArgumentOutOfRangeException ()
 
