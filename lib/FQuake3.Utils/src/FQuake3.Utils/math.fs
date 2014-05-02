@@ -74,35 +74,19 @@ module Rad =
 
     let inline toDeg x : single<deg> = x * ``180 / PI``
 
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Vector2 =
-    val X : single
-    val Y : single
-
-    new (x, y) = { X = x; Y = y }
-    new (x) = { X = x; Y = x }
-
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X | 1 -> this.Y
-            | _ -> raise <| IndexOutOfRangeException ()
-and vec2 = Vector2
-
-/// Vector2 Module
-[<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Vec2 =    
-    let zero =  vec2 (0.f)
-    let one =   vec2 (1.f)
-    let right = vec2 (1.f, 0.f)
-    let up =    vec2 (0.f, 1.f)
+[<AutoOpen>]
+module Vector2f =
+    type Vector2f with
+        member inline this.Item
+            with get (i) =
+                match i with
+                | 0 -> this.X | 1 -> this.Y
+                | _ -> raise <| IndexOutOfRangeException ()
+    and vec2 = Vector2f
 
 [<AutoOpen>]
 module Vector3f =
     type Vector3f with
-
         member inline this.Item
             with get (i) =
                 match i with
@@ -170,10 +154,28 @@ module Vector3f =
             v - s
     and vec3 = Vector3f
 
+[<AutoOpen>]
+module Vector4f =
+    type Vector4f with    
+        member inline this.Item
+            with get (i) =
+                match i with
+                | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
+                | _ -> raise <| IndexOutOfRangeException ()
+    and vec4 = Vector4f
+
+open Vector2f
 open Vector3f
+open Vector4f
 
 [<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Vec2 =    
+    let zero =  vec2 (0.f)
+    let one =   vec2 (1.f)
+    let right = vec2 (1.f, 0.f)
+    let up =    vec2 (0.f, 1.f)
+
+[<RequireQualifiedAccess>]
 module Vec3 =
     let zero =      vec3 (0.f)
     let one =       vec3 (1.f)
@@ -184,6 +186,7 @@ module Vec3 =
     let down =      vec3 (0.f, -1.f,  0.f)
     let back =      vec3 (0.f,  0.f, -1.f)
 
+    // FIXME: hacky
     let inline minDimension (v: vec3) =
         match v.X < v.Y with
         | true ->
@@ -217,7 +220,7 @@ module Vec3 =
         let length = 1.f / length v
         vec3 (v.X * length, v.Y * length, v.Z * length)
 
-    // FIXME: This is kinda of all hacky t begin with.
+    // FIXME: This is kinda of all hacky to begin with.
     let inline perpendicular v =
         let uv =
             match vec3.Abs v |> minDimension with
@@ -233,35 +236,7 @@ module Vec3 =
     let inline lerp (v1: vec3) (v2: vec3) (t: single) =
         vec3 (Math.lerp v1.X v2.X t, Math.lerp v1.Y v2.Y t, Math.lerp v1.Z v2.Z t)
 
-[<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
-type Vector4 =
-    val X : single
-    val Y : single
-    val Z : single
-    val W : single
-
-    new (x, y, z, w) = { X = x; Y = y; Z = z; W = w }
-    new (x) = { X = x; Y = x; Z = x; W = x }
-    
-    member inline this.Item
-        with get (i) =
-            match i with
-            | 0 -> this.X | 1 -> this.Y | 2 -> this.Z | 3 -> this.W
-            | _ -> raise <| IndexOutOfRangeException ()
-
-    static member inline (*) (v1: vec4, v2: vec4) =
-        vec4 (v1.X * v2.X, v1.Y * v2.Y, v1.Z * v2.Z, v1.W * v2.W)
-        
-    static member inline (+) (v1: vec4, v2: vec4) =
-        vec4 (v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z, v1.W + v2.W)
-
-    static member inline (-) (v1: vec4, v2: vec4) =
-        vec4 (v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z, v1.W - v2.W) 
-and vec4 = Vector4 
-
 [<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
 module Vec4 =
     let zero = vec4 (0.f)
 
@@ -269,100 +244,115 @@ module Vec4 =
         v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z + v1.W * v2.W
 
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Matrix2 =
-    val m11 : single; val m12 : single
-    val m21 : single; val m22 : single
+    val Row1 : vec2
+    val Row2 : vec2
 
     new (m11, m12, m21, m22) = { 
-        m11 = m11; m12 = m12;
-        m21 = m21; m22 = m22 }
+        Row1 = vec2 (m11, m12)
+        Row2 = vec2 (m21, m22) }
+
+    member inline this.M11 = this.Row1.X
+    member inline this.M12 = this.Row1.Y
+    member inline this.M21 = this.Row2.X
+    member inline this.M22 = this.Row2.Y
 
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.m11 | (0, 1) -> this.m12
-                | (1, 0) -> this.m21 | (1, 1) -> this.m22
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22
                 | _ -> raise <| IndexOutOfRangeException ()
 and mat2 = Matrix2
 
-[<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Mat2 =
-    let zero = mat2 (0.f, 0.f, 0.f, 0.f)
-
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Matrix3 =
-    val m11 : single; val m12 : single; val m13 : single
-    val m21 : single; val m22 : single; val m23 : single
-    val m31 : single; val m32 : single; val m33 : single     
+    val Row1 : vec3
+    val Row2 : vec3
+    val Row3 : vec3   
 
-    new (m11, m12, m13, m21, m22, m23, m31, m32, m33) =
-        {
-        m11 = m11; m12 = m12; m13 = m13;
-        m21 = m21; m22 = m22; m23 = m23;
-        m31 = m31; m32 = m32; m33 = m33 }
+    new (m11, m12, m13, m21, m22, m23, m31, m32, m33) = {
+        Row1 = vec3 (m11, m12, m13)
+        Row2 = vec3 (m21, m22, m23)
+        Row3 = vec3 (m31, m32, m33) }
 
-    new (x) =
-        {
-        m11 = x; m12 = x; m13 = x;
-        m21 = x; m22 = x; m23 = x;
-        m31 = x; m32 = x; m33 = x }
+    new (value) = {
+        Row1 = vec3 value
+        Row2 = vec3 value
+        Row3 = vec3 value }
+
+    member inline this.M11 = this.Row1.X
+    member inline this.M12 = this.Row1.Y
+    member inline this.M13 = this.Row1.Z
+    member inline this.M21 = this.Row2.X
+    member inline this.M22 = this.Row2.Y
+    member inline this.M23 = this.Row2.Z
+    member inline this.M31 = this.Row3.X
+    member inline this.M32 = this.Row3.Y
+    member inline this.M33 = this.Row3.Z
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.m11 | (0, 1) -> this.m12 | (0, 2) -> this.m13
-                | (1, 0) -> this.m21 | (1, 1) -> this.m22 | (1, 2) -> this.m23
-                | (2, 0) -> this.m31 | (2, 1) -> this.m32 | (2, 2) -> this.m33
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23
+                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33
                 | _ -> raise <| IndexOutOfRangeException ()
 and mat3 = Matrix3
 
-[<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Mat3 =
-    let zero = mat3 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
-
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Matrix4 =
-    val m11 : single; val m12 : single; val m13 : single; val m14 : single
-    val m21 : single; val m22 : single; val m23 : single; val m24 : single
-    val m31 : single; val m32 : single; val m33 : single; val m34 : single
-    val m41 : single; val m42 : single; val m43 : single; val m44 : single        
+    val Row1 : vec4
+    val Row2 : vec4
+    val Row3 : vec4  
+    val Row4 : vec4       
 
-    new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) =
-        {
-        m11 = m11; m12 = m12; m13 = m13; m14 = m14;
-        m21 = m21; m22 = m22; m23 = m23; m24 = m24;
-        m31 = m31; m32 = m32; m33 = m33; m34 = m34;
-        m41 = m41; m42 = m42; m43 = m43; m44 = m44 }
+    new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) = {
+        Row1 = vec4 (m11, m12, m13, m14)
+        Row2 = vec4 (m21, m22, m23, m24)
+        Row3 = vec4 (m31, m32, m33, m34)
+        Row4 = vec4 (m41, m42, m43, m44) }
 
-    new (x) =
-        {
-        m11 = x; m12 = x; m13 = x; m14 = x;
-        m21 = x; m22 = x; m23 = x; m24 = x;
-        m31 = x; m32 = x; m33 = x; m34 = x;
-        m41 = x; m42 = x; m43 = x; m44 = x }
+    new (value) = {
+        Row1 = vec4 value
+        Row2 = vec4 value
+        Row3 = vec4 value
+        Row4 = vec4 value }
+
+    member inline this.M11 = this.Row1.X
+    member inline this.M12 = this.Row1.Y
+    member inline this.M13 = this.Row1.Z
+    member inline this.M14 = this.Row1.W
+    member inline this.M21 = this.Row2.X
+    member inline this.M22 = this.Row2.Y
+    member inline this.M23 = this.Row2.Z
+    member inline this.M24 = this.Row2.W
+    member inline this.M31 = this.Row3.X
+    member inline this.M32 = this.Row3.Y
+    member inline this.M33 = this.Row3.Z
+    member inline this.M34 = this.Row3.W
+    member inline this.M41 = this.Row4.X
+    member inline this.M42 = this.Row4.Y
+    member inline this.M43 = this.Row4.Z
+    member inline this.M44 = this.Row4.W
     
     member inline this.Item
             with get (i, j) =
                 match (i, j) with
-                | (0, 0) -> this.m11 | (0, 1) -> this.m12 | (0, 2) -> this.m13 | (0, 3) -> this.m14
-                | (1, 0) -> this.m21 | (1, 1) -> this.m22 | (1, 2) -> this.m23 | (1, 3) -> this.m24
-                | (2, 0) -> this.m31 | (2, 1) -> this.m32 | (2, 2) -> this.m33 | (2, 3) -> this.m34
-                | (3, 0) -> this.m41 | (3, 1) -> this.m42 | (3, 2) -> this.m43 | (3, 3) -> this.m44
+                | (0, 0) -> this.M11 | (0, 1) -> this.M12 | (0, 2) -> this.M13 | (0, 3) -> this.M14
+                | (1, 0) -> this.M21 | (1, 1) -> this.M22 | (1, 2) -> this.M23 | (1, 3) -> this.M24
+                | (2, 0) -> this.M31 | (2, 1) -> this.M32 | (2, 2) -> this.M33 | (2, 3) -> this.M34
+                | (3, 0) -> this.M41 | (3, 1) -> this.M42 | (3, 2) -> this.M43 | (3, 3) -> this.M44
                 | _ -> raise <| IndexOutOfRangeException ()
     
     override this.ToString () =
         let inline f x y z w = sprintf "\t %f\t %f\t %f\t %f\n" x y z w
         sprintf
             "{\n%s%s%s%s}"
-            (f this.m11 this.m12 this.m13 this.m14)
-            (f this.m21 this.m22 this.m23 this.m24)
-            (f this.m31 this.m32 this.m33 this.m34)
-            (f this.m41 this.m42 this.m43 this.m44)     
+            (f this.M11 this.M12 this.M13 this.M14)
+            (f this.M21 this.M22 this.M23 this.M24)
+            (f this.M31 this.M32 this.M33 this.M34)
+            (f this.M41 this.M42 this.M43 this.M44)     
 
 #if DEBUG
     static member (*) (m1: mat4, m2: mat4) =
@@ -377,21 +367,17 @@ type Matrix4 =
             f 3 0, f 3 1, f 3 2, f 3 3)
 and mat4 = Matrix4
 
-[<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
-module Mat4 =
-    let zero = mat4 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
-
 [<Struct>]
-[<StructLayout (LayoutKind.Sequential)>]
 type Quaternion =
-    val X : single
-    val Y : single
-    val Z : single
+    val XYZ : vec3
     val W : single
 
-    new (w, x, y, z) = { X = x; Y = y; Z = z; W = w }
-    new (w, v: vec3) = { X = v.X; Y = v.Y; Z = v.Z; W = w }
+    new (w, x, y, z) = { XYZ = vec3 (x, y, z); W = w }
+    new (w, v: vec3) = { XYZ = v; W = w }
+
+    member inline this.X = this.XYZ.X
+    member inline this.Y = this.XYZ.Y
+    member inline this.Z = this.XYZ.Z
         
     static member inline Dot (q1: quat, q2: quat) =
         q1.X * q2.X + q1.Y * q2.Y + q1.Z * q2.Z + q1.W * q2.W
@@ -419,7 +405,18 @@ type Quaternion =
 and quat = Quaternion
 
 [<RequireQualifiedAccess>]
-[<CompilationRepresentation (CompilationRepresentationFlags.ModuleSuffix)>]
+module Mat2 =
+    let zero = mat2 (0.f, 0.f, 0.f, 0.f)
+
+[<RequireQualifiedAccess>]
+module Mat3 =
+    let zero = mat3 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
+
+[<RequireQualifiedAccess>]
+module Mat4 =
+    let zero = mat4 (0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f)
+
+[<RequireQualifiedAccess>]
 module Quat =
     let inline dot q1 q2 = quat.Dot (q1, q2)
 
