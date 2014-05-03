@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2DFB87DA-0A78-49A9-A7A8-0C54A908C227}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -38,14 +38,32 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>..\..\packages\Microsoft.Bcl.Simd.1.0.1-beta\lib\portable-net45+win8\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="Ferop.TypeProvider">
+      <HintPath>..\..\..\Ferop.TypeProvider.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" />
   <ItemGroup>
-    <None Include="FQuake3.Viewer.exe.config" />
-    <None Include="libFQ3Viewer.dylib">
+    <ProjectReference Include="..\FQuake3.Utils\FQuake3.Utils.XS.fsproj">
+      <Project>{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}</Project>
+      <Name>FQuake3.Utils.XS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FQuake3.Viewer.Native\FQuake3.Viewer.Native.fsproj">
+      <Project>{549E1748-F300-4985-B5E6-8411F776EBF9}</Project>
+      <Name>FQuake3.Viewer.Native</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="v.vertex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="f.fragment">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

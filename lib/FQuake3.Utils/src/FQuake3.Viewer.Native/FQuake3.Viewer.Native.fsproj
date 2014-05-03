@@ -5,11 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{42876C02-ABF4-4EA5-9B0D-7ADC275D56AA}</ProjectGuid>
+    <ProjectGuid>{549E1748-F300-4985-B5E6-8411F776EBF9}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FQuake3.Utils</RootNamespace>
-    <AssemblyName>FQuake3.Utils</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>FQuake3.Viewer.Native</RootNamespace>
+    <AssemblyName>FQuake3.Viewer.Native</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,32 +37,12 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors">
-      <HintPath>..\..\packages\Microsoft.Bcl.Simd.1.0.1-beta\lib\portable-net45+win8\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="Ferop">
+      <HintPath>..\..\..\Ferop.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.1\Framework\v4.0\Microsoft.FSharp.Targets" />
   <ItemGroup>
-    <Compile Include="liteParsec.fs">
-      <Link>liteParsec.fs</Link>
-    </Compile>
-    <Compile Include="math.fs">
-      <Link>math.fs</Link>
-    </Compile>
-    <Compile Include="fq3math.fs">
-      <Link>fq3math.fs</Link>
-    </Compile>
-    <Compile Include="md3.fs">
-      <Link>md3.fs</Link>
-    </Compile>
-    <Compile Include="internalMd3Parser.fs">
-      <Link>internalMd3Parser.fs</Link>
-    </Compile>
-    <Compile Include="md3Parser.fs">
-      <Link>md3Parser.fs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="native.fs" />
   </ItemGroup>
 </Project>
