@@ -318,7 +318,9 @@ let setFarClip (rdFlags: RdFlags) (visibilityBounds: Bounds) (orientation: Orien
 let setupProjection (zNear: single) (rdFlags: RdFlags) (view: View) (fovX: single) (fovY: single) =
     // dynamically compute far clip plane distance
     let zFar = setFarClip rdFlags view.VisibilityBounds view.Orientation
-
+    let xMax = zNear * (tan <| fovX * Math.PI / 360.f)
+    let yMax = zNear * (tan <| fovY * Math.PI / 360.f)
+#if OLD
     let xMax = zNear * (tan <| fovX * Math.PI / 360.f)
     let xMin = -xMax
 
@@ -337,6 +339,9 @@ let setupProjection (zNear: single) (rdFlags: RdFlags) (view: View) (fovX: singl
             0.f, 0.f, (-2.f * zFar * zNear / depth), 0.f),
         zFar
     )
+#endif
+
+    Mat4.createPerspective (fovY * 1.f<deg>) (xMax / yMax) zNear zFar, zFar
 
 /// <summary>
 /// Based on Q3: R_SetupProjection

@@ -270,12 +270,17 @@ type Matrix3 =
                 | _ -> raise <| IndexOutOfRangeException ()
 and mat3 = Matrix3
 
-[<Struct>]
-type Matrix4 =
+type mat4 = Matrix4
+and [<Struct>] Matrix4 =
     val Row1 : vec4
     val Row2 : vec4
     val Row3 : vec4  
-    val Row4 : vec4       
+    val Row4 : vec4
+
+    member inline this.Column1 = vec4 (this.Row1.X, this.Row2.X, this.Row3.X, this.Row4.X)
+    member inline this.Column2 = vec4 (this.Row1.Y, this.Row2.Y, this.Row3.Y, this.Row4.Y)
+    member inline this.Column3 = vec4 (this.Row1.Z, this.Row2.Z, this.Row3.Z, this.Row4.Z)
+    member inline this.Column4 = vec4 (this.Row1.W, this.Row2.W, this.Row3.W, this.Row4.W)       
 
     new (m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44) = {
         Row1 = vec4 (m11, m12, m13, m14)
@@ -283,17 +288,11 @@ type Matrix4 =
         Row3 = vec4 (m31, m32, m33, m34)
         Row4 = vec4 (m41, m42, m43, m44) }
 
-    new (row1, row2, row3, row4) = {
-        Row1 = row1
-        Row2 = row2
-        Row3 = row3
-        Row4 = row4 }
-
     new (value) = {
-        Row1 = vec4 value
-        Row2 = vec4 value
-        Row3 = vec4 value
-        Row4 = vec4 value }
+        Row1 = vec4 (value, 0.f, 0.f, 0.f)
+        Row2 = vec4 (0.f, value, 0.f, 0.f)
+        Row3 = vec4 (0.f, 0.f, value, 0.f)
+        Row4 = vec4 (0.f, 0.f, 0.f, value) }
 
     member inline this.M11 = this.Row1.X
     member inline this.M12 = this.Row1.Y
@@ -311,11 +310,6 @@ type Matrix4 =
     member inline this.M42 = this.Row4.Y
     member inline this.M43 = this.Row4.Z
     member inline this.M44 = this.Row4.W
-
-    member inline this.Column1 = vec4 (this.M11, this.M21, this.M31, this.M41)
-    member inline this.Column2 = vec4 (this.M12, this.M22, this.M32, this.M42)
-    member inline this.Column3 = vec4 (this.M13, this.M23, this.M33, this.M43)
-    member inline this.Column4 = vec4 (this.M14, this.M24, this.M34, this.M44)
     
     member inline this.Item
             with get (i, j) =
@@ -333,7 +327,10 @@ type Matrix4 =
             f 1 0, f 1 1, f 1 2, f 1 3,
             f 2 0, f 2 1, f 2 2, f 2 3,
             f 3 0, f 3 1, f 3 2, f 3 3)
-and mat4 = Matrix4
+
+    static member (*) (m: mat4, v: vec4) =
+        let inline f i = m.[0, i] * v.X + m.[1, i] * v.Y + m.[2, i] * v.Z + m.[3, i] * v.W
+        vec4 (f 0, f 1, f 2, f 3)
 
 [<Struct>]
 type Quaternion =
@@ -373,22 +370,50 @@ type Quaternion =
 and quat = Quaternion
 
 [<RequireQualifiedAccess>]
-module Mat2 =
-    let zero = mat2 (0.f)
-
-[<RequireQualifiedAccess>]
-module Mat3 =
-    let zero = mat3 (0.f)
-
-[<RequireQualifiedAccess>]
 module Mat4 =
-    let zero = mat4 (0.f)
-    let identity = 
+    let identity = mat4 (1.f)
+
+    let transpose (m: mat4) =
         mat4 (
-            1.f, 0.f, 0.f, 0.f,
-            0.f, 1.f, 0.f, 0.f,
-            0.f, 0.f, 1.f, 0.f,
+            m.M11, m.M21, m.M31, m.M41,
+            m.M12, m.M22, m.M32, m.M42,
+            m.M13, m.M23, m.M33, m.M43,
+            m.M14, m.M24, m.M34, m.M44)
+
+    let inline createTranslation x y z =
+        mat4 (
+            1.f, 0.f, 0.f, x,
+            0.f, 1.f, 0.f, y,
+            0.f, 0.f, 1.f, z,
             0.f, 0.f, 0.f, 1.f)
+
+    let inline createScaling x y z =
+        mat4 (
+            x,   0.f, 0.f, 0.f,
+            0.f, y,   0.f, 0.f,
+            0.f, 0.f, z,   0.f,
+            0.f, 0.f, 0.f, 1.f)
+
+    let inline createPerspective fovY aspect zNear zFar =
+        let fovY = Deg.toRad fovY
+        let tanHalfFovY = tan <| fovY / 2.f<rad>
+
+        mat4 (
+            1.f / (aspect * tanHalfFovY), 0.f, 0.f, 0.f,
+            0.f, 1.f / tanHalfFovY, 0.f, 0.f,
+            0.f, 0.f, - (zFar + zNear) / (zFar - zNear), -1.f,
+            0.f, 0.f, - (2.f * zFar * zNear) / (zFar - zNear), 0.f)
+
+    let inline lookAt eye center up =
+        let f = Vec3.normalize (center - eye)
+        let s = Vec3.cross f up |> Vec3.normalize
+        let u = Vec3.cross s f
+
+        mat4 (
+            s.X, u.X, -f.X, 0.f,
+            s.Y, u.Y, -f.Y, 0.f,
+            s.Z, u.Z, -f.Z, 0.f,
+            -Vec3.dot s eye, -Vec3.dot u eye, Vec3.dot f eye, 1.f)
 
 [<RequireQualifiedAccess>]
 module Quat =
