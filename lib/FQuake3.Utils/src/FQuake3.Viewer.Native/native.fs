@@ -82,11 +82,21 @@ glBufferData (GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
 return vbo;
         """
 
-    let drawVbo (size: int) (data: nativeint) (vbo: int) : unit =
+    let generateElementVbo (size: int) (data: nativeint) : int =
+        C """
+GLuint vbo;
+glGenBuffers (1, &vbo);
+
+glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, vbo);
+
+glBufferData (GL_ELEMENT_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+return vbo;
+        """
+
+    let drawData (vbo: int) (ebo: int) (count: int) : unit =
         C """
 glEnableVertexAttribArray(0);
 glBindBuffer(GL_ARRAY_BUFFER, vbo);
-glBufferData (GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
 glVertexAttribPointer (
    0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
    3,                  // size
@@ -96,11 +106,13 @@ glVertexAttribPointer (
    (void*)0            // array buffer offset
 );
 
-glDrawArrays(GL_TRIANGLES, 0, size); 
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+//glDrawArrays(GL_TRIANGLES, 0, count); 
 glDisableVertexAttribArray(0);
         """
 
-    let loadShaders (vertexSource: nativeint) (fragmentSource: nativeint) : unit =
+    let loadShaders (vertexSource: nativeint) (fragmentSource: nativeint) : uint32 =
         C """
 GLint result = GL_FALSE;
 int infoLogLength;
@@ -136,5 +148,19 @@ glLinkProgram (shaderProgram);
 glUseProgram (shaderProgram);
 
 /******************************************************/
+return shaderProgram;
     """
+
+    let uniformMVP (programId: uint32) : uint32 =
+        C """
+// Get a handle for our "MVP" uniform
+GLuint MatrixID = glGetUniformLocation(programId, "MVP");
+return MatrixID;
+        """
+
+    let enableUniformMVP (mvpId: uint32) (mvp: nativeint) : unit =
+        C """
+// in the "MVP" uniform
+glUniformMatrix4fv(mvpId, 1, GL_FALSE, mvp);
+        """
 

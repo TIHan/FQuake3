@@ -40,11 +40,12 @@ let loadShaders () =
     let fh = GCHandle.Alloc (fragmentFile, GCHandleType.Pinned)
     let fp = fh.AddrOfPinnedObject ()
 
-    Native.App.loadShaders (vp, fp)
+    let programId = Native.App.loadShaders (vp, fp)
 
     vh.Free ()
     fh.Free ()
     // End Fixed
+    programId
 
 let makeVao () = Native.App.generateVao ()
 
@@ -55,11 +56,12 @@ let makeVbo (data: Triangle []) =
     h.Free ()
     vbo
 
-let drawVbo (data: Triangle []) vbo =
+let makeElementVbo (data: int []) = 
     let h = GCHandle.Alloc (data, GCHandleType.Pinned)
     let p = h.AddrOfPinnedObject ()
-    Native.App.drawVbo (data.Length * sizeof<Triangle>, p, vbo)
+    let vbo = Native.App.generateElementVbo (data.Length * sizeof<int>, p)
     h.Free ()
+    vbo
 
 let init () = Native.App.init ()
 
@@ -68,41 +70,53 @@ let exit app = Native.App.exit app
 // http://wiki.libsdl.org/SDL_EventType
 let shouldQuit () = Native.App.shouldQuit ()
 
+let enableUniformMVP (mvpId: uint32) (mvp: mat4) =
+    let dh = GCHandle.Alloc (mvp, GCHandleType.Pinned)
+    let dp = dh.AddrOfPinnedObject ()
+
+    Native.App.enableUniformMVP (mvpId, dp)
+
+    dh.Free () 
+
 let trigcoord = (1.f / 64.f)
 
 [<EntryPoint>]
 let main args =
-    let bytes = File.ReadAllBytes ("../../../FQuake3.Utils.Tests/Resources/models/players/arachnatron/head.md3")
+    let bytes = File.ReadAllBytes ("../../../FQuake3.Utils.Tests/Resources/models/players/arachnatron/lower.md3")
     let md3 = Md3.parse bytes
     let surface = md3.Surfaces.[0]
+
     let data = surface.Vertices |> Array.map (fun x -> Triangle (single x.x * trigcoord, single x.y * trigcoord, single x.z * trigcoord))
+    let normals =
+        surface.Vertices
+        |> Array.map (fun x -> Triangle (cos x.lat * sin x.lng, sin x.lat * sin x.lng, cos x.lng))
+    let indices = surface.Triangles |> Array.map (fun x -> [|x.x;x.y;x.z|]) |> Array.reduce (fun x y -> Array.append x y)
 
-    let dater = surface.Triangles |> Array.map (fun x -> Triangle (data.[x.x].X, data.[x.y].Y, data.[x.z].Z))
-
-
-    let _,dater =
-        dater
-        |> Array.fold (fun (i, data) x ->
-            match i % 3 = 0 with
-            | true -> (i + 1, Array.append data [|x;x|])
-            | _ -> (i + 1, Array.append data [|x|])
-        ) (1, [||])
+    let projection = Mat4.createPerspective 45.f<deg> (4.f / 3.f) 0.1f 10000.f |> Mat4.transpose 
+    let view = Mat4.lookAt (vec3 (100.f, 0.f, 100.f)) (vec3 0.f) (vec3 (0.f, -1.f, 0.f)) |> Mat4.transpose 
+    let model = Mat4.identity
+    let mvp = projection * view * model |> Mat4.transpose
 
     printfn "Frame Count: %i" md3.Frames.Length
     printfn "Triangle Count: %i" surface.Triangles.Length
     printfn "Vertex Count: %i" surface.Vertices.Length
 
+    //let data = Array.append data normals
+
     let app = init ()
 
     let vao = makeVao ()
-    let vbo = makeVbo dater
+    let vbo = makeVbo data
+    let ebo = makeElementVbo indices
 
-    loadShaders ()
+    let programId = loadShaders ()
+    let mvpId = Native.App.uniformMVP (programId)
 
     while not <| shouldQuit () do
         clear ()
         depthTest ()
-        drawVbo dater vbo
+        enableUniformMVP mvpId mvp
+        Native.App.drawData (vbo, ebo, (surface.Triangles.Length * 3))
         draw app
 
     exit (app)
