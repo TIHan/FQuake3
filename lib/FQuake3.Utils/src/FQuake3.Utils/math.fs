@@ -18,6 +18,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+Influenced by:
+    The Open Toolkit library.
+    OpenGL Mathematics (glm.g-truc.net)
 *)
 
 namespace FSharp.Game.Math
@@ -382,16 +386,30 @@ module Mat4 =
 
     let inline createTranslation x y z =
         mat4 (
-            1.f, 0.f, 0.f, x,
-            0.f, 1.f, 0.f, y,
-            0.f, 0.f, 1.f, z,
-            0.f, 0.f, 0.f, 1.f)
+            1.f, 0.f, 0.f, 0.f,
+            0.f, 1.f, 0.f, 0.f,
+            0.f, 0.f, 1.f, 0.f,
+            x, y, z, 1.f)
 
     let inline createScaling x y z =
         mat4 (
             x,   0.f, 0.f, 0.f,
             0.f, y,   0.f, 0.f,
             0.f, 0.f, z,   0.f,
+            0.f, 0.f, 0.f, 1.f)
+
+    let inline createRotation axis angle =
+        let angle = Deg.toRad angle * 1.f</rad>
+        let axis = Vec3.normalize axis
+
+        let c = cos -angle
+        let s = sin -angle
+        let t = 1.f - c
+
+        mat4 (
+            t * axis.X * axis.X + c, t * axis.X * axis.Y - s * axis.Z, t * axis.X * axis.Z + s * axis.Y, 0.f,
+            t * axis.X * axis.Y + s * axis.Z, t * axis.Y * axis.Y + c, t * axis.Y * axis.Z - s * axis.X, 0.f,
+            t * axis.X * axis.Z - s * axis.Y, t * axis.Y * axis.Z + s * axis.X, t * axis.Z * axis.Z + c, 0.f,
             0.f, 0.f, 0.f, 1.f)
 
     let inline createPerspective fovY aspect zNear zFar =

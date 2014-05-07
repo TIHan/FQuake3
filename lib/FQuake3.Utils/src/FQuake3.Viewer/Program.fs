@@ -94,8 +94,11 @@ let main args =
 
     let projection = Mat4.createPerspective 45.f<deg> (4.f / 3.f) 0.1f 10000.f |> Mat4.transpose 
     let view = Mat4.lookAt (vec3 (100.f, 0.f, 100.f)) (vec3 0.f) (vec3 (0.f, -1.f, 0.f)) |> Mat4.transpose 
-    let model = Mat4.identity
-    let mvp = projection * view * model |> Mat4.transpose
+    let model = Mat4.identity |> Mat4.transpose
+    let pos = Mat4.createTranslation 0.f 0.f 0.f |> Mat4.transpose
+    let rot = Mat4.createRotation (Vec3.right) 90.f<deg> |> Mat4.transpose
+    let rot2 = Mat4.createRotation (Vec3.back) 45.f<deg> |> Mat4.transpose
+    let mvp = projection * view * (pos * rot * rot2 * model) |> Mat4.transpose
 
     printfn "Frame Count: %i" md3.Frames.Length
     printfn "Triangle Count: %i" surface.Triangles.Length
