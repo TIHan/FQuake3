@@ -165,7 +165,7 @@ let beginDrawingView (r_finish: Cvar) (r_measureOverdraw: Cvar) (r_shadows: Cvar
 
     if useColorBuf then
 #if DEBUG
-        NativeBackend.Backend.glClearWithColor (clearBits, 0.8f, 0.7f, 0.4f) // FIXME: get color of sky
+        Native.Backend.glClearWithColor (clearBits, 0.8f, 0.7f, 0.4f) // FIXME: get color of sky
 #else
         Native.Backend.glClearWithColor (clearBits, 0.f, 0.f, 0.f) // FIXME: get color of sky
 #endif
