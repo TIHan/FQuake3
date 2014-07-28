@@ -63,6 +63,15 @@ let makeElementVbo (data: int []) =
     h.Free ()
     vbo
 
+let generateVBO (data: single[]) =
+    let dh = GCHandle.Alloc (data, GCHandleType.Pinned)
+    let dp = dh.AddrOfPinnedObject ()
+
+    let vbo = Native.App.generateVbo (sizeof<single> * data.Length, dp)
+
+    dh.Free ()
+    vbo
+
 let init () = Native.App.init ()
 
 let exit app = Native.App.exit app
@@ -108,17 +117,28 @@ let main args =
 
     let app = init ()
 
+    let uvTextureData =
+        surface.St 
+        |> Array.collect (fun x -> [|x.st.X; x.st.Y|])
+
     let vao = makeVao ()
     let vbo = makeVbo data
     let ebo = makeElementVbo indices
+    let uv = uint32 <| generateVBO uvTextureData
+
+    let bmp = new Gdk.Pixbuf ("../../../FQuake3.Utils.Tests/Resources/models/players/arachnatron/legs.jpg")
+    let textureId = Native.App.generateTexture (bmp.Width, bmp.Height, bmp.Pixels)
 
     let programId = loadShaders ()
     let mvpId = Native.App.uniformMVP (programId)
+    let myTextureSamplerId = Native.App.uniform (programId, "myTextureSampler")
 
     while not <| shouldQuit () do
         clear ()
         depthTest ()
         enableUniformMVP mvpId mvp
+        Native.App.bindTexture (textureId, myTextureSamplerId)
+        Native.App.drawUV uv
         Native.App.drawData (vbo, ebo, (surface.Triangles.Length * 3))
         draw app
 
