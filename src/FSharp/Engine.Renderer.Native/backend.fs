@@ -26,7 +26,7 @@ open Ferop.Code
 
 open GLS
 
-[<Ferop>]
+[<ReflectedDefinition>]
 [<Include ("<windows.h>")>]
 [<Include ("<gl/gl.h>")>]
 [<MsvcLibsWin ("opengl32.lib")>]

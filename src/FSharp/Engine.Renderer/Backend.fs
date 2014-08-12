@@ -39,7 +39,7 @@ open Ferop.TypeProvider
 open Ferop
 
 open Engine.Renderer.Native
-type Native = FeropProvider<"Engine.Renderer.Native", "../../../build">
+type Native = FeropProvider<"Engine.Renderer.Native", "../../../build", Code.Platform.Auto>
 
 [<RequireQualifiedAccess>]
 module GL =
