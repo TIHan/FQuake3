@@ -10,7 +10,7 @@ type Application =
     val Window : nativeint
     val GLContext : nativeint
 
-[<Ferop>]
+[<ReflectedDefinition>]
 [<ClangFlagsOsx ("-DGL_GLEXT_PROTOTYPES")>]
 [<ClangLibsOsx ("-framework Cocoa -framework OpenGL -framework IOKit -framework SDL2")>]
 [<Include ("<stdio.h>")>]

@@ -13,7 +13,7 @@ open FSharp.Game.Math
 open FQuake3.Utils
 open Ferop
 
-type Native = FeropProvider<"FQuake3.Viewer.Native", "bin/Release">
+type Native = FeropProvider<"FQuake3.Viewer.Native", "bin/Release", Ferop.Code.Platform.Auto>
 
 [<Struct>]
 type Triangle =
