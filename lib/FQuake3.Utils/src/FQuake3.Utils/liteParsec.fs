@@ -20,9 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *)
 
-module FSharp.LiteParsec
+module FSharp.LitePickler.Reader
 
 open System
+open System.IO
 open System.Text
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
@@ -30,125 +31,137 @@ open Microsoft.FSharp.NativeInterop
 #nowarn "9"
 #nowarn "51"
 
-type ByteStream (bytes: byte []) =
+type ILiteReadStream =
+    abstract Position : int
+    abstract Length : int
+    abstract Seek : int -> unit
+    abstract Peek : int -> byte
+    abstract Skip : int -> unit
+    abstract ReadByte : unit -> byte
+    abstract ReadBytes : int -> byte []
+    abstract ReadString  : int -> string
+    abstract Read<'a when 'a : unmanaged> : unit -> 'a
+
+type ByteReadStream (bytes: byte[]) =
     let mutable position = 0
     let length = bytes.Length
 
-    member this.Position = position
+    interface ILiteReadStream with
+        member this.Position = position
 
-    member this.Length = length
+        member this.Length = length
 
-    member this.Seek offset = position <- offset
+        member this.Seek offset = position <- offset
 
-    member this.Peek offset = bytes.[position + offset]
+        member this.Peek offset = bytes.[position + offset]
 
-    member this.Skip n = position <- position + n
+        member this.Skip n = position <- position + n
 
-    member this.ReadByte () =
-        let result = bytes.[position]
-        position <- position + 1
-        result
+        member this.ReadByte () =
+            let result = bytes.[position]
+            position <- position + 1
+            result
 
-    member this.ReadBytes n =
-        let i = position
-        position <- position + n
-        bytes.[i..position]
+        member this.ReadBytes n =
+            let i = position
+            position <- position + n
+            bytes.[i..position]
 
-    member this.ReadString n = 
-        let s : nativeptr<sbyte> = (NativePtr.ofNativeInt <| NativePtr.toNativeInt &&bytes.[position])
-        let result = String (s, 0, n)
-        position <- position + n
-        result
+        member this.ReadString n = 
+            let s : nativeptr<sbyte> = (NativePtr.ofNativeInt <| NativePtr.toNativeInt &&bytes.[position])
+            let result = String (s, 0, n)
+            position <- position + n
+            result
 
-    member this.Read<'a when 'a : unmanaged> () =
-        let result = NativePtr.read (NativePtr.ofNativeInt<'a> <| NativePtr.toNativeInt &&bytes.[position])
-        position <- position + sizeof<'a>
-        result
+        member this.Read<'a when 'a : unmanaged> () =
+            let result = NativePtr.read (NativePtr.ofNativeInt<'a> <| NativePtr.toNativeInt &&bytes.[position])
+            position <- position + sizeof<'a>
+            result
 
-type Parser<'a> = ByteStream -> 'a
+type Reader<'a> = ILiteReadStream -> 'a
 
-let anyByte : Parser<byte> =
+let u_byte : Reader<byte> =
     fun stream -> stream.ReadByte ()
 
-let anyBytes n : Parser<byte []> =
+let u_bytes n : Reader<byte []> =
     fun stream -> stream.ReadBytes (n)
 
-let anyInt16 : Parser<int16> =
+let u_int16 : Reader<int16> =
     fun stream -> stream.Read<int16> ()
 
-let anyInt32 : Parser<int> =
+let u_int32 : Reader<int> =
     fun stream -> stream.Read<int32> ()
 
-let anySingle : Parser<single> =
+let u_single : Reader<single> =
     fun stream -> stream.Read<single> ()
 
-let inline anyString n : Parser<string> =
+let inline u_string n : Reader<string> =
     fun stream -> stream.ReadString n
 
-let inline (|>>) p f =
-    fun stream -> f (p stream)
-
-let inline pipe2 a b f : Parser<_> =
+let inline u_pipe2 a b f : Reader<_> =
     fun stream -> f (a stream) (b stream)
 
-let inline pipe3 a b c f : Parser<_> =
+let inline u_pipe3 a b c f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream)
 
-let inline pipe4 a b c d f : Parser<_> =
+let inline u_pipe4 a b c d f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream)
 
-let inline pipe5 a b c d e f : Parser<_> =
+let inline u_pipe5 a b c d e f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream)
 
-let inline pipe6 a b c d e g f : Parser<_> =
+let inline u_pipe6 a b c d e g f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream)
 
-let inline pipe7 a b c d e g h f : Parser<_> =
+let inline u_pipe7 a b c d e g h f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream)
 
-let inline pipe8 a b c d e g h i f : Parser<_> =
+let inline u_pipe8 a b c d e g h i f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream)
 
-let inline pipe9 a b c d e g h i j f : Parser<_> =
+let inline u_pipe9 a b c d e g h i j f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream)
 
-let inline pipe10 a b c d e g h i j k f : Parser<_> =
+let inline u_pipe10 a b c d e g h i j k f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream)
 
-let inline pipe11 a b c d e g h i j k l f : Parser<_> =
+let inline u_pipe11 a b c d e g h i j k l f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream)
 
-let inline pipe12 a b c d e g h i j k l m f : Parser<_> =
+let inline u_pipe12 a b c d e g h i j k l m f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream) (m stream)
 
-let inline pipe13 a b c d e g h i j k l m n f : Parser<_> =
+let inline u_pipe13 a b c d e g h i j k l m n f : Reader<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream) (m stream) (n stream)
 
-let inline any1<'a when 'a : unmanaged> : Parser<_> =
+let inline u<'a when 'a : unmanaged> : Reader<_> =
     fun stream -> stream.Read<'a> ()
 
-let inline parray n (p: Parser<'a>) =
+let inline u_array n (p: Reader<'a>) =
     fun stream ->
         match n with
         | 0 -> [||]
         | _ -> Array.init n (fun _ -> p stream)
 
-let inline skipAnyBytes n : Parser<_> =
+let inline u_skipBytes n : Reader<_> =
     fun stream -> stream.Skip (n)
 
-let inline lookAhead (p: Parser<'a>) : Parser<'a> =
+let inline u_lookAhead (p: Reader<'a>) : Reader<'a> =
     fun stream ->
         let prevPosition = stream.Position
         let result = p stream
         stream.Seek (prevPosition)
         result
 
-let inline (>>=) (p: Parser<'a>) (f: 'a -> Parser<'b>) =
+let inline (>>=) (p: Reader<'a>) (f: 'a -> Reader<'b>) =
     fun stream -> f (p stream) stream
 
-let inline (>>.) (p1: Parser<'a>) (p2: Parser<'b>) =
+let inline (>>.) (p1: Reader<'a>) (p2: Reader<'b>) =
     fun stream ->
         p1 stream |> ignore
         p2 stream
 
-let inline run (p: Parser<_>) (bytes: byte []) = p <| ByteStream (bytes)
+let inline (|>>) p f =
+    fun stream -> f (p stream)
+
+let inline u_run (p: Reader<_>) (bytes: byte []) = p <| ByteReadStream (bytes)
