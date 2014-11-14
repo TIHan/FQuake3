@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *)
 
-module FSharp.LitePickler.Reader
+module FSharp.LitePickler.Unpickle
 
 open System
 open System.IO
@@ -78,85 +78,85 @@ type ByteReadStream (bytes: byte[]) =
             position <- position + sizeof<'a>
             result
 
-type Reader<'a> = ILiteReadStream -> 'a
+type Unpickle<'a> = ILiteReadStream -> 'a
 
-let u_byte : Reader<byte> =
+let u_byte : Unpickle<byte> =
     fun stream -> stream.ReadByte ()
 
-let u_bytes n : Reader<byte []> =
+let u_bytes n : Unpickle<byte []> =
     fun stream -> stream.ReadBytes (n)
 
-let u_int16 : Reader<int16> =
+let u_int16 : Unpickle<int16> =
     fun stream -> stream.Read<int16> ()
 
-let u_int32 : Reader<int> =
+let u_int32 : Unpickle<int> =
     fun stream -> stream.Read<int32> ()
 
-let u_single : Reader<single> =
+let u_single : Unpickle<single> =
     fun stream -> stream.Read<single> ()
 
-let inline u_string n : Reader<string> =
+let inline u_string n : Unpickle<string> =
     fun stream -> stream.ReadString n
 
-let inline u_pipe2 a b f : Reader<_> =
+let inline u_pipe2 a b f : Unpickle<_> =
     fun stream -> f (a stream) (b stream)
 
-let inline u_pipe3 a b c f : Reader<_> =
+let inline u_pipe3 a b c f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream)
 
-let inline u_pipe4 a b c d f : Reader<_> =
+let inline u_pipe4 a b c d f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream)
 
-let inline u_pipe5 a b c d e f : Reader<_> =
+let inline u_pipe5 a b c d e f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream)
 
-let inline u_pipe6 a b c d e g f : Reader<_> =
+let inline u_pipe6 a b c d e g f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream)
 
-let inline u_pipe7 a b c d e g h f : Reader<_> =
+let inline u_pipe7 a b c d e g h f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream)
 
-let inline u_pipe8 a b c d e g h i f : Reader<_> =
+let inline u_pipe8 a b c d e g h i f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream)
 
-let inline u_pipe9 a b c d e g h i j f : Reader<_> =
+let inline u_pipe9 a b c d e g h i j f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream)
 
-let inline u_pipe10 a b c d e g h i j k f : Reader<_> =
+let inline u_pipe10 a b c d e g h i j k f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream)
 
-let inline u_pipe11 a b c d e g h i j k l f : Reader<_> =
+let inline u_pipe11 a b c d e g h i j k l f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream)
 
-let inline u_pipe12 a b c d e g h i j k l m f : Reader<_> =
+let inline u_pipe12 a b c d e g h i j k l m f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream) (m stream)
 
-let inline u_pipe13 a b c d e g h i j k l m n f : Reader<_> =
+let inline u_pipe13 a b c d e g h i j k l m n f : Unpickle<_> =
     fun stream -> f (a stream) (b stream) (c stream) (d stream) (e stream) (g stream) (h stream) (i stream) (j stream) (k stream) (l stream) (m stream) (n stream)
 
-let inline u<'a when 'a : unmanaged> : Reader<_> =
+let inline u<'a when 'a : unmanaged> : Unpickle<_> =
     fun stream -> stream.Read<'a> ()
 
-let inline u_array n (p: Reader<'a>) =
+let inline u_array n (p: Unpickle<'a>) =
     fun stream ->
         match n with
         | 0 -> [||]
         | _ -> Array.init n (fun _ -> p stream)
 
-let inline u_skipBytes n : Reader<_> =
+let inline u_skipBytes n : Unpickle<_> =
     fun stream -> stream.Skip (n)
 
-let inline u_lookAhead (p: Reader<'a>) : Reader<'a> =
+let inline u_lookAhead (p: Unpickle<'a>) : Unpickle<'a> =
     fun stream ->
         let prevPosition = stream.Position
         let result = p stream
         stream.Seek (prevPosition)
         result
 
-let inline (>>=) (p: Reader<'a>) (f: 'a -> Reader<'b>) =
+let inline (>>=) (p: Unpickle<'a>) (f: 'a -> Unpickle<'b>) =
     fun stream -> f (p stream) stream
 
-let inline (>>.) (p1: Reader<'a>) (p2: Reader<'b>) =
+let inline (>>.) (p1: Unpickle<'a>) (p2: Unpickle<'b>) =
     fun stream ->
         p1 stream |> ignore
         p2 stream
@@ -164,4 +164,4 @@ let inline (>>.) (p1: Reader<'a>) (p2: Reader<'b>) =
 let inline (|>>) p f =
     fun stream -> f (p stream)
 
-let inline u_run (p: Reader<_>) (bytes: byte []) = p <| ByteReadStream (bytes)
+let inline u_run (p: Unpickle<_>) (bytes: byte []) = p <| ByteReadStream (bytes)

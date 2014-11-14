@@ -1,17 +1,17 @@
 ﻿module internal FQuake3.Utils.Internal.Md3Parser
 
-open FSharp.LitePickler.Reader
+open FSharp.LitePickler.Unpickle
 open FSharp.Game.Math
 open FQuake3.Md3
 open FQuake3.Math
 
-let u_vec2 : Reader<vec2> =
+let u_vec2 : Unpickle<vec2> =
     fun stream ->
         vec2 (
             stream.Read<single> (),
             stream.Read<single> ())
 
-let u_vec3 : Reader<vec3> =
+let u_vec3 : Unpickle<vec3> =
     fun stream ->
         vec3 (
             stream.Read<single> (),
@@ -72,7 +72,7 @@ let ptriangle =
 let u_st = u_vec2 |>> fun x -> Md3St (x)
 
 let ``2 * PI / 255`` = 2.f * Math.PI / 255.f  
-let u_vertex : Reader<Md3Vertex> =
+let u_vertex : Unpickle<Md3Vertex> =
     u_pipe5 u_int16 u_int16 u_int16 u_byte u_byte <|
     fun x y z zenith azimuth -> Md3Vertex (x, y, z, single zenith * ``2 * PI / 255``, single azimuth * ``2 * PI / 255``)
 
@@ -132,7 +132,7 @@ let u_surfaces count offset =
         St = st
         Vertices = vertices })
 
-let u_md3 : Reader<_> =
+let u_md3 : Unpickle<_> =
     u_lookAhead u_header >>= fun header ->
     u_pipe3
         (u_lookAhead <| u_frames header.FrameCount header.FramesOffset)
