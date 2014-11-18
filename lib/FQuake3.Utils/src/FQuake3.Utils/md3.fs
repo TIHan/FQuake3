@@ -57,6 +57,7 @@ type Md3St =
 
     new (st) = { st = st }
 
+let internal ``2 * PI / 255`` = 2.f * Math.PI / 255.f 
 /// Md3Vertex
 /// Also known as XyzNormal
 [<Struct>]
@@ -65,10 +66,13 @@ type Md3Vertex =
     val x : int16
     val y : int16
     val z : int16
-    val lat : single
-    val lng : single
+    val Zenith : byte
+    val Azimuth : byte
 
-    new (x, y, z, lat, lng) = { x = x; y = y; z = z; lat = lat; lng = lng }
+    new (x, y, z, zenith, azimuth) = { x = x; y = y; z = z; Zenith = zenith; Azimuth = azimuth }
+
+    member this.lat = single this.Zenith * ``2 * PI / 255``
+    member this.lng = single this.Azimuth * ``2 * PI / 255``
 
 /// Md3SurfaceHeader
 type Md3SurfaceHeader = {

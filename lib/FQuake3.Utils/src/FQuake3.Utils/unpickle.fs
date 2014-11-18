@@ -153,7 +153,7 @@ let inline u_lookAhead (p: Unpickle<'a>) : Unpickle<'a> =
         stream.Seek (prevPosition)
         result
 
-let inline (>>=) (p: Unpickle<'a>) (f: 'a -> Unpickle<'b>) =
+let inline (>>=) (p: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
     fun stream -> f (p stream) stream
 
 let inline (>>.) (p1: Unpickle<'a>) (p2: Unpickle<'b>) =

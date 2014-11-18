@@ -54,11 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="liteParsec.fs" />
+    <Compile Include="unpickle.fs" />
+    <Compile Include="pickle.fs" />
     <Compile Include="math.fs" />
     <Compile Include="fq3math.fs" />
     <Compile Include="md3.fs" />
     <Compile Include="internalMd3Parser.fs" />
+    <Compile Include="PickleMd3.fs" />
     <Compile Include="md3Parser.fs" />
     <None Include="packages.config" />
   </ItemGroup>

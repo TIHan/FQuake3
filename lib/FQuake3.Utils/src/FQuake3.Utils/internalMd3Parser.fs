@@ -70,11 +70,10 @@ let ptriangle =
     fun x y z -> Md3Triangle (x, y, z)
 
 let u_st = u_vec2 |>> fun x -> Md3St (x)
-
-let ``2 * PI / 255`` = 2.f * Math.PI / 255.f  
+ 
 let u_vertex : Unpickle<Md3Vertex> =
     u_pipe5 u_int16 u_int16 u_int16 u_byte u_byte <|
-    fun x y z zenith azimuth -> Md3Vertex (x, y, z, single zenith * ``2 * PI / 255``, single azimuth * ``2 * PI / 255``)
+    fun x y z zenith azimuth -> Md3Vertex (x, y, z, zenith, azimuth)
 
 let u_surfaceHeader =
     u_pipe12
