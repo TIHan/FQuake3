@@ -16,30 +16,17 @@ let p_vec3 : Pickle<vec3> =
         stream.Write v.Y
         stream.Write v.Z
 
-let p_frame : Pickle<Md3Frame> =
-    p_pipe5 
-        (fun x -> x.Bounds.Min, x.Bounds.Max, x.LocalOrigin, x.Radius, x.Name)
-        p_vec3
-        p_vec3
-        p_vec3
-        p_single
-        (p_string 16 StringKind.EightBit)
+let p_frame =
+    p_pipe5 p_vec3 p_vec3 p_vec3 p_single (p_string 16 StringKind.EightBit) <|
+    fun (x: Md3Frame) -> 
+        x.Bounds.Min,
+        x.Bounds.Max,
+        x.LocalOrigin,
+        x.Radius,
+        x.Name
 
-let p_header : Pickle<Md3Header> =
+let p_header =
     p_pipe12
-        (fun x -> 
-            x.Ident,
-            x.Version,
-            x.Name,
-            x.Flags,
-            x.FrameCount,
-            x.TagCount,
-            x.SurfaceCount,
-            x.SkinCount,
-            x.FramesOffset,
-            x.TagsOffset,
-            x.SurfacesOffset,
-            x.EofOffset)
         (p_string 4 StringKind.EightBit)
         p_int32
         (p_string 64 StringKind.EightBit)
@@ -51,56 +38,61 @@ let p_header : Pickle<Md3Header> =
         p_int32
         p_int32
         p_int32
-        p_int32
+        p_int32 <|
+    fun (x: Md3Header) -> 
+        x.Ident,
+        x.Version,
+        x.Name,
+        x.Flags,
+        x.FrameCount,
+        x.TagCount,
+        x.SurfaceCount,
+        x.SkinCount,
+        x.FramesOffset,
+        x.TagsOffset,
+        x.SurfacesOffset,
+        x.EofOffset
 
 let p_tag : Pickle<Md3Tag> =
-    p_pipe5
-        (fun x -> x.Name, x.Origin, x.Axis.X, x.Axis.Y, x.Axis.Z)
-        (p_string 64 StringKind.EightBit)
-        p_vec3
-        p_vec3
-        p_vec3
-        p_vec3
+    p_pipe5 (p_string 64 StringKind.EightBit) p_vec3 p_vec3 p_vec3 p_vec3 <|
+    fun x -> 
+        x.Name,
+        x.Origin,
+        x.Axis.X,
+        x.Axis.Y,
+        x.Axis.Z
 
 let p_shader : Pickle<Md3Shader> =
     p_pipe2
-        (fun x -> x.Name, x.ShaderId)
         (p_string 64 StringKind.EightBit)
-        p_int32
+        p_int32 <|
+    fun x -> 
+        x.Name,
+        x.ShaderId
 
 let p_triangle : Pickle<Md3Triangle> =
     p_pipe3
-        (fun x -> x.x, x.y, x.z)
         p_int32
         p_int32
-        p_int32
+        p_int32 <|
+    fun x -> 
+        x.x, 
+        x.y, 
+        x.z
 
-let p_st : Pickle<Md3St> = p_vec2 |>> (fun x -> x.st)
+let p_st : Pickle<Md3St> = p_vec2 |>> fun x -> x.st
  
 let p_vertex : Pickle<Md3Vertex> =
-    p_pipe5
-        (fun x -> x.x, x.y, x.z, x.Zenith, x.Azimuth)
-        p_int16
-        p_int16
-        p_int16
-        p_byte
-        p_byte
+    p_pipe5 p_int16 p_int16 p_int16 p_byte p_byte <|
+    fun x -> 
+        x.x, 
+        x.y, 
+        x.z, 
+        x.Zenith, 
+        x.Azimuth
 
 let p_surfaceHeader : Pickle<Md3SurfaceHeader> =
     p_pipe12
-        (fun x ->
-            x.Ident,
-            x.Name,
-            x.Flags,
-            x.FrameCount,
-            x.ShaderCount,
-            x.VertexCount,
-            x.TriangleCount,
-            x.TrianglesOffset,
-            x.ShadersOffset,
-            x.StOffset,
-            x.VerticesOffset,
-            x.EndOffset)
         (p_string 4 StringKind.EightBit)
         (p_string 64 StringKind.EightBit)
         p_int32
@@ -112,7 +104,20 @@ let p_surfaceHeader : Pickle<Md3SurfaceHeader> =
         p_int32
         p_int32
         p_int32
-        p_int32
+        p_int32 <|
+    fun x ->
+        x.Ident,
+        x.Name,
+        x.Flags,
+        x.FrameCount,
+        x.ShaderCount,
+        x.VertexCount,
+        x.TriangleCount,
+        x.TrianglesOffset,
+        x.ShadersOffset,
+        x.StOffset,
+        x.VerticesOffset,
+        x.EndOffset
        
 let p_frames count offset : Pickle<Md3Frame[]> =
     p_skipBytes offset >>. 
@@ -144,11 +149,14 @@ let p_surfaces count offset : Pickle<Md3Surface[]> =
     p_skipBytes offset >>.
     (f, id)
 
-let p_md3 : Pickle<Md3> =
+let p_md3 : Pickle<_> =
     (p_lookAhead p_header, fun x -> x.Header) >>= fun header ->
     p_pipe3
-        (fun x -> x.Frames, x.Tags, x.Surfaces)
         (p_lookAhead <| p_frames header.FrameCount header.FramesOffset)
         (p_lookAhead <| p_tags header.TagCount header.TagsOffset)
-        (p_lookAhead <| p_surfaces header.SurfaceCount header.SurfacesOffset)
+        (p_lookAhead <| p_surfaces header.SurfaceCount header.SurfacesOffset) <|
+    fun (x: Md3) -> 
+        x.Frames,
+        x.Tags,
+        x.Surfaces
 

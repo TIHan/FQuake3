@@ -124,20 +124,20 @@ let p_single : Pickle<_> =
 let p_string n kind : Pickle<_> =
     fun stream x -> stream.WriteString n kind x
 
-let inline p_pipe2 f a b : Pickle<_> =
+let inline p_pipe2 a b f : Pickle<_> =
     fun stream x -> 
         let a',b' = f x
         (a stream a')
         (b stream b')
 
-let inline p_pipe3 f a b c : Pickle<_> =
+let inline p_pipe3 a b c f : Pickle<_> =
     fun stream x -> 
         let a',b',c' = f x
         (a stream a')
         (b stream b')
         (c stream c')
 
-let inline p_pipe4 f a b c d : Pickle<_> =
+let inline p_pipe4 a b c d f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d' = f x
         (a stream a')
@@ -145,7 +145,7 @@ let inline p_pipe4 f a b c d : Pickle<_> =
         (c stream c')
         (d stream d')
 
-let inline p_pipe5 f a b c d e : Pickle<_> =
+let inline p_pipe5 a b c d e f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e' = f x
         (a stream a')
@@ -154,7 +154,7 @@ let inline p_pipe5 f a b c d e : Pickle<_> =
         (d stream d')
         (e stream e')
 
-let inline p_pipe6 f a b c d e g : Pickle<_> =
+let inline p_pipe6 a b c d e g f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g' = f x
         (a stream a')
@@ -164,7 +164,7 @@ let inline p_pipe6 f a b c d e g : Pickle<_> =
         (e stream e')
         (g stream g')
 
-let inline p_pipe7 f a b c d e g h : Pickle<_> =
+let inline p_pipe7 a b c d e g h f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h' = f x
         (a stream a')
@@ -175,7 +175,7 @@ let inline p_pipe7 f a b c d e g h : Pickle<_> =
         (g stream g')
         (h stream h')
 
-let inline p_pipe8 f a b c d e g h i : Pickle<_> =
+let inline p_pipe8 a b c d e g h i f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i' = f x
         (a stream a')
@@ -187,7 +187,7 @@ let inline p_pipe8 f a b c d e g h i : Pickle<_> =
         (h stream h')
         (i stream i')
 
-let inline p_pipe9 f a b c d e g h i j : Pickle<_> =
+let inline p_pipe9 a b c d e g h i j f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i',j' = f x
         (a stream a')
@@ -200,7 +200,7 @@ let inline p_pipe9 f a b c d e g h i j : Pickle<_> =
         (i stream i')
         (j stream j')
 
-let inline p_pipe10 f a b c d e g h i j k : Pickle<_> =
+let inline p_pipe10 a b c d e g h i j k f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i',j',k' = f x
         (a stream a')
@@ -214,7 +214,7 @@ let inline p_pipe10 f a b c d e g h i j k : Pickle<_> =
         (j stream j')
         (k stream k')
 
-let inline p_pipe11 f a b c d e g h i j k l : Pickle<_> =
+let inline p_pipe11 a b c d e g h i j k l f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i',j',k', l' = f x
         (a stream a')
@@ -229,7 +229,7 @@ let inline p_pipe11 f a b c d e g h i j k l : Pickle<_> =
         (k stream k')
         (l stream l')
 
-let inline p_pipe12 f a b c d e g h i j k l m : Pickle<_> =
+let inline p_pipe12 a b c d e g h i j k l m f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i',j',k', l',m' = f x
         (a stream a')
@@ -245,7 +245,7 @@ let inline p_pipe12 f a b c d e g h i j k l m : Pickle<_> =
         (l stream l')
         (m stream m')
 
-let inline p_pipe13 f a b c d e g h i j k l m n : Pickle<_> =
+let inline p_pipe13 a b c d e g h i j k l m n f : Pickle<_> =
     fun stream x -> 
         let a',b',c',d',e',g',h',i',j',k', l',m',n' = f x
         (a stream a')
