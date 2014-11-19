@@ -6,12 +6,12 @@ open FQuake3.Md3
 open FQuake3.Math
 
 let p_vec2 : Pickle<vec2> =
-    fun stream v ->
+    fun v stream ->
         stream.Write v.X
         stream.Write v.Y
 
 let p_vec3 : Pickle<vec3> =
-    fun stream v ->
+    fun v stream ->
         stream.Write v.X
         stream.Write v.Y
         stream.Write v.Z
@@ -126,23 +126,23 @@ let p_tags count offset =
     p_skipBytes offset >>. p_array count p_tag <| ()
 
 let p_surface : Pickle<Md3Surface> =
-    fun stream x ->
+    fun x stream ->
         let header = x.Header
-        p_lookAhead p_surfaceHeader stream header
-        p_lookAhead (p_skipBytes header.TrianglesOffset >>. p_array header.TriangleCount p_triangle <| ()) stream x.Triangles
-        p_lookAhead (p_skipBytes header.ShadersOffset >>. p_array header.ShaderCount p_shader <| ()) stream x.Shaders
-        p_lookAhead (p_skipBytes header.StOffset >>. p_array header.VertexCount p_st <| ()) stream x.St
-        p_lookAhead (p_skipBytes header.VerticesOffset >>. p_array (header.VertexCount * header.FrameCount) p_vertex <| ()) stream x.Vertices
+        p_lookAhead p_surfaceHeader header stream
+        p_lookAhead (p_skipBytes header.TrianglesOffset >>. p_array header.TriangleCount p_triangle <| ()) x.Triangles stream
+        p_lookAhead (p_skipBytes header.ShadersOffset >>. p_array header.ShaderCount p_shader <| ()) x.Shaders stream
+        p_lookAhead (p_skipBytes header.StOffset >>. p_array header.VertexCount p_st <| ()) x.St stream
+        p_lookAhead (p_skipBytes header.VerticesOffset >>. p_array (header.VertexCount * header.FrameCount) p_vertex <| ()) x.Vertices stream
 
 let p_surfaces count offset =
     let f =
-        fun stream xs ->
+        fun xs stream ->
             xs
             |> Array.iteri (fun i x ->
-                p_surface stream x
+                p_surface x stream
             
                 if i + 1 <> count then
-                    p_skipBytes x.Header.EndOffset stream x)
+                    p_skipBytes x.Header.EndOffset x stream)
 
     p_skipBytes offset >>. f <| ()
 

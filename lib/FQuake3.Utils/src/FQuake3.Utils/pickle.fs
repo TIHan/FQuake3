@@ -104,41 +104,41 @@ type ByteWriteStream (bytes: byte []) =
                 bytes.[position] <- (NativePtr.get ptr (i - 1))
                 position <- position + 1
 
-type Pickle<'a> = ILiteWriteStream -> 'a -> unit
+type Pickle<'a> = 'a -> ILiteWriteStream -> unit
 
-let p_byte : Pickle<_> =
-    fun stream x -> stream.WriteByte x
+let p_byte : Pickle<byte> =
+    fun x stream -> stream.WriteByte x
 
-let inline p_bytes n : Pickle<_> =
-    fun stream xs -> stream.WriteBytes n xs
+let inline p_bytes n : Pickle<byte []> =
+    fun xs stream -> stream.WriteBytes n xs
 
-let p_int16 : Pickle<_> =
-    fun stream x -> stream.Write<int16> x
+let p_int16 : Pickle<int16> =
+    fun x stream -> stream.Write<int16> x
 
-let p_int32 : Pickle<_> =
-    fun stream x -> stream.Write<int32> x
+let p_int32 : Pickle<int32> =
+    fun x stream -> stream.Write<int32> x
 
-let p_single : Pickle<_> =
-    fun stream x -> stream.Write<single> x
+let p_single : Pickle<single> =
+    fun x stream -> stream.Write<single> x
 
-let p_string n kind : Pickle<_> =
-    fun stream x -> stream.WriteString n kind x
+let p_string n kind : Pickle<string> =
+    fun x stream -> stream.WriteString n kind x
 
 let inline p_pipe2 a b f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b' = f x
-        (a stream a')
-        (b stream b')
+        (a a' stream)
+        (b b' stream)
 
 let inline p_pipe3 a b c f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c' = f x
-        (a stream a')
-        (b stream b')
-        (c stream c')
+        (a a' stream)
+        (b b' stream)
+        (c c' stream)
 
 let inline p_pipe4 a b c d f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d' = f x
         (a stream a')
         (b stream b')
@@ -146,16 +146,16 @@ let inline p_pipe4 a b c d f : Pickle<_> =
         (d stream d')
 
 let inline p_pipe5 a b c d e f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e' = f x
-        (a stream a')
-        (b stream b')
-        (c stream c')
-        (d stream d')
-        (e stream e')
+        (a a' stream)
+        (b b' stream)
+        (c c' stream)
+        (d d' stream)
+        (e e' stream)
 
 let inline p_pipe6 a b c d e g f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g' = f x
         (a stream a')
         (b stream b')
@@ -165,7 +165,7 @@ let inline p_pipe6 a b c d e g f : Pickle<_> =
         (g stream g')
 
 let inline p_pipe7 a b c d e g h f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h' = f x
         (a stream a')
         (b stream b')
@@ -176,7 +176,7 @@ let inline p_pipe7 a b c d e g h f : Pickle<_> =
         (h stream h')
 
 let inline p_pipe8 a b c d e g h i f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i' = f x
         (a stream a')
         (b stream b')
@@ -188,7 +188,7 @@ let inline p_pipe8 a b c d e g h i f : Pickle<_> =
         (i stream i')
 
 let inline p_pipe9 a b c d e g h i j f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i',j' = f x
         (a stream a')
         (b stream b')
@@ -201,7 +201,7 @@ let inline p_pipe9 a b c d e g h i j f : Pickle<_> =
         (j stream j')
 
 let inline p_pipe10 a b c d e g h i j k f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i',j',k' = f x
         (a stream a')
         (b stream b')
@@ -215,7 +215,7 @@ let inline p_pipe10 a b c d e g h i j k f : Pickle<_> =
         (k stream k')
 
 let inline p_pipe11 a b c d e g h i j k l f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i',j',k', l' = f x
         (a stream a')
         (b stream b')
@@ -230,23 +230,23 @@ let inline p_pipe11 a b c d e g h i j k l f : Pickle<_> =
         (l stream l')
 
 let inline p_pipe12 a b c d e g h i j k l m f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i',j',k', l',m' = f x
-        (a stream a')
-        (b stream b')
-        (c stream c')
-        (d stream d')
-        (e stream e')
-        (g stream g')
-        (h stream h')
-        (i stream i')
-        (j stream j')
-        (k stream k')
-        (l stream l')
-        (m stream m')
+        (a a' stream)
+        (b b' stream)
+        (c c' stream)
+        (d d' stream)
+        (e e' stream)
+        (g g' stream)
+        (h h' stream)
+        (i i' stream)
+        (j j' stream)
+        (k k' stream)
+        (l l' stream)
+        (m m' stream)
 
 let inline p_pipe13 a b c d e g h i j k l m n f : Pickle<_> =
-    fun stream x -> 
+    fun x stream -> 
         let a',b',c',d',e',g',h',i',j',k', l',m',n' = f x
         (a stream a')
         (b stream b')
@@ -263,37 +263,37 @@ let inline p_pipe13 a b c d e g h i j k l m n f : Pickle<_> =
         (n stream n')
 
 let p : Pickle<_> =
-    fun stream x -> stream.Write x
+    fun x stream -> stream.Write x
 
 let inline p_array n (p: Pickle<'a>) : Pickle<'a[]> =
-    fun stream xs ->
+    fun xs stream ->
         match n with
         | 0 -> ()
-        | _ -> xs.[..n - 1] |> Array.iter (p stream)
+        | _ -> xs.[..n - 1] |> Array.iter (fun x -> p x stream)
 
 let inline p_skipBytes n : Pickle<_> =
-    fun stream _ -> stream.Skip n
+    fun _ stream -> stream.Skip n
 
 let inline p_lookAhead (p: Pickle<_>) : Pickle<_> =
-    fun stream x ->
+    fun x stream ->
         let prevPosition = stream.Position
-        p stream x
+        p x stream
         stream.Seek (prevPosition)
 
 let inline (>>=) (p: Pickle<'a>, g) (f: 'a -> Pickle<'b>) : Pickle<'b> =
-    fun stream (x: 'b) ->
+    fun x stream ->
         let gx = g x
-        p stream gx
-        (f gx) stream x
+        p gx stream
+        (f gx) x stream
 
 let inline (>>.) (p1: Pickle<'a>) (p2: Pickle<'b>) =
     fun x ->
-        fun stream y ->
-            p1 stream x
-            p2 stream y
+        fun y stream ->
+            p1 x stream
+            p2 y stream
 
 let (|>>) a f : Pickle<_> =
-    fun stream x -> (a stream (f x))
+    fun x stream -> (a (f x) stream)
 
-let inline p_run (p: Pickle<_>) bytes = p <| ByteWriteStream (bytes)
+let inline p_run (p: Pickle<_>) x bytes = p x <| ByteWriteStream (bytes)
 
