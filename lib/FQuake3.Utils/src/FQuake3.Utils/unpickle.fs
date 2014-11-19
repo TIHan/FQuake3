@@ -153,8 +153,14 @@ let inline u_lookAhead (p: Unpickle<'a>) : Unpickle<'a> =
         stream.Seek (prevPosition)
         result
 
-let inline (>>=) (p: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
-    fun stream -> f (p stream) stream
+let inline fmap (f: 'a -> 'b) (u: Unpickle<'a>) : Unpickle<'b> =
+    fun stream -> f (u stream)
+
+let inline (<*>) (u1: Unpickle<'a -> 'b>) (u2: Unpickle<'a>) : Unpickle<'b> =
+    fun stream -> u1 stream (u2 stream)
+
+let inline (>>=) (u: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
+    fun stream -> f (u stream) stream
 
 let inline (>>.) (p1: Unpickle<unit>) (p2: Unpickle<'a>) =
     fun stream ->
