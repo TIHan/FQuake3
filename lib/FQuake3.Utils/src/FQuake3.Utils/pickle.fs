@@ -51,54 +51,34 @@ type ILiteWriteStream =
     abstract WriteString : int -> StringKind -> string -> unit
     abstract Write<'a when 'a : unmanaged> : 'a -> unit
 
-type ByteResizeWriteStream (bytes: byte ResizeArray) =
+type ByteWriteStream (bytes: byte []) =
     let mutable position = 0
-
-    let insert i byte =
-        if bytes.Count < i + 1 then 
-            bytes.Capacity <- i + 1
-
-        let diff = i + 1 - bytes.Count
-        if diff > 0 then
-            bytes.AddRange (Array.zeroCreate diff)
-
-        bytes.[i] <- byte
-
-    let insertRange i (bytes': byte[]) =
-        if bytes.Count < i + bytes'.Length then
-            bytes.Capacity <- i + bytes'.Length
-
-        let diff = i + bytes'.Length - bytes.Count
-        if diff > 0 then
-            bytes.AddRange (Array.zeroCreate diff)
-
-        bytes' |> Array.iter (fun byte -> bytes.[i] <- byte)
 
     interface ILiteWriteStream with
         member this.Position = position
 
-        member this.Length = bytes.Count
+        member this.Length = bytes.Length
 
         member this.Seek offset = position <- offset
 
         member this.Skip n = position <- position + n
 
         member this.WriteByte byte =
-            insert position byte
+            bytes.[position] <- byte
             position <- position + 1
 
         member this.WriteBytes n bytes' =
-            insertRange position bytes'.[..n - 1]
-            position <- position + n
+            for i = 0 to n do
+                bytes.[position + i] <- bytes'.[i]
+                position <- position + 1
 
-        // TODO: please fix
         member this.WriteString n kind string = 
             match kind with
             | EightBit ->
                 let length = string.Length
 
                 for i = 1 to length do
-                    insert position (byte <| sbyte string.[i - 1])
+                    bytes.[position] <- (byte <| sbyte string.[i - 1])
                     position <- position + 1
  
             | _ ->
@@ -113,8 +93,7 @@ type ByteResizeWriteStream (bytes: byte ResizeArray) =
                     | _ -> System.Text.Encoding.Default
 
                 let bytes' = encoding.GetBytes (string)
-                insertRange position bytes'
-                position <- position + bytes'.Length
+                (this :> ILiteWriteStream).WriteBytes bytes'.Length bytes'
 
         member this.Write<'a when 'a : unmanaged> (a: 'a) =
             let mutable a = a
@@ -122,7 +101,7 @@ type ByteResizeWriteStream (bytes: byte ResizeArray) =
             let ptr : nativeptr<byte> = &&a |> NativePtr.toNativeInt |> NativePtr.ofNativeInt
 
             for i = 1 to size do
-                insert position (NativePtr.get ptr (i - 1))
+                bytes.[position] <- (NativePtr.get ptr (i - 1))
                 position <- position + 1
 
 type Pickle<'a> = ILiteWriteStream -> 'a -> unit
@@ -315,5 +294,5 @@ let inline (>>.) (p1: Pickle<'a>) ((p2: Pickle<'b>), f) =
 let (|>>) a f : Pickle<_> =
     fun stream x -> (a stream (f x))
 
-let inline p_run (p: Pickle<_>) bytes = p <| ByteResizeWriteStream (bytes)
+let inline p_run (p: Pickle<_>) bytes = p <| ByteWriteStream (bytes)
 

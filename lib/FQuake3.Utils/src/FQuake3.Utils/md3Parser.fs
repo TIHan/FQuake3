@@ -10,6 +10,6 @@ let parse bytes = u_run u_md3 bytes
 
 let pickle md3 = 
     // hard coding this for now
-    let bytes = ResizeArray (Array.zeroCreate 1306652)
+    let bytes = Array.zeroCreate 1306652
     p_run p_md3 bytes md3
     bytes

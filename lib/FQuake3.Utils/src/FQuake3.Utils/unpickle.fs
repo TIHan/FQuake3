@@ -42,7 +42,7 @@ type ILiteReadStream =
     abstract ReadString  : int -> string
     abstract Read<'a when 'a : unmanaged> : unit -> 'a
 
-type ByteReadStream (bytes: byte[]) =
+type ByteReadStream (bytes: byte []) =
     let mutable position = 0
     let length = bytes.Length
 
