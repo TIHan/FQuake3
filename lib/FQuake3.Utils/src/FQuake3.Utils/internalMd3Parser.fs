@@ -105,12 +105,10 @@ let u_surfaceHeader =
         EndOffset = endOffset }
 
 let u_frames count offset =
-    u_skipBytes offset >>.
-    u_array count u_frame |>> fun x -> x
+    u_skipBytes offset >>. u_array count u_frame
 
 let u_tags count offset =
-    u_skipBytes offset >>.
-    u_array count u_tag |>> fun x -> x
+    u_skipBytes offset >>. u_array count u_tag
 
 let u_surfaces count offset =
     u_skipBytes offset >>.

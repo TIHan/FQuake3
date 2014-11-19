@@ -156,9 +156,9 @@ let inline u_lookAhead (p: Unpickle<'a>) : Unpickle<'a> =
 let inline (>>=) (p: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
     fun stream -> f (p stream) stream
 
-let inline (>>.) (p1: Unpickle<'a>) (p2: Unpickle<'b>) =
+let inline (>>.) (p1: Unpickle<unit>) (p2: Unpickle<'a>) =
     fun stream ->
-        p1 stream |> ignore
+        p1 stream
         p2 stream
 
 let inline (|>>) p f =
