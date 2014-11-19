@@ -120,19 +120,19 @@ let p_surfaceHeader =
         x.EndOffset
        
 let p_frames count offset =
-    p_skipBytes offset >>. p_array count p_frame
+    p_skipBytes offset >>. p_array count p_frame <| ()
 
 let p_tags count offset =
-    p_skipBytes offset >>. p_array count p_tag
+    p_skipBytes offset >>. p_array count p_tag <| ()
 
 let p_surface : Pickle<Md3Surface> =
     fun stream x ->
         let header = x.Header
         p_lookAhead p_surfaceHeader stream header
-        p_lookAhead (p_skipBytes header.TrianglesOffset >>. p_array header.TriangleCount p_triangle) stream x.Triangles
-        p_lookAhead (p_skipBytes header.ShadersOffset >>. p_array header.ShaderCount p_shader) stream x.Shaders
-        p_lookAhead (p_skipBytes header.StOffset >>. p_array header.VertexCount p_st) stream x.St
-        p_lookAhead (p_skipBytes header.VerticesOffset >>. p_array (header.VertexCount * header.FrameCount) p_vertex) stream x.Vertices
+        p_lookAhead (p_skipBytes header.TrianglesOffset >>. p_array header.TriangleCount p_triangle <| ()) stream x.Triangles
+        p_lookAhead (p_skipBytes header.ShadersOffset >>. p_array header.ShaderCount p_shader <| ()) stream x.Shaders
+        p_lookAhead (p_skipBytes header.StOffset >>. p_array header.VertexCount p_st <| ()) stream x.St
+        p_lookAhead (p_skipBytes header.VerticesOffset >>. p_array (header.VertexCount * header.FrameCount) p_vertex <| ()) stream x.Vertices
 
 let p_surfaces count offset =
     let f =
@@ -144,7 +144,7 @@ let p_surfaces count offset =
                 if i + 1 <> count then
                     p_skipBytes x.Header.EndOffset stream x)
 
-    p_skipBytes offset >>. f
+    p_skipBytes offset >>. f <| ()
 
 let p_md3 : Pickle<_> =
     (p_lookAhead p_header, fun x -> x.Header) >>= fun header ->

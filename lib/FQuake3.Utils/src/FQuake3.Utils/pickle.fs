@@ -286,10 +286,11 @@ let inline (>>=) (p: Pickle<'a>, g) (f: 'a -> Pickle<'b>) : Pickle<'b> =
         p stream gx
         (f gx) stream x
 
-let inline (>>.) (p1: Pickle<unit>) (p2: Pickle<'a>) =
-    fun stream x ->
-        p1 stream ()
-        p2 stream x
+let inline (>>.) (p1: Pickle<'a>) (p2: Pickle<'b>) =
+    fun x ->
+        fun stream y ->
+            p1 stream x
+            p2 stream y
 
 let (|>>) a f : Pickle<_> =
     fun stream x -> (a stream (f x))
