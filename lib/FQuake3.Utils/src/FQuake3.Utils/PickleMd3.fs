@@ -80,7 +80,7 @@ let p_triangle =
         x.y, 
         x.z
 
-let p_st = p_vec2 |>> fun (x: Md3St) -> x.st
+let p_st = fun (x: Md3St) stream -> p_vec2 x.st stream
  
 let p_vertex =
     p_pipe5 p_int16 p_int16 p_int16 p_byte p_byte <|
@@ -120,31 +120,50 @@ let p_surfaceHeader =
         x.EndOffset
        
 let p_frames count offset =
-    p_skipBytes offset >>. p_array count p_frame <| ()
+    fun xs stream ->
+        p_skipBytes offset () stream
+        p_array count p_frame xs stream
 
 let p_tags count offset =
-    p_skipBytes offset >>. p_array count p_tag <| ()
+    fun xs stream ->
+        p_skipBytes offset () stream
+        p_array count p_tag xs stream
 
 let p_surface : Pickle<Md3Surface> =
     fun x stream ->
         let header = x.Header
+
         p_lookAhead p_surfaceHeader header stream
-        p_lookAhead (p_skipBytes header.TrianglesOffset >>. p_array header.TriangleCount p_triangle <| ()) x.Triangles stream
-        p_lookAhead (p_skipBytes header.ShadersOffset >>. p_array header.ShaderCount p_shader <| ()) x.Shaders stream
-        p_lookAhead (p_skipBytes header.StOffset >>. p_array header.VertexCount p_st <| ()) x.St stream
-        p_lookAhead (p_skipBytes header.VerticesOffset >>. p_array (header.VertexCount * header.FrameCount) p_vertex <| ()) x.Vertices stream
+
+        p_lookAhead
+            (fun triangles stream ->
+                p_skipBytes header.TrianglesOffset () stream
+                p_array header.TriangleCount p_triangle triangles stream) x.Triangles stream
+
+        p_lookAhead
+            (fun shaders stream ->
+                p_skipBytes header.ShadersOffset () stream
+                p_array header.ShaderCount p_shader shaders stream) x.Shaders stream
+
+        p_lookAhead
+            (fun xs stream ->
+                p_skipBytes header.StOffset () stream
+                p_array header.VertexCount p_st xs stream) x.St stream
+
+        p_lookAhead
+            (fun vertices stream ->
+                p_skipBytes header.VerticesOffset () stream
+                p_array (header.VertexCount * header.FrameCount) p_vertex vertices stream) x.Vertices stream
 
 let p_surfaces count offset =
-    let f =
-        fun xs stream ->
-            xs
-            |> Array.iteri (fun i x ->
-                p_surface x stream
+    fun (xs: Md3Surface []) stream ->
+        p_skipBytes offset () stream
+        xs
+        |> Array.iteri (fun i x ->
+            p_surface x stream
             
-                if i + 1 <> count then
-                    p_skipBytes x.Header.EndOffset x stream)
-
-    p_skipBytes offset >>. f <| ()
+            if i + 1 <> count then
+                p_skipBytes x.Header.EndOffset x stream)
 
 let p_md3 : Pickle<_> =
     fun (x: Md3) stream ->

@@ -280,14 +280,5 @@ let inline p_lookAhead (p: Pickle<_>) : Pickle<_> =
         p x stream
         stream.Seek (prevPosition)
 
-let inline (>>.) (p1: Pickle<'a>) (p2: Pickle<'b>) =
-    fun x ->
-        fun y stream ->
-            p1 x stream
-            p2 y stream
-
-let (|>>) a f : Pickle<_> =
-    fun x stream -> (a (f x) stream)
-
 let inline p_run (p: Pickle<_>) x bytes = p x <| ByteWriteStream (bytes)
 
