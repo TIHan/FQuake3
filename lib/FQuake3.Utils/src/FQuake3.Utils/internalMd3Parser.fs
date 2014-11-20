@@ -110,24 +110,31 @@ let u_frames count offset =
 let u_tags count offset =
     u_skipBytes offset >>. u_array count u_tag
 
+let u_surface =
+    u_lookAhead u_surfaceHeader >>= fun header ->
+    u_pipe4
+        (u_lookAhead (u_skipBytes header.TrianglesOffset >>. u_array header.TriangleCount ptriangle))
+        (u_lookAhead (u_skipBytes header.ShadersOffset >>. u_array header.ShaderCount pshader))
+        (u_lookAhead (u_skipBytes header.StOffset >>. u_array header.VertexCount u_st))
+        (u_lookAhead (u_skipBytes header.VerticesOffset >>. u_array (header.VertexCount * header.FrameCount) u_vertex)) <|
+    fun triangles shaders st vertices ->
+        { Header = header
+          Shaders = shaders
+          Triangles = triangles
+          St = st
+          Vertices = vertices }
+
 let u_surfaces count offset =
     u_skipBytes offset >>.
     fun stream ->
-    Array.init count (fun i ->
-        let header = u_lookAhead u_surfaceHeader stream
-        let triangles = u_lookAhead (u_skipBytes header.TrianglesOffset >>. u_array header.TriangleCount ptriangle) stream
-        let shaders = u_lookAhead (u_skipBytes header.ShadersOffset >>. u_array header.ShaderCount pshader) stream
-        let st = u_lookAhead (u_skipBytes header.StOffset >>. u_array header.VertexCount u_st) stream
-        let vertices = u_lookAhead (u_skipBytes header.VerticesOffset >>. u_array (header.VertexCount * header.FrameCount) u_vertex) stream
+        Array.init count (fun i ->
+            let surface = u_surface stream
+            let header = surface.Header
 
-        if i + 1 <> count then
-            u_skipBytes header.EndOffset stream |> ignore
-        {
-        Header = header
-        Shaders = shaders
-        Triangles = triangles
-        St = st
-        Vertices = vertices })
+            if i + 1 <> count then
+                u_skipBytes header.EndOffset stream |> ignore
+            
+            surface)
 
 let u_md3 : Unpickle<_> =
     u_lookAhead u_header >>= fun header ->

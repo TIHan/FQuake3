@@ -153,7 +153,8 @@ let inline u_lookAhead (p: Unpickle<'a>) : Unpickle<'a> =
         stream.Seek (prevPosition)
         result
 
-let inline fmap (f: 'a -> 'b) (u: Unpickle<'a>) : Unpickle<'b> =
+// fmap
+let inline (|>>) (u: Unpickle<'a>) (f: 'a -> 'b) : Unpickle<'b> =
     fun stream -> f (u stream)
 
 let inline (<*>) (u1: Unpickle<'a -> 'b>) (u2: Unpickle<'a>) : Unpickle<'b> =
@@ -162,12 +163,20 @@ let inline (<*>) (u1: Unpickle<'a -> 'b>) (u2: Unpickle<'a>) : Unpickle<'b> =
 let inline (>>=) (u: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
     fun stream -> f (u stream) stream
 
-let inline (>>.) (p1: Unpickle<unit>) (p2: Unpickle<'a>) =
+let inline (>>.) (u1: Unpickle<_>) (u2: Unpickle<'a>) =
     fun stream ->
-        p1 stream
-        p2 stream
+        u1 stream
+        u2 stream
 
-let inline (|>>) p f =
-    fun stream -> f (p stream)
+let inline (.>>) (u1: Unpickle<'a>) (u2: Unpickle<_>) =
+    fun stream ->
+        let result = u1 stream
+        u2 stream
+        result
+
+let inline (.>>.) (u1: Unpickle<'a>) (u2: Unpickle<'b>) =
+    fun stream ->
+        u1 stream,
+        u2 stream
 
 let inline u_run (p: Unpickle<_>) (bytes: byte []) = p <| ByteReadStream (bytes)
