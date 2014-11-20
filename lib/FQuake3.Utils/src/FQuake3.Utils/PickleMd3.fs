@@ -147,13 +147,10 @@ let p_surfaces count offset =
     p_skipBytes offset >>. f <| ()
 
 let p_md3 : Pickle<_> =
-    (p_lookAhead p_header, fun x -> x.Header) >>= fun header ->
-    p_pipe3
-        (p_lookAhead <| p_frames header.FrameCount header.FramesOffset)
-        (p_lookAhead <| p_tags header.TagCount header.TagsOffset)
-        (p_lookAhead <| p_surfaces header.SurfaceCount header.SurfacesOffset) <|
-    fun (x: Md3) -> 
-        x.Frames,
-        x.Tags,
-        x.Surfaces
+    fun (x: Md3) stream ->
+        let header = x.Header
+        (p_lookAhead p_header) header stream
+        (p_lookAhead <| p_frames header.FrameCount header.FramesOffset) x.Frames stream
+        (p_lookAhead <| p_tags header.TagCount header.TagsOffset) x.Tags stream
+        (p_lookAhead <| p_surfaces header.SurfaceCount header.SurfacesOffset) x.Surfaces stream
 
