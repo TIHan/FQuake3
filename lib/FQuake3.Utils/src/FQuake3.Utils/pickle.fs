@@ -280,5 +280,9 @@ let inline p_lookAhead (p: Pickle<_>) : Pickle<_> =
         p x stream
         stream.Seek (prevPosition)
 
+// contramap
+let inline (<<|) (p: Pickle<'a>) (f: 'b -> 'a) : Pickle<'b> =
+    fun b' stream -> p (f b') stream
+
 let inline p_run (p: Pickle<_>) x bytes = p x <| ByteWriteStream (bytes)
 

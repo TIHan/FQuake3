@@ -80,7 +80,7 @@ let p_triangle =
         x.y, 
         x.z
 
-let p_st = fun (x: Md3St) stream -> p_vec2 x.st stream
+let p_st = p_vec2 <<| fun (x: Md3St) -> x.st
  
 let p_vertex =
     p_pipe5 p_int16 p_int16 p_int16 p_byte p_byte <|
