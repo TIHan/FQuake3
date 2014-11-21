@@ -63,18 +63,13 @@ let p_tag =
         x.Axis.Z
 
 let p_shader =
-    p_pipe2
-        (p_string 64 StringKind.EightBit)
-        p_int32 <|
+    p_pipe2 (p_string 64 StringKind.EightBit) p_int32 <|
     fun (x: Md3Shader) -> 
         x.Name,
         x.ShaderId
 
 let p_triangle =
-    p_pipe3
-        p_int32
-        p_int32
-        p_int32 <|
+    p_pipe3 p_int32 p_int32 p_int32 <|
     fun (x: Md3Triangle) -> 
         x.x, 
         x.y, 
