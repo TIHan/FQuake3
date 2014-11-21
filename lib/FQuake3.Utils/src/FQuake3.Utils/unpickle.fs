@@ -163,15 +163,15 @@ let inline (<*>) (u1: Unpickle<'a -> 'b>) (u2: Unpickle<'a>) : Unpickle<'b> =
 let inline (>>=) (u: Unpickle<'a>) (f: 'a -> Unpickle<'b>) : Unpickle<'b> =
     fun stream -> f (u stream) stream
 
-let inline (>>.) (u1: Unpickle<_>) (u2: Unpickle<'a>) =
+let inline (>>.) (u1: Unpickle<'a>) (u2: Unpickle<'b>) =
     fun stream ->
-        u1 stream
+        u1 stream |> ignore
         u2 stream
 
-let inline (.>>) (u1: Unpickle<'a>) (u2: Unpickle<_>) =
+let inline (.>>) (u1: Unpickle<'a>) (u2: Unpickle<'b>) =
     fun stream ->
         let result = u1 stream
-        u2 stream
+        u2 stream |> ignore
         result
 
 let inline (.>>.) (u1: Unpickle<'a>) (u2: Unpickle<'b>) =
