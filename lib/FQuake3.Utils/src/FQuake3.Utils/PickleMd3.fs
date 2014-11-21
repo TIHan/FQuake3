@@ -7,14 +7,14 @@ open FQuake3.Math
 
 let p_vec2 : Pickle<vec2> =
     fun v stream ->
-        stream.Write v.X
-        stream.Write v.Y
+        Stream.write v.X stream
+        Stream.write v.Y stream
 
 let p_vec3 : Pickle<vec3> =
     fun v stream ->
-        stream.Write v.X
-        stream.Write v.Y
-        stream.Write v.Z
+        Stream.write v.X stream
+        Stream.write v.Y stream
+        Stream.write v.Z stream
 
 let p_frame =
     p_pipe5 p_vec3 p_vec3 p_vec3 p_single (p_string 16 StringKind.EightBit) <|

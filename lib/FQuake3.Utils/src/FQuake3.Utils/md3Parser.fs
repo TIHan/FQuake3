@@ -12,6 +12,6 @@ let pickle md3 =
     let name = "test.md3"
     let path = System.IO.Path.Combine (System.Environment.CurrentDirectory, name)
     use file = System.IO.File.Create (name)
-    p_run p_md3 md3 <| WriteStream (file)
+    p_run p_md3 md3 file
     file.Close ()
     System.IO.File.ReadAllBytes (path)

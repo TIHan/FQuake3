@@ -41,132 +41,63 @@ type StringKind =
     | UTF7
     | UTF8
 
-type IWriteStream =
-    abstract Position : int64
-    abstract Length : int64
-    abstract Seek : int64 -> unit
-    abstract Skip : int64 -> unit
-    abstract WriteByte : byte -> unit
-    abstract WriteBytes : int -> byte [] -> unit
-    abstract WriteString : int -> StringKind -> string -> unit
-    abstract Write<'a when 'a : unmanaged> : 'a -> unit
+type Pickle<'a> = 'a -> Stream -> unit
 
-type WriteStream (stream: Stream) =
-    interface IWriteStream with
-        member this.Position = stream.Position
+module Stream =
+    let write<'a when 'a : unmanaged> (a: 'a) (stream: Stream) =
+        let mutable a = a
+        let size = sizeof<'a>
+        let ptr : nativeptr<byte> = &&a |> NativePtr.toNativeInt |> NativePtr.ofNativeInt
 
-        member this.Length = stream.Length
+        for i = 1 to size do
+            stream.WriteByte (NativePtr.get ptr (i - 1))
 
-        member this.Seek offset = stream.Seek (offset, SeekOrigin.Begin) |> ignore
+    let writeString n kind (string: string) (stream: Stream) =
+        match kind with
+        | EightBit ->
+            let length = string.Length
 
-        member this.Skip n = stream.Seek (n, SeekOrigin.Current) |> ignore
-
-        member this.WriteByte byte = stream.WriteByte byte
-
-        member this.WriteBytes n bytes = stream.Write (bytes, 0, n)
-
-        member this.WriteString n kind string =
-            match kind with
-            | EightBit ->
-                let length = string.Length
-
-                for i = 1 to length do
-                    stream.WriteByte (byte <| sbyte string.[i - 1])
+            for i = 0 to n - 1 do
+                if i >= length
+                then stream.WriteByte (0uy)
+                else stream.WriteByte (byte <| sbyte string.[i])
  
-            | _ ->
-                let encoding =
-                    match kind with
-                    | ASCII -> System.Text.Encoding.ASCII
-                    | BigEndianUnicode -> System.Text.Encoding.BigEndianUnicode
-                    | Unicode -> System.Text.Encoding.Unicode
-                    | UTF32 -> System.Text.Encoding.UTF32
-                    | UTF7 -> System.Text.Encoding.UTF7
-                    | UTF8 -> System.Text.Encoding.UTF8
-                    | _ -> System.Text.Encoding.Default
+        | _ ->
+            let encoding =
+                match kind with
+                | ASCII -> System.Text.Encoding.ASCII
+                | BigEndianUnicode -> System.Text.Encoding.BigEndianUnicode
+                | Unicode -> System.Text.Encoding.Unicode
+                | UTF32 -> System.Text.Encoding.UTF32
+                | UTF7 -> System.Text.Encoding.UTF7
+                | UTF8 -> System.Text.Encoding.UTF8
+                | _ -> System.Text.Encoding.Default
 
-                let bytes' = encoding.GetBytes (string)
-                (this :> IWriteStream).WriteBytes bytes'.Length bytes'
+            let bytes = encoding.GetBytes (string)
+            let length = bytes.Length
 
-        member this.Write<'a when 'a : unmanaged> (a: 'a) =
-            let mutable a = a
-            let size = sizeof<'a>
-            let ptr : nativeptr<byte> = &&a |> NativePtr.toNativeInt |> NativePtr.ofNativeInt
-
-            for i = 1 to size do
-                stream.WriteByte (NativePtr.get ptr (i - 1))
-
-type WriteByteStream (bytes: byte []) =
-    let mutable position = 0
-
-    interface IWriteStream with
-        member this.Position = int64 position
-
-        member this.Length = int64 bytes.Length
-
-        member this.Seek offset = position <- int offset
-
-        member this.Skip n = position <- position + int n
-
-        member this.WriteByte byte =
-            bytes.[position] <- byte
-            position <- position + 1
-
-        member this.WriteBytes n bytes' =
-            for i = 0 to n do
-                bytes.[position + i] <- bytes'.[i]
-                position <- position + 1
-
-        member this.WriteString n kind string = 
-            match kind with
-            | EightBit ->
-                let length = string.Length
-
-                for i = 1 to length do
-                    bytes.[position] <- (byte <| sbyte string.[i - 1])
-                    position <- position + 1
- 
-            | _ ->
-                let encoding =
-                    match kind with
-                    | ASCII -> System.Text.Encoding.ASCII
-                    | BigEndianUnicode -> System.Text.Encoding.BigEndianUnicode
-                    | Unicode -> System.Text.Encoding.Unicode
-                    | UTF32 -> System.Text.Encoding.UTF32
-                    | UTF7 -> System.Text.Encoding.UTF7
-                    | UTF8 -> System.Text.Encoding.UTF8
-                    | _ -> System.Text.Encoding.Default
-
-                let bytes' = encoding.GetBytes (string)
-                (this :> IWriteStream).WriteBytes bytes'.Length bytes'
-
-        member this.Write<'a when 'a : unmanaged> (a: 'a) =
-            let mutable a = a
-            let size = sizeof<'a>
-            let ptr : nativeptr<byte> = &&a |> NativePtr.toNativeInt |> NativePtr.ofNativeInt
-
-            for i = 1 to size do
-                bytes.[position] <- (NativePtr.get ptr (i - 1))
-                position <- position + 1
-
-type Pickle<'a> = 'a -> IWriteStream -> unit
+            for i = 0 to n - 1 do
+                if i >= length
+                then stream.WriteByte (0uy)
+                else stream.WriteByte (bytes.[i])
 
 let p_byte : Pickle<byte> =
     fun x stream -> stream.WriteByte x
 
 let inline p_bytes n : Pickle<byte []> =
-    fun xs stream -> stream.WriteBytes n xs
+    fun xs stream -> stream.Write (xs, 0, n)
 
 let p_int16 : Pickle<int16> =
-    fun x stream -> stream.Write<int16> x
+    fun x stream -> Stream.write<int16> x stream
 
 let p_int32 : Pickle<int32> =
-    fun x stream -> stream.Write<int32> x
+    fun x stream -> Stream.write<int32> x stream
 
 let p_single : Pickle<single> =
-    fun x stream -> stream.Write<single> x
+    fun x stream -> Stream.write<single> x stream
 
 let p_string n kind : Pickle<string> =
-    fun x stream -> stream.WriteString n kind x
+    fun x stream -> Stream.writeString n kind x stream
 
 let inline p_pipe2 a b f : Pickle<_> =
     fun x stream -> 
@@ -313,16 +244,16 @@ let inline p_array n (p: Pickle<'a>) : Pickle<'a[]> =
     fun xs stream ->
         match n with
         | 0 -> ()
-        | _ -> xs.[..n - 1] |> Array.iter (fun x -> p x stream)
+        | _ -> for i = 0 to n - 1 do p xs.[i] stream
 
 let inline p_skipBytes n : Pickle<_> =
-    fun _ stream -> stream.Skip n
+    fun _ stream -> stream.Seek (n, SeekOrigin.Current) |> ignore
 
 let inline p_lookAhead (p: Pickle<_>) : Pickle<_> =
     fun x stream ->
         let prevPosition = stream.Position
         p x stream
-        stream.Seek (prevPosition)
+        stream.Seek (prevPosition, SeekOrigin.Begin) |> ignore
 
 // contramap
 let inline (>>|) (p: Pickle<'a>) (f: 'b -> 'a) : Pickle<'b> =
