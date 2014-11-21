@@ -41,27 +41,71 @@ type StringKind =
     | UTF7
     | UTF8
 
-type ILiteWriteStream =
-    abstract Position : int
-    abstract Length : int
-    abstract Seek : int -> unit
-    abstract Skip : int -> unit
+type IWriteStream =
+    abstract Position : int64
+    abstract Length : int64
+    abstract Seek : int64 -> unit
+    abstract Skip : int64 -> unit
     abstract WriteByte : byte -> unit
     abstract WriteBytes : int -> byte [] -> unit
     abstract WriteString : int -> StringKind -> string -> unit
     abstract Write<'a when 'a : unmanaged> : 'a -> unit
 
-type ByteWriteStream (bytes: byte []) =
+type WriteStream (stream: Stream) =
+    interface IWriteStream with
+        member this.Position = stream.Position
+
+        member this.Length = stream.Length
+
+        member this.Seek offset = stream.Seek (offset, SeekOrigin.Begin) |> ignore
+
+        member this.Skip n = stream.Seek (n, SeekOrigin.Current) |> ignore
+
+        member this.WriteByte byte = stream.WriteByte byte
+
+        member this.WriteBytes n bytes = stream.Write (bytes, 0, n)
+
+        member this.WriteString n kind string =
+            match kind with
+            | EightBit ->
+                let length = string.Length
+
+                for i = 1 to length do
+                    stream.WriteByte (byte <| sbyte string.[i - 1])
+ 
+            | _ ->
+                let encoding =
+                    match kind with
+                    | ASCII -> System.Text.Encoding.ASCII
+                    | BigEndianUnicode -> System.Text.Encoding.BigEndianUnicode
+                    | Unicode -> System.Text.Encoding.Unicode
+                    | UTF32 -> System.Text.Encoding.UTF32
+                    | UTF7 -> System.Text.Encoding.UTF7
+                    | UTF8 -> System.Text.Encoding.UTF8
+                    | _ -> System.Text.Encoding.Default
+
+                let bytes' = encoding.GetBytes (string)
+                (this :> IWriteStream).WriteBytes bytes'.Length bytes'
+
+        member this.Write<'a when 'a : unmanaged> (a: 'a) =
+            let mutable a = a
+            let size = sizeof<'a>
+            let ptr : nativeptr<byte> = &&a |> NativePtr.toNativeInt |> NativePtr.ofNativeInt
+
+            for i = 1 to size do
+                stream.WriteByte (NativePtr.get ptr (i - 1))
+
+type WriteByteStream (bytes: byte []) =
     let mutable position = 0
 
-    interface ILiteWriteStream with
-        member this.Position = position
+    interface IWriteStream with
+        member this.Position = int64 position
 
-        member this.Length = bytes.Length
+        member this.Length = int64 bytes.Length
 
-        member this.Seek offset = position <- offset
+        member this.Seek offset = position <- int offset
 
-        member this.Skip n = position <- position + n
+        member this.Skip n = position <- position + int n
 
         member this.WriteByte byte =
             bytes.[position] <- byte
@@ -93,7 +137,7 @@ type ByteWriteStream (bytes: byte []) =
                     | _ -> System.Text.Encoding.Default
 
                 let bytes' = encoding.GetBytes (string)
-                (this :> ILiteWriteStream).WriteBytes bytes'.Length bytes'
+                (this :> IWriteStream).WriteBytes bytes'.Length bytes'
 
         member this.Write<'a when 'a : unmanaged> (a: 'a) =
             let mutable a = a
@@ -104,7 +148,7 @@ type ByteWriteStream (bytes: byte []) =
                 bytes.[position] <- (NativePtr.get ptr (i - 1))
                 position <- position + 1
 
-type Pickle<'a> = 'a -> ILiteWriteStream -> unit
+type Pickle<'a> = 'a -> IWriteStream -> unit
 
 let p_byte : Pickle<byte> =
     fun x stream -> stream.WriteByte x
@@ -291,5 +335,5 @@ let inline (=>>) (p: Pickle<'a>) (f: 'b -> 'a * Pickle<'b>) : Pickle<'b> =
         p a' stream
         p2 b' stream
 
-let inline p_run (p: Pickle<_>) x bytes = p x <| ByteWriteStream (bytes)
+let inline p_run (p: Pickle<_>) x stream = p x stream
 

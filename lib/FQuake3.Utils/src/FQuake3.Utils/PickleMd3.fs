@@ -137,22 +137,22 @@ let p_surface : Pickle<Md3Surface> =
 
         p_lookAhead
             (fun triangles stream ->
-                p_skipBytes header.TrianglesOffset () stream
+                p_skipBytes (int64 header.TrianglesOffset) () stream
                 p_array header.TriangleCount p_triangle triangles stream) x.Triangles stream
 
         p_lookAhead
             (fun shaders stream ->
-                p_skipBytes header.ShadersOffset () stream
+                p_skipBytes (int64 header.ShadersOffset) () stream
                 p_array header.ShaderCount p_shader shaders stream) x.Shaders stream
 
         p_lookAhead
             (fun xs stream ->
-                p_skipBytes header.StOffset () stream
+                p_skipBytes (int64 header.StOffset) () stream
                 p_array header.VertexCount p_st xs stream) x.St stream
 
         p_lookAhead
             (fun vertices stream ->
-                p_skipBytes header.VerticesOffset () stream
+                p_skipBytes (int64 header.VerticesOffset) () stream
                 p_array (header.VertexCount * header.FrameCount) p_vertex vertices stream) x.Vertices stream
 
 let p_surfaces count offset =
@@ -163,15 +163,15 @@ let p_surfaces count offset =
             p_surface x stream
             
             if i + 1 <> count then
-                p_skipBytes x.Header.EndOffset x stream)
+                p_skipBytes (int64 x.Header.EndOffset) x stream)
 
 let p_md3 : Pickle<_> =
     (p_lookAhead p_header) =>> fun md3 ->
         let header = md3.Header
         header,
         p_pipe3
-            (p_lookAhead <| p_frames header.FrameCount header.FramesOffset)
-            (p_lookAhead <| p_tags header.TagCount header.TagsOffset)
-            (p_lookAhead <| p_surfaces header.SurfaceCount header.SurfacesOffset) <|
+            (p_lookAhead <| p_frames header.FrameCount (int64 header.FramesOffset))
+            (p_lookAhead <| p_tags header.TagCount (int64 header.TagsOffset))
+            (p_lookAhead <| p_surfaces header.SurfaceCount (int64 header.SurfacesOffset)) <|
         fun x -> x.Frames, x.Tags, x.Surfaces
 

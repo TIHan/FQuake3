@@ -9,7 +9,9 @@ open FQuake3.Utils.Internal.PickleMd3
 let parse bytes = u_run u_md3 bytes
 
 let pickle md3 = 
-    // hard coding this for now
-    let bytes = Array.zeroCreate 1306652
-    p_run p_md3 md3 bytes
-    bytes
+    let name = "test.md3"
+    let path = System.IO.Path.Combine (System.Environment.CurrentDirectory, name)
+    use file = System.IO.File.Create (name)
+    p_run p_md3 md3 <| WriteStream (file)
+    file.Close ()
+    System.IO.File.ReadAllBytes (path)
