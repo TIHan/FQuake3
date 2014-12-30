@@ -9,7 +9,7 @@ Supported Platforms:
 
 # Update!
 
-This project has been put to rest in pursuit of something a little less extreme. :) This project was most ambitious and a bit over my head about 99% of the time. However, I learned a ton: math, functional programming, game engine development, language interop. If it wasn't for this project in the first place, I wouldn't be where I am at and doing what I am doing. This means all this hard work did pay for something!
+FQuake3 has been put to rest in pursuit of something a little less extreme. :) It was most ambitious and a bit over my head about 99% of the time. However, I learned a ton: math, functional programming, game engine development, language interop. If it wasn't for this project in the first place, I wouldn't be where I am at and doing what I am doing. This means all the hard work did pay for something!
 
 ## Build and Run Instructions
 
