@@ -1,5 +1,5 @@
 # FQuake3
-_F\# Implementation of id Software's Quake III Arena._
+_Attempted F\# Implementation of id Software's Quake III Arena._
 
 ![logo](https://raw.github.com/TIHan/FQuake3/master/fquake3_logo.png)
 
@@ -7,34 +7,9 @@ Supported Platforms:
 
 * __Windows 32-bit__
 
-##Notes
-The current source has a long way to go before everything is implemented in F#, but you should be able to build and run what is there; however, that may vary until a release. Use at your own risk.
+# Update!
 
-Any code related to QVMs have been entirely removed. LCC and the vm_* console variables are gone. So, that means you have to have compiled x86 dlls. In the future, this will be replaced by IL coded dlls. Research will be needed for security against cgame, game, ui assemblies to prevent malicious mod'ers. [This](https://subterraneangames.com/threads/requested-namespaces-for-dungeoneer-scripting.2406/) is an example.
-
-The following is the order of which implementations will be done first (rough):
-
-1. Renderer
- * tr_main.c port to F#
- * Port bits that make use of anything in tr_main.c; eventually this will lead up to getting rid of tr_main.c entirely - this will mark a first version release.
- * Start creating thin wrappers around native GL and GLFW calls. This may or may not include the window itself.
- * Finish porting - new version release
-2. Low-Level Networking
- * New version release when done.
-3. Engine
- * Try to remove any OS specific C code and let F# take care of most of it as best as it can.
- * Find a sound library that is preferably not GPL. Might look at OpenAL 1.1 / OpenALsoft.
- * If all goes well, we can start trying to build on Linux and OSX. New release.
-4. CGame / UI
- * Research and proof out security, as CGame/UI/Game should be mod-able. Figuring out what to do with FSharp.Core in this case may be difficult; might need to customize. We don't want mod'ers using a mailboxprocessor ;)
-5. Game / Botlib
- * Game logic, including physics, rules, and bots.
-
-Also, performance will vary between build to build, quite significantly. When re-writing functions to F#, marshaling and interoping between C and the Mono Runtime, and vice versa, can promote a lot of object copying of all different sizes and rates. Once more code gets ported to F#, this won't, in theory, be an issue.
-
-Quake3 C functions ported to F#, will be made __pure__. No side effects. Cases where something needs to not be pure, try to handle them in computation expressions (like monads in Haskell); unless we are doing interoping that we know for sure does not have any side effects. There will be cases where we can't make a function pure at a specific point in time, so for documentation purposes, we will mark functions that __are pure__ with the __[Pure]__ attribute; and in theory go back to the functions that are not and fix them, but will try to avoid this as much as possible. ;)
-
-All data types will be __immutable__. This also means we cannot use .NET's array type, as it is considered mutable in F# due to being ubiquitous.
+This project has been put to rest in pursuit of something a little less extreme. :) This project was most ambitious and a bit over my head about 99% of the time. However, I learned a ton: math, functional programming, game engine development, language interop. If it wasn't for this project in the first place, I wouldn't be where I am at and doing what I am doing. This means all this hard work did pay for something!
 
 ## Build and Run Instructions
 
@@ -73,23 +48,3 @@ Notes:
 
 * Team Arena configuration builds are "Debug TA" and "Release TA". Make sure you have built one of the other configurations before building and running these.
 * You can only Debug C code. F# code is not debug-able currently, however it is possible, but requires embedded mono configuration to set up a debug agent, and have a remote debugger, probably from Xamarin Studio to listen and use the F# source files. Also, the assembly .pdb debug files will need to be converted to .mdb using Mono's _pdb2mdb_.
-
-####Ubuntu
-_Not Ready_
-
-####OSX
-
-_Not Ready_
-
-## Why F#?
-* Strongly Typed
-* Functional-First
-* Concise Code compared to other mainstream languages
-* Easier Testability
-* Concurrency
-* Native Interoperability
-* Visual Studio + Xamarin Studio IDEs supported
-* Cross-Platform with Mono
-* .NET Ecosystem
-* Mature
-* Fun
